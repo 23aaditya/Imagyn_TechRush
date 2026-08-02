@@ -1,0 +1,135 @@
+"use client"
+
+import { motion } from "framer-motion"
+import { Globe, ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+
+// Pin positions as percentages over the world-map illustration
+const pins = [
+  { top: "34%", left: "22%", delay: 0 },
+  { top: "30%", left: "48%", delay: 0.6 },
+  { top: "42%", left: "70%", delay: 1.1 },
+  { top: "58%", left: "32%", delay: 0.3 },
+  { top: "62%", left: "82%", delay: 0.9 },
+  { top: "26%", left: "82%", delay: 1.4 },
+]
+
+// Floating landmark bubbles using existing destination imagery
+const landmarks = [
+  { src: "/images/dest-santorini.png", label: "Santorini", top: "12%", left: "6%", delay: 0 },
+  { src: "/images/dest-jaipur.png", label: "Jaipur", top: "20%", right: "8%", delay: 0.4 },
+  { src: "/images/dest-bali.png", label: "Bali", bottom: "16%", left: "10%", delay: 0.8 },
+  { src: "/images/dest-manali.png", label: "Manali", bottom: "12%", right: "9%", delay: 1.2 },
+]
+
+export function ExploreWorld() {
+  return (
+    <section id="explore" className="relative isolate overflow-hidden bg-[oklch(0.17_0.02_257)] px-4 py-24 sm:px-6 lg:py-32">
+      {/* World map backdrop */}
+      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+        <img
+          src="/images/world-map-dark.png"
+          alt=""
+          aria-hidden
+          className="h-full w-full max-w-6xl object-contain opacity-60"
+        />
+        {/* Glowing pins layered over the map */}
+        <div className="absolute inset-0 mx-auto max-w-6xl">
+          {pins.map((pin, i) => (
+            <span
+              key={i}
+              className="absolute"
+              style={{ top: pin.top, left: pin.left }}
+            >
+              <motion.span
+                className="absolute -inset-3 rounded-full bg-emerald/40"
+                animate={{ scale: [1, 2.4, 1], opacity: [0.6, 0, 0.6] }}
+                transition={{ duration: 2.4, delay: pin.delay, repeat: Number.POSITIVE_INFINITY, ease: "easeOut" }}
+              />
+              <span className="relative block h-2.5 w-2.5 rounded-full bg-emerald shadow-[0_0_12px_2px_var(--color-emerald)]" />
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Dark vignette for text contrast */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-[oklch(0.17_0.02_257)]/70 via-[oklch(0.17_0.02_257)]/40 to-[oklch(0.17_0.02_257)]/85" />
+
+      {/* Floating landmark bubbles */}
+      {landmarks.map((lm, i) => (
+        <motion.div
+          key={lm.label}
+          className="pointer-events-none absolute hidden lg:block"
+          style={{ top: lm.top, left: lm.left, right: lm.right, bottom: lm.bottom }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: i * 0.12 }}
+        >
+          <motion.div
+            animate={{ y: [0, -14, 0] }}
+            transition={{ duration: 5 + i, delay: lm.delay, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+            className="flex flex-col items-center gap-2"
+          >
+            <div className="h-20 w-20 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/40 ring-1 ring-white/10">
+              <img src={lm.src || "/placeholder.svg"} alt={lm.label} className="h-full w-full object-cover" />
+            </div>
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
+              {lm.label}
+            </span>
+          </motion.div>
+        </motion.div>
+      ))}
+
+      {/* Content */}
+      <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
+        <motion.span
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/90 backdrop-blur-md"
+        >
+          <Globe className="h-4 w-4 text-emerald" />
+          Immersive Discovery
+        </motion.span>
+
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-6 font-heading text-4xl font-bold tracking-tight text-balance text-white sm:text-5xl"
+        >
+          Don&apos;t know where to travel?
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-4 max-w-lg text-lg leading-relaxed text-pretty text-white/70"
+        >
+          Explore the world visually through our immersive interactive globe.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Button
+            size="lg"
+            className="mt-9 h-14 rounded-2xl bg-emerald px-8 text-base font-semibold text-emerald-foreground shadow-lg shadow-emerald/25 transition-transform hover:-translate-y-0.5 hover:bg-emerald/90"
+          >
+            <Globe className="mr-1 h-5 w-5" />
+            Open Interactive Globe
+            <ArrowRight className="ml-1 h-5 w-5" />
+          </Button>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
