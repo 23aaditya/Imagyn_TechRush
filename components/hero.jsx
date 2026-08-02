@@ -1,6 +1,7 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 import {
   MapPin,
   Calendar,
@@ -38,6 +39,15 @@ const floatingCards = [
   { icon: PlaneTakeoff, title: "Flights", subtitle: "From $89", accent: "primary", pos: "left-16 bottom-2", delay: 1.6 },
 ]
 
+const heroBackgrounds = [
+  { src: "/images/hero-mountains.png", alt: "Misty mountain range at golden hour" },
+  { src: "/images/dest-goa.png", alt: "Sunny palm-lined beach shoreline in Goa" },
+  { src: "/images/dest-bali.png", alt: "Tropical palm-fringed beach in Bali" },
+  { src: "/images/dest-jaipur.png", alt: "Warm, sunlit city escape in Jaipur" },
+  { src: "/images/dest-santorini.png", alt: "Whitewashed cliffside coastal town in Santorini" },
+  { src: "/images/dest-manali.png", alt: "Snow-capped adventure mountains in Manali" },
+]
+
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show: (i) => ({
@@ -48,17 +58,57 @@ const fadeUp = {
 }
 
 export function Hero() {
+  const [activeSlide, setActiveSlide] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % heroBackgrounds.length)
+    }, 6000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <section id="home" className="relative isolate min-h-screen w-full overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 -z-10">
-        <img
-          src="/images/hero-mountains.png"
-          alt="Misty mountain range at golden hour"
-          className="h-full w-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/15 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/45 to-background/5" />
+      {/* Background slideshow */}
+      <div className="absolute inset-0 -z-10 overflow-hidden bg-slate-100">
+        <AnimatePresence>
+          <motion.div
+            key={heroBackgrounds[activeSlide].src}
+            initial={{ opacity: 0, scale: 1 }}
+            animate={{ opacity: 1, scale: 1.09 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              opacity: { duration: 1.6, ease: "easeInOut" },
+              scale: { duration: 6, ease: "linear" },
+            }}
+            className="absolute inset-0"
+          >
+            <img
+              src={heroBackgrounds[activeSlide].src || "/placeholder.svg"}
+              alt={heroBackgrounds[activeSlide].alt}
+              className="h-full w-full object-cover object-center"
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Soft blue/teal travel-inspired wash */}
+        <div className="absolute inset-0 bg-gradient-to-br from-sky-400/15 via-transparent to-emerald-400/15 mix-blend-soft-light" />
+
+        {/* Readability overlays — bright, airy, not cinematic-dark */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-background/20 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/92 via-background/50 to-background/10" />
+
+        {/* Slide indicators */}
+        <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+          {heroBackgrounds.map((bg, i) => (
+            <span
+              key={bg.src}
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                i === activeSlide ? "w-6 bg-primary" : "w-1.5 bg-foreground/25"
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-20 pt-32 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:pt-40">
@@ -134,7 +184,7 @@ export function Hero() {
                 <SelectField options={["Any type", "Solo", "Couple", "Family", "Friends", "Business"]} />
               </SearchField>
             </div>
-            <Button className="mt-3 h-12 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90">
+            <Button className="mt-3 h-12 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-xl shadow-primary/30 ring-1 ring-primary/20 hover:bg-primary/90 hover:shadow-2xl hover:shadow-primary/40">
               <Search className="mr-1 h-5 w-5" />
               Start Planning
             </Button>
