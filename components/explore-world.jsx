@@ -22,7 +22,7 @@ const landmarks = [
   { src: "/images/dest-manali.png", label: "Manali", bottom: "12%", right: "9%", delay: 1.2 },
 ]
 
-export function ExploreWorld() {
+export function ExploreWorld({ onNavigateView }) {
   return (
     <section id="explore" className="relative isolate overflow-hidden bg-[oklch(0.17_0.02_257)] px-4 py-24 sm:px-6 lg:py-32">
       {/* World map backdrop */}
@@ -111,7 +111,7 @@ export function ExploreWorld() {
           transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="mt-4 max-w-lg text-lg leading-relaxed text-pretty text-white/70"
         >
-          Explore the world visually through our immersive interactive globe.
+          Explore the world visually through our immersive interactive destination directory.
         </motion.p>
 
         <motion.div
@@ -122,10 +122,11 @@ export function ExploreWorld() {
         >
           <Button
             size="lg"
+            onClick={() => onNavigateView?.("explore")}
             className="mt-9 h-14 rounded-2xl bg-emerald px-8 text-base font-semibold text-emerald-foreground shadow-lg shadow-emerald/25 transition-transform hover:-translate-y-0.5 hover:bg-emerald/90"
           >
             <Globe className="mr-1 h-5 w-5" />
-            Open Interactive Globe
+            Launch Interactive Explorer Workspace
             <ArrowRight className="ml-1 h-5 w-5" />
           </Button>
         </motion.div>

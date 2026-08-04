@@ -3,7 +3,6 @@
 import { motion } from "framer-motion"
 import { Check, X, Star, Sparkles } from "lucide-react"
 
-
 const providers = ["TripNest", "Travel Agency A", "Travel Agency B"]
 
 const rows = [
@@ -32,7 +31,7 @@ function CellValue({ value }) {
   return <span>{value}</span>
 }
 
-export function PackageComparison() {
+export function PackageComparison({ onNavigateView, onOpenAuth }) {
   return (
     <section id="packages" className="relative w-full py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
@@ -105,13 +104,20 @@ export function PackageComparison() {
                 </ul>
 
                 <button
+                  onClick={() => {
+                    if (isFeatured) {
+                      onNavigateView?.("itinerary")
+                    } else {
+                      onOpenAuth?.("signup")
+                    }
+                  }}
                   className={
                     isFeatured
                       ? "mt-8 w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                       : "mt-8 w-full rounded-xl border border-border bg-background py-3 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
                   }
                 >
-                  {isFeatured ? "Choose TripNest" : "View Details"}
+                  {isFeatured ? "Launch AI Plan Generator" : "Sign Up For Offer"}
                 </button>
               </motion.div>
             )

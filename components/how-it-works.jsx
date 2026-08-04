@@ -3,7 +3,6 @@
 import { motion } from "framer-motion"
 import { Search, Package, Sparkles, Calculator, PlaneTakeoff, ArrowRight } from "lucide-react"
 
-
 const steps = [
   {
     number: "01",
@@ -11,6 +10,7 @@ const steps = [
     description: "Browse trending spots tailored to your season and style.",
     icon: Search,
     accent: "primary",
+    view: "explore"
   },
   {
     number: "02",
@@ -18,6 +18,7 @@ const steps = [
     description: "Weigh stays, flights, and activities side by side.",
     icon: Package,
     accent: "emerald",
+    view: "packages"
   },
   {
     number: "03",
@@ -25,6 +26,7 @@ const steps = [
     description: "Let AI craft a day-by-day plan in seconds.",
     icon: Sparkles,
     accent: "primary",
+    view: "itinerary"
   },
   {
     number: "04",
@@ -32,17 +34,19 @@ const steps = [
     description: "Get a clear, realistic breakdown of every cost.",
     icon: Calculator,
     accent: "emerald",
+    view: "budget"
   },
   {
     number: "05",
-    title: "Start Exploring",
-    description: "Pack up and set off on your perfect trip.",
+    title: "Track Expenses",
+    description: "Log spending live and stay stress-free.",
     icon: PlaneTakeoff,
     accent: "primary",
+    view: "expenses"
   },
 ]
 
-export function HowItWorks() {
+export function HowItWorks({ onNavigateView }) {
   return (
     <section id="how-it-works" className="relative bg-background px-4 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
@@ -64,7 +68,7 @@ export function HowItWorks() {
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="mt-3 text-lg leading-relaxed text-pretty text-muted-foreground"
           >
-            From daydream to departure in five simple steps.
+            From daydream to departure in five simple steps. Click any step to launch that feature workspace.
           </motion.p>
         </div>
 
@@ -84,10 +88,11 @@ export function HowItWorks() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.55, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                  className="relative flex flex-col items-center text-center"
+                  onClick={() => onNavigateView?.(step.view)}
+                  className="relative flex cursor-pointer flex-col items-center text-center group"
                 >
                   {/* Icon node */}
-                  <div className="relative z-10">
+                  <div className="relative z-10 transition-transform group-hover:scale-110">
                     <div
                       className={`flex h-[72px] w-[72px] items-center justify-center rounded-2xl shadow-lg ${
                         isPrimary
@@ -106,7 +111,9 @@ export function HowItWorks() {
                     </span>
                   </div>
 
-                  <h3 className="mt-5 font-heading text-lg font-bold leading-tight text-foreground">{step.title}</h3>
+                  <h3 className="mt-5 font-heading text-lg font-bold leading-tight text-foreground group-hover:text-primary transition-colors">
+                    {step.title}
+                  </h3>
                   <p className="mt-2 max-w-[15rem] text-sm leading-relaxed text-muted-foreground">
                     {step.description}
                   </p>

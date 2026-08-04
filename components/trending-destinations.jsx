@@ -4,7 +4,6 @@ import { motion } from "framer-motion"
 import { MapPin, Star, Clock, Wallet, ArrowRight, CloudSun, Snowflake, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-
 const destinations = [
   {
     name: "Goa",
@@ -70,7 +69,7 @@ const destinations = [
 
 const weatherIcon = { sun: Sun, cloud: CloudSun, snow: Snowflake }
 
-export function TrendingDestinations() {
+export function TrendingDestinations({ onNavigateView }) {
   return (
     <section id="destinations" className="relative bg-background px-4 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
@@ -167,10 +166,11 @@ export function TrendingDestinations() {
                   </div>
 
                   <Button
+                    onClick={() => onNavigateView?.("explore")}
                     variant="outline"
                     className="mt-5 h-11 w-full rounded-2xl border-border font-semibold text-foreground transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground"
                   >
-                    Explore
+                    Explore Destination Details
                     <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Button>
                 </div>

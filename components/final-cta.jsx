@@ -11,7 +11,7 @@ const floaters = [
   { icon: Sparkles, pos: "right-[16%] bottom-[20%]", delay: 1.6, size: "h-7 w-7" },
 ]
 
-export function FinalCTA() {
+export function FinalCTA({ onNavigateView }) {
   return (
     <section id="get-started" className="relative w-full overflow-hidden px-4 py-20 sm:px-6 md:py-28">
       <div className="mx-auto max-w-6xl">
@@ -101,12 +101,16 @@ export function FinalCTA() {
               transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
             >
-              <Button className="h-12 w-full rounded-2xl bg-white px-7 text-base font-semibold text-primary shadow-lg shadow-black/10 hover:bg-white/90 sm:w-auto">
-                Plan My Trip
+              <Button
+                onClick={() => onNavigateView?.("itinerary")}
+                className="h-12 w-full rounded-2xl bg-white px-7 text-base font-semibold text-primary shadow-lg shadow-black/10 hover:bg-white/90 sm:w-auto"
+              >
+                Plan My Trip Now
                 <ArrowRight className="ml-1 h-5 w-5" aria-hidden data-icon="inline-end" />
               </Button>
               <Button
                 variant="outline"
+                onClick={() => onNavigateView?.("explore")}
                 className="h-12 w-full rounded-2xl border-white/40 bg-white/5 px-7 text-base font-semibold text-white backdrop-blur-md hover:bg-white/15 hover:text-white sm:w-auto"
               >
                 Explore Destinations

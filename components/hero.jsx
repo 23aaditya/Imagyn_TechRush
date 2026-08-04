@@ -23,20 +23,20 @@ import {
 import { Button } from "@/components/ui/button"
 
 const chips = [
-  { label: "Mountains", icon: Mountain },
-  { label: "Beaches", icon: Palmtree },
-  { label: "Heritage", icon: Landmark },
-  { label: "Nature", icon: TreePine },
-  { label: "Backpacking", icon: Backpack },
-  { label: "Luxury", icon: Sparkles },
+  { label: "Mountains", icon: Mountain, view: "explore" },
+  { label: "Beaches", icon: Palmtree, view: "explore" },
+  { label: "Heritage", icon: Landmark, view: "explore" },
+  { label: "Nature", icon: TreePine, view: "explore" },
+  { label: "Backpacking", icon: Backpack, view: "itinerary" },
+  { label: "Luxury", icon: Sparkles, view: "packages" },
 ]
 
 const floatingCards = [
-  { icon: CloudSun, title: "Weather", subtitle: "28°C · Sunny", accent: "emerald", pos: "left-0 top-2", delay: 0 },
-  { icon: Wallet, title: "Budget", subtitle: "$1,240 planned", accent: "primary", pos: "right-2 top-24", delay: 0.4 },
-  { icon: Hotel, title: "Hotels", subtitle: "320+ nearby", accent: "primary", pos: "left-6 top-48", delay: 0.8 },
-  { icon: MapIcon, title: "Interactive Maps", subtitle: "12 stops mapped", accent: "emerald", pos: "right-0 top-72", delay: 1.2 },
-  { icon: PlaneTakeoff, title: "Flights", subtitle: "From $89", accent: "primary", pos: "left-16 bottom-2", delay: 1.6 },
+  { icon: CloudSun, title: "Weather", subtitle: "28°C · Sunny", accent: "emerald", pos: "left-0 top-2", delay: 0, view: "explore" },
+  { icon: Wallet, title: "Budget", subtitle: "$1,240 planned", accent: "primary", pos: "right-2 top-24", delay: 0.4, view: "budget" },
+  { icon: Hotel, title: "Hotels", subtitle: "320+ nearby", accent: "primary", pos: "left-6 top-48", delay: 0.8, view: "explore" },
+  { icon: MapIcon, title: "Interactive Maps", subtitle: "12 stops mapped", accent: "emerald", pos: "right-0 top-72", delay: 1.2, view: "explore" },
+  { icon: PlaneTakeoff, title: "Expense Tracker", subtitle: "Live logs active", accent: "primary", pos: "left-16 bottom-2", delay: 1.6, view: "expenses" },
 ]
 
 const heroBackgrounds = [
@@ -57,46 +57,36 @@ const fadeUp = {
   }),
 }
 
-export function Hero() {
+export function Hero({ onStartPlanning }) {
   const [activeSlide, setActiveSlide] = useState(0)
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % heroBackgrounds.length)
     }, 6000)
-    return () => clearInterval(interval)
+    return () => clearInterval(timer)
   }, [])
 
   return (
-    <section id="home" className="relative isolate min-h-screen w-full overflow-hidden">
+    <section id="home" className="relative min-h-[92vh] w-full overflow-hidden">
       {/* Background slideshow */}
-      <div className="absolute inset-0 -z-10 overflow-hidden bg-slate-100">
-        <AnimatePresence>
-          <motion.div
+      <div className="absolute inset-0 z-0">
+        <AnimatePresence mode="wait">
+          <motion.img
             key={heroBackgrounds[activeSlide].src}
-            initial={{ opacity: 0, scale: 1 }}
-            animate={{ opacity: 1, scale: 1.09 }}
+            src={heroBackgrounds[activeSlide].src}
+            alt={heroBackgrounds[activeSlide].alt}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{
-              opacity: { duration: 1.6, ease: "easeInOut" },
-              scale: { duration: 6, ease: "linear" },
-            }}
-            className="absolute inset-0"
-          >
-            <img
-              src={heroBackgrounds[activeSlide].src || "/placeholder.svg"}
-              alt={heroBackgrounds[activeSlide].alt}
-              className="h-full w-full object-cover object-center"
-            />
-          </motion.div>
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="h-full w-full object-cover"
+          />
         </AnimatePresence>
 
-        {/* Soft blue/teal travel-inspired wash */}
-        <div className="absolute inset-0 bg-gradient-to-br from-sky-400/15 via-transparent to-emerald-400/15 mix-blend-soft-light" />
-
-        {/* Readability overlays — bright, airy, not cinematic-dark */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-background/20 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/92 via-background/50 to-background/10" />
+        {/* Gradient overlays for readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-background/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
 
         {/* Slide indicators */}
         <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
@@ -111,7 +101,7 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-20 pt-32 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:pt-40">
+      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-20 pt-32 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:pt-40">
         {/* Left column */}
         <div className="max-w-2xl">
           <motion.span
@@ -184,9 +174,12 @@ export function Hero() {
                 <SelectField options={["Any type", "Solo", "Couple", "Family", "Friends", "Business"]} />
               </SearchField>
             </div>
-            <Button className="mt-3 h-12 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-xl shadow-primary/30 ring-1 ring-primary/20 hover:bg-primary/90 hover:shadow-2xl hover:shadow-primary/40">
+            <Button
+              onClick={() => onStartPlanning?.("itinerary")}
+              className="mt-3 h-12 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-xl shadow-primary/30 ring-1 ring-primary/20 hover:bg-primary/90 hover:shadow-2xl hover:shadow-primary/40"
+            >
               <Search className="mr-1 h-5 w-5" />
-              Start Planning
+              Generate Smart Itinerary
             </Button>
           </motion.div>
 
@@ -203,6 +196,7 @@ export function Hero() {
               return (
                 <button
                   key={chip.label}
+                  onClick={() => onStartPlanning?.(chip.view)}
                   className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/60 px-4 py-2 text-sm font-medium text-foreground backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-background/80"
                 >
                   <ChipIcon className="h-4 w-4 text-emerald" aria-hidden />
@@ -223,12 +217,13 @@ export function Hero() {
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.4 + card.delay * 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className={`absolute ${card.pos}`}
+                className={`absolute ${card.pos} cursor-pointer`}
+                onClick={() => onStartPlanning?.(card.view)}
               >
                 <motion.div
                   animate={{ y: [0, -12, 0] }}
                   transition={{ duration: 4, delay: card.delay, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                  className="flex w-52 items-center gap-3 rounded-2xl border border-border/60 bg-background/70 p-3.5 shadow-xl shadow-black/10 backdrop-blur-xl"
+                  className="flex w-52 items-center gap-3 rounded-2xl border border-border/60 bg-background/70 p-3.5 shadow-xl shadow-black/10 backdrop-blur-xl hover:border-primary/50 transition-all"
                 >
                   <span
                     className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
