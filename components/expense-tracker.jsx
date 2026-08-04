@@ -1,51 +1,86 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "framer-motion"
-import { Wallet, PiggyBank, TrendingUp, CalendarDays, BarChart3 } from "lucide-react"
-
-const stats = [
-  { label: "Total Spent", value: "₹31,200", delta: "+₹2,400 this week", icon: Wallet, tone: "primary" },
-  { label: "Remaining Budget", value: "₹13,800", delta: "31% left", icon: PiggyBank, tone: "emerald" },
-  { label: "Highest Category", value: "Hotels", delta: "₹14,500 spent", icon: TrendingUp, tone: "primary" },
-  { label: "Daily Average", value: "₹4,457", delta: "over 7 days", icon: CalendarDays, tone: "emerald" },
-]
-
-const weekly = [
-  { day: "Mon", value: 62 },
-  { day: "Tue", value: 40 },
-  { day: "Wed", value: 88 },
-  { day: "Thu", value: 55 },
-  { day: "Fri", value: 100 },
-  { day: "Sat", value: 74 },
-  { day: "Sun", value: 48 },
-]
-
-const categories = [
-  { label: "Accommodation", pct: 46, amount: "₹14,500" },
-  { label: "Food & Dining", pct: 24, amount: "₹7,600" },
-  { label: "Transport", pct: 18, amount: "₹5,600" },
-  { label: "Activities", pct: 12, amount: "₹3,500" },
-]
+import { Wallet, PiggyBank, TrendingUp, CalendarDays, BarChart3, Plus, Lock } from "lucide-react"
+import { useItinerary } from "@/lib/itinerary-context"
+import { useAuth } from "@/lib/auth-context"
 
 export function ExpenseTracker() {
+  const {
+    grandTotalBudget,
+    totalSpent,
+    remainingBudget,
+    userLoggedExpenses,
+    addExpense
+  } = useItinerary()
+
+  const { requireAuth } = useAuth()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [label, setLabel] = useState("")
+  const [category, setCategory] = useState("Food & Dining")
+  const [amount, setAmount] = useState("")
+
+  const handleOpenModal = () => {
+    requireAuth(
+      () => setIsModalOpen(true),
+      "Please sign in to log live trip expenses and keep track of your budget ledger"
+    )
+  }
+
+  const handleAddExpense = (e) => {
+    e.preventDefault()
+    if (!label.trim() || !amount) return
+    addExpense({
+      label,
+      category,
+      amount: Number.parseFloat(amount) || 0
+    })
+    setLabel("")
+    setAmount("")
+    setIsModalOpen(false)
+  }
+
+  const percentLeft = grandTotalBudget > 0 ? Math.round((remainingBudget / grandTotalBudget) * 100) : 0
+
+  const stats = [
+    { label: "Total Spent", value: `₹${totalSpent.toLocaleString("en-IN")}`, delta: "Live tracking", icon: Wallet, tone: "primary" },
+    { label: "Remaining Budget", value: `₹${remainingBudget.toLocaleString("en-IN")}`, delta: `${percentLeft}% budget remaining`, icon: PiggyBank, tone: "emerald" },
+    { label: "Planned Total", value: `₹${grandTotalBudget.toLocaleString("en-IN")}`, delta: "Based on itinerary", icon: TrendingUp, tone: "primary" },
+    { label: "Logged Entries", value: `${userLoggedExpenses.length} items`, delta: "In trip ledger", icon: CalendarDays, tone: "emerald" },
+  ]
+
   return (
-    <section id="tracker" className="relative w-full py-20 md:py-28">
+    <section id="tracker" className="relative w-full py-20 md:py-28 bg-background">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="mx-auto mb-14 max-w-2xl text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
             <BarChart3 className="h-3.5 w-3.5 text-emerald" aria-hidden />
-            Live Expense Tracker
+            Smart Expense Tracker
           </span>
-          <h2 className="mt-4 text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+          <h2 className="mt-4 text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-foreground">
             Track Spending As You Travel
           </h2>
           <p className="mt-4 text-pretty text-muted-foreground leading-relaxed">
-            A real-time dashboard that keeps your trip on budget with clear analytics and daily insights.
+            Real-time comparison between your planned itinerary budget and actual trip expenses.
           </p>
         </div>
 
         <div className="rounded-3xl border border-border bg-card p-6 shadow-lg md:p-8">
-          {/* Stat cards */}
+          {/* Header Action */}
+          <div className="mb-6 flex items-center justify-between">
+            <h3 className="font-heading text-lg font-bold text-foreground">Live Trip Ledger</h3>
+            <button
+              onClick={handleOpenModal}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald px-4 py-2 text-xs font-semibold text-white shadow-md hover:bg-emerald/90 transition-all"
+            >
+              <Plus className="h-4 w-4" />
+              Log New Expense
+            </button>
+          </div>
+
+          {/* Stat Cards */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat, i) => {
               const Icon = stat.icon
@@ -76,57 +111,93 @@ export function ExpenseTracker() {
             })}
           </div>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-5">
-            {/* Bar chart */}
-            <div className="rounded-2xl border border-border bg-background p-5 lg:col-span-3">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-heading text-sm font-semibold text-foreground">Weekly Spending</h3>
-                <span className="text-xs text-muted-foreground">Last 7 days</span>
-              </div>
-              <div className="flex h-44 items-end justify-between gap-2 sm:gap-4">
-                {weekly.map((d, i) => (
-                  <div key={d.day} className="flex flex-1 flex-col items-center gap-2">
-                    <div className="flex w-full flex-1 items-end">
-                      <motion.div
-                        initial={{ height: 0 }}
-                        whileInView={{ height: `${d.value}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: i * 0.07, ease: "easeOut" }}
-                        className="w-full rounded-t-md bg-gradient-to-t from-primary/70 to-primary"
-                      />
-                    </div>
-                    <span className="text-xs text-muted-foreground">{d.day}</span>
+          {/* Recent Logged Expenses Table */}
+          <div className="mt-8 rounded-2xl border border-border bg-background p-5">
+            <h4 className="mb-4 font-heading text-sm font-semibold text-foreground">Recent Expenses Logged</h4>
+            <div className="space-y-3">
+              {userLoggedExpenses.map((exp) => (
+                <div key={exp.id} className="flex items-center justify-between border-b border-border/50 pb-2.5 last:border-b-0 last:pb-0 text-xs sm:text-sm">
+                  <div>
+                    <span className="font-semibold text-foreground">{exp.label}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">({exp.category})</span>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Category progress */}
-            <div className="rounded-2xl border border-border bg-background p-5 lg:col-span-2">
-              <h3 className="mb-4 font-heading text-sm font-semibold text-foreground">Spending by Category</h3>
-              <ul className="space-y-4">
-                {categories.map((c, i) => (
-                  <li key={c.label}>
-                    <div className="mb-1.5 flex items-center justify-between text-xs">
-                      <span className="font-medium text-foreground">{c.label}</span>
-                      <span className="text-muted-foreground">{c.amount}</span>
-                    </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${c.pct}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.7, delay: i * 0.1, ease: "easeOut" }}
-                        className="h-full rounded-full bg-emerald"
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                  <div className="text-right">
+                    <span className="font-heading font-bold text-foreground">₹{exp.amount.toLocaleString("en-IN")}</span>
+                    <span className="block text-[10px] text-muted-foreground">{exp.date}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Log Expense Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-2xl">
+            <h3 className="font-heading text-lg font-bold text-foreground">Log Travel Expense</h3>
+            <p className="text-xs text-muted-foreground mt-1">Record a real spending entry to update your remaining budget.</p>
+
+            <form onSubmit={handleAddExpense} className="mt-4 space-y-3 text-xs sm:text-sm">
+              <div>
+                <label className="block font-medium text-muted-foreground">Expense Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Taxi fare to Fort"
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div>
+                <label className="block font-medium text-muted-foreground">Category</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                >
+                  <option value="Accommodation">Accommodation</option>
+                  <option value="Food & Dining">Food & Dining</option>
+                  <option value="Transport">Transport</option>
+                  <option value="Attractions & Entry">Attractions & Entry</option>
+                  <option value="Shopping & Misc">Shopping & Misc</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-medium text-muted-foreground">Amount (₹)</label>
+                <input
+                  type="number"
+                  required
+                  placeholder="e.g. 850"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="rounded-xl border border-border px-4 py-2 text-xs font-semibold text-muted-foreground"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-emerald px-4 py-2 text-xs font-semibold text-white hover:bg-emerald/90"
+                >
+                  Save Expense
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

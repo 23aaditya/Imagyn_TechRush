@@ -3,14 +3,14 @@
 import { motion } from "framer-motion"
 import { MapPin, Star, Clock, Wallet, ArrowRight, CloudSun, Snowflake, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
+import { useItinerary } from "@/lib/itinerary-context"
 
 const destinations = [
   {
     name: "Goa",
     country: "India",
     image: "/images/dest-goa.png",
-    budget: "$450",
+    budget: "₹12,500",
     duration: "4–5 days",
     weather: { label: "31°C Sunny", icon: "sun" },
     rating: 4.8,
@@ -20,7 +20,7 @@ const destinations = [
     name: "Jaipur",
     country: "India",
     image: "/images/dest-jaipur.png",
-    budget: "$380",
+    budget: "₹9,800",
     duration: "3–4 days",
     weather: { label: "29°C Clear", icon: "sun" },
     rating: 4.7,
@@ -30,7 +30,7 @@ const destinations = [
     name: "Kerala",
     country: "India",
     image: "/images/dest-kerala.png",
-    budget: "$520",
+    budget: "₹16,500",
     duration: "5–6 days",
     weather: { label: "27°C Humid", icon: "cloud" },
     rating: 4.9,
@@ -40,7 +40,7 @@ const destinations = [
     name: "Manali",
     country: "India",
     image: "/images/dest-manali.png",
-    budget: "$410",
+    budget: "₹11,500",
     duration: "4–5 days",
     weather: { label: "12°C Snowy", icon: "snow" },
     rating: 4.6,
@@ -50,7 +50,7 @@ const destinations = [
     name: "Bali",
     country: "Indonesia",
     image: "/images/dest-bali.png",
-    budget: "$1,150",
+    budget: "₹45,000",
     duration: "6–7 days",
     weather: { label: "30°C Tropical", icon: "sun" },
     rating: 4.9,
@@ -60,7 +60,7 @@ const destinations = [
     name: "Santorini",
     country: "Greece",
     image: "/images/dest-santorini.png",
-    budget: "$1,780",
+    budget: "₹75,000",
     duration: "5–6 days",
     weather: { label: "26°C Sunny", icon: "sun" },
     rating: 4.8,
@@ -71,6 +71,16 @@ const destinations = [
 const weatherIcon = { sun: Sun, cloud: CloudSun, snow: Snowflake }
 
 export function TrendingDestinations() {
+  const { setDestination } = useItinerary()
+
+  const handleExplore = (destName) => {
+    setDestination(destName)
+    const el = document.getElementById("itinerary")
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
   return (
     <section id="destinations" className="relative bg-background px-4 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
@@ -92,7 +102,7 @@ export function TrendingDestinations() {
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="mt-3 text-lg leading-relaxed text-pretty text-muted-foreground"
           >
-            Discover destinations based on seasonal weather.
+            Discover destinations based on seasonal weather & budget.
           </motion.p>
         </div>
 
@@ -119,19 +129,16 @@ export function TrendingDestinations() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
-                  {/* Weather badge */}
                   <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/35 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
                     <WeatherIcon className="h-3.5 w-3.5" />
                     {dest.weather.label}
                   </span>
 
-                  {/* Rating badge */}
                   <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-xs font-bold text-foreground backdrop-blur-md">
                     <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                     {dest.rating}
                   </span>
 
-                  {/* Location */}
                   <div className="absolute bottom-3 left-3 text-white">
                     <h3 className="font-heading text-xl font-bold leading-tight drop-shadow-sm">{dest.name}</h3>
                     <p className="flex items-center gap-1 text-sm text-white/85">
@@ -167,10 +174,11 @@ export function TrendingDestinations() {
                   </div>
 
                   <Button
+                    onClick={() => handleExplore(dest.name)}
                     variant="outline"
                     className="mt-5 h-11 w-full rounded-2xl border-border font-semibold text-foreground transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground"
                   >
-                    Explore
+                    Explore & Build Itinerary
                     <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Button>
                 </div>

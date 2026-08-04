@@ -5,7 +5,6 @@ import { Plane, ArrowRight } from "lucide-react";
 import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { Button } from "@/components/ui/button"
 
-
 const columns = [
   {
     title: "Product",
@@ -43,13 +42,19 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 pb-14 sm:grid-cols-3 lg:grid-cols-[1.4fr_repeat(5,1fr)] lg:gap-x-8">
           {/* Brand + newsletter */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-            <a href="#home" className="flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/30">
+            <a href="#home" className="flex items-center gap-2.5 group">
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-primary via-indigo-600 to-sky-400 text-white shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform duration-300">
                 <Plane className="h-5 w-5 -rotate-45" aria-hidden />
               </span>
-              <span className="font-heading text-lg font-bold tracking-tight text-foreground">
-                Trip<span className="text-primary">Nest</span>
-              </span>
+              <div className="flex flex-col">
+                <span className="font-heading text-xl font-extrabold tracking-tight text-foreground flex items-center gap-0.5">
+                  Trip<span className="text-primary">Nest</span>
+                  <span className="h-2 w-2 rounded-full bg-emerald inline-block ml-0.5"></span>
+                </span>
+                <span className="text-[10px] font-bold tracking-wider uppercase text-muted-foreground -mt-1">
+                  AI Travel Planner
+                </span>
+              </div>
             </a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               Plan your dream trip smarter, faster and stress-free — destinations, budgets, and itineraries in one

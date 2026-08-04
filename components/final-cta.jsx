@@ -4,6 +4,8 @@ import { motion } from "framer-motion"
 import { ArrowRight, Compass, Plane, MapPin, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+import { useAuth } from "@/lib/auth-context"
+
 const floaters = [
   { icon: Plane, pos: "left-[8%] top-[18%]", delay: 0, size: "h-10 w-10" },
   { icon: MapPin, pos: "right-[10%] top-[22%]", delay: 0.6, size: "h-9 w-9" },
@@ -12,6 +14,15 @@ const floaters = [
 ]
 
 export function FinalCTA() {
+  const { requireAuth } = useAuth()
+
+  const handlePlanMyTrip = () => {
+    requireAuth(() => {
+      const el = document.getElementById("itinerary")
+      if (el) el.scrollIntoView({ behavior: "smooth" })
+    }, "Sign in to plan your next trip adventure")
+  }
+
   return (
     <section id="get-started" className="relative w-full overflow-hidden px-4 py-20 sm:px-6 md:py-28">
       <div className="mx-auto max-w-6xl">
@@ -101,12 +112,19 @@ export function FinalCTA() {
               transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
             >
-              <Button className="h-12 w-full rounded-2xl bg-white px-7 text-base font-semibold text-primary shadow-lg shadow-black/10 hover:bg-white/90 sm:w-auto">
+              <Button
+                onClick={handlePlanMyTrip}
+                className="h-12 w-full rounded-2xl bg-white px-7 text-base font-semibold text-primary shadow-lg shadow-black/10 hover:bg-white/90 sm:w-auto"
+              >
                 Plan My Trip
                 <ArrowRight className="ml-1 h-5 w-5" aria-hidden data-icon="inline-end" />
               </Button>
               <Button
                 variant="outline"
+                onClick={() => {
+                  const el = document.getElementById("destinations")
+                  if (el) el.scrollIntoView({ behavior: "smooth" })
+                }}
                 className="h-12 w-full rounded-2xl border-white/40 bg-white/5 px-7 text-base font-semibold text-white backdrop-blur-md hover:bg-white/15 hover:text-white sm:w-auto"
               >
                 Explore Destinations
