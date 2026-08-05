@@ -18,6 +18,7 @@ import { AuthModal } from "@/components/auth-modal"
 import { ItineraryPlanner } from "@/components/itinerary-planner"
 import { ExploreWorkspace } from "@/components/explore-workspace"
 import { HomeBackground } from "@/components/home-background"
+import { AiChatbot } from "@/components/ai-chatbot"
 
 export default function Page() {
   const [activeView, setActiveView] = useState("home") // 'home' | 'itinerary' | 'explore' | 'destinations' | 'budget' | 'expenses' | 'packages'
@@ -176,6 +177,9 @@ export default function Page() {
           <PackageComparison onNavigateView={handleViewChange} onOpenAuth={openAuth} />
         </div>
       )}
+
+      {/* Floating AI Travel Concierge Assistant */}
+      <AiChatbot currentView={activeView} onNavigate={handleViewChange} />
     </main>
   )
 }
