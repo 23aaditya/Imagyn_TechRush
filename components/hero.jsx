@@ -148,31 +148,30 @@ export function Hero({ onStartPlanning }) {
             src={heroBackgrounds[activeSlide].src}
             alt={heroBackgrounds[activeSlide].alt}
             initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 0.70, scale: 1 }}
+            animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="h-full w-full object-cover dark:opacity-60"
+            className="h-full w-full object-cover filter brightness-[0.92] contrast-[1.05]"
           />
         </AnimatePresence>
 
-        {/* Gradient overlays for enhanced readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/55 to-background/25" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+        {/* Minimal dark overlay to ensure high contrast without white corner washes */}
+        <div className="absolute inset-0 bg-black/25" />
 
         {/* Slide indicators */}
-        <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+        <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
           {heroBackgrounds.map((bg, i) => (
             <span
               key={bg.src}
               className={`h-1.5 rounded-full transition-all duration-500 ${
-                i === activeSlide ? "w-6 bg-primary" : "w-1.5 bg-foreground/25"
+                i === activeSlide ? "w-6 bg-white" : "w-1.5 bg-white/40"
               }`}
             />
           ))}
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-5xl px-4 pb-20 pt-32 sm:px-6 lg:pt-36">
+      <div className="relative z-10 mx-auto max-w-5xl px-4 pb-12 pt-28 sm:px-6 lg:pt-32">
         <div className="mx-auto text-center">
           
           <motion.span
@@ -180,10 +179,10 @@ export function Hero({ onStartPlanning }) {
             custom={0}
             initial="hidden"
             animate="show"
-            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-1.5 text-sm font-medium text-foreground backdrop-blur-md"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/85 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-foreground backdrop-blur-md"
           >
-            <Compass className="h-4 w-4 text-emerald" />
-            Your Ultimate Travel Companion
+            <Compass className="h-3.5 w-3.5 text-emerald" />
+            Curated Editorial Journeys
           </motion.span>
 
           <motion.h1
@@ -191,11 +190,9 @@ export function Hero({ onStartPlanning }) {
             custom={1}
             initial="hidden"
             animate="show"
-            className="mt-5 font-heading text-4xl font-extrabold leading-[1.08] tracking-tight text-balance text-foreground sm:text-5xl lg:text-6xl"
+            className="mt-5 font-heading text-5xl font-extrabold leading-[1.05] tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl"
           >
-            Plan Your Dream Trip{" "}
-            <span className="text-primary">Smarter</span>, Faster &{" "}
-            <span className="text-emerald">Stress-Free.</span>
+            Journeys, Quietly Well-Planned.
           </motion.h1>
 
           <motion.p
@@ -203,9 +200,9 @@ export function Hero({ onStartPlanning }) {
             custom={2}
             initial="hidden"
             animate="show"
-            className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground"
+            className="mx-auto mt-4 max-w-2xl text-base sm:text-lg leading-relaxed text-pretty text-muted-foreground font-normal"
           >
-            Discover destinations, compare travel packages, organize custom itineraries, and calculate realistic travel budgets across India and beyond.
+            Explore handpicked destinations, compare realistic travel packages, and craft bespoke itineraries tailored to your pace.
           </motion.p>
 
           {/* Enhanced Search Card ("Where To?") */}

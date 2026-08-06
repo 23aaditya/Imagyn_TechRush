@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const navLinks = [
-  { label: "Home Overview", view: "home" },
-  { label: "AI Itinerary", view: "itinerary" },
+  { label: "Overview", view: "home" },
+  { label: "Planner", view: "itinerary" },
   { label: "Explore", view: "explore" },
-  { label: "Budget Planner", view: "budget" },
-  { label: "Expense Tracker", view: "expenses" },
+  { label: "Budget", view: "budget" },
+  { label: "Expenses", view: "expenses" },
   { label: "Packages", view: "packages" },
 ]
 
@@ -47,16 +47,9 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed inset-x-0 top-0 z-40 px-4 pt-3 sm:px-6"
+      className="fixed inset-x-0 top-0 z-50 w-full bg-white text-neutral-900 border-b border-neutral-200/80 shadow-sm"
     >
-      <nav
-        className={cn(
-          "mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-2xl border border-transparent px-4 py-3 transition-all duration-300 sm:px-6",
-          scrolled || activeView !== "home"
-            ? "border-border/60 bg-background/80 shadow-lg shadow-black/5 backdrop-blur-xl"
-            : "bg-background/40 backdrop-blur-md",
-        )}
-      >
+      <nav className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3">
         {/* Travel-Oriented Logo Emblem (Globe + Route + Pin + Plane) */}
         <button
           onClick={() => handleNavClick("home")}

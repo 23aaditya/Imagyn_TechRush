@@ -328,13 +328,13 @@ export function AiChatbot({ currentView, onNavigate }) {
                 <div>
                   <h3 className="font-heading text-sm font-bold text-foreground flex items-center gap-1.5">
                     Boots
-                    <span className="text-[10px] font-normal text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-full text-primary">
-                      AI Chatbot
+                    <span className="text-[10px] font-semibold text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-full text-primary">
+                      Concierge
                     </span>
                   </h3>
                   <p className="text-[11px] text-muted-foreground flex items-center gap-1">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    Your Personal Travel Assistant
+                    Personal Travel Concierge
                   </p>
                 </div>
               </div>
