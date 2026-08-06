@@ -424,35 +424,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
             <span className="font-medium text-foreground text-sm">Itinerary Planner Workspace</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsMapVisible(!isMapVisible)}
-              className={`rounded-full border text-xs font-semibold px-3.5 py-1.5 transition-all ${
-                isMapVisible
-                  ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                  : "border-blue-500/40 bg-blue-500/10 text-blue-600 hover:bg-blue-500/20"
-              }`}
-            >
-              <Globe className="mr-1.5 h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-              {isMapVisible ? "Hide Map View" : "🗺️ View Interactive Map"}
-            </Button>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setBotOpen(!botOpen)}
-              className="rounded-full border-primary/40 bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20"
-            >
-              <Sparkles className="mr-1.5 h-3.5 w-3.5 text-primary animate-pulse" />
-              AI Copilot Assistant
-            </Button>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              <Calendar className="h-3.5 w-3.5" />
-              Itinerary Engine Active
-            </span>
-          </div>
         </div>
 
         {/* Title Header & Live Search Bar */}

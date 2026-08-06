@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet"
 import L from "leaflet"
+import "leaflet/dist/leaflet.css"
 
 // Map Auto-Bound Adjuster & Invalidate Size Trigger
 function MapBoundsUpdater({ spots, nearbyPlaces, forceZoomTrigger }) {
