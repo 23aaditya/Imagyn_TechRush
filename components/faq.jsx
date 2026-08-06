@@ -68,6 +68,7 @@ export function FAQ() {
               >
                 <button
                   type="button"
+                  suppressHydrationWarning
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                   aria-expanded={isOpen}
                   className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6 sm:py-5"
