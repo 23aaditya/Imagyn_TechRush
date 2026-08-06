@@ -8,9 +8,8 @@ import { cn } from "@/lib/utils"
 
 const navLinks = [
   { label: "Home Overview", view: "home" },
-  { label: "Itinerary Planner", view: "itinerary" },
-  { label: "Explore Maps", view: "explore" },
-  { label: "Destinations", view: "destinations" },
+  { label: "AI Itinerary", view: "itinerary" },
+  { label: "Explore", view: "explore" },
   { label: "Budget Planner", view: "budget" },
   { label: "Expense Tracker", view: "expenses" },
   { label: "Packages", view: "packages" },

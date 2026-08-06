@@ -152,3 +152,12 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Explore workspace scrollbar hide */
+.explore-scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.explore-scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

@@ -142,7 +142,7 @@ export default function Page() {
       )}
 
       {/* Dedicated Workspace: World Explorer */}
-      {(activeView === "explore" || activeView === "destinations") && (
+      {activeView === "explore" && (
         <div className="relative z-10 animate-in fade-in duration-300">
           <ExploreWorkspace
             onBack={() => handleViewChange("home")}
