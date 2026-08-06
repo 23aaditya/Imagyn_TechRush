@@ -10,7 +10,6 @@ const navLinks = [
   { label: "Home Overview", view: "home" },
   { label: "AI Itinerary", view: "itinerary" },
   { label: "Explore", view: "explore" },
-  { label: "Destinations", view: "destinations" },
   { label: "Budget Planner", view: "budget" },
   { label: "Expense Tracker", view: "expenses" },
   { label: "Packages", view: "packages" },
