@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Search, Package, Sparkles, Calculator, PlaneTakeoff, ArrowRight } from "lucide-react"
+import { Search, Package, Calendar, Calculator, PlaneTakeoff, ArrowRight } from "lucide-react"
 
 const steps = [
   {
@@ -22,16 +22,16 @@ const steps = [
   },
   {
     number: "03",
-    title: "Generate Smart Itinerary",
-    description: "Let AI craft a day-by-day plan in seconds.",
-    icon: Sparkles,
+    title: "Generate Itinerary",
+    description: "Craft a day-by-day plan tailored to your budget & pace.",
+    icon: Calendar,
     accent: "primary",
     view: "itinerary"
   },
   {
     number: "04",
     title: "Calculate Budget",
-    description: "Get a clear, realistic breakdown of every cost.",
+    description: "Get a clear, realistic cost breakdown for your trip.",
     icon: Calculator,
     accent: "emerald",
     view: "budget"
@@ -39,7 +39,7 @@ const steps = [
   {
     number: "05",
     title: "Track Expenses",
-    description: "Log spending live and stay stress-free.",
+    description: "Log spending live and stay stress-free throughout your trip.",
     icon: PlaneTakeoff,
     accent: "primary",
     view: "expenses"

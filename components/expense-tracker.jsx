@@ -1,26 +1,27 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   Wallet,
   PiggyBank,
   TrendingUp,
-  CalendarDays,
-  BarChart3,
   ArrowLeft,
   Plus,
   Trash2,
   Receipt,
-  ChevronRight
+  Info
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const initialLogs = [
-  { id: 1, title: "Artjuna Cafe Breakfast", category: "Food & Dining", amount: 450, date: "Today" },
-  { id: 2, title: "Fort Aguada Entry Ticket", category: "Activities", amount: 200, date: "Today" },
-  { id: 3, title: "Scooter Rental (2 Days)", category: "Transport", amount: 1200, date: "Yesterday" },
-  { id: 4, title: "Beachside Shack Hotel Stay", category: "Accommodation", amount: 6500, date: "2 days ago" },
+  { id: 1, title: "Artjuna Cafe Breakfast", category: "Food & Dining", amount: 500, day: "Mon", date: "Monday" },
+  { id: 2, title: "Fort Aguada Entry & Scooter Fuel", category: "Transport", amount: 1200, day: "Tue", date: "Tuesday" },
+  { id: 3, title: "Beachside Shack Dinner", category: "Food & Dining", amount: 700, day: "Wed", date: "Wednesday" },
+  { id: 4, title: "Water Sports & Parasailing", category: "Activities", amount: 2200, day: "Thu", date: "Thursday" },
+  { id: 5, title: "Hotel Stay Booking", category: "Accommodation", amount: 4500, day: "Fri", date: "Friday" },
+  { id: 6, title: "Night Market Souvenirs", category: "Shopping", amount: 1800, day: "Sat", date: "Saturday" },
+  { id: 7, title: "Airport Cab Ride", category: "Transport", amount: 900, day: "Sun", date: "Sunday" },
 ]
 
 export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace }) {
@@ -29,6 +30,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace })
   const [title, setTitle] = useState("")
   const [category, setCategory] = useState("Food & Dining")
   const [amount, setAmount] = useState("")
+  const [hoveredDay, setHoveredDay] = useState(null)
 
   const handleAddExpense = (e) => {
     e.preventDefault()
@@ -38,6 +40,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace })
       title,
       category,
       amount: Number(amount),
+      day: "Today",
       date: "Just now"
     }
     setLogs([newLog, ...logs])
@@ -53,24 +56,39 @@ export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace })
   const remaining = Math.max(0, budgetGoal - totalSpent)
   const pctRemaining = Math.round((remaining / budgetGoal) * 100)
 
-  // Category totals breakdown
+  // Category breakdown
   const catBreakdown = logs.reduce((acc, l) => {
     acc[l.category] = (acc[l.category] || 0) + l.amount
     return acc
   }, {})
 
-  const weekly = [
-    { day: "Mon", value: 62 },
-    { day: "Tue", value: 40 },
-    { day: "Wed", value: 88 },
-    { day: "Thu", value: 55 },
-    { day: "Fri", value: 100 },
-    { day: "Sat", value: 74 },
-    { day: "Sun", value: 48 },
+  // Weekly daily breakdown calculation
+  const daysList = [
+    { day: "Mon", full: "Monday" },
+    { day: "Tue", full: "Tuesday" },
+    { day: "Wed", full: "Wednesday" },
+    { day: "Thu", full: "Thursday" },
+    { day: "Fri", full: "Friday" },
+    { day: "Sat", full: "Saturday" },
+    { day: "Sun", full: "Sunday" }
   ]
 
+  const weeklyData = daysList.map((d) => {
+    const dayTotal = logs
+      .filter((l) => l.day === d.day || l.date === d.full)
+      .reduce((sum, item) => sum + item.amount, 0)
+    return {
+      day: d.day,
+      full: d.full,
+      amount: dayTotal
+    }
+  })
+
+  const maxDaily = Math.max(...weeklyData.map((d) => d.amount), 1000)
+  const highestDay = weeklyData.reduce((prev, current) => (current.amount > prev.amount ? current : prev), weeklyData[0])
+
   return (
-    <section id="tracker" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background pt-24 pb-20" : "py-20 md:py-28"}`}>
+    <section id="tracker" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background pt-24 pb-20" : "py-20 md:py-28 bg-background"}`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Workspace Top Bar */}
@@ -101,11 +119,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace })
 
         {/* Header */}
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
-            <BarChart3 className="h-3.5 w-3.5 text-emerald" aria-hidden />
-            Live Expense Tracker
-          </span>
-          <h2 className="mt-4 text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+          <h2 className="text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-foreground">
             {isWorkspace ? "Live Trip Expense Workspace" : "Track Spending As You Travel"}
           </h2>
           <p className="mt-3 text-pretty text-muted-foreground leading-relaxed">
@@ -113,49 +127,137 @@ export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace })
           </p>
         </div>
 
-        {/* Stat Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 text-primary">
-              <Wallet className="h-4 w-4" />
+        {/* Stat Cards (3 Cards - Average Per Item removed as requested) */}
+        <div className="grid gap-4 sm:grid-cols-3 mb-8">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <Wallet className="h-5 w-5" />
             </span>
-            <p className="mt-3 text-xs font-medium text-muted-foreground">Total Spent</p>
-            <p className="mt-0.5 font-heading text-xl font-bold text-foreground">₹{totalSpent.toLocaleString("en-IN")}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{logs.length} logged items</p>
+            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Spent</p>
+            <p className="mt-1 font-heading text-2xl font-bold text-foreground">₹{totalSpent.toLocaleString("en-IN")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{logs.length} items logged</p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-emerald/15 text-emerald-600 dark:text-emerald-400">
-              <PiggyBank className="h-4 w-4" />
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald/15 text-emerald-600 dark:text-emerald-400">
+              <PiggyBank className="h-5 w-5" />
             </span>
-            <p className="mt-3 text-xs font-medium text-muted-foreground">Remaining Budget</p>
-            <p className="mt-0.5 font-heading text-xl font-bold text-emerald-600 dark:text-emerald-400">₹{remaining.toLocaleString("en-IN")}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{pctRemaining}% budget left</p>
+            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Remaining Budget</p>
+            <p className="mt-1 font-heading text-2xl font-bold text-emerald-600 dark:text-emerald-400">₹{remaining.toLocaleString("en-IN")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{pctRemaining}% of budget remaining</p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 text-primary">
-              <TrendingUp className="h-4 w-4" />
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <TrendingUp className="h-5 w-5" />
             </span>
-            <p className="mt-3 text-xs font-medium text-muted-foreground">Target Trip Budget</p>
-            <p className="mt-0.5 font-heading text-xl font-bold text-foreground">₹{budgetGoal.toLocaleString("en-IN")}</p>
-            <p className="mt-1 text-xs text-muted-foreground">Limit configured</p>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-emerald/15 text-emerald-600 dark:text-emerald-400">
-              <CalendarDays className="h-4 w-4" />
-            </span>
-            <p className="mt-3 text-xs font-medium text-muted-foreground">Avg per Item</p>
-            <p className="mt-0.5 font-heading text-xl font-bold text-foreground">
-              ₹{logs.length ? Math.round(totalSpent / logs.length).toLocaleString("en-IN") : 0}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">Calculated live</p>
+            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Target Budget Goal</p>
+            <p className="mt-1 font-heading text-2xl font-bold text-foreground">₹{budgetGoal.toLocaleString("en-IN")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Configured limit</p>
           </div>
         </div>
 
-        {/* Interactive Workspace Logging Form & Logs List */}
-        {isWorkspace ? (
+        {/* Meaningful Weekly Spending Trends Graph & Breakdown */}
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-lg md:p-8 mb-8">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-border/60 pb-4">
+            <div>
+              <h3 className="font-heading text-lg font-bold text-foreground">Weekly Spending Trends & Analysis</h3>
+              <p className="text-xs text-muted-foreground">Understand your spending habits over time and pinpoint peak expense days.</p>
+            </div>
+
+            {highestDay.amount > 0 && (
+              <div className="flex items-center gap-2 rounded-xl bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                <Info className="h-4 w-4" />
+                <span>Peak Expense Day: {highestDay.full} (₹{highestDay.amount.toLocaleString("en-IN")})</span>
+              </div>
+            )}
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-5 items-end">
+            
+            {/* Graph Columns with Tooltips & Real Rupee Values */}
+            <div className="rounded-2xl border border-border bg-background p-5 lg:col-span-3">
+              <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                <span>Daily Amount (₹)</span>
+                <span>Max: ₹{maxDaily.toLocaleString("en-IN")}</span>
+              </div>
+
+              <div className="flex h-52 items-end justify-between gap-2 sm:gap-3 pt-6">
+                {weeklyData.map((d) => {
+                  const heightPct = Math.max(8, Math.round((d.amount / maxDaily) * 100))
+                  const isSelected = hoveredDay?.day === d.day
+                  return (
+                    <div
+                      key={d.day}
+                      onMouseEnter={() => setHoveredDay(d)}
+                      onMouseLeave={() => setHoveredDay(null)}
+                      className="relative flex flex-1 flex-col items-center gap-2 h-full justify-end group cursor-pointer"
+                    >
+                      {/* Tooltip on Hover */}
+                      <AnimatePresence>
+                        {isSelected && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 5 }}
+                            className="absolute -top-10 z-20 whitespace-nowrap rounded-lg bg-foreground px-2.5 py-1 text-[11px] font-bold text-background shadow-md"
+                          >
+                            ₹{d.amount.toLocaleString("en-IN")}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      <div className="w-full flex-1 flex items-end">
+                        <div
+                          style={{ height: `${heightPct}%` }}
+                          className={`w-full rounded-t-lg transition-all duration-300 ${
+                            d.day === highestDay.day
+                              ? "bg-gradient-to-t from-primary/80 to-primary shadow-md shadow-primary/30"
+                              : "bg-gradient-to-t from-emerald/60 to-emerald"
+                          }`}
+                        />
+                      </div>
+
+                      <div className="text-center">
+                        <span className="block text-xs font-bold text-foreground">{d.day}</span>
+                        <span className="block text-[10px] text-muted-foreground font-medium">₹{d.amount}</span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Category Breakdown */}
+            <div className="rounded-2xl border border-border bg-background p-5 lg:col-span-2 space-y-4">
+              <h4 className="font-heading text-sm font-bold text-foreground">Expense Categories</h4>
+              <div className="space-y-3">
+                {Object.entries(catBreakdown).map(([catName, amt]) => {
+                  const pct = Math.round((amt / (totalSpent || 1)) * 100)
+                  return (
+                    <div key={catName}>
+                      <div className="mb-1 flex items-center justify-between text-xs font-semibold">
+                        <span className="text-foreground">{catName}</span>
+                        <span className="text-muted-foreground">₹{amt.toLocaleString("en-IN")} ({pct}%)</span>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div style={{ width: `${pct}%` }} className="h-full rounded-full bg-emerald" />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="mt-4 rounded-xl bg-secondary/60 p-3 text-xs text-muted-foreground leading-relaxed">
+                💡 <span className="font-semibold text-foreground">Spending Insight:</span> Tracking daily category expenses helps prevent overspending on activities and dining early in your trip.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Interactive Workspace Logging Form & Logs List (Only in Workspace mode) */}
+        {isWorkspace && (
           <div className="grid gap-8 lg:grid-cols-12">
             
             {/* Form to Add Expense */}
@@ -248,60 +350,6 @@ export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace })
               </div>
             </div>
 
-          </div>
-        ) : (
-          /* Preview Mode Chart */
-          <div className="rounded-3xl border border-border bg-card p-6 shadow-lg md:p-8">
-            <div className="grid gap-6 lg:grid-cols-5">
-              <div className="rounded-2xl border border-border bg-background p-5 lg:col-span-3">
-                <h3 className="font-heading text-sm font-semibold text-foreground mb-4">Weekly Spending Trend</h3>
-                <div className="flex h-44 items-end justify-between gap-2 sm:gap-4">
-                  {weekly.map((d, i) => (
-                    <div key={d.day} className="flex flex-1 flex-col items-center gap-2">
-                      <div className="flex w-full flex-1 items-end">
-                        <div
-                          style={{ height: `${d.value}%` }}
-                          className="w-full rounded-t-md bg-gradient-to-t from-primary/70 to-primary"
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground">{d.day}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-border bg-background p-5 lg:col-span-2">
-                <h3 className="mb-4 font-heading text-sm font-semibold text-foreground">Spending Breakdown</h3>
-                <div className="space-y-4">
-                  {Object.entries(catBreakdown).map(([catName, amt]) => {
-                    const pct = Math.round((amt / totalSpent) * 100) || 0
-                    return (
-                      <div key={catName}>
-                        <div className="mb-1.5 flex items-center justify-between text-xs">
-                          <span className="font-medium text-foreground">{catName}</span>
-                          <span className="text-muted-foreground">₹{amt.toLocaleString("en-IN")}</span>
-                        </div>
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                          <div style={{ width: `${pct}%` }} className="h-full rounded-full bg-emerald" />
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {onOpenWorkspace && (
-              <div className="mt-8 text-center border-t border-border/60 pt-6">
-                <Button
-                  onClick={onOpenWorkspace}
-                  className="rounded-2xl bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90"
-                >
-                  Launch Full Expense Tracker Workspace
-                  <ChevronRight className="ml-1.5 h-4 w-4" />
-                </Button>
-              </div>
-            )}
           </div>
         )}
 

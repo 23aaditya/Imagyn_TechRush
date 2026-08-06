@@ -1,138 +1,62 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Plane, ArrowRight } from "lucide-react";
-import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
-import { Button } from "@/components/ui/button"
-
-
-const columns = [
-  {
-    title: "Product",
-    links: ["Features", "Smart Planner", "Budget Calculator"],
-  },
-  {
-    title: "Explore",
-    links: ["Destinations", "Packages", "Travel Guides"],
-  },
-  {
-    title: "Resources",
-    links: ["Blog", "Help Center", "FAQs"],
-  },
-  {
-    title: "Company",
-    links: ["About", "Careers", "Contact"],
-  },
-  {
-    title: "Support",
-    links: ["Help", "Privacy", "Terms"],
-  },
-]
-
-const socials = [
-  { icon: FaInstagram, label: "Instagram" },
-  { icon: FaTwitter, label: "Twitter" },
-  { icon: FaFacebook, label: "Facebook" },
-  { icon: FaYoutube, label: "YouTube" },
-]
-
-export function Footer() {
+export function Footer({ onNavigateView }) {
   return (
-    <footer className="relative w-full border-t border-border/60 bg-secondary/40 px-4 pt-16 sm:px-6">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 pb-14 sm:grid-cols-3 lg:grid-cols-[1.4fr_repeat(5,1fr)] lg:gap-x-8">
-          {/* Brand + newsletter */}
-          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-            <a href="#home" className="flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/30">
-                <Plane className="h-5 w-5 -rotate-45" aria-hidden />
-              </span>
-              <span className="font-heading text-lg font-bold tracking-tight text-foreground">
-                Trip<span className="text-primary">Nest</span>
-              </span>
-            </a>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              Plan your dream trip smarter, faster and stress-free — destinations, budgets, and itineraries in one
-              place.
-            </p>
+    <footer className="relative w-full border-t border-border/60 bg-card px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-6">
+        
+        {/* TripNest Brand Emblem */}
+        <button
+          onClick={() => {
+            onNavigateView?.("home")
+            window.scrollTo({ top: 0, behavior: "smooth" })
+          }}
+          className="flex items-center gap-2.5 text-left focus:outline-none group"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-emerald to-teal-500 text-white shadow-md shadow-primary/20">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+              <circle cx="12" cy="12" r="9" className="opacity-40" />
+              <path d="M12 12C12 12 15 8.5 15 6.5C15 4.8 13.7 3.5 12 3.5C10.3 3.5 9 4.8 9 6.5C9 8.5 12 12 12 12Z" fill="currentColor" fillOpacity="0.3" stroke="currentColor" />
+              <path d="M18.5 7.5L16 11.5L18 12.5L20 10.5L21.5 11L19.5 14L15.5 13L13 17L11.5 16.5L13 12L9.5 11L8 12.5L6.5 12L7.5 9.5L6.5 7L8 6.5L9.5 8L13 7L11.5 2.5L13 2L15.5 6L19.5 5L21.5 8L18.5 7.5Z" fill="currentColor" />
+            </svg>
+          </span>
+          <span className="font-heading text-lg font-bold tracking-tight text-foreground">
+            Trip<span className="text-primary">Nest</span>
+          </span>
+        </button>
 
-            <div className="mt-6">
-              <p className="text-xs font-semibold uppercase tracking-wide text-foreground">Stay in the loop</p>
-              <form
-                onSubmit={(e) => e.preventDefault()}
-                className="mt-3 flex items-center gap-2 rounded-2xl border border-border/70 bg-background/70 p-1.5 shadow-sm backdrop-blur-md focus-within:border-primary/40"
-              >
-                <input
-                  type="email"
-                  required
-                  placeholder="Your email"
-                  aria-label="Email address"
-                  className="w-full min-w-0 flex-1 bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  aria-label="Subscribe"
-                  className="h-8 w-8 shrink-0 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  <ArrowRight className="h-4 w-4" aria-hidden />
-                </Button>
-              </form>
-            </div>
-          </div>
-
-          {/* Link columns */}
-          {columns.map((col, i) => (
-            <motion.div
-              key={col.title}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
-            >
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground">{col.title}</h3>
-              <ul className="mt-4 space-y-2.5">
-                {col.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
+        {/* Essential Navigation Links */}
+        <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-muted-foreground">
+          <button onClick={() => onNavigateView?.("home")} className="hover:text-primary transition-colors">
+            Home
+          </button>
+          <span>•</span>
+          <button onClick={() => onNavigateView?.("itinerary")} className="hover:text-primary transition-colors">
+            Itinerary Planner
+          </button>
+          <span>•</span>
+          <button onClick={() => onNavigateView?.("explore")} className="hover:text-primary transition-colors">
+            Explore Maps
+          </button>
+          <span>•</span>
+          <button onClick={() => onNavigateView?.("budget")} className="hover:text-primary transition-colors">
+            Budget Planner
+          </button>
+          <span>•</span>
+          <button onClick={() => onNavigateView?.("expenses")} className="hover:text-primary transition-colors">
+            Expense Tracker
+          </button>
+          <span>•</span>
+          <button onClick={() => onNavigateView?.("packages")} className="hover:text-primary transition-colors">
+            Packages
+          </button>
         </div>
 
-        {/* Bottom bar */}
-        <div className="flex flex-col items-center gap-4 border-t border-border/60 py-6 sm:flex-row sm:justify-between">
-          <p className="text-center text-sm text-muted-foreground sm:text-left">
-            © 2026 TripNest. Made with{" "}
-            <span className="text-primary" aria-hidden>
-              ❤️
-            </span>{" "}
-            for Travelers.
-          </p>
+        {/* Copyright */}
+        <p className="text-xs text-muted-foreground text-center sm:text-right">
+          © 2026 TripNest. Made for Travelers.
+        </p>
 
-          <div className="flex items-center gap-2">
-            {socials.map((s) => {
-              const Icon = s.icon
-              return (
-                <a
-                  key={s.label}
-                  href="#"
-                  aria-label={s.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border/70 bg-background text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary"
-                >
-                  <Icon className="h-4 w-4" aria-hidden />
-                </a>
-              )
-            })}
-          </div>
-        </div>
       </div>
     </footer>
   )

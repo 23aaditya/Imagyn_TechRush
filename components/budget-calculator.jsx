@@ -10,12 +10,7 @@ import {
   ShoppingBag,
   ShieldAlert,
   Wallet,
-  TrendingUp,
-  ArrowLeft,
-  Users,
-  Calendar,
-  Sparkles,
-  ChevronRight
+  ArrowLeft
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -27,7 +22,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
   const [travelers, setTravelers] = useState(2)
   const [stayTier, setStayTier] = useState("Standard") // Economy | Standard | Luxury
 
-  // Dynamic calculations based on parameters
+  // Dynamic calculations based on parameters in Indian Rupees (₹)
   const stayMultiplier = stayTier === "Economy" ? 1800 : stayTier === "Standard" ? 3500 : 7500
   const foodPerDay = 1200 * travelers * days
   const stayTotal = stayMultiplier * days
@@ -82,11 +77,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
         {/* Section Title */}
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-            <Wallet className="h-3.5 w-3.5 text-emerald" aria-hidden />
-            Smart Budget Estimator
-          </span>
-          <h2 className="mt-4 text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+          <h2 className="text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-foreground">
             {isWorkspace ? "Interactive Trip Budget Calculator" : "Plan Every Rupee With Confidence"}
           </h2>
           <p className="mt-3 text-pretty text-muted-foreground leading-relaxed">
@@ -189,7 +180,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
           {/* Breakdown Items */}
           <div className="grid gap-3 sm:grid-cols-2">
-            {segments.map((seg, i) => {
+            {segments.map((seg) => {
               const Icon = seg.icon
               const pct = Math.round((seg.value / TOTAL) * 100)
               return (
@@ -217,19 +208,6 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
             })}
           </div>
         </div>
-
-        {/* Home Overview Action CTA */}
-        {!isWorkspace && onOpenWorkspace && (
-          <div className="mt-8 text-center">
-            <Button
-              onClick={onOpenWorkspace}
-              className="rounded-2xl bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90"
-            >
-              Open Full Interactive Budget Workspace
-              <ChevronRight className="ml-1.5 h-4 w-4" />
-            </Button>
-          </div>
-        )}
 
       </div>
     </section>

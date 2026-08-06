@@ -31,15 +31,15 @@ export function HomeBackground() {
           src={famousPlaces[index].src}
           alt={famousPlaces[index].alt}
           initial={{ opacity: 0, scale: 1.08 }}
-          animate={{ opacity: 0.18, scale: 1 }}
+          animate={{ opacity: 0.35, scale: 1 }}
           exit={{ opacity: 0, scale: 0.96 }}
           transition={{ duration: 1.8, ease: "easeInOut" }}
-          className="h-full w-full object-cover filter blur-[1px] dark:opacity-[0.14]"
+          className="h-full w-full object-cover filter blur-[0.5px] dark:opacity-[0.25]"
         />
       </AnimatePresence>
 
       {/* Subtle overlay gradient to ensure text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/20 to-background/60" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/25 to-background/70" />
     </div>
   )
 }

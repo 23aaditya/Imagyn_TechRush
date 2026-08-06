@@ -84,7 +84,7 @@ export default function Page() {
 
   return (
     <main className="relative min-h-screen bg-background text-foreground">
-      {/* Dynamic low-opacity rotating famous places background for home page */}
+      {/* Dynamic low-opacity travel background */}
       {activeView === "home" && <HomeBackground />}
 
       {/* Top Fixed Header Navigation */}
@@ -131,7 +131,7 @@ export default function Page() {
         </div>
       )}
 
-      {/* Dedicated Workspace: AI Itinerary Planner */}
+      {/* Dedicated Workspace: Itinerary Planner */}
       {activeView === "itinerary" && (
         <div className="relative z-10 animate-in fade-in duration-300">
           <ItineraryPlanner
@@ -173,7 +173,7 @@ export default function Page() {
 
       {/* Dedicated Workspace: Packages Comparison */}
       {activeView === "packages" && (
-        <div className="relative z-10 animate-in fade-in duration-[300ms] pt-20">
+        <div className="relative z-10 animate-in fade-in duration-300 pt-20">
           <PackageComparison onNavigateView={handleViewChange} onOpenAuth={openAuth} />
         </div>
       )}

@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import {
   Globe2,
   Compass,
-  BrainCircuit,
+  Calendar,
   Wallet,
   MapPin,
   LineChart,
@@ -12,62 +12,70 @@ import {
   ListChecks,
 } from "lucide-react"
 
-
 const features = [
   {
-    title: "Smart Destination Discovery",
-    description: "Find your next escape with AI that matches places to your vibe, season, and budget.",
+    title: "Destination Discovery",
+    description: "Find your next escape tailored to your style, season preference, and travel budget.",
     icon: Globe2,
     accent: "primary",
+    view: "explore"
   },
   {
-    title: "Interactive Globe Exploration",
-    description: "Spin the globe and explore destinations visually before you ever book a ticket.",
+    title: "Interactive Globe & Maps",
+    description: "Explore destinations visually and trace travel routes before you ever book a ticket.",
     icon: Compass,
     accent: "emerald",
+    view: "explore"
   },
   {
-    title: "AI Itinerary Builder",
-    description: "Generate a day-by-day plan in seconds, tailored to your interests and pace.",
-    icon: BrainCircuit,
+    title: "Custom Itinerary Builder",
+    description: "Generate an organized day-by-day travel plan in seconds, tailored to your pace.",
+    icon: Calendar,
     accent: "primary",
+    view: "itinerary"
   },
   {
-    title: "Smart Budget Calculator",
-    description: "See a realistic cost breakdown for flights, stays, food, and activities upfront.",
+    title: "Trip Budget Calculator",
+    description: "See a realistic cost breakdown for stay options, transport, food, and activities upfront.",
     icon: Wallet,
     accent: "emerald",
+    view: "budget"
   },
   {
     title: "Context-Aware Maps",
-    description: "Maps that surface nearby gems, transit, and timing based on where you are.",
+    description: "Maps that surface nearby attractions, local dining, and transit options seamlessly.",
     icon: MapPin,
     accent: "primary",
+    view: "explore"
   },
   {
-    title: "Expense Tracker",
-    description: "Log spending on the go and stay on budget throughout your entire trip.",
+    title: "Live Expense Tracker",
+    description: "Log daily trip spending on the go and keep your travel budget completely on track.",
     icon: LineChart,
     accent: "emerald",
+    view: "expenses"
   },
   {
-    title: "AI Recommendations",
-    description: "Get curated stays, food, and experiences chosen just for your travel style.",
+    title: "Curated Recommendations",
+    description: "Get handpicked stays, authentic local food spots, and experiences for your travel style.",
     icon: Sparkles,
     accent: "primary",
+    view: "itinerary"
   },
   {
-    title: "Packing Checklist",
-    description: "Auto-generated packing lists based on weather, activities, and trip length.",
+    title: "Smart Packing Checklist",
+    description: "Auto-generated packing lists based on local weather, planned activities, and trip length.",
     icon: ListChecks,
     accent: "emerald",
+    view: "itinerary"
   },
 ]
 
-export function WhyTripNest() {
+export function WhyTripNest({ onNavigateView }) {
   return (
     <section id="features" className="relative bg-secondary/40 px-4 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
+        
         {/* Header */}
         <div className="mx-auto max-w-2xl text-center">
           <motion.h2
@@ -86,7 +94,7 @@ export function WhyTripNest() {
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="mt-3 text-lg leading-relaxed text-pretty text-muted-foreground"
           >
-            Everything you need to plan your perfect journey.
+            Everything you need to plan your perfect journey with ease and confidence.
           </motion.p>
         </div>
 
@@ -102,8 +110,9 @@ export function WhyTripNest() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: (i % 4) * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ y: -6 }}
-                className="group relative overflow-hidden rounded-3xl border border-border/70 bg-card p-6 shadow-sm transition-shadow duration-300 hover:shadow-xl hover:shadow-black/5"
+                whileHover={{ y: -4 }}
+                onClick={() => onNavigateView?.(feature.view)}
+                className="group relative cursor-pointer overflow-hidden rounded-3xl border border-border/70 bg-card p-6 shadow-sm transition-all duration-300 hover:border-primary/50 hover:shadow-xl"
               >
                 {/* Gradient wash */}
                 <div

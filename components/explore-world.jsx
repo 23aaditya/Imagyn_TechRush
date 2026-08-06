@@ -1,10 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Globe, ArrowRight } from "lucide-react"
+import { Map, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-// Pin positions as percentages over the world-map illustration
+// Pin positions over the world-map backdrop
 const pins = [
   { top: "34%", left: "22%", delay: 0 },
   { top: "30%", left: "48%", delay: 0.6 },
@@ -14,7 +14,7 @@ const pins = [
   { top: "26%", left: "82%", delay: 1.4 },
 ]
 
-// Floating landmark bubbles using existing destination imagery
+// Floating landmark bubbles
 const landmarks = [
   { src: "/images/dest-santorini.png", label: "Santorini", top: "12%", left: "6%", delay: 0 },
   { src: "/images/dest-jaipur.png", label: "Jaipur", top: "20%", right: "8%", delay: 0.4 },
@@ -83,23 +83,13 @@ export function ExploreWorld({ onNavigateView }) {
 
       {/* Content */}
       <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
-        <motion.span
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/90 backdrop-blur-md"
-        >
-          <Globe className="h-4 w-4 text-emerald" />
-          Immersive Discovery
-        </motion.span>
-
+        
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-6 font-heading text-4xl font-bold tracking-tight text-balance text-white sm:text-5xl"
+          className="font-heading text-4xl font-bold tracking-tight text-balance text-white sm:text-5xl"
         >
           Don&apos;t know where to travel?
         </motion.h2>
@@ -111,9 +101,10 @@ export function ExploreWorld({ onNavigateView }) {
           transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="mt-4 max-w-lg text-lg leading-relaxed text-pretty text-white/70"
         >
-          Explore the world visually through our immersive interactive destination directory.
+          Explore destinations visually through interactive digital maps, animated routes, and location markers.
         </motion.p>
 
+        {/* Green highlighted action button: "Let's Explore With Maps" */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -123,11 +114,11 @@ export function ExploreWorld({ onNavigateView }) {
           <Button
             size="lg"
             onClick={() => onNavigateView?.("explore")}
-            className="mt-9 h-14 rounded-2xl bg-emerald px-8 text-base font-semibold text-emerald-foreground shadow-lg shadow-emerald/25 transition-transform hover:-translate-y-0.5 hover:bg-emerald/90"
+            className="mt-9 h-14 rounded-2xl bg-emerald px-8 text-base font-bold text-emerald-foreground shadow-lg shadow-emerald/25 transition-transform hover:-translate-y-0.5 hover:bg-emerald/90"
           >
-            <Globe className="mr-1 h-5 w-5" />
-            Launch Interactive Explorer Workspace
-            <ArrowRight className="ml-1 h-5 w-5" />
+            <Map className="mr-2 h-5 w-5" />
+            Let&apos;s Explore With Maps
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </motion.div>
       </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import {
   MapPin,
@@ -8,36 +8,14 @@ import {
   Wallet,
   Compass,
   Search,
-  CloudSun,
-  Hotel,
-  Map as MapIcon,
-  PlaneTakeoff,
   ChevronDown,
-  Mountain,
-  Palmtree,
-  Landmark,
-  TreePine,
-  Backpack,
+  Clock,
+  Flame,
   Sparkles,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-const chips = [
-  { label: "Mountains", icon: Mountain, view: "explore" },
-  { label: "Beaches", icon: Palmtree, view: "explore" },
-  { label: "Heritage", icon: Landmark, view: "explore" },
-  { label: "Nature", icon: TreePine, view: "explore" },
-  { label: "Backpacking", icon: Backpack, view: "itinerary" },
-  { label: "Luxury", icon: Sparkles, view: "packages" },
-]
-
-const floatingCards = [
-  { icon: CloudSun, title: "Weather", subtitle: "28°C · Sunny", accent: "emerald", pos: "left-0 top-2", delay: 0, view: "explore" },
-  { icon: Wallet, title: "Budget", subtitle: "$1,240 planned", accent: "primary", pos: "right-2 top-24", delay: 0.4, view: "budget" },
-  { icon: Hotel, title: "Hotels", subtitle: "320+ nearby", accent: "primary", pos: "left-6 top-48", delay: 0.8, view: "explore" },
-  { icon: MapIcon, title: "Interactive Maps", subtitle: "12 stops mapped", accent: "emerald", pos: "right-0 top-72", delay: 1.2, view: "explore" },
-  { icon: PlaneTakeoff, title: "Expense Tracker", subtitle: "Live logs active", accent: "primary", pos: "left-16 bottom-2", delay: 1.6, view: "expenses" },
-]
 
 const heroBackgrounds = [
   { src: "/images/hero-mountains.png", alt: "Misty mountain range at golden hour" },
@@ -46,6 +24,21 @@ const heroBackgrounds = [
   { src: "/images/dest-jaipur.png", alt: "Warm, sunlit city escape in Jaipur" },
   { src: "/images/dest-santorini.png", alt: "Whitewashed cliffside coastal town in Santorini" },
   { src: "/images/dest-manali.png", alt: "Snow-capped adventure mountains in Manali" },
+]
+
+const allDestinations = [
+  { name: "Jaipur", region: "Rajasthan, India", type: "popular" },
+  { name: "Jaisalmer", region: "Rajasthan, India", type: "trending" },
+  { name: "Jammu", region: "Jammu & Kashmir, India", type: "trending" },
+  { name: "Goa", region: "India", type: "popular" },
+  { name: "Kerala", region: "India", type: "popular" },
+  { name: "Manali", region: "Himachal, India", type: "trending" },
+  { name: "Udaipur", region: "Rajasthan, India", type: "popular" },
+  { name: "Shimla", region: "Himachal, India", type: "trending" },
+  { name: "Bali", region: "Indonesia", type: "popular" },
+  { name: "Santorini", region: "Greece", type: "trending" },
+  { name: "Lonavala", region: "Maharashtra, India", type: "popular" },
+  { name: "Munnar", region: "Kerala, India", type: "trending" }
 ]
 
 const fadeUp = {
@@ -60,6 +53,32 @@ const fadeUp = {
 export function Hero({ onStartPlanning }) {
   const [activeSlide, setActiveSlide] = useState(0)
 
+  // Search autocomplete state
+  const [query, setQuery] = useState("")
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [recentSearches, setRecentSearches] = useState([])
+  const dropdownRef = useRef(null)
+
+  // Date range picker state
+  const [fromDate, setFromDate] = useState("")
+  const [toDate, setToDate] = useState("")
+  const [dateError, setDateError] = useState("")
+  const [tripDuration, setTripDuration] = useState(null)
+
+  // Budget state
+  const [selectedBudget, setSelectedBudget] = useState("Any budget")
+
+  // Load recent searches on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("tripnest_recent_searches")
+      if (saved) setRecentSearches(JSON.parse(saved))
+    } catch (e) {
+      console.error(e)
+    }
+  }, [])
+
+  // Auto rotate background hero slideshow
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % heroBackgrounds.length)
@@ -67,8 +86,60 @@ export function Hero({ onStartPlanning }) {
     return () => clearInterval(timer)
   }, [])
 
+  // Handle outside click for search dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  // Handle Date Range validation & Duration calculation
+  useEffect(() => {
+    if (fromDate && toDate) {
+      const start = new Date(fromDate)
+      const end = new Date(toDate)
+      if (end < start) {
+        setDateError("End date cannot be before start date")
+        setTripDuration(null)
+      } else {
+        setDateError("")
+        const diffTime = Math.abs(end - start)
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+        setTripDuration(diffDays)
+      }
+    } else {
+      setDateError("")
+      setTripDuration(null)
+    }
+  }, [fromDate, toDate])
+
+  const handleSelectDestination = (destName) => {
+    setQuery(destName)
+    setIsDropdownOpen(false)
+
+    // Save to recent searches
+    const updated = [destName, ...recentSearches.filter((s) => s !== destName)].slice(0, 4)
+    setRecentSearches(updated)
+    try {
+      localStorage.setItem("tripnest_recent_searches", JSON.stringify(updated))
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const filteredDestinations = query.trim()
+    ? allDestinations.filter((d) => d.name.toLowerCase().includes(query.toLowerCase()))
+    : []
+
+  const trendingDestinations = allDestinations.filter((d) => d.type === "trending")
+  const popularDestinations = allDestinations.filter((d) => d.type === "popular")
+
   return (
-    <section id="home" className="relative min-h-[92vh] w-full overflow-hidden">
+    <section id="home" className="relative min-h-[88vh] w-full overflow-hidden">
       {/* Background slideshow */}
       <div className="absolute inset-0 z-0">
         <AnimatePresence mode="wait">
@@ -77,15 +148,15 @@ export function Hero({ onStartPlanning }) {
             src={heroBackgrounds[activeSlide].src}
             alt={heroBackgrounds[activeSlide].alt}
             initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 0.70, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover dark:opacity-60"
           />
         </AnimatePresence>
 
-        {/* Gradient overlays for readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-background/30" />
+        {/* Gradient overlays for enhanced readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/55 to-background/25" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
 
         {/* Slide indicators */}
@@ -101,18 +172,18 @@ export function Hero({ onStartPlanning }) {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-20 pt-32 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:pt-40">
-        {/* Left column */}
-        <div className="max-w-2xl">
+      <div className="relative z-10 mx-auto max-w-5xl px-4 pb-20 pt-32 sm:px-6 lg:pt-36">
+        <div className="mx-auto text-center">
+          
           <motion.span
             variants={fadeUp}
             custom={0}
             initial="hidden"
             animate="show"
-            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-4 py-1.5 text-sm font-medium text-foreground backdrop-blur-md"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-1.5 text-sm font-medium text-foreground backdrop-blur-md"
           >
             <Compass className="h-4 w-4 text-emerald" />
-            Smart itineraries, powered by AI
+            Your Ultimate Travel Companion
           </motion.span>
 
           <motion.h1
@@ -120,7 +191,7 @@ export function Hero({ onStartPlanning }) {
             custom={1}
             initial="hidden"
             animate="show"
-            className="mt-5 font-heading text-4xl font-bold leading-[1.05] tracking-tight text-balance text-foreground sm:text-5xl lg:text-6xl"
+            className="mt-5 font-heading text-4xl font-extrabold leading-[1.08] tracking-tight text-balance text-foreground sm:text-5xl lg:text-6xl"
           >
             Plan Your Dream Trip{" "}
             <span className="text-primary">Smarter</span>, Faster &{" "}
@@ -132,147 +203,239 @@ export function Hero({ onStartPlanning }) {
             custom={2}
             initial="hidden"
             animate="show"
-            className="mt-5 max-w-xl text-lg leading-relaxed text-pretty text-muted-foreground"
+            className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground"
           >
-            Discover destinations, compare travel packages, generate intelligent
-            itineraries, calculate travel budgets and explore the world visually.
+            Discover destinations, compare travel packages, organize custom itineraries, and calculate realistic travel budgets across India and beyond.
           </motion.p>
 
-          {/* Search card */}
+          {/* Enhanced Search Card ("Where To?") */}
           <motion.div
             variants={fadeUp}
             custom={3}
             initial="hidden"
             animate="show"
-            className="mt-8 rounded-3xl border border-border/60 bg-background/70 p-4 shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-5"
+            className="mt-8 mx-auto max-w-3xl rounded-3xl border border-border/80 bg-background/80 p-4 shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-6"
           >
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <SearchField icon={MapPin} label="Destination">
-                <input
-                  type="text"
-                  placeholder="Where to?"
-                  className="w-full bg-transparent text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none"
-                />
-              </SearchField>
-              <SearchField icon={Calendar} label="Travel Dates">
-                <input
-                  type="text"
-                  onFocus={(e) => (e.target.type = "date")}
-                  onBlur={(e) => {
-                    if (!e.target.value) e.target.type = "text"
-                  }}
-                  placeholder="Add dates"
-                  className="w-full bg-transparent text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none"
-                />
-              </SearchField>
-              <SearchField icon={Wallet} label="Budget">
-                <SelectField
-                  options={["Any budget", "Under $500", "$500 – $1,500", "$1,500 – $3,000", "$3,000+"]}
-                />
-              </SearchField>
-              <SearchField icon={Compass} label="Travel Type">
-                <SelectField options={["Any type", "Solo", "Couple", "Family", "Friends", "Business"]} />
-              </SearchField>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 text-left">
+              
+              {/* Destination Search Input with Auto-complete Dropdown */}
+              <div className="relative md:col-span-2" ref={dropdownRef}>
+                <label className="flex cursor-text items-center gap-3 rounded-2xl border border-border/60 bg-background/80 px-3.5 py-2.5 transition-colors focus-within:border-primary">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <MapPin className="h-4 w-4" />
+                  </span>
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="text-[11px] font-semibold uppercase text-muted-foreground">Where To?</span>
+                    <input
+                      type="text"
+                      value={query}
+                      onFocus={() => setIsDropdownOpen(true)}
+                      onChange={(e) => {
+                        setQuery(e.target.value)
+                        setIsDropdownOpen(true)
+                      }}
+                      placeholder="e.g. Jaipur, Goa, Manali..."
+                      className="w-full bg-transparent text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    />
+                  </span>
+                </label>
+
+                {/* Dropdown Menu */}
+                <AnimatePresence>
+                  {isDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-border bg-card p-3 shadow-2xl backdrop-blur-2xl"
+                    >
+                      {/* Search Matches */}
+                      {query.trim() !== "" && (
+                        <div className="mb-2">
+                          <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            Suggestions for &quot;{query}&quot;
+                          </p>
+                          {filteredDestinations.length > 0 ? (
+                            filteredDestinations.map((dest) => (
+                              <button
+                                key={dest.name}
+                                onClick={() => handleSelectDestination(dest.name)}
+                                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold text-foreground transition-colors hover:bg-accent"
+                              >
+                                <span className="flex items-center gap-2">
+                                  <MapPin className="h-3.5 w-3.5 text-primary" />
+                                  {dest.name}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">{dest.region}</span>
+                              </button>
+                            ))
+                          ) : (
+                            <p className="px-3 py-2 text-xs text-muted-foreground">No matching destinations found.</p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Recently Searched */}
+                      {recentSearches.length > 0 && query.trim() === "" && (
+                        <div className="mb-3 border-b border-border/60 pb-2">
+                          <p className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <Clock className="h-3 w-3 text-emerald" />
+                            Recently Searched
+                          </p>
+                          <div className="flex flex-wrap gap-1.5 px-2 pt-1">
+                            {recentSearches.map((item) => (
+                              <button
+                                key={item}
+                                onClick={() => handleSelectDestination(item)}
+                                className="rounded-full bg-accent px-3 py-1 text-xs font-medium text-foreground hover:bg-primary/20 transition-colors"
+                              >
+                                {item}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Trending Suggestions */}
+                      {query.trim() === "" && (
+                        <div className="mb-3 border-b border-border/60 pb-2">
+                          <p className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <Flame className="h-3 w-3 text-amber-500" />
+                            Trending Destinations
+                          </p>
+                          {trendingDestinations.map((dest) => (
+                            <button
+                              key={dest.name}
+                              onClick={() => handleSelectDestination(dest.name)}
+                              className="flex w-full items-center justify-between rounded-xl px-3 py-1.5 text-left text-xs font-medium text-foreground transition-colors hover:bg-accent"
+                            >
+                              <span className="flex items-center gap-2">
+                                <MapPin className="h-3.5 w-3.5 text-amber-500" />
+                                {dest.name}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground">{dest.region}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Popular Suggestions */}
+                      {query.trim() === "" && (
+                        <div>
+                          <p className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <Sparkles className="h-3 w-3 text-primary" />
+                            Popular Choices
+                          </p>
+                          {popularDestinations.slice(0, 4).map((dest) => (
+                            <button
+                              key={dest.name}
+                              onClick={() => handleSelectDestination(dest.name)}
+                              className="flex w-full items-center justify-between rounded-xl px-3 py-1.5 text-left text-xs font-medium text-foreground transition-colors hover:bg-accent"
+                            >
+                              <span className="flex items-center gap-2">
+                                <MapPin className="h-3.5 w-3.5 text-primary" />
+                                {dest.name}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground">{dest.region}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Date Range Picker (From Date & To Date) */}
+              <div className="md:col-span-2 grid grid-cols-2 gap-2">
+                <label className="flex cursor-pointer flex-col justify-center rounded-2xl border border-border/60 bg-background/80 px-3 py-2 transition-colors focus-within:border-primary">
+                  <span className="text-[10px] font-semibold uppercase text-muted-foreground">From Date</span>
+                  <input
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                    className="w-full bg-transparent text-xs font-semibold text-foreground focus:outline-none"
+                  />
+                </label>
+
+                <label className="flex cursor-pointer flex-col justify-center rounded-2xl border border-border/60 bg-background/80 px-3 py-2 transition-colors focus-within:border-primary">
+                  <span className="text-[10px] font-semibold uppercase text-muted-foreground">To Date</span>
+                  <input
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                    className="w-full bg-transparent text-xs font-semibold text-foreground focus:outline-none"
+                  />
+                </label>
+              </div>
+
+              {/* Budget Picker in INR */}
+              <div className="md:col-span-2">
+                <label className="flex cursor-pointer flex-col justify-center rounded-2xl border border-border/60 bg-background/80 px-3 py-2 transition-colors focus-within:border-primary">
+                  <span className="flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground">
+                    <Wallet className="h-3 w-3 text-emerald" />
+                    Budget (₹)
+                  </span>
+                  <select
+                    value={selectedBudget}
+                    onChange={(e) => setSelectedBudget(e.target.value)}
+                    className="w-full cursor-pointer bg-transparent text-xs font-semibold text-foreground focus:outline-none"
+                  >
+                    <option value="Any budget" className="bg-background text-foreground">Any Budget</option>
+                    <option value="Under ₹5,000" className="bg-background text-foreground">Under ₹5,000</option>
+                    <option value="₹5,000 – ₹15,000" className="bg-background text-foreground">₹5,000 – ₹15,000</option>
+                    <option value="₹15,000 – ₹35,000" className="bg-background text-foreground">₹15,000 – ₹35,000</option>
+                    <option value="₹35,000+" className="bg-background text-foreground">₹35,000+</option>
+                  </select>
+                </label>
+              </div>
+
+              {/* Travel Type */}
+              <div className="md:col-span-2">
+                <label className="flex cursor-pointer flex-col justify-center rounded-2xl border border-border/60 bg-background/80 px-3 py-2 transition-colors focus-within:border-primary">
+                  <span className="flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground">
+                    <Compass className="h-3 w-3 text-primary" />
+                    Travel Type
+                  </span>
+                  <select className="w-full cursor-pointer bg-transparent text-xs font-semibold text-foreground focus:outline-none">
+                    <option className="bg-background text-foreground">Any Type</option>
+                    <option className="bg-background text-foreground">Solo</option>
+                    <option className="bg-background text-foreground">Couple</option>
+                    <option className="bg-background text-foreground">Family</option>
+                    <option className="bg-background text-foreground">Friends</option>
+                  </select>
+                </label>
+              </div>
+
             </div>
+
+            {/* Validation & Duration Display */}
+            {dateError && (
+              <div className="mt-3 flex items-center gap-2 rounded-xl bg-destructive/10 p-2.5 text-xs text-destructive">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{dateError}</span>
+              </div>
+            )}
+
+            {tripDuration && !dateError && (
+              <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald/10 p-2.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <span>Trip Duration Calculated: {tripDuration} {tripDuration === 1 ? "Day" : "Days"}</span>
+              </div>
+            )}
+
+            {/* Submit CTA */}
             <Button
               onClick={() => onStartPlanning?.("itinerary")}
-              className="mt-3 h-12 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-xl shadow-primary/30 ring-1 ring-primary/20 hover:bg-primary/90 hover:shadow-2xl hover:shadow-primary/40"
+              className="mt-4 h-12 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-xl shadow-primary/30 hover:bg-primary/90"
             >
-              <Search className="mr-1 h-5 w-5" />
-              Generate Smart Itinerary
+              <Search className="mr-1.5 h-5 w-5" />
+              Plan Itinerary
             </Button>
           </motion.div>
 
-          {/* Chips */}
-          <motion.div
-            variants={fadeUp}
-            custom={4}
-            initial="hidden"
-            animate="show"
-            className="mt-6 flex flex-wrap gap-2.5"
-          >
-            {chips.map((chip) => {
-              const ChipIcon = chip.icon
-              return (
-                <button
-                  key={chip.label}
-                  onClick={() => onStartPlanning?.(chip.view)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/60 px-4 py-2 text-sm font-medium text-foreground backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-background/80"
-                >
-                  <ChipIcon className="h-4 w-4 text-emerald" aria-hidden />
-                  {chip.label}
-                </button>
-              )
-            })}
-          </motion.div>
-        </div>
-
-        {/* Right column: floating cards */}
-        <div className="relative hidden h-[480px] lg:block">
-          {floatingCards.map((card) => {
-            const Icon = card.icon
-            return (
-              <motion.div
-                key={card.title}
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.4 + card.delay * 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className={`absolute ${card.pos} cursor-pointer`}
-                onClick={() => onStartPlanning?.(card.view)}
-              >
-                <motion.div
-                  animate={{ y: [0, -12, 0] }}
-                  transition={{ duration: 4, delay: card.delay, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                  className="flex w-52 items-center gap-3 rounded-2xl border border-border/60 bg-background/70 p-3.5 shadow-xl shadow-black/10 backdrop-blur-xl hover:border-primary/50 transition-all"
-                >
-                  <span
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-                      card.accent === "emerald"
-                        ? "bg-emerald/15 text-emerald"
-                        : "bg-primary/15 text-primary"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">{card.title}</p>
-                    <p className="truncate text-xs text-muted-foreground">{card.subtitle}</p>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )
-          })}
         </div>
       </div>
     </section>
-  )
-}
-
-function SearchField({ icon: Icon, label, children }) {
-  return (
-    <label className="flex cursor-text items-center gap-3 rounded-2xl border border-border/60 bg-background/60 px-3.5 py-2.5 transition-colors focus-within:border-primary/50">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-primary">
-        <Icon className="h-4 w-4" />
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
-        {children}
-      </span>
-    </label>
-  )
-}
-
-function SelectField({ options }) {
-  return (
-    <span className="relative flex items-center">
-      <select className="w-full cursor-pointer appearance-none bg-transparent pr-5 text-sm font-medium text-foreground focus:outline-none">
-        {options.map((opt) => (
-          <option key={opt} className="bg-background text-foreground">
-            {opt}
-          </option>
-        ))}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-0 h-4 w-4 text-muted-foreground" />
-    </span>
   )
 }

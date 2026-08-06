@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Mail, Lock, User, Sparkles, CheckCircle2, ArrowRight, ShieldCheck } from "lucide-react"
+import { X, Mail, Lock, User, Sparkles, CheckCircle2, ArrowRight, ShieldCheck, Compass } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login" }) {
@@ -10,6 +10,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
+  const [travelFrequency, setTravelFrequency] = useState("Occasional traveler")
   const [rememberMe, setRememberMe] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState("")
@@ -25,7 +26,8 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
         name: name.trim() || email.split("@")[0] || "Traveler",
         email: email || "traveler@tripnest.com",
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name || email || 'Traveler'}`,
-        initials: (name || email || "TR").substring(0, 2).toUpperCase()
+        initials: (name || email || "TR").substring(0, 2).toUpperCase(),
+        travelFrequency
       }
       setSuccessMsg(tab === "login" ? "Welcome back!" : "Account created successfully!")
       setTimeout(() => {
@@ -43,7 +45,8 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
       const mockUser = {
         name: `${provider} Traveler`,
         email: `user@${provider.toLowerCase()}.com`,
-        initials: provider.substring(0, 2).toUpperCase()
+        initials: provider.substring(0, 2).toUpperCase(),
+        travelFrequency
       }
       setSuccessMsg(`Authenticated with ${provider}!`)
       setTimeout(() => {
@@ -183,6 +186,24 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                   className="w-full rounded-xl border border-border bg-background py-2.5 pl-9 pr-3 text-sm text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
               </div>
+            </div>
+
+            {/* Travel Frequency Selector */}
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground flex items-center gap-1">
+                <Compass className="h-3.5 w-3.5 text-emerald" />
+                Travel Frequency
+              </label>
+              <select
+                value={travelFrequency}
+                onChange={(e) => setTravelFrequency(e.target.value)}
+                className="w-full rounded-xl border border-border bg-background py-2.5 px-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+              >
+                <option value="First trip">First trip</option>
+                <option value="Occasional traveler">Occasional traveler</option>
+                <option value="Frequent traveler">Frequent traveler</option>
+                <option value="Travel enthusiast">Travel enthusiast</option>
+              </select>
             </div>
 
             {tab === "login" && (

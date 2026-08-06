@@ -1,28 +1,20 @@
 "use client"
 
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import {
   ArrowLeft,
-  Sparkles,
   MapPin,
   Calendar,
   Compass,
   Clock,
   Coins,
-  Share2,
-  Download,
   Bookmark,
-  CheckCircle,
   Sun,
   Utensils,
   Camera,
   Coffee,
-  Bed,
-  Car,
-  ChevronRight,
   Filter,
-  Plus
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -63,17 +55,17 @@ const presetItineraries = {
       day: 1,
       title: "Ubud Cultural Heart & Rice Terraces",
       activities: [
-        { time: "08:30 AM", type: "Nature", title: "Tegalalang Rice Terraces & Swing", desc: "Lush green terraced views and giant jungle swing", cost: "$15", icon: Camera },
-        { time: "11:30 AM", type: "Culture", title: "Sacred Monkey Forest Sanctuary", desc: "Walk among ancient temple ruins and gray macaques", cost: "$8", icon: MapPin },
-        { time: "02:00 PM", type: "Food", title: "Organic Lunch at Bebek Tepi Sawah", desc: "Crispy duck with traditional sambal sauces", cost: "$22", icon: Utensils }
+        { time: "08:30 AM", type: "Nature", title: "Tegalalang Rice Terraces & Swing", desc: "Lush green terraced views and giant jungle swing", cost: "₹1,200", icon: Camera },
+        { time: "11:30 AM", type: "Culture", title: "Sacred Monkey Forest Sanctuary", desc: "Walk among ancient temple ruins and gray macaques", cost: "₹650", icon: MapPin },
+        { time: "02:00 PM", type: "Food", title: "Organic Lunch at Bebek Tepi Sawah", desc: "Crispy duck with traditional sambal sauces", cost: "₹1,800", icon: Utensils }
       ]
     },
     {
       day: 2,
       title: "Uluwatu Sunset & Kecak Fire Dance",
       activities: [
-        { time: "10:00 AM", type: "Beach", title: "Padang Padang Beach Surfing", desc: "Famous white sand cove with world-class waves", cost: "$20", icon: Sun },
-        { time: "05:30 PM", type: "Show", title: "Uluwatu Cliffside Temple & Kecak Dance", desc: "Sunset performance against ocean backdrop", cost: "$18", icon: Compass }
+        { time: "10:00 AM", type: "Beach", title: "Padang Padang Beach Surfing", desc: "Famous white sand cove with world-class waves", cost: "₹1,600", icon: Sun },
+        { time: "05:30 PM", type: "Show", title: "Uluwatu Cliffside Temple & Kecak Dance", desc: "Sunset performance against ocean backdrop", cost: "₹1,400", icon: Compass }
       ]
     }
   ]
@@ -94,7 +86,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
       setIsGenerating(false)
       const data = presetItineraries[destination] || presetItineraries["Goa, India"]
       setItinerary(data)
-    }, 800)
+    }, 600)
   }
 
   return (
@@ -114,13 +106,13 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               Back to Overview
             </Button>
             <span className="text-muted-foreground">/</span>
-            <span className="font-medium text-foreground text-sm">AI Itinerary Generator</span>
+            <span className="font-medium text-foreground text-sm">Itinerary Planner Workspace</span>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              <Sparkles className="h-3.5 w-3.5" />
-              AI Engine v4.2 Ready
+              <Calendar className="h-3.5 w-3.5" />
+              Itinerary Engine Active
             </span>
           </div>
         </div>
@@ -146,7 +138,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   <Filter className="h-4 w-4 text-primary" />
                   Trip Preferences
                 </h3>
-                <span className="text-xs text-muted-foreground">Smart Parameters</span>
+                <span className="text-xs text-muted-foreground">Parameters</span>
               </div>
 
               {/* Destination Selector */}
@@ -157,7 +149,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 <select
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-background p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  className="w-full rounded-xl border border-border bg-background p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
                 >
                   {sampleDestinations.map((d) => (
                     <option key={d} value={d}>{d}</option>
@@ -246,8 +238,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" />
-                    Generate AI Itinerary
+                    <Calendar className="h-4 w-4" />
+                    Generate Itinerary
                   </span>
                 )}
               </Button>
