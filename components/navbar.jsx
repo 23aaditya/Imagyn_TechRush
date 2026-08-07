@@ -50,29 +50,17 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
       className="fixed inset-x-0 top-0 z-50 w-full bg-white text-neutral-900 border-b border-neutral-200/80 shadow-sm"
     >
       <nav className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3">
-        {/* Travel-Oriented Logo Emblem (Globe + Route + Pin + Plane) */}
+        {/* Official TripNest Imagyn Logo */}
         <button
           onClick={() => handleNavClick("home")}
-          className="flex items-center gap-2.5 text-left focus:outline-none group"
+          className="flex items-center gap-2.5 text-left focus:outline-none group py-1"
           aria-label="TripNest Homepage"
         >
-          <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-emerald to-teal-500 text-white shadow-md shadow-primary/30 transition-transform group-hover:scale-105">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6">
-              <circle cx="12" cy="12" r="9" className="opacity-40" />
-              <path d="M3.6 9h16.8M3.6 15h16.8" className="opacity-30" />
-              <path d="M5 16C7 11 12 7 18 8" strokeDasharray="2 2" className="text-white/90" />
-              <path d="M12 12C12 12 15 8.5 15 6.5C15 4.8 13.7 3.5 12 3.5C10.3 3.5 9 4.8 9 6.5C9 8.5 12 12 12 12Z" fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M18.5 7.5L16 11.5L18 12.5L20 10.5L21.5 11L19.5 14L15.5 13L13 17L11.5 16.5L13 12L9.5 11L8 12.5L6.5 12L7.5 9.5L6.5 7L8 6.5L9.5 8L13 7L11.5 2.5L13 2L15.5 6L19.5 5L21.5 8L18.5 7.5Z" fill="currentColor" />
-            </svg>
-          </span>
-          <div className="flex flex-col">
-            <span className="font-heading text-xl font-extrabold tracking-tight text-foreground leading-none">
-              Trip<span className="text-primary">Nest</span>
-            </span>
-            <span className="text-[10px] font-medium tracking-widest uppercase text-muted-foreground">
-              Travel Platform
-            </span>
-          </div>
+          <img
+            src="/images/tripnest-logo.png"
+            alt="TripNest Imagyn"
+            className="h-9 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
+          />
         </button>
 
         {/* Center links */}

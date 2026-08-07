@@ -110,25 +110,25 @@ export function Testimonials() {
   }
 
   return (
-    <section id="testimonials" className="relative w-full overflow-hidden bg-secondary/40 py-20 md:py-28">
+    <section id="testimonials" className="relative w-full overflow-hidden bg-[#0D2B45] py-20 md:py-28">
       {/* Ambient glow */}
-      <div className="pointer-events-none absolute left-1/4 top-0 -z-10 h-72 w-72 rounded-full bg-primary/15 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 right-1/4 -z-10 h-72 w-72 rounded-full bg-emerald/15 blur-3xl" />
+      <div className="pointer-events-none absolute left-1/4 top-0 -z-10 h-72 w-72 rounded-full bg-[#8DBFB7]/20 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 right-1/4 -z-10 h-72 w-72 rounded-full bg-[#5A7D9A]/20 blur-3xl" />
 
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Header */}
         <div className="mx-auto mb-10 max-w-2xl text-center">
-          <h2 className="text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-foreground">
+          <h2 className="text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-white">
             Traveler Reviews & Experiences
           </h2>
-          <p className="mt-3 text-pretty text-muted-foreground leading-relaxed">
+          <p className="mt-3 text-pretty text-white/70 leading-relaxed">
             Read reviews from fellow travelers or share your own journey experience with the community.
           </p>
 
           <Button
             onClick={() => setAddModalOpen(true)}
-            className="mt-6 rounded-2xl bg-primary px-6 py-2.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90"
+            className="mt-6 rounded-2xl bg-[#8DBFB7] px-6 py-2.5 font-semibold text-[#0D2B45] shadow-lg shadow-[#8DBFB7]/25 hover:bg-[#8DBFB7]/90"
           >
             <Plus className="mr-1.5 h-4 w-4" />
             Add Your Review
@@ -146,10 +146,10 @@ export function Testimonials() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, delay: (i % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="group relative overflow-hidden rounded-3xl border border-border/60 bg-background/70 p-6 shadow-lg shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:border-primary/40"
+                className="group relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-6 shadow-lg shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:border-[#8DBFB7]/40"
               >
                 <Quote
-                  className="absolute -right-2 -top-2 h-20 w-20 text-foreground/[0.04]"
+                  className="absolute -right-2 -top-2 h-20 w-20 text-white/[0.06]"
                   aria-hidden
                   strokeWidth={1}
                 />
@@ -182,15 +182,15 @@ export function Testimonials() {
                 </div>
 
                 {/* Quote */}
-                <p className="relative mt-4 text-sm leading-relaxed text-foreground/90">{t.quote}</p>
+                <p className="relative mt-4 text-sm leading-relaxed text-white">{t.quote}</p>
 
                 {/* Author Info */}
-                <div className="relative mt-6 flex items-center gap-3 border-t border-border/60 pt-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                <div className="relative mt-6 flex items-center gap-3 border-t border-white/15 pt-4">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#8DBFB7] text-sm font-bold text-[#0D2B45]">
                     {initials}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-foreground flex items-center gap-1.5">
+                    <p className="truncate text-sm font-semibold text-white flex items-center gap-1.5">
                       {t.name}
                       {t.isOwn && (
                         <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
@@ -198,7 +198,7 @@ export function Testimonials() {
                         </span>
                       )}
                     </p>
-                    <p className="truncate text-xs text-muted-foreground">
+                    <p className="truncate text-xs text-white/60">
                       {t.trip} · {t.location}
                     </p>
                   </div>

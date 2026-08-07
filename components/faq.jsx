@@ -37,17 +37,17 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState(0)
 
   return (
-    <section id="faq" className="relative w-full py-20 md:py-28">
+    <section id="faq" className="relative w-full py-20 md:py-28 bg-[#0D2B45] text-white">
       <div className="mx-auto max-w-3xl px-4 md:px-6">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
-            <HelpCircle className="h-3.5 w-3.5 text-emerald" aria-hidden />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
+            <HelpCircle className="h-3.5 w-3.5 text-[#8DBFB7]" aria-hidden />
             Got Questions?
           </span>
-          <h2 className="mt-4 text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+          <h2 className="mt-4 text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-white">
             Frequently Asked Questions
           </h2>
-          <p className="mt-4 text-pretty text-muted-foreground leading-relaxed">
+          <p className="mt-4 text-pretty text-white/70 leading-relaxed">
             Everything you need to know about planning your trip with TripNest.
           </p>
         </div>
@@ -62,8 +62,8 @@ export function FAQ() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.4, delay: i * 0.06 }}
-                className={`overflow-hidden rounded-2xl border bg-background/60 shadow-sm backdrop-blur-xl transition-colors duration-300 ${
-                  isOpen ? "border-primary/30 shadow-lg shadow-primary/5" : "border-border/60"
+                className={`overflow-hidden rounded-2xl border shadow-lg backdrop-blur-xl transition-all duration-300 ${
+                  isOpen ? "border-white bg-white ring-2 ring-white/20 shadow-2xl" : "border-white/80 bg-white"
                 }`}
               >
                 <button
@@ -74,8 +74,8 @@ export function FAQ() {
                   className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6 sm:py-5"
                 >
                   <span
-                    className={`text-sm font-semibold sm:text-base ${
-                      isOpen ? "text-primary" : "text-foreground"
+                    className={`text-sm font-bold sm:text-base font-heading ${
+                      isOpen ? "text-primary" : "text-neutral-900"
                     }`}
                   >
                     {faq.question}
@@ -84,7 +84,7 @@ export function FAQ() {
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                      isOpen ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+                      isOpen ? "bg-primary/10 text-primary" : "bg-neutral-100 text-neutral-600"
                     }`}
                   >
                     <ChevronDown className="h-4 w-4" aria-hidden />
@@ -101,7 +101,7 @@ export function FAQ() {
                       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground sm:px-6 sm:pb-6">
+                      <p className="px-5 pb-5 text-sm leading-relaxed text-neutral-600 sm:px-6 sm:pb-6 font-sans">
                         {faq.answer}
                       </p>
                     </motion.div>

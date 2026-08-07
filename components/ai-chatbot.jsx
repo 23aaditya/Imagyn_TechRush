@@ -294,14 +294,14 @@ export function AiChatbot({ currentView, onNavigate }) {
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
-              className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-background border-2 border-primary/40 shadow-xl shadow-primary/30 transition-all hover:shadow-primary/50 focus:outline-none overflow-hidden"
+              className="group relative flex h-[72px] w-[72px] items-center justify-center rounded-full bg-background border-[3px] border-primary/50 shadow-2xl shadow-primary/40 transition-all hover:shadow-primary/60 focus:outline-none overflow-hidden"
               aria-label="Open Boots AI Assistant"
             >
               {/* Outer pulsing ring */}
-              <span className="absolute -inset-1 rounded-full bg-primary/30 animate-ping opacity-75" />
+              <span className="absolute -inset-2 rounded-full bg-primary/25 animate-ping opacity-75" />
 
               <img
                 src="/boots-avatar.jpg"
@@ -310,9 +310,9 @@ export function AiChatbot({ currentView, onNavigate }) {
               />
 
               {/* Status indicator dot */}
-              <span className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5">
+              <span className="absolute top-1 right-1 flex h-4 w-4">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-background" />
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-background" />
               </span>
             </motion.button>
           )}

@@ -1,5 +1,5 @@
 import { Analytics } from '@vercel/analytics/next'
-import { Inter, Cascadia_Code } from 'next/font/google'
+import { Inter, Playfair_Display } from 'next/font/google'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './globals.css'
 const inter = Inter({
@@ -9,11 +9,12 @@ const inter = Inter({
   fallback: ['system-ui', 'sans-serif'],
 })
 
-const cascadia = Cascadia_Code({
+const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
-  fallback: ['Cascadia Code', 'Consolas', 'monospace'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  fallback: ['Georgia', 'serif'],
 })
 
 export const metadata = {
@@ -50,7 +51,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${cascadia.variable} bg-background`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable} bg-background`}>
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

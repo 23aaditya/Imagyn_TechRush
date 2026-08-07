@@ -1,282 +1,203 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
-const oldMoneyFeatures = [
+const features = [
   {
-    num: "I",
+    id: 1,
     title: "Destination Discovery",
-    desc: "Find the perfect destination that matches your mood, budget, and travel dreams."
+    tagline: "Find Your Perfect Vibe",
+    desc: "Discover handpicked spots matching your mood, budget, and travel dreams effortlessly.",
+    img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1200&auto=format&fit=crop&q=80",
+    badge: "01 / Discovery"
   },
   {
-    num: "II",
-    title: "Smart Destination Comparison",
-    desc: "Explore the world naturally with smart comparisons designed for effortless discovery."
+    id: 2,
+    title: "Smart Package Comparison",
+    tagline: "Transparent Side-by-Side Analysis",
+    desc: "Weigh stays, transport, dining costs, and activity value before making any booking.",
+    img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&auto=format&fit=crop&q=80",
+    badge: "02 / Comparison"
   },
   {
-    num: "III",
-    title: "Custom Itinerary Builder",
-    desc: "Your journey, perfectly planned with AI-powered itineraries tailored just for you."
+    id: 3,
+    title: "AI-Powered Itinerary Builder",
+    tagline: "Bespoke Routes & Timings",
+    desc: "Your journey, day-by-day, optimized with opening hours, route distances, and rest spots.",
+    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&auto=format&fit=crop&q=80",
+    badge: "03 / Itineraries"
   },
   {
-    num: "IV",
-    title: "Trip Budget Calculator",
-    desc: "Know your travel costs before you book and explore with complete confidence."
+    id: 4,
+    title: "Realistic Budget Calculator",
+    tagline: "Know Your Costs Upfront",
+    desc: "Up-to-date regional expenditure breakdowns for accommodation, meals, and local transit.",
+    img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&auto=format&fit=crop&q=80",
+    badge: "04 / Budgeting"
   },
   {
-    num: "V",
-    title: "Context-Aware Maps",
-    desc: "Everything around you—from landmarks to local favorites—exactly when you need it."
+    id: 5,
+    title: "Context-Aware Local Maps",
+    tagline: "Landmarks to Hidden Gems",
+    desc: "Everything around you—from iconic views to secret eateries—right when you need it.",
+    img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&auto=format&fit=crop&q=80",
+    badge: "05 / Navigation"
   },
   {
-    num: "VI",
+    id: 6,
     title: "Live Expense Tracker",
-    desc: "Track every rupee effortlessly and stay on budget throughout your adventure."
-  },
-  {
-    num: "VII",
-    title: "Curated Recommendations",
-    desc: "Handpicked experiences that turn every trip into an unforgettable story."
-  },
-  {
-    num: "VIII",
-    title: "Smart Packing Checklist",
-    desc: "Never forget the essentials with intelligent packing tailored to your journey."
-  }
-]
-
-// 8 Bigger Interlocking Honeycomb Hexagons with Punchline Overlays
-const honeycombTiles = [
-  {
-    id: "disc",
-    punchline: "Find Your Vibe",
-    title: "Discovery",
-    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80",
-    offset: "translate-x-0"
-  },
-  {
-    id: "comp",
-    punchline: "Compare Places",
-    title: "Comparison",
-    img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop&q=80",
-    offset: "translate-x-0"
-  },
-  {
-    id: "itin",
-    punchline: "Bespoke Routes",
-    title: "Itineraries",
-    img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&auto=format&fit=crop&q=80",
-    offset: "translate-x-0"
-  },
-  {
-    id: "budg",
-    punchline: "Know Your Cost",
-    title: "Budgeting",
-    img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80",
-    offset: "-mt-10 sm:-mt-14 translate-x-1/2"
-  },
-  {
-    id: "maps",
-    punchline: "Explore Nearby",
-    title: "Context Maps",
-    img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80",
-    offset: "-mt-10 sm:-mt-14 translate-x-1/2"
-  },
-  {
-    id: "exps",
-    punchline: "Track Every Rupee",
-    title: "Expenses",
-    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80",
-    offset: "-mt-10 sm:-mt-14 translate-x-1/2"
-  },
-  {
-    id: "recs",
-    punchline: "Handpicked Stays",
-    title: "Curated Recommendations",
-    img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80",
-    offset: "-mt-10 sm:-mt-14 translate-x-0"
-  },
-  {
-    id: "pack",
-    punchline: "Pack Essentials",
-    title: "Smart Packing",
-    img: "https://images.unsplash.com/photo-1581553680321-4fffae59fccd?w=800&auto=format&fit=crop&q=80",
-    offset: "-mt-10 sm:-mt-14 translate-x-0"
+    tagline: "Stay Stress-Free On the Go",
+    desc: "Log daily spending live in your local currency and track remaining travel funds in real time.",
+    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&auto=format&fit=crop&q=80",
+    badge: "06 / Expense Tracking"
   }
 ]
 
 export function WhyTripNest() {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+
+  // Auto slide every 6 seconds
+  useEffect(() => {
+    if (isPaused) return
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % features.length)
+    }, 6000)
+    return () => clearInterval(interval)
+  }, [isPaused])
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + features.length) % features.length)
+  }
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % features.length)
+  }
+
+  // Get previous, current, and next indices
+  const prevIndex = (currentIndex - 1 + features.length) % features.length
+  const nextIndex = (currentIndex + 1) % features.length
+
   return (
     <section id="features" className="relative bg-background px-4 py-20 sm:px-6 lg:py-28 border-t border-border/60 overflow-hidden select-none">
       <div className="mx-auto max-w-7xl">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          
-          {/* LEFT SIDE: Rich Old Money Vibe Editorial Text */}
-          <div className="lg:col-span-6 space-y-8 text-left">
+        {/* Section Header */}
+        <div className="mx-auto max-w-3xl text-center mb-16 space-y-3">
+          <span className="font-heading text-xs font-bold uppercase tracking-[0.25em] text-amber-600 dark:text-amber-400 block">
+            THE TRIPNEST PHILOSOPHY
+          </span>
+
+          <h2 className="font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl leading-[1.06]">
+            Why TripNest?
+          </h2>
+
+          <p className="font-sans text-base sm:text-lg leading-relaxed text-muted-foreground font-normal max-w-xl mx-auto">
+            Curated for discerning travelers — replacing chaotic planning with quiet precision, bespoke routes, and effortless elegance.
+          </p>
+        </div>
+
+        {/* 3-Card Focused Slide Show Showcase (Fully Automatic) */}
+        <div 
+          className="relative min-h-[460px] sm:min-h-[520px] w-full flex items-center justify-center"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          {/* Cards Stage Container */}
+          <div className="relative w-full max-w-5xl h-[420px] sm:h-[480px] flex items-center justify-center">
             
-            <div className="space-y-3">
-              <span className="font-heading text-xs font-bold uppercase tracking-[0.25em] text-amber-600 dark:text-amber-400 block">
-                THE TRIPNEST PHILOSOPHY
-              </span>
+            {features.map((feat, idx) => {
+              let position = "hidden"
+              if (idx === currentIndex) position = "center"
+              else if (idx === prevIndex) position = "left"
+              else if (idx === nextIndex) position = "right"
 
-              <h2 className="font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl leading-[1.06]">
-                Why TripNest?
-              </h2>
+              if (position === "hidden") return null
 
-              <p className="font-sans text-base sm:text-lg leading-relaxed text-muted-foreground font-normal max-w-xl">
-                Curated for discerning travelers — TripNest replaces chaotic planning with quiet precision, bespoke routes, and effortless elegance.
-              </p>
-            </div>
+              const isCenter = position === "center"
+              const isLeft = position === "left"
 
-            {/* Old Money Roman Numeral Feature Notes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 border-t border-border/60 pt-6">
-              {oldMoneyFeatures.map((feat) => (
-                <div key={feat.num} className="space-y-1 group">
-                  <div className="flex items-center gap-2">
-                    <span className="font-heading text-xs font-bold text-amber-600 dark:text-amber-400 tracking-wider">
-                      {feat.num}.
-                    </span>
-                    <h3 className="font-heading text-sm font-extrabold text-foreground tracking-tight group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                      {feat.title}
-                    </h3>
+              return (
+                <motion.div
+                  key={feat.id}
+                  layout
+                  initial={{ 
+                    opacity: 0, 
+                    scale: 0.7, 
+                    x: isLeft ? "-90%" : isCenter ? "0%" : "90%" 
+                  }}
+                  animate={{
+                    opacity: isCenter ? 1 : 0.55,
+                    scale: isCenter ? 1 : 0.7,
+                    x: isLeft ? "-60%" : isCenter ? "0%" : "60%",
+                    zIndex: isCenter ? 30 : 10,
+                  }}
+                  transition={{
+                    duration: 0.8,
+                    ease: [0.16, 1, 0.3, 1]
+                  }}
+                  onClick={() => {
+                    if (isLeft) handlePrev()
+                    if (!isCenter && !isLeft) handleNext()
+                  }}
+                  className={`absolute top-0 w-[85%] sm:w-[580px] h-full rounded-3xl overflow-hidden border border-border/80 bg-card shadow-2xl transition-shadow duration-500 cursor-pointer ${
+                    isCenter ? "shadow-[0_25px_60px_rgba(0,0,0,0.35)] pointer-events-auto" : "filter brightness-[0.8] hover:brightness-[0.95]"
+                  }`}
+                >
+                  {/* Card High-Impact Travel Image */}
+                  <div className="relative h-full w-full overflow-hidden">
+                    <img
+                      src={feat.img}
+                      alt={feat.title}
+                      className="h-full w-full object-cover filter brightness-[0.75] contrast-[1.08] transition-transform duration-1000"
+                    />
+
+                    {/* Gradient Dark Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+
+                    {/* Top Pill Badge */}
+                    <div className="absolute top-5 left-6 z-10">
+                      <span className="font-heading text-xs font-bold uppercase tracking-widest text-amber-300 bg-black/60 border border-amber-400/30 px-3.5 py-1.5 rounded-full backdrop-blur-md">
+                        {feat.badge}
+                      </span>
+                    </div>
+
+                    {/* Bottom Editorial Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 text-left space-y-2 z-10">
+                      <span className="font-sans text-xs sm:text-sm font-semibold uppercase tracking-wider text-amber-400 block">
+                        {feat.tagline}
+                      </span>
+
+                      <h3 className="font-heading text-2xl sm:text-4xl font-extrabold text-white leading-tight">
+                        {feat.title}
+                      </h3>
+
+                      <p className="font-sans text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-xl font-normal pt-1">
+                        {feat.desc}
+                      </p>
+                    </div>
                   </div>
-                  <p className="font-sans text-xs text-muted-foreground leading-relaxed font-normal pl-4">
-                    {feat.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
+                </motion.div>
+              )
+            })}
 
           </div>
+        </div>
 
-          {/* RIGHT SIDE: Unified Interlocking Honeycomb Structure (Bigger Hexagons + Punchline Overlays) */}
-          <div className="lg:col-span-6 relative flex justify-center items-center py-6">
-            
-            {/* Ambient Gold Glow Background */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/15 via-amber-300/5 to-transparent rounded-full blur-3xl -z-10" />
-
-            {/* Tight Interlocking Honeycomb Structure */}
-            <div className="flex flex-col items-center justify-center -space-y-12 sm:-space-y-16">
-              
-              {/* Row 1: 3 Hexagons */}
-              <div className="flex items-center justify-center -space-x-3 sm:-space-x-5">
-                {honeycombTiles.slice(0, 3).map((tile, i) => (
-                  <motion.div
-                    key={tile.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: i * 0.06 }}
-                    className="group relative w-36 h-40 sm:w-48 sm:h-52 overflow-hidden shadow-2xl bg-neutral-900 transition-transform duration-500 hover:scale-110 hover:z-50 cursor-default"
-                    style={{
-                      clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)"
-                    }}
-                  >
-                    <img
-                      src={tile.img}
-                      alt={tile.title}
-                      className="h-full w-full object-cover filter brightness-[0.75] contrast-[1.1] group-hover:scale-110 transition-transform duration-700"
-                    />
-
-                    {/* Dark Glass Overlay for Punchline Feature Text */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent p-4 flex flex-col justify-end text-center">
-                      <span className="font-heading text-[11px] sm:text-xs font-extrabold text-amber-400 tracking-wider uppercase mb-0.5">
-                        {tile.punchline}
-                      </span>
-                      <span className="font-heading text-[9px] sm:text-[10px] text-white/80 font-semibold tracking-tight">
-                        {tile.title}
-                      </span>
-                    </div>
-
-                    <div 
-                      className="absolute inset-0 border border-amber-500/30 pointer-events-none group-hover:border-amber-400/80 transition-colors"
-                      style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Row 2: 3 Hexagons (Interlocked Staggered Offset) */}
-              <div className="flex items-center justify-center -space-x-3 sm:-space-x-5">
-                {honeycombTiles.slice(3, 6).map((tile, i) => (
-                  <motion.div
-                    key={tile.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: (i + 3) * 0.06 }}
-                    className="group relative w-36 h-40 sm:w-48 sm:h-52 overflow-hidden shadow-2xl bg-neutral-900 transition-transform duration-500 hover:scale-110 hover:z-50 cursor-default"
-                    style={{
-                      clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)"
-                    }}
-                  >
-                    <img
-                      src={tile.img}
-                      alt={tile.title}
-                      className="h-full w-full object-cover filter brightness-[0.75] contrast-[1.1] group-hover:scale-110 transition-transform duration-700"
-                    />
-
-                    {/* Dark Glass Overlay for Punchline Feature Text */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent p-4 flex flex-col justify-end text-center">
-                      <span className="font-heading text-[11px] sm:text-xs font-extrabold text-amber-400 tracking-wider uppercase mb-0.5">
-                        {tile.punchline}
-                      </span>
-                      <span className="font-heading text-[9px] sm:text-[10px] text-white/80 font-semibold tracking-tight">
-                        {tile.title}
-                      </span>
-                    </div>
-
-                    <div 
-                      className="absolute inset-0 border border-amber-500/30 pointer-events-none group-hover:border-amber-400/80 transition-colors"
-                      style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Row 3: 2 Hexagons (Centered Under Row 2) */}
-              <div className="flex items-center justify-center -space-x-3 sm:-space-x-5">
-                {honeycombTiles.slice(6, 8).map((tile, i) => (
-                  <motion.div
-                    key={tile.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: (i + 6) * 0.06 }}
-                    className="group relative w-36 h-40 sm:w-48 sm:h-52 overflow-hidden shadow-2xl bg-neutral-900 transition-transform duration-500 hover:scale-110 hover:z-50 cursor-default"
-                    style={{
-                      clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)"
-                    }}
-                  >
-                    <img
-                      src={tile.img}
-                      alt={tile.title}
-                      className="h-full w-full object-cover filter brightness-[0.75] contrast-[1.1] group-hover:scale-110 transition-transform duration-700"
-                    />
-
-                    {/* Dark Glass Overlay for Punchline Feature Text */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent p-4 flex flex-col justify-end text-center">
-                      <span className="font-heading text-[11px] sm:text-xs font-extrabold text-amber-400 tracking-wider uppercase mb-0.5">
-                        {tile.punchline}
-                      </span>
-                      <span className="font-heading text-[9px] sm:text-[10px] text-white/80 font-semibold tracking-tight">
-                        {tile.title}
-                      </span>
-                    </div>
-
-                    <div 
-                      className="absolute inset-0 border border-amber-500/30 pointer-events-none group-hover:border-amber-400/80 transition-colors"
-                      style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-
-            </div>
-
-          </div>
-
+        {/* Carousel Indicator Dots */}
+        <div className="flex items-center justify-center gap-2 mt-8">
+          {features.map((feat, i) => (
+            <button
+              key={feat.id}
+              onClick={() => setCurrentIndex(i)}
+              className={`h-2.5 rounded-full transition-all duration-500 ${
+                i === currentIndex ? "w-8 bg-amber-500" : "w-2.5 bg-neutral-300 dark:bg-neutral-700 hover:bg-amber-400"
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
         </div>
 
       </div>

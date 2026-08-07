@@ -172,7 +172,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
   const isCheaper = pkgA.budget.numericTotal < pkgB.budget.numericTotal
 
   return (
-    <section id="packages" className="relative w-full min-h-screen py-20 md:py-28 bg-neutral-950 text-white overflow-hidden select-none font-sans">
+    <section id="packages" className="relative w-full min-h-screen py-20 md:py-28 bg-[#0D2B45] text-white overflow-hidden select-none font-sans">
       
       {/* 1. FRENCH LUXURY / NIKE EDITORIAL VIDEO BACKGROUND */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -198,7 +198,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
         </AnimatePresence>
 
         {/* ELEGANT MINIMALIST OVERLAYS (Lightened for +50% Background Opacity) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/15 to-black/45 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0D2B45]/70 via-[#0D2B45]/40 to-[#0D2B45]/80 z-10" />
       </div>
 
       {/* 2. MAIN EDITORIAL CONTENT */}
@@ -238,20 +238,20 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
           </motion.p>
         </div>
 
-        {/* 3. FORMAL EDITORIAL DESTINATION COMPARISON CARDS */}
+        {/* 3. FORMAL EDITORIAL DESTINATION COMPARISON CARDS (White Cards, Black Text) */}
         <div className="grid gap-6 md:grid-cols-12 items-center">
           
           {/* Destination A Card */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="md:col-span-5 rounded-2xl border border-white/20 bg-black/60 backdrop-blur-2xl p-6 shadow-2xl space-y-5"
+            className="md:col-span-5 rounded-3xl border border-white bg-white p-6 shadow-2xl space-y-5 text-neutral-900"
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <span className="font-heading text-[11px] font-extrabold uppercase tracking-widest text-white/70">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
+              <span className="font-heading text-[11px] font-extrabold uppercase tracking-widest text-neutral-500">
                 DESTINATION A
               </span>
-              <span className="font-sans text-xs font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-full border border-white/20">
+              <span className="font-sans text-xs font-bold text-neutral-900 bg-neutral-100 px-2.5 py-0.5 rounded-full border border-neutral-300">
                 {pkgA.rating}
               </span>
             </div>
@@ -259,39 +259,37 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
             <select
               value={destA}
               onChange={(e) => setDestA(e.target.value)}
-              className="w-full rounded-xl border border-white/20 bg-neutral-900 p-3.5 font-heading text-xl font-extrabold text-white uppercase outline-none focus:border-white cursor-pointer shadow-inner"
+              className="w-full rounded-2xl border border-neutral-300 bg-neutral-100 p-3.5 font-heading text-xl font-extrabold text-neutral-900 uppercase outline-none focus:border-primary cursor-pointer shadow-inner"
             >
               {availableDestinations.map((d) => (
-                <option key={`a-${d}`} value={d} disabled={d === destB} className="bg-neutral-950 text-white font-sans text-base">
+                <option key={`a-${d}`} value={d} disabled={d === destB} className="bg-white text-neutral-900 font-sans text-base">
                   {d} — {destinationPackages[d].country}
                 </option>
               ))}
             </select>
 
-            <div className="relative h-48 w-full rounded-xl overflow-hidden border border-white/15">
+            <div className="relative h-48 w-full rounded-2xl overflow-hidden border border-neutral-200">
               <img
                 src={pkgA.image}
                 alt={destA}
-                className="h-full w-full object-cover filter brightness-[0.9]"
+                className="h-full w-full object-cover filter brightness-[0.95]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-5 flex flex-col justify-end">
-                <span className="font-sans text-xs font-semibold text-white/80 uppercase tracking-wider">{pkgA.vibe}</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent p-5 flex flex-col justify-end">
+                <span className="font-sans text-xs font-semibold text-white/90 uppercase tracking-wider">{pkgA.vibe}</span>
                 <h3 className="font-heading text-2xl font-extrabold text-white uppercase">{destA}</h3>
               </div>
             </div>
 
-            <div className="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/10">
+            <div className="flex items-center justify-between bg-neutral-100 p-4 rounded-2xl border border-neutral-200">
               <div>
-                <span className="font-heading text-[10px] uppercase tracking-widest font-bold text-white/60 block">Est. Cost</span>
-                <span className="font-heading text-2xl font-extrabold text-white">{pkgA.budget.total}</span>
+                <span className="font-heading text-[10px] uppercase tracking-widest font-bold text-neutral-500 block">Est. Cost</span>
+                <span className="font-heading text-2xl font-extrabold text-neutral-900">{pkgA.budget.total}</span>
               </div>
-              <Button
-                size="sm"
-                onClick={() => onSelectDestination ? onSelectDestination(destA) : onNavigateView("itinerary", destA)}
-                className="rounded-lg bg-white hover:bg-white/90 text-black font-heading font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 shadow-lg"
+              <span
+                className="rounded-xl bg-[#0D2B45] text-white font-heading font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 shadow-md cursor-default"
               >
-                Plan {destA}
-              </Button>
+                {destA}
+              </span>
             </div>
           </motion.div>
 
@@ -300,25 +298,25 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
             <button
               type="button"
               onClick={swapDestinations}
-              className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/10 border border-white/20 backdrop-blur-xl hover:bg-white hover:text-black transition-all"
+              className="group flex h-12 w-12 items-center justify-center rounded-full bg-white border border-neutral-200 shadow-xl hover:scale-110 transition-all"
               title="Swap Destinations"
             >
-              <ArrowRightLeft className="h-5 w-5 text-white group-hover:text-black transition-colors" />
+              <ArrowRightLeft className="h-5 w-5 text-neutral-900 transition-colors" />
             </button>
-            <span className="mt-2 font-heading text-[10px] font-extrabold text-white/60 tracking-widest uppercase">VS</span>
+            <span className="mt-2 font-heading text-[10px] font-extrabold text-white/80 tracking-widest uppercase">VS</span>
           </div>
 
           {/* Destination B Card */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="md:col-span-5 rounded-2xl border border-white/20 bg-black/60 backdrop-blur-2xl p-6 shadow-2xl space-y-5"
+            className="md:col-span-5 rounded-3xl border border-white bg-white p-6 shadow-2xl space-y-5 text-neutral-900"
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <span className="font-heading text-[11px] font-extrabold uppercase tracking-widest text-white/70">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
+              <span className="font-heading text-[11px] font-extrabold uppercase tracking-widest text-neutral-500">
                 DESTINATION B
               </span>
-              <span className="font-sans text-xs font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-full border border-white/20">
+              <span className="font-sans text-xs font-bold text-neutral-900 bg-neutral-100 px-2.5 py-0.5 rounded-full border border-neutral-300">
                 {pkgB.rating}
               </span>
             </div>
@@ -326,47 +324,45 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
             <select
               value={destB}
               onChange={(e) => setDestB(e.target.value)}
-              className="w-full rounded-xl border border-white/20 bg-neutral-900 p-3.5 font-heading text-xl font-extrabold text-white uppercase outline-none focus:border-white cursor-pointer shadow-inner"
+              className="w-full rounded-2xl border border-neutral-300 bg-neutral-100 p-3.5 font-heading text-xl font-extrabold text-neutral-900 uppercase outline-none focus:border-primary cursor-pointer shadow-inner"
             >
               {availableDestinations.map((d) => (
-                <option key={`b-${d}`} value={d} disabled={d === destA} className="bg-neutral-950 text-white font-sans text-base">
+                <option key={`b-${d}`} value={d} disabled={d === destA} className="bg-white text-neutral-900 font-sans text-base">
                   {d} — {destinationPackages[d].country}
                 </option>
               ))}
             </select>
 
-            <div className="relative h-48 w-full rounded-xl overflow-hidden border border-white/15">
+            <div className="relative h-48 w-full rounded-2xl overflow-hidden border border-neutral-200">
               <img
                 src={pkgB.image}
                 alt={destB}
-                className="h-full w-full object-cover filter brightness-[0.9]"
+                className="h-full w-full object-cover filter brightness-[0.95]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-5 flex flex-col justify-end">
-                <span className="font-sans text-xs font-semibold text-white/80 uppercase tracking-wider">{pkgB.vibe}</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent p-5 flex flex-col justify-end">
+                <span className="font-sans text-xs font-semibold text-white/90 uppercase tracking-wider">{pkgB.vibe}</span>
                 <h3 className="font-heading text-2xl font-extrabold text-white uppercase">{destB}</h3>
               </div>
             </div>
 
-            <div className="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/10">
+            <div className="flex items-center justify-between bg-neutral-100 p-4 rounded-2xl border border-neutral-200">
               <div>
-                <span className="font-heading text-[10px] uppercase tracking-widest font-bold text-white/60 block">Est. Cost</span>
-                <span className="font-heading text-2xl font-extrabold text-white">{pkgB.budget.total}</span>
+                <span className="font-heading text-[10px] uppercase tracking-widest font-bold text-neutral-500 block">Est. Cost</span>
+                <span className="font-heading text-2xl font-extrabold text-neutral-900">{pkgB.budget.total}</span>
               </div>
-              <Button
-                size="sm"
-                onClick={() => onSelectDestination ? onSelectDestination(destB) : onNavigateView("itinerary", destB)}
-                className="rounded-lg bg-white hover:bg-white/90 text-black font-heading font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 shadow-lg"
+              <span
+                className="rounded-xl bg-[#0D2B45] text-white font-heading font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 shadow-md cursor-default"
               >
-                Plan {destB}
-              </Button>
+                {destB}
+              </span>
             </div>
           </motion.div>
 
         </div>
 
-        {/* 4. FORMAL LUXURY COMPARISON MATRIX TABLE */}
+        {/* 4. FORMAL LUXURY COMPARISON MATRIX TABLE (White Background, Black Text) */}
         <div className="space-y-6">
-          <div className="flex flex-wrap items-center justify-center gap-2 border-b border-white/15 pb-4">
+          <div className="flex flex-wrap items-center justify-center gap-2 border-b border-white/20 pb-4">
             {[
               { id: "all", label: "Overview Matrix", icon: Compass },
               { id: "cost", label: "Cost Breakdown", icon: DollarSign },
@@ -380,10 +376,10 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 rounded-xl px-5 py-2.5 font-heading text-xs font-extrabold uppercase tracking-wider transition-all ${
+                  className={`flex items-center gap-2 rounded-2xl px-5 py-2.5 font-heading text-xs font-extrabold uppercase tracking-wider transition-all ${
                     isActive
-                      ? "bg-white text-black shadow-lg shadow-white/10"
-                      : "bg-white/5 border border-white/15 text-white/70 hover:bg-white/15"
+                      ? "bg-white text-neutral-900 shadow-xl"
+                      : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
                   }`}
                 >
                   <IconComp className="h-4 w-4" />
@@ -393,52 +389,52 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
             })}
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-white/20 bg-black/60 backdrop-blur-2xl shadow-2xl">
+          <div className="overflow-hidden rounded-3xl border border-white bg-white text-neutral-900 shadow-2xl">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[700px] font-sans">
                 
                 <thead>
-                  <tr className="border-b border-white/15 bg-white/5">
-                    <th className="p-5 font-heading text-xs font-extrabold uppercase tracking-widest text-white/60 w-1/3">Factor</th>
-                    <th className="p-5 font-heading text-xl font-extrabold text-white w-1/3 text-center uppercase border-l border-white/10">
-                      {destA} {isCheaper && <span className="ml-2 inline-block text-[10px] bg-white/10 text-white border border-white/20 px-2 py-0.5 rounded-full font-sans font-bold">Best Value</span>}
+                  <tr className="border-b border-neutral-200 bg-neutral-100">
+                    <th className="p-5 font-heading text-xs font-extrabold uppercase tracking-widest text-neutral-500 w-1/3">Factor</th>
+                    <th className="p-5 font-heading text-xl font-extrabold text-neutral-900 w-1/3 text-center uppercase border-l border-neutral-200">
+                      {destA} {isCheaper && <span className="ml-2 inline-block text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full font-sans font-bold">Best Value</span>}
                     </th>
-                    <th className="p-5 font-heading text-xl font-extrabold text-white w-1/3 text-center uppercase border-l border-white/10">
-                      {destB} {!isCheaper && <span className="ml-2 inline-block text-[10px] bg-white/10 text-white border border-white/20 px-2 py-0.5 rounded-full font-sans font-bold">Best Value</span>}
+                    <th className="p-5 font-heading text-xl font-extrabold text-neutral-900 w-1/3 text-center uppercase border-l border-neutral-200">
+                      {destB} {!isCheaper && <span className="ml-2 inline-block text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full font-sans font-bold">Best Value</span>}
                     </th>
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-white/10 text-sm">
+                <tbody className="divide-y divide-neutral-200 text-sm">
                   
                   {/* SECTION: BUDGET */}
                   {(activeTab === "all" || activeTab === "cost") && (
                     <>
-                      <tr className="bg-white/5">
-                        <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-white/80 flex items-center gap-2">
-                          <DollarSign className="h-4 w-4" /> Cost & Budget
+                      <tr className="bg-neutral-50">
+                        <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-neutral-700 flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-emerald-600" /> Cost & Budget
                         </td>
                       </tr>
 
                       <tr>
-                        <td className="p-5 font-semibold text-white">Total Estimated Trip Cost</td>
-                        <td className="p-5 font-heading font-extrabold text-white text-center text-xl border-l border-white/10">{pkgA.budget.total}</td>
-                        <td className="p-5 font-heading font-extrabold text-white text-center text-xl border-l border-white/10">{pkgB.budget.total}</td>
+                        <td className="p-5 font-semibold text-neutral-900">Total Estimated Trip Cost</td>
+                        <td className="p-5 font-heading font-extrabold text-neutral-900 text-center text-xl border-l border-neutral-200">{pkgA.budget.total}</td>
+                        <td className="p-5 font-heading font-extrabold text-neutral-900 text-center text-xl border-l border-neutral-200">{pkgB.budget.total}</td>
                       </tr>
                       <tr>
-                        <td className="p-5 font-medium text-white/70">Transport Expense</td>
-                        <td className="p-5 text-white/90 text-center font-medium border-l border-white/10">{pkgA.budget.transport}</td>
-                        <td className="p-5 text-white/90 text-center font-medium border-l border-white/10">{pkgB.budget.transport}</td>
+                        <td className="p-5 font-medium text-neutral-600">Transport Expense</td>
+                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgA.budget.transport}</td>
+                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgB.budget.transport}</td>
                       </tr>
                       <tr>
-                        <td className="p-5 font-medium text-white/70">Food & Dining Expense</td>
-                        <td className="p-5 text-white/90 text-center font-medium border-l border-white/10">{pkgA.budget.food}</td>
-                        <td className="p-5 text-white/90 text-center font-medium border-l border-white/10">{pkgB.budget.food}</td>
+                        <td className="p-5 font-medium text-neutral-600">Food & Dining Expense</td>
+                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgA.budget.food}</td>
+                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgB.budget.food}</td>
                       </tr>
                       <tr>
-                        <td className="p-5 font-medium text-white/70">Activity & Sightseeing Expense</td>
-                        <td className="p-5 text-white/90 text-center font-medium border-l border-white/10">{pkgA.budget.activities}</td>
-                        <td className="p-5 text-white/90 text-center font-medium border-l border-white/10">{pkgB.budget.activities}</td>
+                        <td className="p-5 font-medium text-neutral-600">Activity & Sightseeing Expense</td>
+                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgA.budget.activities}</td>
+                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgB.budget.activities}</td>
                       </tr>
                     </>
                   )}
@@ -446,26 +442,26 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
                   {/* SECTION: ACCOMMODATION */}
                   {(activeTab === "all" || activeTab === "stay") && (
                     <>
-                      <tr className="bg-white/5">
-                        <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-white/80 flex items-center gap-2">
-                          <Hotel className="h-4 w-4" /> Stay Options
+                      <tr className="bg-neutral-50">
+                        <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-neutral-700 flex items-center gap-2">
+                          <Hotel className="h-4 w-4 text-primary" /> Stay Options
                         </td>
                       </tr>
 
                       <tr>
-                        <td className="p-5 font-medium text-white/70">5-Star Luxury Resorts</td>
-                        <td className="p-5 text-center border-l border-white/10">{renderBool(pkgA.stay.fiveStar)}</td>
-                        <td className="p-5 text-center border-l border-white/10">{renderBool(pkgB.stay.fiveStar)}</td>
+                        <td className="p-5 font-medium text-neutral-600">5-Star Luxury Resorts</td>
+                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgA.stay.fiveStar)}</td>
+                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgB.stay.fiveStar)}</td>
                       </tr>
                       <tr>
-                        <td className="p-5 font-medium text-white/70">3-Star Standard Hotels</td>
-                        <td className="p-5 text-center border-l border-white/10">{renderBool(pkgA.stay.threeStar)}</td>
-                        <td className="p-5 text-center border-l border-white/10">{renderBool(pkgB.stay.threeStar)}</td>
+                        <td className="p-5 font-medium text-neutral-600">3-Star Standard Hotels</td>
+                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgA.stay.threeStar)}</td>
+                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgB.stay.threeStar)}</td>
                       </tr>
                       <tr>
-                        <td className="p-5 font-medium text-white/70">Hostels & Backpacker Stays</td>
-                        <td className="p-5 text-center border-l border-white/10">{renderBool(pkgA.stay.hostel)}</td>
-                        <td className="p-5 text-center border-l border-white/10">{renderBool(pkgB.stay.hostel)}</td>
+                        <td className="p-5 font-medium text-neutral-600">Hostels & Backpacker Stays</td>
+                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgA.stay.hostel)}</td>
+                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgB.stay.hostel)}</td>
                       </tr>
                     </>
                   )}
@@ -473,27 +469,27 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
                   {/* SECTION: EXPERIENCE */}
                   {(activeTab === "all" || activeTab === "experience") && (
                     <>
-                      <tr className="bg-white/5">
-                        <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-white/80 flex items-center gap-2">
-                          <Sparkles className="h-4 w-4" /> Travel Highlights
+                      <tr className="bg-neutral-50">
+                        <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-neutral-700 flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-amber-500" /> Travel Highlights
                         </td>
                       </tr>
 
                       <tr>
-                        <td className="p-5 font-medium text-white/70">Key Activities</td>
-                        <td className="p-5 text-center border-l border-white/10">
+                        <td className="p-5 font-medium text-neutral-600">Key Activities</td>
+                        <td className="p-5 text-center border-l border-neutral-200">
                           <div className="flex flex-wrap justify-center gap-1.5">
                             {pkgA.experience.activities.map((act, idx) => (
-                              <span key={idx} className="rounded-md bg-white/10 border border-white/15 px-2.5 py-0.5 text-xs font-semibold text-white">
+                              <span key={idx} className="rounded-md bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-900">
                                 {act}
                               </span>
                             ))}
                           </div>
                         </td>
-                        <td className="p-5 text-center border-l border-white/10">
+                        <td className="p-5 text-center border-l border-neutral-200">
                           <div className="flex flex-wrap justify-center gap-1.5">
                             {pkgB.experience.activities.map((act, idx) => (
-                              <span key={idx} className="rounded-md bg-white/10 border border-white/15 px-2.5 py-0.5 text-xs font-semibold text-white">
+                              <span key={idx} className="rounded-md bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-900">
                                 {act}
                               </span>
                             ))}
@@ -501,19 +497,19 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
                         </td>
                       </tr>
                       <tr>
-                        <td className="p-5 font-medium text-white/70">Best Season</td>
-                        <td className="p-5 text-xs font-semibold text-white text-center border-l border-white/10">{pkgA.experience.bestSeason}</td>
-                        <td className="p-5 text-xs font-semibold text-white text-center border-l border-white/10">{pkgB.experience.bestSeason}</td>
+                        <td className="p-5 font-medium text-neutral-600">Best Season</td>
+                        <td className="p-5 text-xs font-semibold text-neutral-900 text-center border-l border-neutral-200">{pkgA.experience.bestSeason}</td>
+                        <td className="p-5 text-xs font-semibold text-neutral-900 text-center border-l border-neutral-200">{pkgB.experience.bestSeason}</td>
                       </tr>
                       <tr>
-                        <td className="p-5 font-medium text-white/70">Ideal Duration</td>
-                        <td className="p-5 text-xs font-bold text-white text-center border-l border-white/10">{pkgA.experience.duration}</td>
-                        <td className="p-5 text-xs font-bold text-white text-center border-l border-white/10">{pkgB.experience.duration}</td>
+                        <td className="p-5 font-medium text-neutral-600">Ideal Duration</td>
+                        <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgA.experience.duration}</td>
+                        <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgB.experience.duration}</td>
                       </tr>
                       <tr>
-                        <td className="p-5 font-medium text-white/70">Ideal Traveler Type</td>
-                        <td className="p-5 text-xs font-bold text-white text-center border-l border-white/10">{pkgA.experience.idealTraveler}</td>
-                        <td className="p-5 text-xs font-bold text-white text-center border-l border-white/10">{pkgB.experience.idealTraveler}</td>
+                        <td className="p-5 font-medium text-neutral-600">Ideal Traveler Type</td>
+                        <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgA.experience.idealTraveler}</td>
+                        <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgB.experience.idealTraveler}</td>
                       </tr>
                     </>
                   )}
@@ -524,20 +520,18 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
           </div>
         </div>
 
-        {/* 5. BOTTOM ACTION BUTTONS */}
+        {/* 5. BOTTOM LABELS (No redirects — feature highlighting only) */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-          <Button
-            onClick={() => onSelectDestination ? onSelectDestination(destA) : onNavigateView("itinerary", destA)}
-            className="w-full sm:w-auto rounded-xl bg-white hover:bg-white/90 px-10 py-4 font-heading font-extrabold text-sm uppercase tracking-wider text-black shadow-2xl transition-transform hover:scale-105"
+          <span
+            className="w-full sm:w-auto rounded-full bg-white px-10 py-4 font-heading font-extrabold text-sm uppercase tracking-wider text-neutral-900 shadow-2xl text-center cursor-default"
           >
-            Create {destA} Itinerary
-          </Button>
-          <Button
-            onClick={() => onSelectDestination ? onSelectDestination(destB) : onNavigateView("itinerary", destB)}
-            className="w-full sm:w-auto rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 px-10 py-4 font-heading font-extrabold text-sm uppercase tracking-wider text-white backdrop-blur-md shadow-2xl transition-transform hover:scale-105"
+            {destA} vs {destB}
+          </span>
+          <span
+            className="w-full sm:w-auto rounded-full bg-white/10 border border-white/20 px-10 py-4 font-heading font-extrabold text-sm uppercase tracking-wider text-white backdrop-blur-md shadow-2xl text-center cursor-default"
           >
-            Create {destB} Itinerary
-          </Button>
+            Compare & Decide
+          </span>
         </div>
 
       </div>
@@ -548,11 +542,11 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
 
 function renderBool(val) {
   return val ? (
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-white font-bold border border-white/30">
+    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold border border-emerald-300">
       <Check className="h-3.5 w-3.5" />
     </span>
   ) : (
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/5 text-white/30">
+    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-neutral-100 text-neutral-400 border border-neutral-200">
       <X className="h-3.5 w-3.5" />
     </span>
   )
