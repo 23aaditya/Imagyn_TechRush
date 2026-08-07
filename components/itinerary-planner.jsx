@@ -172,12 +172,102 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
     }
   }, [startDate, endDate])
 
+  // Coordinate map lookup for destinations
+  const cityCoords = {
+    "Goa": { lat: 15.55, lng: 73.75 },
+    "Bali": { lat: -8.43, lng: 115.28 },
+    "Kerala": { lat: 9.93, lng: 76.26 },
+    "Jaipur": { lat: 26.91, lng: 75.78 },
+    "Manali": { lat: 32.24, lng: 77.18 },
+    "Santorini": { lat: 36.39, lng: 25.46 },
+    "Switzerland": { lat: 46.52, lng: 7.98 },
+    "Maldives": { lat: 3.20, lng: 73.22 },
+    "Ladakh": { lat: 34.15, lng: 77.57 },
+    "Rishikesh": { lat: 30.08, lng: 78.26 },
+    "Tokyo": { lat: 35.67, lng: 139.65 },
+    "Amsterdam": { lat: 52.36, lng: 4.90 },
+    "Rome": { lat: 41.90, lng: 12.49 },
+    "Singapore": { lat: 1.35, lng: 103.81 },
+    "Barcelona": { lat: 41.38, lng: 2.17 },
+    "Paris": { lat: 48.85, lng: 2.35 },
+    "Iceland": { lat: 64.14, lng: -21.94 },
+    "New Zealand": { lat: -45.03, lng: 168.66 },
+    "Shimla": { lat: 31.10, lng: 77.17 },
+    "Udaipur": { lat: 24.58, lng: 73.68 },
+    "Dubai": { lat: 25.20, lng: 55.27 },
+    "Thailand": { lat: 7.88, lng: 98.39 },
+    "Vietnam": { lat: 20.97, lng: 107.04 },
+  }
+
   // Build Itinerary Helper
   const buildItineraryData = (cityName, totalDays, startStr) => {
+    const matchedDest = destinationsData.find(d => 
+      d.name.toLowerCase() === cityName.toLowerCase() || 
+      cityName.toLowerCase().includes(d.name.toLowerCase()) ||
+      d.name.toLowerCase().includes(cityName.toLowerCase())
+    )
+
     const cleanKey = Object.keys(citySpotTemplates).find((k) =>
       cityName.toLowerCase().includes(k.toLowerCase())
-    ) || "Goa"
-    const templates = citySpotTemplates[cleanKey] || citySpotTemplates["Goa"]
+    )
+    let spotsForCity = cleanKey ? citySpotTemplates[cleanKey] : null
+
+    if (!spotsForCity && matchedDest) {
+      const baseLat = cityCoords[matchedDest.name]?.lat || (matchedDest.country === "India" ? 20.0 : 35.0)
+      const baseLng = cityCoords[matchedDest.name]?.lng || (matchedDest.country === "India" ? 78.0 : 10.0)
+      const img = matchedDest.image || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+
+      spotsForCity = [
+        {
+          title: `${matchedDest.name} City & Famous Sights Tour`,
+          type: "Sightseeing",
+          cost: matchedDest.startingBudget || "₹850",
+          open: "08:30 AM - 06:00 PM",
+          desc: `Explore top landmarks, heritage architecture, and famous highlights of ${matchedDest.name}.`,
+          lat: baseLat + 0.01,
+          lng: baseLng + 0.01,
+          isPopular: true,
+          img: img
+        },
+        {
+          title: `${matchedDest.specialty || matchedDest.vibe} Experience`,
+          type: matchedDest.type === "Beach" ? "Relaxation" : matchedDest.type === "Mountains" ? "Nature" : "Culture",
+          cost: "₹1,200",
+          open: "09:00 AM - 07:00 PM",
+          desc: `Immerse in ${matchedDest.name}'s signature experience: ${matchedDest.description}`,
+          lat: baseLat - 0.01,
+          lng: baseLng + 0.02,
+          isPopular: true,
+          img: img
+        },
+        {
+          title: `Authentic ${matchedDest.name} Food & Dining Trail`,
+          type: "Food",
+          cost: "₹750",
+          open: "12:00 PM - 11:00 PM",
+          desc: `Savor authentic local cuisines, food markets, and popular restaurants in ${matchedDest.name}.`,
+          lat: baseLat + 0.02,
+          lng: baseLng - 0.01,
+          isPopular: false,
+          img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          title: `${matchedDest.name} Golden Hour Sunset Walk`,
+          type: "Sunset",
+          cost: "₹400",
+          open: "04:30 PM - 08:30 PM",
+          desc: `Enjoy scenic panoramic views, sunset photography spots, and evening strolls at ${matchedDest.subtitle || matchedDest.name}.`,
+          lat: baseLat - 0.02,
+          lng: baseLng - 0.02,
+          isPopular: true,
+          img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80"
+        }
+      ]
+    }
+
+    if (!spotsForCity) {
+      spotsForCity = citySpotTemplates["Goa"]
+    }
 
     const generated = []
     for (let d = 1; d <= totalDays; d++) {
@@ -189,20 +279,20 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         day: "numeric"
       })
 
-      const dayActivities = templates.slice((d - 1) % templates.length, ((d - 1) % templates.length) + 3).map((spot, i) => ({
-        id: `${cleanKey.toLowerCase()}-${d}-${i}-${Date.now()}`,
+      const dayActivities = spotsForCity.slice((d - 1) % spotsForCity.length, ((d - 1) % spotsForCity.length) + 3).map((spot, i) => ({
+        id: `${cityName.toLowerCase().replace(/\s+/g, '-')}-${d}-${i}-${Date.now()}`,
         time: i === 0 ? "09:00 AM" : i === 1 ? "01:30 PM" : "06:00 PM",
         openingHours: spot.open || "08:00 AM - 08:00 PM",
         type: spot.type || "Sightseeing",
         title: spot.title,
         desc: spot.desc,
         cost: spot.cost,
-        lat: spot.lat + (Math.random() - 0.5) * 0.02,
-        lng: spot.lng + (Math.random() - 0.5) * 0.02,
+        lat: spot.lat + (Math.random() - 0.5) * 0.01,
+        lng: spot.lng + (Math.random() - 0.5) * 0.01,
         isPopular: spot.isPopular || false,
         distanceToNext: i < 2 ? `${(3 + i * 2.5).toFixed(1)} km • ${10 + i * 8} mins travel` : undefined,
         images: [
-          spot.img,
+          spot.img || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80",
           "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80",
           "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&auto=format&fit=crop&q=80"
         ]
@@ -217,6 +307,18 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
     }
     return generated
   }
+
+  // Synchronize itinerary whenever destination changes
+  useEffect(() => {
+    if (destination) {
+      const isAlreadyMatching = itinerary && itinerary.length > 0 && itinerary[0]?.title?.toLowerCase().includes(destination.toLowerCase())
+      if (!isAlreadyMatching) {
+        const newPlan = buildItineraryData(destination, days, startDate)
+        setItinerary(newPlan)
+        setActiveDayIndex(0)
+      }
+    }
+  }, [destination])
 
   // Handle Search Input Change -> Auto Suggestions from 105 Destinations
   const handleSearchInputChange = (val) => {

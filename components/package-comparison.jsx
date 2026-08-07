@@ -142,7 +142,7 @@ const destinationPackages = {
 
 const availableDestinations = Object.keys(destinationPackages)
 
-export function PackageComparison({ onNavigateView }) {
+export function PackageComparison({ onNavigateView, onSelectDestination }) {
   const [destA, setDestA] = useState("Lonavala")
   const [destB, setDestB] = useState("Manali")
   const [activeTab, setActiveTab] = useState("all")
@@ -287,7 +287,7 @@ export function PackageComparison({ onNavigateView }) {
               </div>
               <Button
                 size="sm"
-                onClick={() => onNavigateView("itinerary")}
+                onClick={() => onSelectDestination ? onSelectDestination(destA) : onNavigateView("itinerary", destA)}
                 className="rounded-lg bg-white hover:bg-white/90 text-black font-heading font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 shadow-lg"
               >
                 Plan {destA}
@@ -354,7 +354,7 @@ export function PackageComparison({ onNavigateView }) {
               </div>
               <Button
                 size="sm"
-                onClick={() => onNavigateView("itinerary")}
+                onClick={() => onSelectDestination ? onSelectDestination(destB) : onNavigateView("itinerary", destB)}
                 className="rounded-lg bg-white hover:bg-white/90 text-black font-heading font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 shadow-lg"
               >
                 Plan {destB}
@@ -364,88 +364,6 @@ export function PackageComparison({ onNavigateView }) {
 
         </div>
 
-<<<<<<< HEAD
-        {/* Interactive Side-by-Side Comparison Matrix Table */}
-        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[600px]">
-              
-              <thead>
-                <tr className="border-b border-border bg-muted/50">
-                  <th className="p-4 sm:p-5 font-heading text-sm font-bold text-foreground w-1/3">Factor</th>
-                  <th className="p-4 sm:p-5 font-heading text-lg font-extrabold text-primary w-1/3 text-center">{destA}</th>
-                  <th className="p-4 sm:p-5 font-heading text-lg font-extrabold text-emerald-600 dark:text-emerald-400 w-1/3 text-center">{destB}</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-border/60 text-sm">
-                
-                {/* Section Header: Budget */}
-                <tr className="bg-secondary/40">
-                  <td colSpan={3} className="px-5 py-2.5 font-bold uppercase tracking-wider text-xs text-muted-foreground">
-                    💰 Budget & Cost Breakdown
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="p-4 font-semibold text-foreground">Total Estimated Cost</td>
-                  <td className="p-4 font-bold text-primary text-center text-base">{pkgA.budget.total}</td>
-                  <td className="p-4 font-bold text-emerald-600 dark:text-emerald-400 text-center text-base">{pkgB.budget.total}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Transport Expense</td>
-                  <td className="p-4 text-foreground text-center font-medium">{pkgA.budget.transport}</td>
-                  <td className="p-4 text-foreground text-center font-medium">{pkgB.budget.transport}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Food & Dining Expense</td>
-                  <td className="p-4 text-foreground text-center font-medium">{pkgA.budget.food}</td>
-                  <td className="p-4 text-foreground text-center font-medium">{pkgB.budget.food}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Activity & Sightseeing Expense</td>
-                  <td className="p-4 text-foreground text-center font-medium">{pkgA.budget.activities}</td>
-                  <td className="p-4 text-foreground text-center font-medium">{pkgB.budget.activities}</td>
-                </tr>
-
-
-
-                {/* Section Header: Experience */}
-                <tr className="bg-secondary/40">
-                  <td colSpan={3} className="px-5 py-2.5 font-bold uppercase tracking-wider text-xs text-muted-foreground">
-                    ✨ Travel Experience & Highlights
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Key Activities</td>
-                  <td className="p-4 text-xs font-medium text-foreground text-center">{pkgA.experience.activities}</td>
-                  <td className="p-4 text-xs font-medium text-foreground text-center">{pkgB.experience.activities}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Best Season</td>
-                  <td className="p-4 text-xs font-semibold text-foreground text-center">{pkgA.experience.bestSeason}</td>
-                  <td className="p-4 text-xs font-semibold text-foreground text-center">{pkgB.experience.bestSeason}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Ideal Trip Duration</td>
-                  <td className="p-4 text-xs font-semibold text-foreground text-center">{pkgA.experience.duration}</td>
-                  <td className="p-4 text-xs font-semibold text-foreground text-center">{pkgB.experience.duration}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Crowd Level</td>
-                  <td className="p-4 text-xs text-foreground text-center">{pkgA.experience.crowdLevel}</td>
-                  <td className="p-4 text-xs text-foreground text-center">{pkgB.experience.crowdLevel}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Ideal Traveler Type</td>
-                  <td className="p-4 text-xs font-bold text-primary text-center">{pkgA.experience.idealTraveler}</td>
-                  <td className="p-4 text-xs font-bold text-emerald-600 dark:text-emerald-400 text-center">{pkgB.experience.idealTraveler}</td>
-                </tr>
-
-              </tbody>
-            </table>
-=======
         {/* 4. FORMAL LUXURY COMPARISON MATRIX TABLE */}
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-center gap-2 border-b border-white/15 pb-4">
@@ -473,7 +391,6 @@ export function PackageComparison({ onNavigateView }) {
                 </button>
               )
             })}
->>>>>>> 4d15a0cf541b10c01d9e2f456f54bd4adb56eb86
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-white/20 bg-black/60 backdrop-blur-2xl shadow-2xl">
@@ -610,13 +527,13 @@ export function PackageComparison({ onNavigateView }) {
         {/* 5. BOTTOM ACTION BUTTONS */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
           <Button
-            onClick={() => onNavigateView("itinerary")}
+            onClick={() => onSelectDestination ? onSelectDestination(destA) : onNavigateView("itinerary", destA)}
             className="w-full sm:w-auto rounded-xl bg-white hover:bg-white/90 px-10 py-4 font-heading font-extrabold text-sm uppercase tracking-wider text-black shadow-2xl transition-transform hover:scale-105"
           >
             Create {destA} Itinerary
           </Button>
           <Button
-            onClick={() => onNavigateView("itinerary")}
+            onClick={() => onSelectDestination ? onSelectDestination(destB) : onNavigateView("itinerary", destB)}
             className="w-full sm:w-auto rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 px-10 py-4 font-heading font-extrabold text-sm uppercase tracking-wider text-white backdrop-blur-md shadow-2xl transition-transform hover:scale-105"
           >
             Create {destB} Itinerary

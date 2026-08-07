@@ -28,7 +28,7 @@ const polaroidCards = [
   { id: "singapore", name: "Singapore", vibe: "City of Possibility", rating: "4.6 ⭐", image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&auto=format&fit=crop&q=80", rotation: "-rotate-6", pos: "top-[380px] right-0 z-40" }
 ]
 
-export function TrendingDestinations() {
+export function TrendingDestinations({ onNavigateView, onSelectDestination }) {
   return (
     <section id="destinations" className="relative bg-neutral-100 dark:bg-neutral-950 px-4 py-20 sm:px-6 lg:py-28 border-t border-border/60 overflow-hidden select-none">
       <div className="mx-auto max-w-7xl">
@@ -50,7 +50,15 @@ export function TrendingDestinations() {
                   whileInView={{ opacity: 1, scale: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: idx * 0.03 }}
-                  className={`absolute ${card.pos} ${card.rotation} w-32 sm:w-40 bg-white dark:bg-neutral-900 p-2 pb-3.5 shadow-[0_15px_35px_rgba(0,0,0,0.22)] rounded-sm border border-neutral-200 dark:border-neutral-800 transform hover:scale-115 hover:z-50 transition-all duration-300 cursor-default group`}
+                  onClick={() => {
+                    const cityName = card.name.split(",")[0].trim()
+                    if (onSelectDestination) {
+                      onSelectDestination(cityName)
+                    } else if (onNavigateView) {
+                      onNavigateView("itinerary", cityName)
+                    }
+                  }}
+                  className={`absolute ${card.pos} ${card.rotation} w-32 sm:w-40 bg-white dark:bg-neutral-900 p-2 pb-3.5 shadow-[0_15px_35px_rgba(0,0,0,0.22)] rounded-sm border border-neutral-200 dark:border-neutral-800 transform hover:scale-115 hover:z-50 transition-all duration-300 cursor-pointer group`}
                 >
                   {/* Polaroid Image Container */}
                   <div className="relative h-24 sm:h-28 w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800 rounded-xs">

@@ -22,7 +22,7 @@ const landmarks = [
   { src: "/images/dest-manali.png", label: "Manali", bottom: "12%", right: "9%", delay: 1.2 },
 ]
 
-export function ExploreWorld({ onNavigateView }) {
+export function ExploreWorld({ onNavigateView, onSelectDestination }) {
   return (
     <section id="explore" className="relative isolate overflow-hidden bg-[oklch(0.17_0.02_257)] px-4 py-24 sm:px-6 lg:py-32">
       {/* World map backdrop */}
@@ -50,6 +50,37 @@ export function ExploreWorld({ onNavigateView }) {
             </span>
           ))}
         </div>
+      </div>
+
+      {/* Floating landmark bubbles */}
+      <div className="absolute inset-0 z-10 pointer-events-none max-w-7xl mx-auto hidden md:block">
+        {landmarks.map((lm, i) => (
+          <motion.button
+            key={lm.label}
+            type="button"
+            initial={{ opacity: 0, scale: 0.8, y: 15 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onSelectDestination?.(lm.label)}
+            style={{
+              top: lm.top,
+              left: lm.left,
+              right: lm.right,
+              bottom: lm.bottom
+            }}
+            className="absolute pointer-events-auto flex items-center gap-2.5 rounded-full border border-white/20 bg-black/60 p-1.5 pr-4 backdrop-blur-xl shadow-2xl transition-all cursor-pointer group"
+          >
+            <div className="h-10 w-10 overflow-hidden rounded-full border border-white/30">
+              <img src={lm.src} alt={lm.label} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300" />
+            </div>
+            <div className="text-left">
+              <span className="block text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Explore</span>
+              <span className="block text-xs font-extrabold text-white">{lm.label}</span>
+            </div>
+          </motion.button>
+        ))}
       </div>
 
       {/* Dark vignette for text contrast */}
