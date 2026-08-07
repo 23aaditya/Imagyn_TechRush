@@ -11,6 +11,21 @@ import {
   HeartHandshake,
   Clock,
   Coins,
+  Ticket,
+  Hotel,
+  Utensils,
+  Mountain,
+  Palmtree,
+  Car,
+  Sun,
+  Snowflake,
+  CloudRain,
+  CloudSun,
+  PartyPopper,
+  Sofa,
+  Compass,
+  Wallet,
+  Crown,
   X,
   SlidersHorizontal,
   TrendingUp,
@@ -88,12 +103,12 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
   const scrollRef = useRef(null)
   const handleScroll = (dir) => {
     if (!scrollRef.current) return
-    scrollRef.current.scrollBy({ left: dir === "left" ? -420 : 420, behavior: "smooth" })
+    scrollRef.current.scrollBy({ left: dir === "left" ? -380 : 380, behavior: "smooth" })
   }
 
   return (
-    <div className="mb-14">
-      <div className="flex items-center justify-between mb-4 px-2">
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-3 px-2">
         <h3 className="flex items-center gap-2 font-heading text-xl font-bold text-foreground">
           <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             {icon}
@@ -114,10 +129,10 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
       </div>
 
       <div ref={scrollRef}
-        className="flex items-start gap-14 overflow-x-auto overflow-y-visible pt-24 pb-20 px-28 explore-scrollbar-hide"
+        className="flex items-start gap-8 overflow-x-auto overflow-y-visible pt-4 pb-6 px-4 explore-scrollbar-hide"
         style={{ scrollbarWidth: "none" }}>
         {destinations.map((item) => (
-          <CircularCard
+          <ArchCard
             key={item.id}
             item={item}
             isHovered={hoveredId === item.id}
@@ -132,9 +147,9 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
 }
 
 /* ─────────────────────────────────────────────
-   CIRCULAR CARD WITH PETAL POP-OUT
+   ARCH CARD WITH PETAL POP-OUT
    ───────────────────────────────────────────── */
-function CircularCard({ item, isHovered, onHover, onLeave, onClick }) {
+function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
   const getPetalValue = (key) => {
     if (key === "minDays") return `${item.minDays || 3} Days`
     return item[key] || ""
@@ -187,44 +202,45 @@ function CircularCard({ item, isHovered, onHover, onLeave, onClick }) {
         })}
       </AnimatePresence>
 
-      {/* Circular Image Card */}
+      {/* Arch Shaped Image Card */}
       <motion.div
-        animate={{ scale: isHovered ? 1.15 : 1 }}
+        animate={{ scale: isHovered ? 1.08 : 1, y: isHovered ? -6 : 0 }}
         transition={{ type: "spring", stiffness: 220, damping: 20 }}
         className="relative"
       >
         <div
-          className="h-48 w-48 sm:h-52 sm:w-52 rounded-full p-[5px] transition-all duration-500"
+          className="h-64 w-48 sm:h-72 sm:w-52 rounded-t-[999px] rounded-b-2xl p-[4px] transition-all duration-500 shadow-xl relative"
           style={{
             background: isHovered
               ? `linear-gradient(135deg, ${item.color || "#10B981"}, ${item.color || "#10B981"}99, ${item.color || "#10B981"}44)`
               : "var(--border)",
             boxShadow: isHovered
-              ? `0 15px 45px ${item.color || "#10B981"}50, 0 0 75px ${item.color || "#10B981"}25`
+              ? `0 15px 45px ${(item.color || "#10B981")}50, 0 0 75px ${(item.color || "#10B981")}25`
               : "0 8px 28px rgba(0,0,0,0.1)",
           }}
         >
-          <div className="h-full w-full overflow-hidden rounded-full relative">
+          <div className="h-full w-full overflow-hidden rounded-t-[999px] rounded-b-xl relative bg-neutral-900">
             <img
               src={item.image}
               alt={item.name}
-              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+              className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           </div>
-        </div>
 
-        {/* Temperature badge */}
-        <span
-          className="absolute top-1 right-1 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold text-white shadow-xl border border-white/40"
-          style={{ background: item.color || "#10B981" }}
-        >
-          {item.temp || "25°C"}
-        </span>
+          {/* Temperature badge */}
+          <span
+            className="absolute top-2 right-2 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold text-white shadow-xl border border-white/40 z-10"
+            style={{ background: item.color || "#10B981" }}
+          >
+            <CloudSun className="h-3.5 w-3.5" />
+            {item.temp || "25°C"}
+          </span>
+        </div>
       </motion.div>
 
-      {/* Name & Subtitle */}
-      <div className="mt-4 text-center relative z-10">
+      {/* Name & Subtitle Below the Shape */}
+      <div className="mt-3 text-center relative z-10">
         <h4
           className="font-heading text-base sm:text-lg font-extrabold transition-colors"
           style={{ color: isHovered ? (item.color || "#10B981") : "var(--foreground)" }}
@@ -449,7 +465,7 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
 
                   <button
                     onClick={() => handleCategoryClick(cat.key)}
-                    className="flex flex-col items-center justify-center rounded-full h-[54px] w-[54px] border-2 shadow-2xl transition-all duration-300 hover:scale-110 bg-white/95"
+                    className="flex flex-col items-center justify-center rounded-t-[999px] rounded-b-md h-[58px] w-[46px] border-2 shadow-2xl transition-all duration-300 hover:scale-110 bg-white/95"
                     style={{
                       borderColor: activeFilters[cat.key] ? cat.color : "rgba(200,200,220,0.6)",
                       background: activeFilters[cat.key]
@@ -461,7 +477,7 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
                       color: activeFilters[cat.key] ? "white" : "#444",
                     }}
                   >
-                    <span className="text-base leading-none">{cat.icon}</span>
+                    <span className="text-sm leading-none">{cat.icon}</span>
                     <span className="text-[9px] font-black mt-0.5" style={{ color: activeFilters[cat.key] ? "white" : cat.color }}>{cat.label}</span>
                   </button>
                 </motion.div>
@@ -474,25 +490,21 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
       <motion.button
         type="button"
         onClick={() => { setIsOpen(!isOpen); setExpandedCategory(null) }}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.94 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative flex items-center justify-center gap-2 rounded-full px-5 py-3.5 shadow-2xl border-2 transition-all cursor-pointer"
+        className="relative flex items-center justify-center gap-2.5 rounded-t-[999px] rounded-b-2xl px-7 py-3.5 shadow-2xl border border-white/30 transition-all cursor-pointer bg-[#0D2B45] text-white hover:bg-[#0D2B45]/90"
         style={{
-          background: isOpen
-            ? "linear-gradient(135deg, #10B981, #059669)"
-            : "linear-gradient(135deg, #10B981, #14B8A6)",
-          borderColor: "rgba(255,255,255,0.4)",
-          boxShadow: "0 10px 30px rgba(16,185,129,0.35), 0 2px 10px rgba(0,0,0,0.12)",
+          boxShadow: "0 15px 35px rgba(13,43,69,0.5), 0 2px 10px rgba(0,0,0,0.2)",
         }}
       >
-        <SlidersHorizontal className={`h-5 w-5 text-white transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
-        <span className="text-xs font-extrabold text-white tracking-wide">
+        <SlidersHorizontal className={`h-4.5 w-4.5 text-white transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
+        <span className="font-heading text-xs font-extrabold uppercase tracking-widest text-white">
           {isOpen ? "Close" : "Customize"}
         </span>
 
         {activeCount > 0 && (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white shadow-md ring-2 ring-white ml-0.5">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-white shadow-md ring-2 ring-white ml-0.5">
             {activeCount}
           </span>
         )}
@@ -588,6 +600,7 @@ export function ExploreWorkspace({ onBack, onSelectDestination }) {
 
   return (
     <div className="min-h-screen bg-background pt-24 pb-32 relative">
+      {/* Filter Background Overlay */}
       <AnimatePresence>
         {hasFilters && (
           <motion.div
