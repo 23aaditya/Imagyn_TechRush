@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { generateFallbackResponse, DESTINATION_KNOWLEDGE } from "@/lib/ai-travel-knowledge"
+import { useTrip } from "@/context/trip-context"
 
 // Categorized Prompt Chips for organized browsing
 const PROMPT_CATEGORIES = [
@@ -60,6 +61,8 @@ const CATEGORIZED_PROMPTS = {
 }
 
 export function AiChatbot({ currentView, onNavigate }) {
+  const { itinerary, addSpotToItinerary, destination } = useTrip()
+
   const [isOpen, setIsOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [apiKey, setApiKey] = useState("")
@@ -125,6 +128,73 @@ export function AiChatbot({ currentView, onNavigate }) {
     setMessages((prev) => [...prev, userMsg])
     if (!textToSend) setInputMessage("")
     setIsLoading(true)
+
+    // Check if user is requesting Boots to add a location to the planner
+    const lowerText = messageText.toLowerCase()
+    const isAddIntent = ["add", "put", "include", "insert", "schedule", "place"].some((kw) => lowerText.includes(kw))
+
+    if (isAddIntent) {
+      let spotName = messageText
+        .replace(/can\s+you\s+/i, "")
+        .replace(/(?:please\s+)?(?:add|put|include|insert|schedule|place)\s+/i, "")
+        .replace(/\s+(?:to|in|into|on)\s+(?:the\s+)?(?:plan|itinerary|trip|schedule).*/i, "")
+        .replace(/\s+(?:on|to)\s+day\s*\d+.*/i, "")
+        .replace(/\s+at\s+\d+.*$/i, "")
+        .replace(/["']/g, "")
+        .trim()
+
+      if (spotName && spotName.length >= 2) {
+        let targetDayIdx = 0
+        const dayMatch = lowerText.match(/day\s*(\d+)/)
+        if (dayMatch && dayMatch[1]) {
+          targetDayIdx = Math.max(0, parseInt(dayMatch[1], 10) - 1)
+        }
+
+        let specifiedTime = null
+        const timeMatch = lowerText.match(/(?:at\s+)?(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i)
+        if (timeMatch) {
+          specifiedTime = timeMatch[1].toUpperCase()
+        } else if (lowerText.includes("morning")) {
+          specifiedTime = "09:30 AM"
+        } else if (lowerText.includes("afternoon")) {
+          specifiedTime = "01:30 PM"
+        } else if (lowerText.includes("evening") || lowerText.includes("sunset") || lowerText.includes("night")) {
+          specifiedTime = "06:30 PM"
+        }
+
+        const allSpots = (itinerary || []).flatMap((d) => d.activities || [])
+        const existingSpot = allSpots.find(
+          (s) => s.title.toLowerCase().includes(spotName.toLowerCase()) || spotName.toLowerCase().includes(s.title.toLowerCase())
+        )
+
+        let actionReply = ""
+        if (existingSpot) {
+          actionReply = `⚠️ **"${existingSpot.title}"** is already in your itinerary on Day ${existingSpot.day || 1}! Each location is kept unique without duplicates.`
+        } else {
+          addSpotToItinerary(targetDayIdx, {
+            title: spotName,
+            time: specifiedTime,
+            desc: `Added via Boots AI for ${destination || "your trip"}.`,
+            cost: "₹750",
+            numericCost: 750
+          })
+          actionReply = `✅ **Added "${spotName}"** to **Day ${targetDayIdx + 1}** ${specifiedTime ? `at ${specifiedTime}` : ""} in your Itinerary Planner!`
+        }
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: actionReply,
+            isLocationAction: true,
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ])
+        setIsLoading(false)
+        return
+      }
+    }
 
     const updatedHistory = [...messages, userMsg].map((m) => ({
       role: m.role,
@@ -465,6 +535,21 @@ export function AiChatbot({ currentView, onNavigate }) {
                               <p>🌙 <strong>Evening:</strong> {msg.dayPlanCard.evening}</p>
                             </div>
                           </div>
+                        )}
+
+                        {/* Location Action CTA Button */}
+                        {msg.isLocationAction && (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              onNavigate?.("itinerary")
+                              setIsOpen(false)
+                            }}
+                            className="mt-2.5 w-full rounded-xl bg-primary text-xs font-semibold text-primary-foreground py-1 shadow flex items-center justify-center gap-1.5"
+                          >
+                            <Compass className="h-3.5 w-3.5" />
+                            Open Itinerary Workspace
+                          </Button>
                         )}
                       </div>
 

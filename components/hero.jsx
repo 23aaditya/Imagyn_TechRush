@@ -587,7 +587,7 @@ export function Hero({ onStartPlanning }) {
             {/* Submit CTA */}
             <Button
               onClick={() => {
-                const targetDest = query.trim() || "Goa"
+                const targetDest = query.trim()
                 onStartPlanning?.("itinerary", targetDest)
               }}
               className="mt-4 h-12 w-full rounded-2xl bg-white text-neutral-900 text-base font-bold shadow-xl hover:bg-white/90 hover:scale-[1.01] transition-all"

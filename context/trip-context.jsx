@@ -108,7 +108,7 @@ const TripContext = createContext(null)
 
 export function TripProvider({ children }) {
   // Shared Core Trip Parameters
-  const [destination, setDestination] = useState("Goa")
+  const [destination, setDestination] = useState("")
   const [startDate, setStartDate] = useState("2026-08-15")
   const [endDate, setEndDate] = useState("2026-08-17")
   const [days, setDays] = useState(3)
@@ -117,19 +117,13 @@ export function TripProvider({ children }) {
   const [customTargetBudget, setCustomTargetBudget] = useState(null) // Custom entered budget amount in INR (₹)
 
   // Centralized Itinerary State
-  const [itinerary, setItinerary] = useState(initialItinerary)
+  const [itinerary, setItinerary] = useState([])
 
   // Manual Category Budget Overrides (User can override in Budget Planner)
   const [budgetOverrides, setBudgetOverrides] = useState({})
 
   // Actual Expenses Log (User logs/marks as paid in Expense Tracker)
-  const [actualExpenses, setActualExpenses] = useState([
-    { id: 1, title: "Artjuna Cafe Breakfast", category: "Food & Dining", amount: 450, isPaid: true, day: "Day 1", date: "Aug 15" },
-    { id: 2, title: "Fort Aguada Entry & Fuel", category: "Transport", amount: 1200, isPaid: true, day: "Day 1", date: "Aug 15" },
-    { id: 3, title: "Thalassa Sunset Dinner", category: "Food & Dining", amount: 1200, isPaid: false, day: "Day 1", date: "Aug 15" },
-    { id: 4, title: "Baga Water Sports", category: "Activities", amount: 1800, isPaid: true, day: "Day 2", date: "Aug 16" },
-    { id: 5, title: "Hotel Stay Booking", category: "Accommodation", amount: 10500, isPaid: true, day: "All Days", date: "Aug 15-17" }
-  ])
+  const [actualExpenses, setActualExpenses] = useState([])
 
   // Extract all itinerary spots helper
   const allItinerarySpots = useMemo(() => {
@@ -287,35 +281,73 @@ export function TripProvider({ children }) {
     setItinerary(newItinerary)
   }
 
-  // 2. Add Spot to Itinerary
-  const addSpotToItinerary = (dayIndex, spot) => {
+  // 2. Add Spot to Itinerary (Prevents duplicates & initializes days if needed)
+  const addSpotToItinerary = (dayIndex = 0, spot) => {
+    let targetDayIdx = Math.max(0, Number(dayIndex) || 0)
+
     setItinerary((prev) => {
-      if (!prev) return prev
-      const updated = [...prev]
-      if (!updated[dayIndex]) return prev
+      const updated = prev && Array.isArray(prev) ? [...prev] : []
+
+      // Check if spot title already exists in any day
+      const spotTitleLower = (spot.title || "").trim().toLowerCase()
+      if (spotTitleLower) {
+        const alreadyExists = updated.some((d) =>
+          d.activities?.some((act) => act.title.toLowerCase() === spotTitleLower)
+        )
+        if (alreadyExists) {
+          console.warn("Spot already exists in itinerary:", spot.title)
+          return prev
+        }
+      }
+
+      // If itinerary is empty or target dayIndex doesn't exist, create days up to targetDayIdx
+      if (updated.length <= targetDayIdx) {
+        const daysToCreate = Math.max(targetDayIdx + 1, updated.length === 0 ? 3 : targetDayIdx + 1)
+        for (let i = updated.length; i < daysToCreate; i++) {
+          updated.push({
+            day: i + 1,
+            date: `Day ${i + 1}`,
+            title: `Day ${i + 1}: ${destination || "City"} Exploration & Culture`,
+            activities: []
+          })
+        }
+      }
+
+      const currentDayObj = updated[targetDayIdx] || updated[0]
+      const existingActs = currentDayObj.activities || []
+
+      // Smart time calculation based on position or spot.time
+      let assignedTime = spot.time
+      if (!assignedTime) {
+        if (existingActs.length === 0) assignedTime = "09:00 AM"
+        else if (existingActs.length === 1) assignedTime = "01:30 PM"
+        else if (existingActs.length === 2) assignedTime = "06:00 PM"
+        else assignedTime = "08:30 PM"
+      }
 
       const numCost = spot.numericCost || parseInt(String(spot.cost || "500").replace(/[^\d]/g, "")) || 500
       const formattedSpot = {
-        id: spot.id || `custom-${Date.now()}`,
-        time: spot.time || "03:00 PM",
-        openingHours: spot.openingHours || "09:00 AM - 08:00 PM",
-        type: spot.type || "Sightseeing",
+        id: spot.id || `custom-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        time: assignedTime,
+        openingHours: spot.openingHours || "08:00 AM - 08:00 PM",
+        type: spot.type || (existingActs.length === 0 ? "Sightseeing" : existingActs.length === 1 ? "Food" : "Sunset"),
         category: spot.category || (spot.type === "Food" ? "Food & Dining" : "Activities"),
-        title: spot.title || "New Attraction",
-        desc: spot.desc || "Added to itinerary.",
-        cost: typeof spot.cost === "string" ? spot.cost : `₹${numCost}`,
+        title: spot.title || "New Spot",
+        desc: spot.desc || `Added attraction for trip itinerary.`,
+        cost: typeof spot.cost === "string" ? spot.cost : `₹${numCost.toLocaleString("en-IN")}`,
         numericCost: numCost,
-        lat: spot.lat || 15.55 + Math.random() * 0.04,
-        lng: spot.lng || 73.75 + Math.random() * 0.04,
+        lat: spot.lat || 15.55 + (Math.random() - 0.5) * 0.05,
+        lng: spot.lng || 73.75 + (Math.random() - 0.5) * 0.05,
         images: spot.images || [
-          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+          spot.img || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
         ]
       }
 
-      updated[dayIndex] = {
-        ...updated[dayIndex],
-        activities: [...updated[dayIndex].activities, formattedSpot]
+      updated[targetDayIdx] = {
+        ...currentDayObj,
+        activities: [...existingActs, formattedSpot]
       }
+
       return updated
     })
   }
