@@ -479,7 +479,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
   const activeNearbyPlaces = nearbyCategory && nearbyPlacesData[nearbyCategory] ? nearbyPlacesData[nearbyCategory] : []
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-20 relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#F4F6F6] text-[#2F3E4E] pt-24 pb-20 relative overflow-x-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Navigation Top Bar */}

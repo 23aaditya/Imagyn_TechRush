@@ -47,24 +47,31 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed inset-x-0 top-0 z-50 w-full bg-white text-neutral-900 border-b border-neutral-200/80 shadow-sm"
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 w-full transition-all duration-300",
+        activeView === "home"
+          ? scrolled
+            ? "bg-[#0D2B45]/90 backdrop-blur-xl border-b border-white/10 text-white shadow-lg"
+            : "bg-gradient-to-b from-black/85 via-black/40 to-transparent text-white border-none shadow-none"
+          : "bg-[#0D2B45] text-white border-b border-white/10 shadow-md"
+      )}
     >
-      <nav className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3">
+      <nav className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3.5">
         {/* Official TripNest Imagyn Logo */}
         <button
           onClick={() => handleNavClick("home")}
-          className="flex items-center gap-2.5 text-left focus:outline-none group py-1"
+          className="flex items-center text-left focus:outline-none group py-1 bg-transparent border-none"
           aria-label="TripNest Homepage"
         >
           <img
             src="/images/tripnest-logo.png"
             alt="TripNest Imagyn"
-            className="h-9 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
+            className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105 mix-blend-screen filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]"
           />
         </button>
 
         {/* Center links */}
-        <ul className="hidden items-center gap-1 xl:flex">
+        <ul className="hidden items-center gap-1.5 xl:flex">
           {navLinks.map((link) => {
             const isActive = activeView === link.view
             return (
@@ -72,10 +79,10 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                 <button
                   onClick={() => handleNavClick(link.view)}
                   className={cn(
-                    "rounded-lg px-3 py-2 text-xs font-semibold transition-all",
+                    "rounded-md px-3.5 py-2 text-xs font-bold transition-all",
                     isActive
-                      ? "bg-primary/10 text-primary shadow-sm"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                      ? "bg-white/20 text-white shadow-sm"
+                      : "text-white/80 hover:bg-white/15 hover:text-white",
                   )}
                 >
                   {link.label}
@@ -93,9 +100,9 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             size="icon"
             aria-label="Toggle dark mode"
             onClick={toggleTheme}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-white/80 hover:text-white hover:bg-white/15"
           >
-            {isDark ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5" />}
+            {isDark ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5 text-white" />}
           </Button>
 
           {/* User Profile / Auth Button */}
@@ -103,12 +110,12 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             <div className="relative">
               <button
                 onClick={() => setUserDropdown(!userDropdown)}
-                className="flex items-center gap-2 rounded-xl border border-border/60 bg-card p-1.5 pr-3 shadow-sm hover:border-primary/50 transition-all"
+                className="flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-2.5 py-1.5 shadow-sm hover:border-white/40 transition-all text-white"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
+                <span className="flex h-7 w-7 items-center justify-center rounded-sm bg-white text-xs font-bold text-[#0D2B45]">
                   {user.initials || "U"}
                 </span>
-                <span className="hidden text-xs font-semibold text-foreground sm:inline-block max-w-[100px] truncate">
+                <span className="hidden text-xs font-semibold text-white sm:inline-block max-w-[100px] truncate">
                   {user.name}
                 </span>
               </button>
@@ -119,25 +126,20 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                     initial={{ opacity: 0, y: 8, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-48 rounded-2xl border border-border bg-card p-2 shadow-xl backdrop-blur-xl z-50"
+                    className="absolute right-0 mt-2 w-48 rounded-md border border-white/20 bg-neutral-900/95 p-2 shadow-2xl backdrop-blur-2xl z-50 text-white"
                   >
-                    <div className="border-b border-border/60 px-3 py-2">
-                      <p className="text-xs font-bold text-foreground truncate">{user.name}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
-                      {user.travelFrequency && (
-                        <span className="mt-1 inline-block rounded-full bg-emerald/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 capitalize">
-                          {user.travelFrequency}
-                        </span>
-                      )}
+                    <div className="border-b border-white/15 px-3 py-2">
+                      <p className="text-xs font-bold text-white truncate">{user.name}</p>
+                      <p className="text-[11px] text-white/60 truncate">{user.email}</p>
                     </div>
                     <button
                       onClick={() => {
                         setUserDropdown(false)
                         handleNavClick("itinerary")
                       }}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-white/80 hover:bg-white/15 hover:text-white"
                     >
-                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                      <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                       My Saved Trips
                     </button>
                     <button
@@ -145,7 +147,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                         setUserDropdown(false)
                         onLogout()
                       }}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10"
+                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/20"
                     >
                       <LogOut className="h-3.5 w-3.5" />
                       Sign Out
@@ -157,15 +159,8 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
           ) : (
             <div className="flex items-center gap-1 sm:gap-2">
               <Button
-                variant="ghost"
-                onClick={() => onOpenAuth("login")}
-                className="hidden font-medium text-foreground hover:bg-accent sm:inline-flex text-xs sm:text-sm"
-              >
-                Sign In
-              </Button>
-              <Button
                 onClick={() => onOpenAuth("signup")}
-                className="rounded-xl bg-primary text-xs font-semibold text-primary-foreground shadow-md shadow-primary/25 hover:bg-primary/90 sm:text-sm"
+                className="rounded-md bg-white text-[#0D2B45] text-xs font-extrabold hover:bg-white/90 sm:text-sm px-5 py-2 shadow-md transition-all"
               >
                 Get Started
               </Button>
@@ -210,17 +205,10 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             ))}
           </ul>
           {!user && (
-            <div className="mt-2 flex gap-2 border-t border-border/60 pt-3">
-              <Button
-                variant="ghost"
-                onClick={() => { setMobileOpen(false); onOpenAuth("login"); }}
-                className="flex-1 text-foreground hover:bg-accent text-xs"
-              >
-                Sign In
-              </Button>
+            <div className="mt-2 border-t border-border/60 pt-3">
               <Button
                 onClick={() => { setMobileOpen(false); onOpenAuth("signup"); }}
-                className="flex-1 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs"
+                className="w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm py-2 font-semibold shadow-md"
               >
                 Get Started
               </Button>

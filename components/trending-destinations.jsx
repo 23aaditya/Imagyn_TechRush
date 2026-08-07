@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 const polaroidCards = [
   { id: "goa", name: "Goa, India", vibe: "Sun, Sand & Serenity", rating: "4.8 ⭐", image: "/images/dest-goa.png", style: { top: "2%", left: "1%", rotate: -8, zIndex: 10 } },
   { id: "manali", name: "Manali, India", vibe: "Snowy Escapes", rating: "4.6 ⭐", image: "/images/dest-manali.png", style: { top: "0%", left: "22%", rotate: 5, zIndex: 20 } },
-  { id: "shimla", name: "Shimla, India", vibe: "Colonial Pine Ridge", rating: "4.6 ⭐", image: "https://images.unsplash.com/photo-1597074866923-dc0589150358?w=500&auto=format&fit=crop&q=80", style: { top: "5%", left: "44%", rotate: -3, zIndex: 15 } },
+  { id: "shimla", name: "Shimla, India", vibe: "Colonial Pine Ridge", rating: "4.6 ⭐", image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1000&auto=format&fit=crop&q=80", style: { top: "5%", left: "44%", rotate: -3, zIndex: 15 } },
   { id: "munnar", name: "Munnar, India", vibe: "Rolling Tea Estates", rating: "4.8 ⭐", image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=500&auto=format&fit=crop&q=80", style: { top: "1%", left: "66%", rotate: 7, zIndex: 25 } },
   { id: "reykjavik", name: "Reykjavik, Iceland", vibe: "Nordic Charm", rating: "4.7 ⭐", image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&auto=format&fit=crop&q=80", style: { top: "3%", right: "1%", rotate: -5, zIndex: 12 } },
   

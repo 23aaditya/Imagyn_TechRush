@@ -99,36 +99,23 @@ export function HowItWorks() {
                 zIndex: 30,
                 transition: { duration: 0.25 }
               }}
-              className={`relative flex flex-col justify-between p-6 rounded-xl border ${step.color} ${step.rotation} shadow-xl shadow-black/10 cursor-default group transition-shadow duration-300 min-h-[220px]`}
+              className={`relative flex flex-col p-5 sm:p-6 rounded-2xl border ${step.color} ${step.rotation} shadow-lg shadow-black/10 cursor-default group transition-all duration-300 h-full`}
             >
               {/* Sticky Tape Header Strip */}
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/40 dark:bg-white/10 backdrop-blur-sm border border-white/40 rounded-xs shadow-xs" />
 
-              {/* Number Pin Header */}
-              <div className="flex items-center justify-between border-b border-current/15 pb-3">
-                <span className="font-heading text-2xl font-black opacity-80">
-                  #{step.number}
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">
-                  Step Note
-                </span>
-              </div>
-
-              {/* Sticky Content */}
-              <div className="py-4 space-y-2 text-left">
-                <h3 className="font-heading text-base font-extrabold tracking-tight leading-snug">
+              {/* Feature Title Above Line */}
+              <div className="border-b border-current/20 pb-2.5 pt-1 text-left">
+                <h3 className="font-heading text-base sm:text-lg font-extrabold tracking-tight leading-snug">
                   {step.title}
                 </h3>
-                <p className="font-sans text-xs opacity-85 leading-relaxed">
-                  {step.description}
-                </p>
               </div>
 
-              {/* Subtle Footer */}
-              <div className="pt-2 text-left">
-                <span className="text-[9px] font-semibold uppercase tracking-wider opacity-50 block">
-                  TripNest Feature Highlight
-                </span>
+              {/* Feature Description Below Line */}
+              <div className="pt-3 text-left">
+                <p className="font-sans text-xs sm:text-sm opacity-90 leading-relaxed font-medium">
+                  {step.description}
+                </p>
               </div>
             </motion.div>
           ))}

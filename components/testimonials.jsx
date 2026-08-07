@@ -146,10 +146,10 @@ export function Testimonials() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, delay: (i % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="group relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-6 shadow-lg shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:border-[#8DBFB7]/40"
+                className="group relative overflow-hidden rounded-3xl border border-neutral-200/80 bg-white p-6 shadow-xl transition-all duration-300 hover:border-neutral-300 hover:shadow-2xl"
               >
                 <Quote
-                  className="absolute -right-2 -top-2 h-20 w-20 text-white/[0.06]"
+                  className="absolute -right-2 -top-2 h-20 w-20 text-neutral-200/50"
                   aria-hidden
                   strokeWidth={1}
                 />
@@ -163,7 +163,7 @@ export function Testimonials() {
                         className={`h-4 w-4 ${
                           s < t.rating
                             ? "fill-amber-400 text-amber-400"
-                            : "fill-muted text-muted"
+                            : "fill-neutral-200 text-neutral-200"
                         }`}
                       />
                     ))}
@@ -173,7 +173,7 @@ export function Testimonials() {
                   {t.isOwn && (
                     <button
                       onClick={() => setDeleteConfirmId(t.id)}
-                      className="rounded-full p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                      className="rounded-full p-1.5 text-neutral-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                       title="Delete your review"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -182,23 +182,23 @@ export function Testimonials() {
                 </div>
 
                 {/* Quote */}
-                <p className="relative mt-4 text-sm leading-relaxed text-white">{t.quote}</p>
+                <p className="relative mt-4 text-sm leading-relaxed text-neutral-800 font-medium">{t.quote}</p>
 
                 {/* Author Info */}
-                <div className="relative mt-6 flex items-center gap-3 border-t border-white/15 pt-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#8DBFB7] text-sm font-bold text-[#0D2B45]">
+                <div className="relative mt-6 flex items-center gap-3 border-t border-neutral-200/80 pt-4">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0D2B45] text-sm font-bold text-white shadow-sm">
                     {initials}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-white flex items-center gap-1.5">
+                    <p className="truncate text-sm font-bold text-neutral-900 flex items-center gap-1.5">
                       {t.name}
                       {t.isOwn && (
-                        <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                        <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-extrabold text-emerald-800">
                           You
                         </span>
                       )}
                     </p>
-                    <p className="truncate text-xs text-white/60">
+                    <p className="truncate text-xs text-neutral-500 font-medium">
                       {t.trip} · {t.location}
                     </p>
                   </div>

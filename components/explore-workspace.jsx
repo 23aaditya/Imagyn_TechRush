@@ -13,6 +13,7 @@ import {
   HeartHandshake,
   Clock,
   Coins,
+  DollarSign,
   Ticket,
   Hotel,
   Utensils,
@@ -996,7 +997,7 @@ const allDestinations = [
     "subtitle": "City of Lakes",
     "country": "India",
     "temp": "28\u00b0C",
-    "image": "/images/dest-jaipur.png",
+    "image": "https://images.unsplash.com/photo-1615836245337-f5b9b2303f10?w=1000&auto=format&fit=crop&q=80",
     "rating": 4.7,
     "ageGroup": "All Ages",
     "vibe": "Regal Lakeside Romance",
@@ -1023,7 +1024,7 @@ const allDestinations = [
     "subtitle": "Colonial Hill Town",
     "country": "India",
     "temp": "12\u00b0C",
-    "image": "/images/dest-manali.png",
+    "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1000&auto=format&fit=crop&q=80",
     "rating": 4.4,
     "ageGroup": "All Ages",
     "vibe": "Heritage & Hill Station",
@@ -1050,7 +1051,7 @@ const allDestinations = [
     "subtitle": "Coffee Highlands",
     "country": "India",
     "temp": "22\u00b0C",
-    "image": "/images/dest-kerala.png",
+    "image": "https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?w=1000&auto=format&fit=crop&q=80",
     "rating": 4.6,
     "ageGroup": "All Ages",
     "vibe": "Misty Coffee Farms",
@@ -2909,7 +2910,7 @@ const allDestinations = [
     "subtitle": "Coffee Estates",
     "country": "India",
     "temp": "20\u00b0C",
-    "image": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?w=1000&auto=format&fit=crop&q=80",
     "rating": 4.6,
     "ageGroup": "All Ages",
     "vibe": "Misty Coffee Hills",
@@ -2936,7 +2937,7 @@ const allDestinations = [
     "subtitle": "Colonial Pines",
     "country": "India",
     "temp": "12\u00b0C",
-    "image": "https://images.unsplash.com/photo-1597074866923-dc0589150358?w=600&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1000&auto=format&fit=crop&q=80",
     "rating": 4.6,
     "ageGroup": "All Ages",
     "vibe": "Colonial Ridge Walks",
@@ -3639,27 +3640,27 @@ const allDestinations = [
    ───────────────────────────────────────────── */
 const filterCategories = [
   {
-    key: "weather", label: "Weather", icon: "☀️",
+    key: "weather", label: "Weather", icon: <Sun className="h-3.5 w-3.5" />,
     options: ["Summers", "Winters", "Monsoon"],
     color: "#F59E0B", bgTint: "rgba(245,158,11,0.06)"
   },
   {
-    key: "company", label: "Company", icon: "👥",
+    key: "company", label: "Company", icon: <Users className="h-3.5 w-3.5" />,
     options: ["Friends", "Family", "Solo"],
     color: "#3B82F6", bgTint: "rgba(59,130,246,0.06)"
   },
   {
-    key: "mood", label: "Mood", icon: "🎭",
+    key: "mood", label: "Mood", icon: <Sparkles className="h-3.5 w-3.5" />,
     options: ["Party", "Relax", "Adventure"],
     color: "#A855F7", bgTint: "rgba(168,85,247,0.06)"
   },
   {
-    key: "budget", label: "Budget", icon: "💰",
+    key: "budget", label: "Budget", icon: <DollarSign className="h-3.5 w-3.5" />,
     options: ["Economy", "Luxury"],
     color: "#10B981", bgTint: "rgba(16,185,129,0.06)"
   },
   {
-    key: "type", label: "Type", icon: "🏔️",
+    key: "type", label: "Type", icon: <Mountain className="h-3.5 w-3.5" />,
     options: ["Mountains", "Beach", "Road Trips"],
     color: "#14B8A6", bgTint: "rgba(20,184,166,0.06)"
   },
@@ -3693,12 +3694,12 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
   const scrollRef = useRef(null)
   const handleScroll = (dir) => {
     if (!scrollRef.current) return
-    scrollRef.current.scrollBy({ left: dir === "left" ? -420 : 420, behavior: "smooth" })
+    scrollRef.current.scrollBy({ left: dir === "left" ? -380 : 380, behavior: "smooth" })
   }
 
   return (
-    <div className="mb-14">
-      <div className="flex items-center justify-between mb-4 px-2">
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-2 px-2">
         <h3 className="flex items-center gap-2 font-heading text-xl font-bold text-foreground">
           <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             {icon}
@@ -3719,10 +3720,10 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
       </div>
 
       <div ref={scrollRef}
-        className="flex items-start gap-14 overflow-x-auto overflow-y-visible pt-24 pb-20 px-28 explore-scrollbar-hide"
+        className="flex items-start gap-8 overflow-x-auto overflow-y-visible pt-3 pb-3 px-12 explore-scrollbar-hide"
         style={{ scrollbarWidth: "none" }}>
         {destinations.map((item) => (
-          <CircularCard
+          <ArchCard
             key={item.id}
             item={item}
             isHovered={hoveredId === item.id}
@@ -3737,9 +3738,9 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
 }
 
 /* ─────────────────────────────────────────────
-   CIRCULAR CARD WITH PETAL POP-OUT (50% LARGER)
+   ARCH WINDOW CARD (SEMICIRCLE TOP, FLAT BOTTOM)
    ───────────────────────────────────────────── */
-function CircularCard({ item, isHovered, onHover, onLeave, onClick }) {
+function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
   const getPetalValue = (key) => {
     if (key === "minDays") return `${item.minDays} Days`
     return item[key] || ""
@@ -3753,7 +3754,7 @@ function CircularCard({ item, isHovered, onHover, onLeave, onClick }) {
       onClick={onClick}
       style={{ zIndex: isHovered ? 40 : 1 }}
     >
-      {/* Petal Bubbles — White cards, Navy/Black text, No Emojis, Premium Spring Pop-out */}
+      {/* Petal Bubbles — White Circle cards on hover */}
       <AnimatePresence mode="wait">
         {isHovered && petalConfig.map((petal, i) => {
           const rad = (petal.angle * Math.PI) / 180
@@ -3792,45 +3793,47 @@ function CircularCard({ item, isHovered, onHover, onLeave, onClick }) {
         })}
       </AnimatePresence>
 
-      {/* 50% Larger Circular Image Card */}
+      {/* Semicircle Arch Dome Top + Flat Rectangular Bottom Image Card */}
       <motion.div
-        animate={{ scale: isHovered ? 1.15 : 1 }}
+        animate={{ scale: isHovered ? 1.08 : 1, y: isHovered ? -6 : 0 }}
         transition={{ type: "spring", stiffness: 220, damping: 20 }}
         className="relative"
       >
         <div
-          className="h-48 w-48 sm:h-52 sm:w-52 rounded-full p-[5px] transition-all duration-500"
+          className="h-64 w-48 sm:h-72 sm:w-52 rounded-t-[999px] rounded-b-2xl p-[4px] transition-all duration-500 shadow-xl"
           style={{
             background: isHovered
               ? `linear-gradient(135deg, ${item.color}, ${item.color}99, ${item.color}44)`
               : "var(--border)",
             boxShadow: isHovered
-              ? `0 15px 45px ${item.color}50, 0 0 75px ${item.color}25`
-              : "0 8px 28px rgba(0,0,0,0.1)",
+              ? `0 20px 45px ${item.color}40, 0 0 60px ${item.color}20`
+              : "0 8px 28px rgba(0,0,0,0.12)",
           }}
         >
-          <div className="h-full w-full overflow-hidden rounded-full relative">
+          <div className="h-full w-full overflow-hidden rounded-t-[999px] rounded-b-xl relative bg-neutral-900">
             <img
               src={item.image}
               alt={item.name}
-              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+              className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+            {/* Temperature Badge on Down Side of the Shape */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20">
+              <span
+                className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-extrabold text-white shadow-xl border border-white/40 backdrop-blur-md whitespace-nowrap"
+                style={{ background: item.color }}
+              >
+                <CloudSun className="h-3.5 w-3.5" />
+                {item.temp}
+              </span>
+            </div>
           </div>
         </div>
-
-        {/* Temperature badge */}
-        <span
-          className="absolute top-1 right-1 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold text-white shadow-xl border border-white/40"
-          style={{ background: item.color }}
-        >
-          <CloudSun className="h-3.5 w-3.5" />
-          {item.temp}
-        </span>
       </motion.div>
 
-      {/* Name & Subtitle */}
-      <div className="mt-4 text-center relative z-10">
+      {/* Name & Subtitle Below the Shape */}
+      <div className="mt-3 text-center relative z-10">
         <h4
           className="font-heading text-base sm:text-lg font-extrabold transition-colors"
           style={{ color: isHovered ? item.color : "var(--foreground)" }}
@@ -4073,10 +4076,10 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
                     })}
                   </AnimatePresence>
 
-                  {/* Category petal button */}
+                  {/* Category petal button (Arch Window Shape) */}
                   <button
                     onClick={() => handleCategoryClick(cat.key)}
-                    className="flex flex-col items-center justify-center rounded-full h-[54px] w-[54px] border-2 shadow-2xl transition-all duration-300 hover:scale-110 bg-white/95"
+                    className="flex flex-col items-center justify-center rounded-t-[999px] rounded-b-md h-[58px] w-[46px] border-2 shadow-2xl transition-all duration-300 hover:scale-110 bg-white/95"
                     style={{
                       borderColor: activeFilters[cat.key] ? cat.color : "rgba(200,200,220,0.6)",
                       background: activeFilters[cat.key]
@@ -4088,7 +4091,7 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
                       color: activeFilters[cat.key] ? "white" : "#444",
                     }}
                   >
-                    <span className="text-base leading-none">{cat.icon}</span>
+                    <span className="text-sm leading-none">{cat.icon}</span>
                     <span className="text-[9px] font-black mt-0.5" style={{ color: activeFilters[cat.key] ? "white" : cat.color }}>{cat.label}</span>
                   </button>
                 </motion.div>
@@ -4098,30 +4101,26 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
         )}
       </AnimatePresence>
 
-      {/* Main Customize Normal Floating Button */}
+      {/* Main Customize Floating Button (Deep Sea Color & Arch Layout) */}
       <motion.button
         type="button"
         onClick={() => { setIsOpen(!isOpen); setExpandedCategory(null) }}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.94 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative flex items-center justify-center gap-2 rounded-full px-5 py-3.5 shadow-2xl border-2 transition-all cursor-pointer"
+        className="relative flex items-center justify-center gap-2.5 rounded-t-[999px] rounded-b-2xl px-7 py-3.5 shadow-2xl border border-white/30 transition-all cursor-pointer bg-[#0D2B45] text-white hover:bg-[#0D2B45]/90"
         style={{
-          background: isOpen
-            ? "linear-gradient(135deg, #10B981, #059669)"
-            : "linear-gradient(135deg, #10B981, #14B8A6)",
-          borderColor: "rgba(255,255,255,0.4)",
-          boxShadow: "0 10px 30px rgba(16,185,129,0.35), 0 2px 10px rgba(0,0,0,0.12)",
+          boxShadow: "0 15px 35px rgba(13,43,69,0.5), 0 2px 10px rgba(0,0,0,0.2)",
         }}
       >
-        <SlidersHorizontal className={`h-5 w-5 text-white transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
-        <span className="text-xs font-extrabold text-white tracking-wide">
+        <SlidersHorizontal className={`h-4.5 w-4.5 text-white transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
+        <span className="font-heading text-xs font-extrabold uppercase tracking-widest text-white">
           {isOpen ? "Close" : "Customize"}
         </span>
 
         {/* Active filter badge */}
         {activeCount > 0 && (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white shadow-md ring-2 ring-white ml-0.5">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-white shadow-md ring-2 ring-white ml-0.5">
             {activeCount}
           </span>
         )}
@@ -4220,7 +4219,7 @@ export function ExploreWorkspace({ onBack, onSelectDestination }) {
   const escapeDests = filteredDestinations.filter(d => d.row === "escapes")
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-32 relative">
+    <div className="min-h-screen bg-[#F4F6F6] text-[#2F3E4E] pt-24 pb-32 relative">
       {/* Filter Background Overlay */}
       <AnimatePresence>
         {hasFilters && (

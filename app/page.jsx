@@ -71,17 +71,13 @@ function MainApp() {
     } catch (e) {
       console.error(e)
     }
-    // If user requested a feature workspace prior to auth, transition to it
     if (pendingDestination) {
       setDestination(pendingDestination)
       setPendingDestination(null)
     }
-    if (pendingView) {
-      setActiveView(pendingView)
-      setPendingView(null)
-    } else if (activeView === "home") {
-      setActiveView("itinerary")
-    }
+    // Always jump straight to Overview (Itinerary Planner) workspace after login/signup
+    setActiveView("itinerary")
+    setPendingView(null)
   }
 
   const handleLogout = () => {
@@ -102,7 +98,7 @@ function MainApp() {
   }
 
   return (
-    <main className="relative min-h-screen bg-background text-foreground">
+    <main className={`relative min-h-screen ${activeView === "home" ? "bg-background" : "bg-[#F4F6F6] text-[#2F3E4E]"}`}>
       {/* Dynamic low-opacity travel background */}
       {activeView === "home" && <HomeBackground />}
 

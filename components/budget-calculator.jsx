@@ -63,7 +63,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
   }
 
   return (
-    <section id="budget" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
+    <section id="budget" className={`relative w-full ${isWorkspace ? "min-h-screen bg-[#F4F6F6] text-[#2F3E4E] pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Workspace Top Bar */}

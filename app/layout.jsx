@@ -1,21 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
-import { Inter, Playfair_Display } from 'next/font/google'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './globals.css'
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-  fallback: ['system-ui', 'sans-serif'],
-})
-
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-heading',
-  display: 'swap',
-  weight: ['400', '500', '600', '700', '800', '900'],
-  fallback: ['Georgia', 'serif'],
-})
 
 export const metadata = {
   title: 'TripNest — Smart Travel Itinerary Planner',
@@ -51,7 +36,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} bg-background`}>
+    <html lang="en" className="bg-background">
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
