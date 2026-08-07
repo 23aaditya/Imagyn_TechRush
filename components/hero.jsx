@@ -67,6 +67,7 @@ export function Hero({ onStartPlanning }) {
 
   // Budget state
   const [selectedBudget, setSelectedBudget] = useState("Any budget")
+  const [customBudgetInput, setCustomBudgetInput] = useState("")
 
   // Load recent searches on mount
   useEffect(() => {
@@ -372,21 +373,49 @@ export function Hero({ onStartPlanning }) {
               {/* Budget Picker in INR */}
               <div className="md:col-span-2">
                 <label className="flex cursor-pointer flex-col justify-center rounded-2xl border border-border/60 bg-background/80 px-3 py-2 transition-colors focus-within:border-primary">
-                  <span className="flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground">
-                    <Wallet className="h-3 w-3 text-emerald" />
-                    Budget (₹)
+                  <span className="flex items-center justify-between text-[10px] font-semibold uppercase text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Wallet className="h-3 w-3 text-emerald" />
+                      Budget (₹)
+                    </span>
+                    {selectedBudget === "Custom" && (
+                      <span className="text-[9px] font-bold text-primary">Enter Amount</span>
+                    )}
                   </span>
-                  <select
-                    value={selectedBudget}
-                    onChange={(e) => setSelectedBudget(e.target.value)}
-                    className="w-full cursor-pointer bg-transparent text-xs font-semibold text-foreground focus:outline-none"
-                  >
-                    <option value="Any budget" className="bg-background text-foreground">Any Budget</option>
-                    <option value="Under ₹5,000" className="bg-background text-foreground">Under ₹5,000</option>
-                    <option value="₹5,000 – ₹15,000" className="bg-background text-foreground">₹5,000 – ₹15,000</option>
-                    <option value="₹15,000 – ₹35,000" className="bg-background text-foreground">₹15,000 – ₹35,000</option>
-                    <option value="₹35,000+" className="bg-background text-foreground">₹35,000+</option>
-                  </select>
+
+                  {selectedBudget === "Custom" ? (
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className="text-xs font-bold text-primary">₹</span>
+                      <input
+                        type="number"
+                        placeholder="e.g. 25000"
+                        value={customBudgetInput}
+                        onChange={(e) => setCustomBudgetInput(e.target.value)}
+                        className="w-full bg-transparent text-xs font-bold text-foreground focus:outline-none"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBudget("Any budget")}
+                        className="text-[10px] text-muted-foreground hover:text-foreground underline"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  ) : (
+                    <select
+                      value={selectedBudget}
+                      onChange={(e) => setSelectedBudget(e.target.value)}
+                      className="w-full cursor-pointer bg-transparent text-xs font-semibold text-foreground focus:outline-none"
+                    >
+                      <option value="Any budget" className="bg-background text-foreground">Any Budget</option>
+                      <option value="Under ₹5,000" className="bg-background text-foreground">Under ₹5,000</option>
+                      <option value="₹5,000 – ₹15,000" className="bg-background text-foreground">₹5,000 – ₹15,000</option>
+                      <option value="₹15,000 – ₹35,000" className="bg-background text-foreground">₹15,000 – ₹35,000</option>
+                      <option value="₹35,000+" className="bg-background text-foreground">₹35,000+</option>
+                      <option value="Custom" className="bg-background font-bold text-primary">✏️ Enter Custom Budget (₹)...</option>
+                    </select>
+                  )}
                 </label>
               </div>
 

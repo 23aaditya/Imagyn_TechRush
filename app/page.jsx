@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { TripProvider } from "@/context/trip-context"
 import { Navbar } from "@/components/navbar"
 import { Hero } from "@/components/hero"
 import { TrendingDestinations } from "@/components/trending-destinations"
@@ -83,103 +84,105 @@ export default function Page() {
   }
 
   return (
-    <main className="relative min-h-screen bg-background text-foreground">
-      {/* Dynamic low-opacity travel background */}
-      {activeView === "home" && <HomeBackground />}
+    <TripProvider>
+      <main className="relative min-h-screen bg-background text-foreground">
+        {/* Dynamic low-opacity travel background */}
+        {activeView === "home" && <HomeBackground />}
 
-      {/* Top Fixed Header Navigation */}
-      <Navbar
-        activeView={activeView}
-        setActiveView={handleViewChange}
-        user={user}
-        onLogout={handleLogout}
-        onOpenAuth={openAuth}
-      />
+        {/* Top Fixed Header Navigation */}
+        <Navbar
+          activeView={activeView}
+          setActiveView={handleViewChange}
+          user={user}
+          onLogout={handleLogout}
+          onOpenAuth={openAuth}
+        />
 
-      {/* Auth Dialog Modal */}
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => {
-          setAuthModalOpen(false)
-          setPendingView(null)
-        }}
-        onAuthSuccess={handleAuthSuccess}
-        initialTab={authInitialTab}
-      />
+        {/* Auth Dialog Modal */}
+        <AuthModal
+          isOpen={authModalOpen}
+          onClose={() => {
+            setAuthModalOpen(false)
+            setPendingView(null)
+          }}
+          onAuthSuccess={handleAuthSuccess}
+          initialTab={authInitialTab}
+        />
 
-      {/* Dynamic View Router */}
-      {activeView === "home" && (
-        <div className="relative z-10 animate-in fade-in duration-300">
-          <Hero onStartPlanning={(view) => handleViewChange(view || "itinerary")} />
-          <TrendingDestinations onNavigateView={handleViewChange} />
-          <WhyTripNest onNavigateView={handleViewChange} />
-          <ExploreWorld onNavigateView={handleViewChange} />
-          <HowItWorks onNavigateView={handleViewChange} />
-          <PackageComparison onNavigateView={handleViewChange} onOpenAuth={openAuth} />
-          <BudgetCalculator
-            isWorkspace={false}
-            onOpenWorkspace={() => handleViewChange("budget")}
-          />
-          <ExpenseTracker
-            isWorkspace={false}
-            onOpenWorkspace={() => handleViewChange("expenses")}
-          />
-          <Testimonials />
-          <FAQ />
-          <FinalCTA onNavigateView={handleViewChange} />
-          <Footer onNavigateView={handleViewChange} />
-        </div>
-      )}
+        {/* Dynamic View Router */}
+        {activeView === "home" && (
+          <div className="relative z-10 animate-in fade-in duration-300">
+            <Hero onStartPlanning={(view) => handleViewChange(view || "itinerary")} />
+            <TrendingDestinations onNavigateView={handleViewChange} />
+            <WhyTripNest onNavigateView={handleViewChange} />
+            <ExploreWorld onNavigateView={handleViewChange} />
+            <HowItWorks onNavigateView={handleViewChange} />
+            <PackageComparison onNavigateView={handleViewChange} onOpenAuth={openAuth} />
+            <BudgetCalculator
+              isWorkspace={false}
+              onOpenWorkspace={() => handleViewChange("budget")}
+            />
+            <ExpenseTracker
+              isWorkspace={false}
+              onOpenWorkspace={() => handleViewChange("expenses")}
+            />
+            <Testimonials />
+            <FAQ />
+            <FinalCTA onNavigateView={handleViewChange} />
+            <Footer onNavigateView={handleViewChange} />
+          </div>
+        )}
 
-      {/* Dedicated Workspace: Itinerary Planner */}
-      {activeView === "itinerary" && (
-        <div className="relative z-10 animate-in fade-in duration-300">
-          <ItineraryPlanner
-            onBack={() => handleViewChange("home")}
-            onNavigateView={handleViewChange}
-          />
-        </div>
-      )}
+        {/* Dedicated Workspace: Itinerary Planner */}
+        {activeView === "itinerary" && (
+          <div className="relative z-10 animate-in fade-in duration-300">
+            <ItineraryPlanner
+              onBack={() => handleViewChange("home")}
+              onNavigateView={handleViewChange}
+            />
+          </div>
+        )}
 
-      {/* Dedicated Workspace: World Explorer */}
-      {activeView === "explore" && (
-        <div className="relative z-10 animate-in fade-in duration-300">
-          <ExploreWorkspace
-            onBack={() => handleViewChange("home")}
-            onSelectDestination={() => handleViewChange("itinerary")}
-          />
-        </div>
-      )}
+        {/* Dedicated Workspace: World Explorer */}
+        {activeView === "explore" && (
+          <div className="relative z-10 animate-in fade-in duration-300">
+            <ExploreWorkspace
+              onBack={() => handleViewChange("home")}
+              onSelectDestination={() => handleViewChange("itinerary")}
+            />
+          </div>
+        )}
 
-      {/* Dedicated Workspace: Budget Calculator */}
-      {activeView === "budget" && (
-        <div className="relative z-10 animate-in fade-in duration-300">
-          <BudgetCalculator
-            isWorkspace={true}
-            onBack={() => handleViewChange("home")}
-          />
-        </div>
-      )}
+        {/* Dedicated Workspace: Budget Calculator */}
+        {activeView === "budget" && (
+          <div className="relative z-10 animate-in fade-in duration-300">
+            <BudgetCalculator
+              isWorkspace={true}
+              onBack={() => handleViewChange("home")}
+            />
+          </div>
+        )}
 
-      {/* Dedicated Workspace: Expense Tracker */}
-      {activeView === "expenses" && (
-        <div className="relative z-10 animate-in fade-in duration-300">
-          <ExpenseTracker
-            isWorkspace={true}
-            onBack={() => handleViewChange("home")}
-          />
-        </div>
-      )}
+        {/* Dedicated Workspace: Expense Tracker */}
+        {activeView === "expenses" && (
+          <div className="relative z-10 animate-in fade-in duration-300">
+            <ExpenseTracker
+              isWorkspace={true}
+              onBack={() => handleViewChange("home")}
+            />
+          </div>
+        )}
 
-      {/* Dedicated Workspace: Packages Comparison */}
-      {activeView === "packages" && (
-        <div className="relative z-10 animate-in fade-in duration-300 pt-20">
-          <PackageComparison onNavigateView={handleViewChange} onOpenAuth={openAuth} />
-        </div>
-      )}
+        {/* Dedicated Workspace: Packages Comparison */}
+        {activeView === "packages" && (
+          <div className="relative z-10 animate-in fade-in duration-300 pt-20">
+            <PackageComparison onNavigateView={handleViewChange} onOpenAuth={openAuth} />
+          </div>
+        )}
 
-      {/* Floating AI Travel Concierge Assistant */}
-      <AiChatbot currentView={activeView} onNavigate={handleViewChange} />
-    </main>
+        {/* Floating AI Travel Concierge Assistant */}
+        <AiChatbot currentView={activeView} onNavigate={handleViewChange} />
+      </main>
+    </TripProvider>
   )
 }

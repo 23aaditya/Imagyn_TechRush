@@ -178,33 +178,7 @@ export function PackageComparison({ onNavigateView }) {
                   <td className="p-4 text-foreground text-center font-medium">{pkgB.budget.activities}</td>
                 </tr>
 
-                {/* Section Header: Stay Options */}
-                <tr className="bg-secondary/40">
-                  <td colSpan={3} className="px-5 py-2.5 font-bold uppercase tracking-wider text-xs text-muted-foreground">
-                    🏨 Stay & Accommodation Options
-                  </td>
-                </tr>
 
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">5-Star Luxury Hotels</td>
-                  <td className="p-4 text-center">{renderBool(pkgA.stay.fiveStar)}</td>
-                  <td className="p-4 text-center">{renderBool(pkgB.stay.fiveStar)}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">3-Star Standard Hotels</td>
-                  <td className="p-4 text-center">{renderBool(pkgA.stay.threeStar)}</td>
-                  <td className="p-4 text-center">{renderBool(pkgB.stay.threeStar)}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Hostels & Backpacker Stays</td>
-                  <td className="p-4 text-center">{renderBool(pkgA.stay.hostel)}</td>
-                  <td className="p-4 text-center">{renderBool(pkgB.stay.hostel)}</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-muted-foreground">Budget Guesthouses</td>
-                  <td className="p-4 text-center">{renderBool(pkgA.stay.budgetStay)}</td>
-                  <td className="p-4 text-center">{renderBool(pkgB.stay.budgetStay)}</td>
-                </tr>
 
                 {/* Section Header: Experience */}
                 <tr className="bg-secondary/40">

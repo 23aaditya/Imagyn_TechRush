@@ -10,82 +10,52 @@ import {
   Plus,
   Trash2,
   Receipt,
-  Info
+  CheckCircle2,
+  Clock,
+  Sparkles,
+  AlertCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-const initialLogs = [
-  { id: 1, title: "Artjuna Cafe Breakfast", category: "Food & Dining", amount: 500, day: "Mon", date: "Monday" },
-  { id: 2, title: "Fort Aguada Entry & Scooter Fuel", category: "Transport", amount: 1200, day: "Tue", date: "Tuesday" },
-  { id: 3, title: "Beachside Shack Dinner", category: "Food & Dining", amount: 700, day: "Wed", date: "Wednesday" },
-  { id: 4, title: "Water Sports & Parasailing", category: "Activities", amount: 2200, day: "Thu", date: "Thursday" },
-  { id: 5, title: "Hotel Stay Booking", category: "Accommodation", amount: 4500, day: "Fri", date: "Friday" },
-  { id: 6, title: "Night Market Souvenirs", category: "Shopping", amount: 1800, day: "Sat", date: "Saturday" },
-  { id: 7, title: "Airport Cab Ride", category: "Transport", amount: 900, day: "Sun", date: "Sunday" },
-]
+import { useTrip } from "@/context/trip-context"
 
 export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace }) {
-  const [logs, setLogs] = useState(initialLogs)
-  const [budgetGoal, setBudgetGoal] = useState(25000)
+  const {
+    totalBudget,
+    totalSpent,
+    remainingBudget,
+    budgetDifference,
+    plannedExpenses,
+    actualExpenses,
+    addActualExpense,
+    toggleExpensePaid,
+    deleteActualExpense
+  } = useTrip()
+
   const [title, setTitle] = useState("")
   const [category, setCategory] = useState("Food & Dining")
   const [amount, setAmount] = useState("")
-  const [hoveredDay, setHoveredDay] = useState(null)
+  const [activeTab, setActiveTab] = useState("actual") // 'actual' | 'planned'
 
-  const handleAddExpense = (e) => {
+  const handleAddExpenseSubmit = (e) => {
     e.preventDefault()
     if (!title || !amount) return
-    const newLog = {
-      id: Date.now(),
+    addActualExpense({
       title,
       category,
       amount: Number(amount),
-      day: "Today",
-      date: "Just now"
-    }
-    setLogs([newLog, ...logs])
+      isPaid: true
+    })
     setTitle("")
     setAmount("")
   }
 
-  const handleDeleteLog = (id) => {
-    setLogs(logs.filter((l) => l.id !== id))
-  }
+  const pctSpent = totalBudget > 0 ? Math.min(100, Math.round((totalSpent / totalBudget) * 100)) : 0
 
-  const totalSpent = logs.reduce((sum, item) => sum + item.amount, 0)
-  const remaining = Math.max(0, budgetGoal - totalSpent)
-  const pctRemaining = Math.round((remaining / budgetGoal) * 100)
-
-  // Category breakdown
-  const catBreakdown = logs.reduce((acc, l) => {
+  // Category breakdown from actual expenses
+  const catBreakdown = actualExpenses.reduce((acc, l) => {
     acc[l.category] = (acc[l.category] || 0) + l.amount
     return acc
   }, {})
-
-  // Weekly daily breakdown calculation
-  const daysList = [
-    { day: "Mon", full: "Monday" },
-    { day: "Tue", full: "Tuesday" },
-    { day: "Wed", full: "Wednesday" },
-    { day: "Thu", full: "Thursday" },
-    { day: "Fri", full: "Friday" },
-    { day: "Sat", full: "Saturday" },
-    { day: "Sun", full: "Sunday" }
-  ]
-
-  const weeklyData = daysList.map((d) => {
-    const dayTotal = logs
-      .filter((l) => l.day === d.day || l.date === d.full)
-      .reduce((sum, item) => sum + item.amount, 0)
-    return {
-      day: d.day,
-      full: d.full,
-      amount: dayTotal
-    }
-  })
-
-  const maxDaily = Math.max(...weeklyData.map((d) => d.amount), 1000)
-  const highestDay = weeklyData.reduce((prev, current) => (current.amount > prev.amount ? current : prev), weeklyData[0])
 
   return (
     <section id="tracker" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background pt-24 pb-20" : "py-20 md:py-28 bg-background"}`}>
@@ -109,9 +79,9 @@ export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace })
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                <Receipt className="h-3.5 w-3.5" />
-                Live Log Sync
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                <Sparkles className="h-3.5 w-3.5" />
+                ⚡ Live Synced with AI Itinerary & Budget Planner
               </span>
             </div>
           </div>
@@ -120,238 +90,255 @@ export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace })
         {/* Header */}
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-foreground">
-            {isWorkspace ? "Live Trip Expense Workspace" : "Track Spending As You Travel"}
+            {isWorkspace ? "Live Expense & Budget Tracker" : "Track Every Expense In Real Time"}
           </h2>
           <p className="mt-3 text-pretty text-muted-foreground leading-relaxed">
-            Log expenses on the go, stay under budget, and analyze spending patterns in real-time.
+            Auto-imports planned expenses from your AI Itinerary and recalculates remaining budget instantly.
           </p>
         </div>
 
-        {/* Stat Cards (3 Cards - Average Per Item removed as requested) */}
-        <div className="grid gap-4 sm:grid-cols-3 mb-8">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
-              <Wallet className="h-5 w-5" />
-            </span>
-            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Spent</p>
-            <p className="mt-1 font-heading text-2xl font-bold text-foreground">₹{totalSpent.toLocaleString("en-IN")}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{logs.length} items logged</p>
+        {/* 4 Summary Cards */}
+        <div className="mb-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Planned Budget</span>
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Wallet className="h-5 w-5" />
+              </span>
+            </div>
+            <p className="mt-3 font-heading text-3xl font-bold text-foreground">₹{totalBudget.toLocaleString("en-IN")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Derived from Budget Planner</p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald/15 text-emerald-600 dark:text-emerald-400">
-              <PiggyBank className="h-5 w-5" />
-            </span>
-            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Remaining Budget</p>
-            <p className="mt-1 font-heading text-2xl font-bold text-emerald-600 dark:text-emerald-400">₹{remaining.toLocaleString("en-IN")}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{pctRemaining}% of budget remaining</p>
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actual Spent</span>
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald/10 text-emerald-600 dark:text-emerald-400">
+                <TrendingUp className="h-5 w-5" />
+              </span>
+            </div>
+            <p className="mt-3 font-heading text-3xl font-bold text-foreground">₹{totalSpent.toLocaleString("en-IN")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{pctSpent}% of total budget used</p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
-              <TrendingUp className="h-5 w-5" />
-            </span>
-            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Target Budget Goal</p>
-            <p className="mt-1 font-heading text-2xl font-bold text-foreground">₹{budgetGoal.toLocaleString("en-IN")}</p>
-            <p className="mt-1 text-xs text-muted-foreground">Configured limit</p>
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Remaining Budget</span>
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <PiggyBank className="h-5 w-5" />
+              </span>
+            </div>
+            <p className="mt-3 font-heading text-3xl font-bold text-emerald-600 dark:text-emerald-400">₹{remainingBudget.toLocaleString("en-IN")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Safe spending margin</p>
+          </div>
+
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Budget Variance</span>
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
+                <Receipt className="h-5 w-5" />
+              </span>
+            </div>
+            <p className={`mt-3 font-heading text-3xl font-bold ${budgetDifference >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"}`}>
+              {budgetDifference >= 0 ? `+₹${budgetDifference.toLocaleString("en-IN")}` : `-₹${Math.abs(budgetDifference).toLocaleString("en-IN")}`}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{budgetDifference >= 0 ? "Under budget goal" : "Exceeded budget!"}</p>
           </div>
         </div>
 
-        {/* Meaningful Weekly Spending Trends Graph & Breakdown */}
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-lg md:p-8 mb-8">
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-border/60 pb-4">
-            <div>
-              <h3 className="font-heading text-lg font-bold text-foreground">Weekly Spending Trends & Analysis</h3>
-              <p className="text-xs text-muted-foreground">Understand your spending habits over time and pinpoint peak expense days.</p>
+        {/* Progress Bar & Category Analytics */}
+        <div className="mb-12 rounded-3xl border border-border bg-card p-6 shadow-md md:p-8">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-sm font-bold text-foreground">Overall Budget Allocation Usage</span>
+            <span className="text-xs font-semibold text-primary">{pctSpent}% Used</span>
+          </div>
+
+          <div className="h-3.5 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-primary to-emerald transition-all duration-600 rounded-full"
+              style={{ width: `${pctSpent}%` }}
+            />
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {Object.entries(catBreakdown).map(([cat, amt]) => {
+              const catBudgetPct = totalSpent > 0 ? Math.round((amt / totalSpent) * 100) : 0
+              return (
+                <div key={cat} className="rounded-2xl border border-border/60 bg-background p-3.5">
+                  <div className="flex justify-between items-center text-xs mb-1">
+                    <span className="font-semibold text-foreground">{cat}</span>
+                    <span className="font-bold text-primary">₹{amt.toLocaleString("en-IN")} ({catBudgetPct}%)</span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden mt-1">
+                    <div className="h-full bg-primary rounded-full" style={{ width: `${catBudgetPct}%` }} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Workspace Logging Form & Synchronized Expense Logs */}
+        <div className="grid gap-8 lg:grid-cols-12">
+          
+          {/* Form to Log New Actual Expense */}
+          <div className="lg:col-span-5">
+            <form onSubmit={handleAddExpenseSubmit} className="rounded-3xl border border-border bg-card p-6 shadow-md space-y-4">
+              <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
+                <Plus className="h-4 w-4 text-primary" />
+                Log Actual Expense
+              </h3>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase text-muted-foreground">Title / Expense Item</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Beach Shack Dinner"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-background p-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase text-muted-foreground">Category</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-background p-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="Food & Dining">Food & Dining</option>
+                  <option value="Accommodation">Accommodation</option>
+                  <option value="Transport">Transport</option>
+                  <option value="Activities">Activities</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Emergency Reserve">Emergency Reserve</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase text-muted-foreground">Amount Spent (₹)</label>
+                <input
+                  type="number"
+                  required
+                  placeholder="e.g. 1200"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-background p-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full rounded-xl bg-primary py-2.5 font-semibold text-primary-foreground shadow-md hover:bg-primary/90"
+              >
+                <Plus className="mr-1.5 h-4 w-4" />
+                Add Expense Entry
+              </Button>
+            </form>
+          </div>
+
+          {/* Logs & Planned Expenses Switcher */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="flex items-center justify-between border-b border-border/60 pb-3">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("actual")}
+                  className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                    activeTab === "actual"
+                      ? "bg-primary text-primary-foreground shadow"
+                      : "bg-muted text-muted-foreground hover:bg-accent"
+                  }`}
+                >
+                  Actual Expenses ({actualExpenses.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("planned")}
+                  className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                    activeTab === "planned"
+                      ? "bg-primary text-primary-foreground shadow"
+                      : "bg-muted text-muted-foreground hover:bg-accent"
+                  }`}
+                >
+                  Planned from AI Itinerary ({plannedExpenses.length})
+                </button>
+              </div>
             </div>
 
-            {highestDay.amount > 0 && (
-              <div className="flex items-center gap-2 rounded-xl bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                <Info className="h-4 w-4" />
-                <span>Peak Expense Day: {highestDay.full} (₹{highestDay.amount.toLocaleString("en-IN")})</span>
+            {activeTab === "actual" ? (
+              <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+                {actualExpenses.length > 0 ? (
+                  actualExpenses.map((log) => (
+                    <div
+                      key={log.id}
+                      className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/40"
+                    >
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => toggleExpensePaid(log.id)}
+                          title="Toggle Paid Status"
+                          className="text-emerald-600 dark:text-emerald-400 hover:scale-110 transition-transform"
+                        >
+                          <CheckCircle2 className={`h-5 w-5 ${log.isPaid ? "fill-emerald-500/20 text-emerald-600" : "opacity-30"}`} />
+                        </button>
+                        <div>
+                          <h4 className="font-semibold text-sm text-foreground">{log.title}</h4>
+                          <div className="flex gap-2 text-xs text-muted-foreground mt-0.5">
+                            <span className="rounded bg-muted px-2 py-0.5 text-[10px] font-semibold">{log.category}</span>
+                            <span>• {log.date}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-sm text-foreground">₹{log.amount.toLocaleString("en-IN")}</span>
+                        <button
+                          type="button"
+                          onClick={() => deleteActualExpense(log.id)}
+                          className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                          aria-label="Delete entry"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-muted-foreground text-xs rounded-2xl border border-dashed border-border">
+                    No actual expenses logged yet. Add your first expense using the form.
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+                {plannedExpenses.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-2xl border border-primary/20 bg-primary/5 p-4 shadow-sm"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Clock className="h-4 w-4 text-primary shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-sm text-foreground">{item.title}</h4>
+                        <div className="flex gap-2 text-xs text-muted-foreground mt-0.5">
+                          <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">{item.category}</span>
+                          <span>• {item.day}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <span className="font-bold text-sm text-primary">₹{item.amount.toLocaleString("en-IN")}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-5 items-end">
-            
-            {/* Graph Columns with Tooltips & Real Rupee Values */}
-            <div className="rounded-2xl border border-border bg-background p-5 lg:col-span-3">
-              <div className="flex justify-between text-xs text-muted-foreground mb-2">
-                <span>Daily Amount (₹)</span>
-                <span>Max: ₹{maxDaily.toLocaleString("en-IN")}</span>
-              </div>
-
-              <div className="flex h-52 items-end justify-between gap-2 sm:gap-3 pt-6">
-                {weeklyData.map((d) => {
-                  const heightPct = Math.max(8, Math.round((d.amount / maxDaily) * 100))
-                  const isSelected = hoveredDay?.day === d.day
-                  return (
-                    <div
-                      key={d.day}
-                      onMouseEnter={() => setHoveredDay(d)}
-                      onMouseLeave={() => setHoveredDay(null)}
-                      className="relative flex flex-1 flex-col items-center gap-2 h-full justify-end group cursor-pointer"
-                    >
-                      {/* Tooltip on Hover */}
-                      <AnimatePresence>
-                        {isSelected && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 5 }}
-                            className="absolute -top-10 z-20 whitespace-nowrap rounded-lg bg-foreground px-2.5 py-1 text-[11px] font-bold text-background shadow-md"
-                          >
-                            ₹{d.amount.toLocaleString("en-IN")}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      <div className="w-full flex-1 flex items-end">
-                        <div
-                          style={{ height: `${heightPct}%` }}
-                          className={`w-full rounded-t-lg transition-all duration-300 ${
-                            d.day === highestDay.day
-                              ? "bg-gradient-to-t from-primary/80 to-primary shadow-md shadow-primary/30"
-                              : "bg-gradient-to-t from-emerald/60 to-emerald"
-                          }`}
-                        />
-                      </div>
-
-                      <div className="text-center">
-                        <span className="block text-xs font-bold text-foreground">{d.day}</span>
-                        <span className="block text-[10px] text-muted-foreground font-medium">₹{d.amount}</span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Category Breakdown */}
-            <div className="rounded-2xl border border-border bg-background p-5 lg:col-span-2 space-y-4">
-              <h4 className="font-heading text-sm font-bold text-foreground">Expense Categories</h4>
-              <div className="space-y-3">
-                {Object.entries(catBreakdown).map(([catName, amt]) => {
-                  const pct = Math.round((amt / (totalSpent || 1)) * 100)
-                  return (
-                    <div key={catName}>
-                      <div className="mb-1 flex items-center justify-between text-xs font-semibold">
-                        <span className="text-foreground">{catName}</span>
-                        <span className="text-muted-foreground">₹{amt.toLocaleString("en-IN")} ({pct}%)</span>
-                      </div>
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                        <div style={{ width: `${pct}%` }} className="h-full rounded-full bg-emerald" />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-
-              <div className="mt-4 rounded-xl bg-secondary/60 p-3 text-xs text-muted-foreground leading-relaxed">
-                💡 <span className="font-semibold text-foreground">Spending Insight:</span> Tracking daily category expenses helps prevent overspending on activities and dining early in your trip.
-              </div>
-            </div>
-
-          </div>
         </div>
-
-        {/* Interactive Workspace Logging Form & Logs List (Only in Workspace mode) */}
-        {isWorkspace && (
-          <div className="grid gap-8 lg:grid-cols-12">
-            
-            {/* Form to Add Expense */}
-            <div className="lg:col-span-5">
-              <form onSubmit={handleAddExpense} className="rounded-3xl border border-border bg-card p-6 shadow-md space-y-4">
-                <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-                  <Plus className="h-4 w-4 text-primary" />
-                  Log New Expense
-                </h3>
-
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase text-muted-foreground">Title / Item</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Dinner at Shack"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-background p-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase text-muted-foreground">Category</label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-background p-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="Food & Dining">Food & Dining</option>
-                    <option value="Accommodation">Accommodation</option>
-                    <option value="Transport">Transport</option>
-                    <option value="Activities">Activities</option>
-                    <option value="Shopping">Shopping</option>
-                    <option value="Misc">Misc</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase text-muted-foreground">Amount (₹)</label>
-                  <input
-                    type="number"
-                    required
-                    placeholder="e.g. 1200"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-background p-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full rounded-xl bg-primary py-2.5 font-semibold text-primary-foreground shadow-md hover:bg-primary/90"
-                >
-                  <Plus className="mr-1.5 h-4 w-4" />
-                  Add Expense Entry
-                </Button>
-              </form>
-            </div>
-
-            {/* Log History */}
-            <div className="lg:col-span-7 space-y-3">
-              <h3 className="font-heading text-lg font-bold text-foreground">Expense Log History</h3>
-              <div className="space-y-2">
-                {logs.map((log) => (
-                  <div
-                    key={log.id}
-                    className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/40"
-                  >
-                    <div>
-                      <h4 className="font-semibold text-sm text-foreground">{log.title}</h4>
-                      <div className="flex gap-2 text-xs text-muted-foreground mt-0.5">
-                        <span className="rounded bg-muted px-2 py-0.5 text-[10px] font-semibold">{log.category}</span>
-                        <span>• {log.date}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-sm text-foreground">₹{log.amount.toLocaleString("en-IN")}</span>
-                      <button
-                        onClick={() => handleDeleteLog(log.id)}
-                        className="text-muted-foreground hover:text-destructive transition-colors p-1"
-                        aria-label="Delete entry"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        )}
 
       </div>
     </section>

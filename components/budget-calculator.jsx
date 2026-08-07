@@ -10,40 +10,57 @@ import {
   ShoppingBag,
   ShieldAlert,
   Wallet,
-  ArrowLeft
+  ArrowLeft,
+  Edit3,
+  RotateCcw,
+  Sparkles
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useTrip } from "@/context/trip-context"
 
 const RADIUS = 80
 const CIRCUM = 2 * Math.PI * RADIUS
 
 export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace }) {
-  const [days, setDays] = useState(5)
-  const [travelers, setTravelers] = useState(2)
-  const [stayTier, setStayTier] = useState("Standard") // Economy | Standard | Luxury
+  const {
+    days,
+    setDays,
+    travelers,
+    setTravelers,
+    stayTier,
+    setStayTier,
+    setCustomTargetBudget,
+    categoryBudgets,
+    totalBudget,
+    budgetOverrides,
+    setBudgetCategoryOverride,
+    resetBudgetCategoryOverride
+  } = useTrip()
 
-  // Dynamic calculations based on parameters in Indian Rupees (₹)
-  const stayMultiplier = stayTier === "Economy" ? 1800 : stayTier === "Standard" ? 3500 : 7500
-  const foodPerDay = 1200 * travelers * days
-  const stayTotal = stayMultiplier * days
-  const transportTotal = 1500 * travelers + 800 * days
-  const activitiesTotal = 1200 * travelers * days
-  const shoppingTotal = 2500 * travelers
-  const emergencyTotal = 1500 * days
+  const [editingCategory, setEditingCategory] = useState(null)
+  const [editValue, setEditValue] = useState("")
 
-  const TOTAL = stayTotal + foodPerDay + transportTotal + activitiesTotal + shoppingTotal + emergencyTotal
+  const TOTAL = totalBudget || 1
   const perPerson = Math.round(TOTAL / travelers)
 
   const segments = [
-    { label: "Accommodation", value: stayTotal, color: "var(--color-primary)", icon: Bed },
-    { label: "Food & Dining", value: foodPerDay, color: "var(--color-emerald)", icon: UtensilsCrossed },
-    { label: "Transport", value: transportTotal, color: "oklch(0.7 0.15 230)", icon: Bus },
-    { label: "Activities", value: activitiesTotal, color: "oklch(0.75 0.15 85)", icon: Ticket },
-    { label: "Shopping", value: shoppingTotal, color: "oklch(0.68 0.16 300)", icon: ShoppingBag },
-    { label: "Emergency Reserve", value: emergencyTotal, color: "oklch(0.62 0.02 257)", icon: ShieldAlert },
+    { label: "Accommodation", value: categoryBudgets["Accommodation"] || 0, color: "var(--color-primary)", icon: Bed },
+    { label: "Food & Dining", value: categoryBudgets["Food & Dining"] || 0, color: "var(--color-emerald)", icon: UtensilsCrossed },
+    { label: "Transport", value: categoryBudgets["Transport"] || 0, color: "oklch(0.7 0.15 230)", icon: Bus },
+    { label: "Activities", value: categoryBudgets["Activities"] || 0, color: "oklch(0.75 0.15 85)", icon: Ticket },
+    { label: "Shopping", value: categoryBudgets["Shopping"] || 0, color: "oklch(0.68 0.16 300)", icon: ShoppingBag },
+    { label: "Emergency Reserve", value: categoryBudgets["Emergency Reserve"] || 0, color: "oklch(0.62 0.02 257)", icon: ShieldAlert },
   ]
 
   let offsetAccum = 0
+
+  const handleSaveOverride = (catLabel) => {
+    if (editValue && !isNaN(Number(editValue))) {
+      setBudgetCategoryOverride(catLabel, Number(editValue))
+    }
+    setEditingCategory(null)
+    setEditValue("")
+  }
 
   return (
     <section id="budget" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
@@ -67,9 +84,9 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                <Wallet className="h-3.5 w-3.5" />
-                Real-Time Calculator Active
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                <Sparkles className="h-3.5 w-3.5" />
+                ⚡ Live Synced with AI Itinerary & Expenses
               </span>
             </div>
           </div>
@@ -81,7 +98,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
             {isWorkspace ? "Interactive Trip Budget Calculator" : "Plan Every Rupee With Confidence"}
           </h2>
           <p className="mt-3 text-pretty text-muted-foreground leading-relaxed">
-            TripNest breaks your trip cost into clear categories so you always know where your money goes.
+            Automatically synchronized with your AI Itinerary. Adjust sliders or manually override any category budget.
           </p>
         </div>
 
@@ -125,7 +142,10 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                   <button
                     key={tier}
                     type="button"
-                    onClick={() => setStayTier(tier)}
+                    onClick={() => {
+                      setStayTier(tier)
+                      setCustomTargetBudget(null)
+                    }}
                     className={`rounded-xl py-2 text-xs font-semibold transition-all ${
                       stayTier === tier
                         ? "bg-primary text-primary-foreground shadow-sm"
@@ -147,7 +167,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
             <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90">
               <circle cx="100" cy="100" r={RADIUS} fill="none" stroke="var(--color-muted)" strokeWidth="18" />
               {segments.map((seg) => {
-                const fraction = seg.value / TOTAL
+                const fraction = TOTAL > 0 ? seg.value / TOTAL : 0
                 const dash = fraction * CIRCUM
                 const circle = (
                   <motion.circle
@@ -178,31 +198,88 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
             </div>
           </div>
 
-          {/* Breakdown Items */}
+          {/* Breakdown Items with Manual Override Triggers */}
           <div className="grid gap-3 sm:grid-cols-2">
             {segments.map((seg) => {
               const Icon = seg.icon
-              const pct = Math.round((seg.value / TOTAL) * 100)
+              const pct = TOTAL > 0 ? Math.round((seg.value / TOTAL) * 100) : 0
+              const isOverridden = budgetOverrides[seg.label] !== undefined
+
               return (
                 <div
                   key={seg.label}
-                  className="flex items-center gap-3 rounded-2xl border border-border bg-background p-3 transition-all hover:border-primary/40"
+                  className={`flex flex-col justify-between rounded-2xl border p-3.5 transition-all ${
+                    isOverridden
+                      ? "border-primary/50 bg-primary/5"
+                      : "border-border bg-background hover:border-primary/30"
+                  }`}
                 >
-                  <span
-                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: `color-mix(in oklch, ${seg.color} 18%, transparent)`, color: seg.color }}
-                  >
-                    <Icon className="h-4 w-4" aria-hidden />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-xs font-medium text-muted-foreground">{seg.label}</span>
-                      <span className="text-xs font-bold text-foreground">{pct}%</span>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                        style={{ backgroundColor: `color-mix(in oklch, ${seg.color} 18%, transparent)`, color: seg.color }}
+                      >
+                        <Icon className="h-4 w-4" aria-hidden />
+                      </span>
+                      <span className="truncate text-xs font-semibold text-foreground">{seg.label}</span>
                     </div>
-                    <span className="font-heading text-sm font-semibold text-foreground">
-                      ₹{seg.value.toLocaleString("en-IN")}
-                    </span>
+                    <span className="text-[11px] font-bold text-muted-foreground">{pct}%</span>
                   </div>
+
+                  {editingCategory === seg.label ? (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <input
+                        type="number"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        placeholder={`₹${seg.value}`}
+                        className="w-full rounded-xl border border-primary bg-background px-2.5 py-1 text-xs font-bold text-foreground focus:outline-none"
+                        autoFocus
+                      />
+                      <Button
+                        size="xs"
+                        onClick={() => handleSaveOverride(seg.label)}
+                        className="rounded-lg text-[10px] font-bold px-2 py-1 bg-primary text-primary-foreground"
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/40">
+                      <span className="font-heading text-sm font-bold text-foreground">
+                        ₹{seg.value.toLocaleString("en-IN")}
+                      </span>
+                      
+                      <div className="flex items-center gap-1">
+                        {isOverridden && (
+                          <button
+                            onClick={() => resetBudgetCategoryOverride(seg.label)}
+                            title="Reset to auto-calculated budget"
+                            className="text-muted-foreground hover:text-foreground p-1"
+                          >
+                            <RotateCcw className="h-3 w-3" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => {
+                            setEditingCategory(seg.label)
+                            setEditValue(String(seg.value))
+                          }}
+                          title="Override budget manually"
+                          className="text-muted-foreground hover:text-primary p-1"
+                        >
+                          <Edit3 className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {isOverridden && (
+                    <span className="mt-1 text-[9px] font-semibold text-primary uppercase tracking-wider">
+                      Manual Override Active
+                    </span>
+                  )}
                 </div>
               )
             })}

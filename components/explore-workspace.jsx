@@ -1941,7 +1941,7 @@ const allDestinations = [
     "subtitle": "Coral Paradise",
     "country": "India",
     "temp": "28\u00b0C",
-    "image": "/images/dest-goa.png",
+    "image": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&auto=format&fit=crop&q=80",
     "rating": 4.7,
     "ageGroup": "All Ages",
     "vibe": "Pristine Coral Beaches",
@@ -1960,7 +1960,7 @@ const allDestinations = [
     "minDays": 5,
     "specialty": "Scuba & Coral Reefs",
     "color": "#0891B2",
-    "row": "escapes"
+    "row": "trending"
   },
   {
     "id": "ooty",
@@ -1968,7 +1968,7 @@ const allDestinations = [
     "subtitle": "Queen of Hills",
     "country": "India",
     "temp": "16\u00b0C",
-    "image": "/images/dest-kerala.png",
+    "image": "https://images.unsplash.com/photo-1596707328906-8d197df32a89?w=600&auto=format&fit=crop&q=80",
     "rating": 4.4,
     "ageGroup": "All Ages",
     "vibe": "Tea Gardens & Misty Hills",
@@ -1987,7 +1987,7 @@ const allDestinations = [
     "minDays": 3,
     "specialty": "Nilgiri Tea & Toy Train",
     "color": "#65A30D",
-    "row": "escapes"
+    "row": "hidden"
   },
   {
     "id": "meghalaya",
@@ -1995,7 +1995,7 @@ const allDestinations = [
     "subtitle": "Cloud Kingdom",
     "country": "India",
     "temp": "20\u00b0C",
-    "image": "/images/dest-kerala.png",
+    "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&auto=format&fit=crop&q=80",
     "rating": 4.7,
     "ageGroup": "18 \u2013 45 Yrs",
     "vibe": "Living Root Bridges",
@@ -2014,7 +2014,7 @@ const allDestinations = [
     "minDays": 5,
     "specialty": "Living Root Bridges",
     "color": "#16A34A",
-    "row": "escapes"
+    "row": "hidden"
   },
   {
     "id": "srilanka",
@@ -2022,7 +2022,7 @@ const allDestinations = [
     "subtitle": "Emerald Isle",
     "country": "Sri Lanka",
     "temp": "27\u00b0C",
-    "image": "/images/dest-bali.png",
+    "image": "https://images.unsplash.com/photo-1546708973-b339540b5162?w=600&auto=format&fit=crop&q=80",
     "rating": 4.6,
     "ageGroup": "All Ages",
     "vibe": "Tea Trails & Temples",
@@ -2049,7 +2049,7 @@ const allDestinations = [
     "subtitle": "Cherry & Neon",
     "country": "Japan",
     "temp": "18\u00b0C",
-    "image": "/images/dest-jaipur.png",
+    "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80",
     "rating": 4.9,
     "ageGroup": "All Ages",
     "vibe": "Tradition Meets Tech",
@@ -2076,7 +2076,7 @@ const allDestinations = [
     "subtitle": "Desert Mystique",
     "country": "Morocco",
     "temp": "22\u00b0C",
-    "image": "/images/dest-jaipur.png",
+    "image": "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=600&auto=format&fit=crop&q=80",
     "rating": 4.5,
     "ageGroup": "18 \u2013 50 Yrs",
     "vibe": "Medinas & Sahara Dunes",
@@ -2103,7 +2103,7 @@ const allDestinations = [
     "subtitle": "Thai Paradise",
     "country": "Thailand",
     "temp": "31\u00b0C",
-    "image": "/images/dest-goa.png",
+    "image": "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=600&auto=format&fit=crop&q=80",
     "rating": 4.6,
     "ageGroup": "18 \u2013 40 Yrs",
     "vibe": "Island Hopping & Parties",
@@ -2130,7 +2130,7 @@ const allDestinations = [
     "subtitle": "Moonland Roads",
     "country": "India",
     "temp": "6\u00b0C",
-    "image": "/images/dest-manali.png",
+    "image": "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?w=600&auto=format&fit=crop&q=80",
     "rating": 4.8,
     "ageGroup": "18 \u2013 45 Yrs",
     "vibe": "Road Trips & Monasteries",
@@ -2149,7 +2149,7 @@ const allDestinations = [
     "minDays": 7,
     "specialty": "Khardung La & Nubra",
     "color": "#7C3AED",
-    "row": "escapes"
+    "row": "trending"
   },
   {
     "id": "mauritius",
@@ -2157,7 +2157,7 @@ const allDestinations = [
     "subtitle": "Tropical Jewel",
     "country": "Mauritius",
     "temp": "26\u00b0C",
-    "image": "/images/dest-bali.png",
+    "image": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&auto=format&fit=crop&q=80",
     "rating": 4.7,
     "ageGroup": "20 \u2013 55 Yrs",
     "vibe": "Lagoons & Resorts",

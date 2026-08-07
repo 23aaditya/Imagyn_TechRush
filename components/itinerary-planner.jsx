@@ -36,6 +36,7 @@ import {
   Plus
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useTrip } from "@/context/trip-context"
 import destinationsData from "@/destinations_105.json"
 
 // Dynamic import of Leaflet Map component with SSR disabled
@@ -96,18 +97,36 @@ const nearbyPlacesData = {
 }
 
 export function ItineraryPlanner({ onBack, onNavigateView }) {
+  // Centralized Trip Context
+  const {
+    destination,
+    setDestination,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    days,
+    setDays,
+    travelers,
+    setTravelers,
+    stayTier,
+    setStayTier,
+    customTargetBudget,
+    setCustomTargetBudget,
+    itinerary,
+    setItinerary,
+    addSpotToItinerary,
+    removeSpotFromItinerary,
+    updateSpotCostInItinerary
+  } = useTrip()
+
   // Main Workspace State
-  const [destination, setDestination] = useState("Goa")
-  const [startDate, setStartDate] = useState("2026-08-15")
-  const [endDate, setEndDate] = useState("2026-08-17")
   const [calendarOpen, setCalendarOpen] = useState(false)
-  const [days, setDays] = useState(3)
   const [travelStyle, setTravelStyle] = useState("Balanced")
-  const [budgetTier, setBudgetTier] = useState("Moderate")
+  const [budgetTier, setBudgetTier] = useState("Moderate") // Moderate | Budget | Luxury | Custom
+  const [customBudgetVal, setCustomBudgetVal] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
 
-  // ITINERARY STATE (Preset loaded for immediate interactive use)
-  const [itinerary, setItinerary] = useState(null)
   const [activeDayIndex, setActiveDayIndex] = useState(0)
   const [saved, setSaved] = useState(false)
 
@@ -152,12 +171,6 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
       }
     }
   }, [startDate, endDate])
-
-  // Initial Auto-Generation so user has rich itinerary ready
-  useEffect(() => {
-    const initialPlan = buildItineraryData("Goa", 3, "2026-08-15")
-    setItinerary(initialPlan)
-  }, [])
 
   // Build Itinerary Helper
   const buildItineraryData = (cityName, totalDays, startStr) => {
@@ -300,10 +313,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
   // Remove Spot
   const removeSpot = (dayIdx, spotIdx) => {
-    if (!itinerary) return
-    const updated = [...itinerary]
-    updated[dayIdx].activities.splice(spotIdx, 1)
-    setItinerary(updated)
+    removeSpotFromItinerary(dayIdx, spotIdx)
   }
 
   // Google Search Submission (Opens Google Search directly for exploration without auto-adding)
@@ -317,50 +327,12 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
   // Add Searched Spot
   const addSearchedPlaceToItinerary = (placeName) => {
-    if (!itinerary) {
-      const initial = buildItineraryData(destination, days, startDate)
-      initial[0].activities.push({
-        id: `custom-${Date.now()}`,
-        time: "04:00 PM",
-        openingHours: "09:00 AM - 07:00 PM",
-        type: "Spot",
-        title: placeName,
-        desc: `Added via Google Search for ${destination}.`,
-        cost: "₹500",
-        lat: 15.54 + Math.random() * 0.04,
-        lng: 73.75 + Math.random() * 0.04,
-        isPopular: false,
-        images: [
-          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
-        ]
-      })
-      setItinerary(initial)
-      setMiniGoogleOpen(false)
-      setSearchQuery("")
-      return
-    }
-
-    const updated = [...itinerary]
-    const current = updated[activeDayIndex] || updated[0]
-    if (!current) return
-
-    current.activities.push({
-      id: `custom-${Date.now()}`,
-      time: "04:00 PM",
-      openingHours: "09:00 AM - 07:00 PM",
-      type: "Spot",
+    addSpotToItinerary(activeDayIndex, {
       title: placeName,
-      desc: `Added via Google Search for ${destination}. High traveler rating.`,
-      cost: "₹500",
-      lat: 15.54 + Math.random() * 0.04,
-      lng: 73.75 + Math.random() * 0.04,
-      isPopular: false,
-      images: [
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&auto=format&fit=crop&q=80"
-      ]
+      desc: `Added for ${destination}. High traveler rating.`,
+      cost: "₹650",
+      numericCost: 650
     })
-    setItinerary(updated)
     setMiniGoogleOpen(false)
     setSearchQuery("")
   }
@@ -687,20 +659,33 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
                   {/* Budget Tier */}
                   <div>
-                    <label className="mb-2 block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Budget Tier
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Budget Tier
+                      </label>
+                      {budgetTier === "Custom" && (
+                        <span className="text-[10px] font-bold text-primary">Custom Enter Mode</span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-1.5">
                       {[
                         { label: "Backpacker", tier: "Budget" },
                         { label: "Standard", tier: "Moderate" },
-                        { label: "Luxury", tier: "Luxury" }
+                        { label: "Luxury", tier: "Luxury" },
+                        { label: "Custom ₹", tier: "Custom" }
                       ].map((b) => (
                         <button
                           key={b.tier}
                           type="button"
-                          onClick={() => setBudgetTier(b.tier)}
-                          className={`rounded-xl border p-2.5 text-xs font-medium transition-all ${
+                          onClick={() => {
+                            setBudgetTier(b.tier)
+                            if (b.tier !== "Custom") {
+                              setStayTier(b.tier)
+                              setCustomTargetBudget(null)
+                            }
+                          }}
+                          className={`rounded-xl border py-2 px-1 text-center text-xs font-medium transition-all ${
                             budgetTier === b.tier
                               ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
                               : "border-border text-muted-foreground hover:border-border/80"
@@ -710,6 +695,38 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                         </button>
                       ))}
                     </div>
+
+                    {/* Custom Budget Enter Input Box */}
+                    {budgetTier === "Custom" && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-3 rounded-2xl border border-primary bg-primary/5 p-3"
+                      >
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                          Enter Target Budget (₹)
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-primary">₹</span>
+                          <input
+                            type="number"
+                            placeholder="e.g. 25000"
+                            value={customBudgetVal}
+                            onChange={(e) => {
+                              setCustomBudgetVal(e.target.value)
+                              if (e.target.value) {
+                                setCustomTargetBudget(Number(e.target.value))
+                              }
+                            }}
+                            className="w-full rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary"
+                            autoFocus
+                          />
+                        </div>
+                        <p className="mt-1.5 text-[10px] text-muted-foreground">
+                          Budget Planner & Expense Tracker will automatically align with this limit.
+                        </p>
+                      </motion.div>
+                    )}
                   </div>
 
                   {/* Generate Button */}

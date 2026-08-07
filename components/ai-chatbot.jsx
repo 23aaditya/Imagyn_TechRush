@@ -268,32 +268,52 @@ export function AiChatbot({ currentView, onNavigate }) {
   return (
     <>
       {/* Floating Trigger Button at Bottom Right */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+        <AnimatePresence>
+          {!isOpen && (
+            <motion.div
+              initial={{ opacity: 0, x: 20, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 20, scale: 0.9 }}
+              className="hidden sm:flex items-center gap-2 rounded-2xl border border-primary/40 bg-card/95 px-3.5 py-2 shadow-2xl backdrop-blur-xl cursor-pointer hover:border-primary transition-colors"
+              onClick={() => setIsOpen(true)}
+            >
+              <Sparkles className="h-4 w-4 text-amber-500 animate-spin" />
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-foreground leading-none">Ask AI Boots</span>
+                <span className="text-[10px] font-semibold text-primary">Live Travel Planning Help</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence>
           {!isOpen && (
             <motion.button
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
-              className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-background border-2 border-primary/40 shadow-xl shadow-primary/30 transition-all hover:shadow-primary/50 focus:outline-none overflow-hidden"
+              className="group relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary via-primary/80 to-amber-500 p-0.5 shadow-[0_0_30px_rgba(var(--primary),0.5)] transition-all hover:shadow-[0_0_40px_rgba(var(--primary),0.7)] focus:outline-none ring-4 ring-primary/30"
               aria-label="Open Boots AI Assistant"
             >
-              {/* Outer pulsing ring */}
-              <span className="absolute -inset-1 rounded-full bg-primary/30 animate-ping opacity-75" />
+              {/* Outer pulsing aura ring */}
+              <span className="absolute -inset-1.5 rounded-full bg-primary/40 animate-ping opacity-60" />
 
-              <img
-                src="/boots-avatar.jpg"
-                alt="Boots AI Chatbot"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-              />
+              <div className="relative h-full w-full rounded-full bg-background overflow-hidden border border-primary/40 p-0.5">
+                <img
+                  src="/boots-avatar.jpg"
+                  alt="Boots AI Chatbot"
+                  className="h-full w-full rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              </div>
 
               {/* Status indicator dot */}
-              <span className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5">
+              <span className="absolute top-0 right-0 flex h-4 w-4">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-background" />
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-background" />
               </span>
             </motion.button>
           )}
@@ -309,16 +329,16 @@ export function AiChatbot({ currentView, onNavigate }) {
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              "fixed z-50 flex flex-col overflow-hidden rounded-3xl border border-border/70 bg-background/95 shadow-2xl shadow-black/20 backdrop-blur-2xl transition-all duration-300",
+              "fixed z-50 flex flex-col overflow-hidden rounded-3xl border-2 border-primary/40 bg-background/95 shadow-2xl shadow-primary/20 backdrop-blur-2xl transition-all duration-300",
               isExpanded
                 ? "bottom-4 right-4 top-4 left-4 sm:left-auto sm:w-[680px] sm:h-[90vh]"
-                : "bottom-6 right-4 sm:right-6 w-[calc(100vw-32px)] sm:w-[440px] h-[600px] max-h-[85vh]"
+                : "bottom-6 right-4 sm:right-6 w-[calc(100vw-32px)] sm:w-[450px] h-[620px] max-h-[88vh]"
             )}
           >
-            {/* Header Bar */}
-            <div className="flex items-center justify-between border-b border-border/60 bg-card/60 px-4 py-3.5 backdrop-blur-md">
+            {/* Vibrant Header Bar */}
+            <div className="flex items-center justify-between border-b border-primary/30 bg-gradient-to-r from-primary/15 via-card to-emerald-500/10 px-4 py-3.5 backdrop-blur-md">
               <div className="flex items-center gap-3">
-                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl overflow-hidden border border-primary/30 shadow-md">
+                <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl overflow-hidden border-2 border-primary/40 shadow-lg shadow-primary/20">
                   <img
                     src="/boots-avatar.jpg"
                     alt="Boots Logo"
@@ -326,15 +346,16 @@ export function AiChatbot({ currentView, onNavigate }) {
                   />
                 </div>
                 <div>
-                  <h3 className="font-heading text-sm font-bold text-foreground flex items-center gap-1.5">
+                  <h3 className="font-heading text-base font-bold text-foreground flex items-center gap-2">
                     Boots
-                    <span className="text-[10px] font-normal text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-full text-primary">
-                      AI Chatbot
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground bg-primary px-2.5 py-0.5 rounded-full shadow-sm">
+                      <Sparkles className="h-3 w-3" />
+                      AI Concierge
                     </span>
                   </h3>
-                  <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    Your Personal Travel Assistant
+                  <p className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Live Intelligent Travel Assistant
                   </p>
                 </div>
               </div>
