@@ -190,7 +190,7 @@ export function Hero({ onStartPlanning }) {
             custom={1}
             initial="hidden"
             animate="show"
-            className="mt-5 font-heading text-5xl font-extrabold leading-[1.05] tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl"
+            className="mt-5 font-heading text-5xl font-extrabold leading-[1.05] tracking-tight text-balance text-white drop-shadow-md sm:text-6xl lg:text-7xl"
           >
             Journeys, Quietly Well-Planned.
           </motion.h1>
@@ -200,7 +200,7 @@ export function Hero({ onStartPlanning }) {
             custom={2}
             initial="hidden"
             animate="show"
-            className="mx-auto mt-4 max-w-2xl text-base sm:text-lg leading-relaxed text-pretty text-muted-foreground font-normal"
+            className="mx-auto mt-4 max-w-2xl text-base sm:text-lg leading-relaxed text-pretty text-white/90 drop-shadow-sm font-normal"
           >
             Explore handpicked destinations, compare realistic travel packages, and craft bespoke itineraries tailored to your pace.
           </motion.p>

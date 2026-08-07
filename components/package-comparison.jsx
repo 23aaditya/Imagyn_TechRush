@@ -542,49 +542,6 @@ export function PackageComparison({ onNavigateView }) {
 
       </div>
 
-      {/* 6. NIKE-STYLE FLOATING VIDEO CONTROL BAR (Matching User Screenshot) */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-black/80 backdrop-blur-2xl px-4 py-2.5 rounded-full border border-white/20 shadow-2xl">
-        <button
-          type="button"
-          onClick={() => setIsPlaying(!isPlaying)}
-          className="p-1.5 rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-colors"
-          title={isPlaying ? "Pause Video" : "Play Video"}
-        >
-          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-        </button>
-
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => setVideoIndex((prev) => (prev === 0 ? CINEMATIC_VIDEOS.length - 1 : prev - 1))}
-            className="p-1 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-            title="Previous Video"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setVideoIndex((prev) => (prev + 1) % CINEMATIC_VIDEOS.length)}
-            className="p-1 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-            title="Next Video"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
-
-        {/* Slide Indicator Dots */}
-        <div className="flex items-center gap-1.5 ml-1">
-          {CINEMATIC_VIDEOS.map((_, idx) => (
-            <div
-              key={idx}
-              className={`h-2 rounded-full transition-all ${
-                videoIndex === idx ? "w-4 bg-white" : "w-2 bg-white/40"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
     </section>
   )
 }

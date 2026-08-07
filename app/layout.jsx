@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next'
 import { Inter, Cascadia_Code } from 'next/font/google'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './globals.css'

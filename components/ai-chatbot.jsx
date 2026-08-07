@@ -272,28 +272,29 @@ export function AiChatbot({ currentView, onNavigate }) {
         <AnimatePresence>
           {!isOpen && (
             <motion.button
+              type="button"
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
-              className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-background border-2 border-primary/40 shadow-xl shadow-primary/30 transition-all hover:shadow-primary/50 focus:outline-none overflow-hidden"
-              aria-label="Open Boots AI Assistant"
+              className="group relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-background border-4 border-primary shadow-2xl shadow-primary/40 hover:shadow-primary/60 ring-4 ring-primary/25 focus:outline-none overflow-hidden transition-all duration-300 z-50"
+              aria-label="Open Concierge Assistant"
             >
-              {/* Outer pulsing ring */}
-              <span className="absolute -inset-1 rounded-full bg-primary/30 animate-ping opacity-75" />
+              {/* Outer pulsing ambient ring */}
+              <span className="absolute -inset-1 rounded-full bg-primary/40 animate-ping opacity-75" />
 
               <img
                 src="/boots-avatar.jpg"
-                alt="Boots AI Chatbot"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                alt="Concierge Chatbot"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
 
-              {/* Status indicator dot */}
-              <span className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5">
+              {/* High-visibility active status badge */}
+              <span className="absolute top-1 right-1 flex h-4 w-4">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-background" />
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white shadow-md" />
               </span>
             </motion.button>
           )}
