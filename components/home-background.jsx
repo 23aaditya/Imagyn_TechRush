@@ -4,13 +4,11 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 const famousPlaces = [
-  { src: "/images/hero-mountains.png", alt: "Misty mountain range" },
-  { src: "/images/dest-santorini.png", alt: "Santorini cliffside Greece" },
-  { src: "/images/dest-goa.png", alt: "Goa shoreline beach India" },
-  { src: "/images/dest-bali.png", alt: "Bali tropical palm retreat" },
-  { src: "/images/dest-jaipur.png", alt: "Jaipur royal pink city palace" },
-  { src: "/images/dest-manali.png", alt: "Manali snow capped peaks" },
-  { src: "/images/dest-kerala.png", alt: "Kerala backwaters & palm groves" },
+  { src: "/images/hero-venice.jpg", alt: "Venice Grand Canal & Gondolas" },
+  { src: "/images/hero-mexico.jpg", alt: "San Miguel de Allende Colonial Street" },
+  { src: "/images/hero-swiss.jpg", alt: "Swiss Alpine Lake & Snow Peaks" },
+  { src: "/images/hero-hawamahal.jpg", alt: "Hawa Mahal Palace of Winds Jaipur" },
+  { src: "/images/hero-tajmahal.jpg", alt: "Taj Mahal Agra" },
 ]
 
 export function HomeBackground() {

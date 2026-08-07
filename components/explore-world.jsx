@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 
 export function ExploreWorld({ onNavigateView }) {
   return (
-    <section id="explore" className="relative isolate overflow-hidden bg-[#0D2B45] px-4 py-24 sm:px-6 lg:py-32">
+    <section id="explore" className="relative isolate overflow-hidden bg-[#0D2B45] px-4 py-14 sm:px-6 lg:py-16">
       {/* Background Pinterest Image */}
       <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
         <img

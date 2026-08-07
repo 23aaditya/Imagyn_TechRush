@@ -45,10 +45,9 @@ const destinationPackages = {
   "Lonavala": {
     country: "Maharashtra, India",
     vibe: "Monsoon Mist & HillForts",
-    rating: "4.7 ⭐",
+    rating: "4.7",
     image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=700&auto=format&fit=crop&q=80",
     budget: { total: "₹15,000", numericTotal: 15000, transport: "₹3,500", food: "₹4,000", activities: "₹2,500", stay: "₹5,000" },
-    stay: { fiveStar: true, threeStar: true, hostel: true, budgetStay: true },
     experience: {
       activities: ["Fort trekking", "Waterfall viewing", "Karla Caves", "Chikki tasting"],
       bestSeason: "Monsoon & Winter (Jul – Feb)",
@@ -61,10 +60,9 @@ const destinationPackages = {
   "Manali": {
     country: "Himachal Pradesh, India",
     vibe: "Snowy Peaks & Alpine Valleys",
-    rating: "4.9 ⭐",
+    rating: "4.9",
     image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=700&auto=format&fit=crop&q=80",
     budget: { total: "₹25,000", numericTotal: 25000, transport: "₹7,500", food: "₹6,000", activities: "₹4,500", stay: "₹7,000" },
-    stay: { fiveStar: true, threeStar: true, hostel: true, budgetStay: true },
     experience: {
       activities: ["Snow sports", "Solang paragliding", "Beas river rafting", "Old Manali cafes"],
       bestSeason: "Oct – May (Snow Season)",
@@ -77,10 +75,9 @@ const destinationPackages = {
   "Goa": {
     country: "Goa, India",
     vibe: "Sun, Sand & Portuguese Heritage",
-    rating: "4.8 ⭐",
+    rating: "4.8",
     image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&auto=format&fit=crop&q=80",
     budget: { total: "₹22,000", numericTotal: 22000, transport: "₹5,500", food: "₹6,500", activities: "₹4,000", stay: "₹6,000" },
-    stay: { fiveStar: true, threeStar: true, hostel: true, budgetStay: true },
     experience: {
       activities: ["Baga water sports", "Cliffside shacks", "Sunset cruise", "Latin Quarter walk"],
       bestSeason: "Nov – Feb (Beach Season)",
@@ -93,10 +90,9 @@ const destinationPackages = {
   "Kerala": {
     country: "Kerala, India",
     vibe: "Emerald Backwaters & Tea Gardens",
-    rating: "4.9 ⭐",
+    rating: "4.9",
     image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=700&auto=format&fit=crop&q=80",
     budget: { total: "₹28,000", numericTotal: 28000, transport: "₹6,000", food: "₹7,000", activities: "₹5,000", stay: "₹10,000" },
-    stay: { fiveStar: true, threeStar: true, hostel: false, budgetStay: true },
     experience: {
       activities: ["Houseboat cruise", "Tea estate walk", "Spice plantation", "Ayurvedic spa"],
       bestSeason: "Sep – Mar",
@@ -109,10 +105,9 @@ const destinationPackages = {
   "Jaipur": {
     country: "Rajasthan, India",
     vibe: "Palaces, Forts & Royal Culture",
-    rating: "4.8 ⭐",
+    rating: "4.8",
     image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?w=700&auto=format&fit=crop&q=80",
     budget: { total: "₹18,000", numericTotal: 18000, transport: "₹4,500", food: "₹5,000", activities: "₹3,500", stay: "₹5,000" },
-    stay: { fiveStar: true, threeStar: true, hostel: true, budgetStay: true },
     experience: {
       activities: ["Amber Fort light show", "Hawa Mahal view", "Johari Bazaar shopping", "Heritage dining"],
       bestSeason: "Oct – Mar",
@@ -125,10 +120,9 @@ const destinationPackages = {
   "Udaipur": {
     country: "Rajasthan, India",
     vibe: "Romantic Lakes & City Palaces",
-    rating: "4.9 ⭐",
-    image: "https://images.unsplash.com/photo-1603201667141-5a2d4c673378?w=700&auto=format&fit=crop&q=80",
+    rating: "4.9",
+    image: "https://images.unsplash.com/photo-1615836245337-f5b9b2303f10?w=1000&auto=format&fit=crop&q=80",
     budget: { total: "₹24,000", numericTotal: 24000, transport: "₹5,000", food: "₹6,000", activities: "₹4,000", stay: "₹9,000" },
-    stay: { fiveStar: true, threeStar: true, hostel: true, budgetStay: true },
     experience: {
       activities: ["Lake Pichola boat cruise", "City Palace tour", "Rooftop lake view dining", "Dharohar dance"],
       bestSeason: "Oct – Mar",
@@ -145,7 +139,6 @@ const availableDestinations = Object.keys(destinationPackages)
 export function PackageComparison({ onNavigateView, onSelectDestination }) {
   const [destA, setDestA] = useState("Lonavala")
   const [destB, setDestB] = useState("Manali")
-  const [activeTab, setActiveTab] = useState("all")
   
   // Cinematic Video Carousel State
   const [videoIndex, setVideoIndex] = useState(0)
@@ -203,20 +196,6 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
 
       {/* 2. MAIN EDITORIAL CONTENT */}
       <div className="relative z-20 mx-auto max-w-7xl px-4 md:px-6 space-y-12">
-        
-        {/* Editorial Top Sub-Bar */}
-        <div className="flex items-center justify-between border-b border-white/15 pb-4">
-          <div className="flex items-center gap-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-white animate-pulse" />
-            <span className="font-heading text-xs font-bold uppercase tracking-widest text-white/90">
-              {CINEMATIC_VIDEOS[videoIndex].title} • {CINEMATIC_VIDEOS[videoIndex].location}
-            </span>
-          </div>
-
-          <span className="font-heading text-xs font-extrabold uppercase tracking-widest text-white/60">
-            Editorial Collection 2026
-          </span>
-        </div>
 
         {/* Main Nike-Style Bold Header */}
         <div className="mx-auto max-w-4xl text-center space-y-4">
@@ -234,7 +213,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
             transition={{ delay: 0.1 }}
             className="font-sans text-sm sm:text-base md:text-lg text-white/80 max-w-2xl mx-auto font-normal leading-relaxed drop-shadow"
           >
-            Realistic trip costs, luxury stay choices, and travel experiences side-by-side.
+            Realistic trip costs, stay choices, and travel experiences side-by-side.
           </motion.p>
         </div>
 
@@ -252,7 +231,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
                 DESTINATION A
               </span>
               <span className="font-sans text-xs font-bold text-neutral-900 bg-neutral-100 px-2.5 py-0.5 rounded-full border border-neutral-300">
-                {pkgA.rating}
+                Rating {pkgA.rating}
               </span>
             </div>
 
@@ -317,7 +296,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
                 DESTINATION B
               </span>
               <span className="font-sans text-xs font-bold text-neutral-900 bg-neutral-100 px-2.5 py-0.5 rounded-full border border-neutral-300">
-                {pkgB.rating}
+                Rating {pkgB.rating}
               </span>
             </div>
 
@@ -362,33 +341,6 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
 
         {/* 4. FORMAL LUXURY COMPARISON MATRIX TABLE (White Background, Black Text) */}
         <div className="space-y-6">
-          <div className="flex flex-wrap items-center justify-center gap-2 border-b border-white/20 pb-4">
-            {[
-              { id: "all", label: "Overview Matrix", icon: Compass },
-              { id: "cost", label: "Cost Breakdown", icon: DollarSign },
-              { id: "stay", label: "Accommodations", icon: Hotel },
-              { id: "experience", label: "Travel Experience", icon: Sparkles }
-            ].map((tab) => {
-              const IconComp = tab.icon
-              const isActive = activeTab === tab.id
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 rounded-2xl px-5 py-2.5 font-heading text-xs font-extrabold uppercase tracking-wider transition-all ${
-                    isActive
-                      ? "bg-white text-neutral-900 shadow-xl"
-                      : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
-                  }`}
-                >
-                  <IconComp className="h-4 w-4" />
-                  {tab.label}
-                </button>
-              )
-            })}
-          </div>
-
           <div className="overflow-hidden rounded-3xl border border-white bg-white text-neutral-900 shadow-2xl">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[700px] font-sans">
@@ -408,111 +360,76 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
                 <tbody className="divide-y divide-neutral-200 text-sm">
                   
                   {/* SECTION: BUDGET */}
-                  {(activeTab === "all" || activeTab === "cost") && (
-                    <>
-                      <tr className="bg-neutral-50">
-                        <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-neutral-700 flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-emerald-600" /> Cost & Budget
-                        </td>
-                      </tr>
+                  <tr className="bg-neutral-50">
+                    <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-neutral-700">
+                      Cost & Budget Breakdown
+                    </td>
+                  </tr>
 
-                      <tr>
-                        <td className="p-5 font-semibold text-neutral-900">Total Estimated Trip Cost</td>
-                        <td className="p-5 font-heading font-extrabold text-neutral-900 text-center text-xl border-l border-neutral-200">{pkgA.budget.total}</td>
-                        <td className="p-5 font-heading font-extrabold text-neutral-900 text-center text-xl border-l border-neutral-200">{pkgB.budget.total}</td>
-                      </tr>
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">Transport Expense</td>
-                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgA.budget.transport}</td>
-                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgB.budget.transport}</td>
-                      </tr>
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">Food & Dining Expense</td>
-                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgA.budget.food}</td>
-                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgB.budget.food}</td>
-                      </tr>
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">Activity & Sightseeing Expense</td>
-                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgA.budget.activities}</td>
-                        <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgB.budget.activities}</td>
-                      </tr>
-                    </>
-                  )}
-
-                  {/* SECTION: ACCOMMODATION */}
-                  {(activeTab === "all" || activeTab === "stay") && (
-                    <>
-                      <tr className="bg-neutral-50">
-                        <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-neutral-700 flex items-center gap-2">
-                          <Hotel className="h-4 w-4 text-primary" /> Stay Options
-                        </td>
-                      </tr>
-
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">5-Star Luxury Resorts</td>
-                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgA.stay.fiveStar)}</td>
-                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgB.stay.fiveStar)}</td>
-                      </tr>
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">3-Star Standard Hotels</td>
-                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgA.stay.threeStar)}</td>
-                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgB.stay.threeStar)}</td>
-                      </tr>
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">Hostels & Backpacker Stays</td>
-                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgA.stay.hostel)}</td>
-                        <td className="p-5 text-center border-l border-neutral-200">{renderBool(pkgB.stay.hostel)}</td>
-                      </tr>
-                    </>
-                  )}
+                  <tr>
+                    <td className="p-5 font-semibold text-neutral-900">Total Estimated Trip Cost</td>
+                    <td className="p-5 font-heading font-extrabold text-neutral-900 text-center text-xl border-l border-neutral-200">{pkgA.budget.total}</td>
+                    <td className="p-5 font-heading font-extrabold text-neutral-900 text-center text-xl border-l border-neutral-200">{pkgB.budget.total}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-5 font-medium text-neutral-600">Transport Expense</td>
+                    <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgA.budget.transport}</td>
+                    <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgB.budget.transport}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-5 font-medium text-neutral-600">Food & Dining Expense</td>
+                    <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgA.budget.food}</td>
+                    <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgB.budget.food}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-5 font-medium text-neutral-600">Activity & Sightseeing Expense</td>
+                    <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgA.budget.activities}</td>
+                    <td className="p-5 text-neutral-900 text-center font-medium border-l border-neutral-200">{pkgB.budget.activities}</td>
+                  </tr>
 
                   {/* SECTION: EXPERIENCE */}
-                  {(activeTab === "all" || activeTab === "experience") && (
-                    <>
-                      <tr className="bg-neutral-50">
-                        <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-neutral-700 flex items-center gap-2">
-                          <Sparkles className="h-4 w-4 text-amber-500" /> Travel Highlights
-                        </td>
-                      </tr>
+                  <tr className="bg-neutral-50">
+                    <td colSpan={3} className="px-5 py-3 font-heading font-extrabold uppercase tracking-widest text-xs text-neutral-700">
+                      Travel Experience Highlights
+                    </td>
+                  </tr>
 
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">Key Activities</td>
-                        <td className="p-5 text-center border-l border-neutral-200">
-                          <div className="flex flex-wrap justify-center gap-1.5">
-                            {pkgA.experience.activities.map((act, idx) => (
-                              <span key={idx} className="rounded-md bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-900">
-                                {act}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                        <td className="p-5 text-center border-l border-neutral-200">
-                          <div className="flex flex-wrap justify-center gap-1.5">
-                            {pkgB.experience.activities.map((act, idx) => (
-                              <span key={idx} className="rounded-md bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-900">
-                                {act}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">Best Season</td>
-                        <td className="p-5 text-xs font-semibold text-neutral-900 text-center border-l border-neutral-200">{pkgA.experience.bestSeason}</td>
-                        <td className="p-5 text-xs font-semibold text-neutral-900 text-center border-l border-neutral-200">{pkgB.experience.bestSeason}</td>
-                      </tr>
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">Ideal Duration</td>
-                        <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgA.experience.duration}</td>
-                        <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgB.experience.duration}</td>
-                      </tr>
-                      <tr>
-                        <td className="p-5 font-medium text-neutral-600">Ideal Traveler Type</td>
-                        <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgA.experience.idealTraveler}</td>
-                        <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgB.experience.idealTraveler}</td>
-                      </tr>
-                    </>
-                  )}
+                  <tr>
+                    <td className="p-5 font-medium text-neutral-600">Key Activities</td>
+                    <td className="p-5 text-center border-l border-neutral-200">
+                      <div className="flex flex-wrap justify-center gap-1.5">
+                        {pkgA.experience.activities.map((act, idx) => (
+                          <span key={idx} className="rounded-md bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-900">
+                            {act}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="p-5 text-center border-l border-neutral-200">
+                      <div className="flex flex-wrap justify-center gap-1.5">
+                        {pkgB.experience.activities.map((act, idx) => (
+                          <span key={idx} className="rounded-md bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-900">
+                            {act}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-5 font-medium text-neutral-600">Best Season</td>
+                    <td className="p-5 text-xs font-semibold text-neutral-900 text-center border-l border-neutral-200">{pkgA.experience.bestSeason}</td>
+                    <td className="p-5 text-xs font-semibold text-neutral-900 text-center border-l border-neutral-200">{pkgB.experience.bestSeason}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-5 font-medium text-neutral-600">Ideal Duration</td>
+                    <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgA.experience.duration}</td>
+                    <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgB.experience.duration}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-5 font-medium text-neutral-600">Ideal Traveler Type</td>
+                    <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgA.experience.idealTraveler}</td>
+                    <td className="p-5 text-xs font-bold text-neutral-900 text-center border-l border-neutral-200">{pkgB.experience.idealTraveler}</td>
+                  </tr>
 
                 </tbody>
               </table>
@@ -520,34 +437,8 @@ export function PackageComparison({ onNavigateView, onSelectDestination }) {
           </div>
         </div>
 
-        {/* 5. BOTTOM LABELS (No redirects — feature highlighting only) */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-          <span
-            className="w-full sm:w-auto rounded-full bg-white px-10 py-4 font-heading font-extrabold text-sm uppercase tracking-wider text-neutral-900 shadow-2xl text-center cursor-default"
-          >
-            {destA} vs {destB}
-          </span>
-          <span
-            className="w-full sm:w-auto rounded-full bg-white/10 border border-white/20 px-10 py-4 font-heading font-extrabold text-sm uppercase tracking-wider text-white backdrop-blur-md shadow-2xl text-center cursor-default"
-          >
-            Compare & Decide
-          </span>
-        </div>
-
       </div>
 
     </section>
-  )
-}
-
-function renderBool(val) {
-  return val ? (
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold border border-emerald-300">
-      <Check className="h-3.5 w-3.5" />
-    </span>
-  ) : (
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-neutral-100 text-neutral-400 border border-neutral-200">
-      <X className="h-3.5 w-3.5" />
-    </span>
   )
 }

@@ -58,7 +58,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack, onOpenWorkspace })
   }, {})
 
   return (
-    <section id="tracker" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background pt-24 pb-20" : "py-20 md:py-28 bg-background"}`}>
+    <section id="tracker" className={`relative w-full ${isWorkspace ? "min-h-screen bg-[#F4F6F6] text-[#2F3E4E] pt-24 pb-20" : "py-20 md:py-28 bg-background"}`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Workspace Top Bar */}
