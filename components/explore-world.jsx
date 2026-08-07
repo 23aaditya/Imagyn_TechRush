@@ -55,32 +55,6 @@ export function ExploreWorld({ onNavigateView }) {
       {/* Dark vignette for text contrast */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-[oklch(0.17_0.02_257)]/70 via-[oklch(0.17_0.02_257)]/40 to-[oklch(0.17_0.02_257)]/85" />
 
-      {/* Floating landmark bubbles */}
-      {landmarks.map((lm, i) => (
-        <motion.div
-          key={lm.label}
-          className="pointer-events-none absolute hidden lg:block"
-          style={{ top: lm.top, left: lm.left, right: lm.right, bottom: lm.bottom }}
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: i * 0.12 }}
-        >
-          <motion.div
-            animate={{ y: [0, -14, 0] }}
-            transition={{ duration: 5 + i, delay: lm.delay, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-            className="flex flex-col items-center gap-2"
-          >
-            <div className="h-20 w-20 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/40 ring-1 ring-white/10">
-              <img src={lm.src || "/placeholder.svg"} alt={lm.label} className="h-full w-full object-cover" />
-            </div>
-            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
-              {lm.label}
-            </span>
-          </motion.div>
-        </motion.div>
-      ))}
-
       {/* Content */}
       <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
         
@@ -104,7 +78,7 @@ export function ExploreWorld({ onNavigateView }) {
           Explore destinations visually through interactive digital maps, animated routes, and location markers.
         </motion.p>
 
-        {/* Green highlighted action button: "Let's Explore With Maps" */}
+        {/* Action button: "Explore" */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -117,7 +91,7 @@ export function ExploreWorld({ onNavigateView }) {
             className="mt-9 h-14 rounded-2xl bg-emerald px-8 text-base font-bold text-emerald-foreground shadow-lg shadow-emerald/25 transition-transform hover:-translate-y-0.5 hover:bg-emerald/90"
           >
             <Map className="mr-2 h-5 w-5" />
-            Let&apos;s Explore With Maps
+            Explore
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </motion.div>

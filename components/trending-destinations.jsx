@@ -1,253 +1,134 @@
 "use client"
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { MapPin, Star, Clock, Wallet, ChevronLeft, ChevronRight, Sun, CloudSun, Snowflake } from "lucide-react"
+import { motion } from "framer-motion"
 
-const destinations = [
-  {
-    id: "goa",
-    name: "Goa",
-    country: "India",
-    image: "/images/dest-goa.png",
-    budget: "₹9,800",
-    duration: "4–5 days",
-    weather: { label: "31°C Sunny", icon: "sun" },
-    rating: 4.8,
-    tags: ["Beaches", "Nightlife"],
-    description: "Golden palm-fringed coastlines, vibrant beach shacks, Portuguese heritage, and sunset cruises.",
-  },
-  {
-    id: "jaipur",
-    name: "Jaipur",
-    country: "India",
-    image: "/images/dest-jaipur.png",
-    budget: "₹8,500",
-    duration: "3–4 days",
-    weather: { label: "29°C Clear", icon: "sun" },
-    rating: 4.7,
-    tags: ["Heritage", "Culture"],
-    description: "The Royal Pink City with majestic hill forts, opulent grand palaces, and bustling artisan bazaars.",
-  },
-  {
-    id: "kerala",
-    name: "Kerala",
-    country: "India",
-    image: "/images/dest-kerala.png",
-    budget: "₹12,500",
-    duration: "5–6 days",
-    weather: { label: "27°C Humid", icon: "cloud" },
-    rating: 4.9,
-    tags: ["Nature", "Backwaters"],
-    description: "Emerald backwaters, luxury houseboats, aromatic spice plantations, and serene tea estates in Munnar.",
-  },
-  {
-    id: "manali",
-    name: "Manali",
-    country: "India",
-    image: "/images/dest-manali.png",
-    budget: "₹11,000",
-    duration: "4–5 days",
-    weather: { label: "12°C Snowy", icon: "snow" },
-    rating: 4.6,
-    tags: ["Mountains", "Adventure"],
-    description: "Snow-capped Himalayan valleys, Solang valley adventures, river rafting, and cozy mountain cafes.",
-  },
-  {
-    id: "bali",
-    name: "Bali",
-    country: "Indonesia",
-    image: "/images/dest-bali.png",
-    budget: "₹28,000",
-    duration: "6–7 days",
-    weather: { label: "30°C Tropical", icon: "sun" },
-    rating: 4.9,
-    tags: ["Beaches", "Island Relaxation"],
-    description: "Tropical island paradise blending cliffside temples, terraced rice paddies, and beachfront villas.",
-  },
-  {
-    id: "santorini",
-    name: "Santorini",
-    country: "Greece",
-    image: "/images/dest-santorini.png",
-    budget: "₹45,000",
-    duration: "5–6 days",
-    weather: { label: "26°C Sunny", icon: "sun" },
-    rating: 4.8,
-    tags: ["Cliffside Stays", "Aegean Views"],
-    description: "Iconic whitewashed cliffside villages with blue domes, volcanic sand beaches, and Aegean sunsets.",
-  },
+// Dense 19-Polaroid Scattered Wall Dataset (Matching Reference Image)
+const polaroidCards = [
+  { id: "goa", name: "Goa, India", vibe: "Sun, Sand & Serenity", rating: "4.8 ⭐", image: "/images/dest-goa.png", rotation: "-rotate-6", pos: "top-0 left-0 z-10" },
+  { id: "manali", name: "Manali, India", vibe: "Snowy Escapes", rating: "4.6 ⭐", image: "/images/dest-manali.png", rotation: "rotate-6", pos: "top-2 left-28 sm:left-36 z-20" },
+  { id: "shimla", name: "Shimla, India", vibe: "Colonial Pine Ridge", rating: "4.6 ⭐", image: "https://images.unsplash.com/photo-1597074866923-dc0589150358?w=500&auto=format&fit=crop&q=80", rotation: "-rotate-3", pos: "top-0 left-56 sm:left-68 z-10" },
+  { id: "munnar", name: "Munnar, India", vibe: "Rolling Tea Estates", rating: "4.8 ⭐", image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=500&auto=format&fit=crop&q=80", rotation: "rotate-8", pos: "top-2 right-12 sm:right-20 z-20" },
+  { id: "reykjavik", name: "Reykjavik, Iceland", vibe: "Nordic Charm", rating: "4.7 ⭐", image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&auto=format&fit=crop&q=80", rotation: "-rotate-5", pos: "top-0 right-0 z-10" },
+  
+  { id: "alleppey", name: "Alleppey, India", vibe: "Backwater Bliss", rating: "4.9 ⭐", image: "/images/dest-kerala.png", rotation: "rotate-4", pos: "top-32 left-0 z-30" },
+  { id: "santorini", name: "Santorini, Greece", vibe: "White Aegean Domes", rating: "4.8 ⭐", image: "/images/dest-santorini.png", rotation: "-rotate-7", pos: "top-28 left-24 sm:left-32 z-40" },
+  { id: "bali", name: "Bali, Indonesia", vibe: "Island of the Gods", rating: "4.9 ⭐", image: "/images/dest-bali.png", rotation: "rotate-5", pos: "top-32 left-52 sm:left-64 z-30" },
+  { id: "jaipur", name: "Jaipur, India", vibe: "Royal Heritage", rating: "4.7 ⭐", image: "/images/dest-jaipur.png", rotation: "-rotate-4", pos: "top-32 right-16 sm:right-24 z-20" },
+
+  { id: "lake-louise", name: "Lake Louise, Canada", vibe: "Emerald Serenity", rating: "4.8 ⭐", image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&auto=format&fit=crop&q=80", rotation: "rotate-6", pos: "top-64 left-0 z-30" },
+  { id: "queenstown", name: "Queenstown, NZ", vibe: "Adventure Awaits", rating: "4.8 ⭐", image: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=500&auto=format&fit=crop&q=80", rotation: "-rotate-5", pos: "top-60 left-24 sm:left-32 z-40" },
+  { id: "maldives", name: "Maldives", vibe: "Turquoise Bungalows", rating: "4.6 ⭐", image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500&auto=format&fit=crop&q=80", rotation: "rotate-3", pos: "top-64 left-52 sm:left-64 z-30" },
+  { id: "jaisalmer", name: "Jaisalmer, India", vibe: "The Golden City", rating: "4.9 ⭐", image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?w=500&auto=format&fit=crop&q=80", rotation: "-rotate-8", pos: "top-60 right-20 sm:right-28 z-40" },
+  { id: "darjeeling", name: "Darjeeling, India", vibe: "Tea & Tranquility", rating: "4.9 ⭐", image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=500&auto=format&fit=crop&q=80", rotation: "rotate-5", pos: "top-64 right-0 z-30" },
+
+  { id: "paris", name: "Paris, France", vibe: "City of Love", rating: "4.7 ⭐", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=500&auto=format&fit=crop&q=80", rotation: "-rotate-4", pos: "top-[380px] left-0 z-40" },
+  { id: "kyoto", name: "Kyoto, Japan", vibe: "Timeless Temples", rating: "4.8 ⭐", image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=500&auto=format&fit=crop&q=80", rotation: "rotate-6", pos: "top-[380px] left-24 sm:left-32 z-50" },
+  { id: "banff", name: "Banff, Canada", vibe: "Ice Mountain Magic", rating: "4.9 ⭐", image: "https://images.unsplash.com/photo-1603201667141-5a2d4c673378?w=500&auto=format&fit=crop&q=80", rotation: "-rotate-5", pos: "top-[380px] left-52 sm:left-64 z-40" },
+  { id: "agra", name: "Agra, India", vibe: "Timeless Wonder", rating: "4.9 ⭐", image: "https://images.unsplash.com/photo-1581553680321-4fffae59fccd?w=500&auto=format&fit=crop&q=80", rotation: "rotate-4", pos: "top-[380px] right-20 sm:right-28 z-50" },
+  { id: "singapore", name: "Singapore", vibe: "City of Possibility", rating: "4.6 ⭐", image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&auto=format&fit=crop&q=80", rotation: "-rotate-6", pos: "top-[380px] right-0 z-40" }
 ]
 
-const weatherIcon = { sun: Sun, cloud: CloudSun, snow: Snowflake }
-
-export function TrendingDestinations({ onNavigateView }) {
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? destinations.length - 1 : prev - 1))
-  }
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev === destinations.length - 1 ? 0 : prev + 1))
-  }
-
-  const activeDest = destinations[currentIndex]
-  const WeatherIcon = weatherIcon[activeDest.weather.icon]
-
+export function TrendingDestinations() {
   return (
-    <section id="destinations" className="relative bg-background px-4 py-20 sm:px-6 lg:py-28">
+    <section id="destinations" className="relative bg-neutral-100 dark:bg-neutral-950 px-4 py-20 sm:px-6 lg:py-28 border-t border-border/60 overflow-hidden select-none">
       <div className="mx-auto max-w-7xl">
         
-        {/* Header */}
-        <div className="mx-auto max-w-2xl text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="font-heading text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl"
-          >
-            🔥 Trending This Season
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-3 text-lg leading-relaxed text-pretty text-muted-foreground"
-          >
-            An overview of top destinations for your next journey.
-          </motion.p>
-        </div>
-
-        {/* Large Sliding Showcase Gallery Carousel */}
-        <div className="mt-12 relative rounded-3xl border border-border/80 bg-card p-4 sm:p-8 shadow-2xl overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* LEFT SIDE: Dense 19-Polaroid Organic Scattered Wall (Exact Match to Reference Screenshot) */}
+          <div className="lg:col-span-7 relative h-[560px] sm:h-[600px] w-full">
             
-            {/* Image Slide Display */}
-            <div className="lg:col-span-7 relative aspect-[16/10] overflow-hidden rounded-2xl group cursor-pointer" onClick={() => onNavigateView?.("explore")}>
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={activeDest.image}
-                  src={activeDest.image}
-                  alt={`${activeDest.name}, ${activeDest.country}`}
-                  initial={{ opacity: 0, scale: 1.08 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.6, ease: "easeInOut" }}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </AnimatePresence>
+            {/* Soft Ambient Radial Glow */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-emerald/10 to-transparent rounded-full blur-3xl -z-10" />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            {/* Dense Organic Polaroid Canvas */}
+            <div className="relative h-full w-full">
+              {polaroidCards.map((card, idx) => (
+                <motion.div
+                  key={card.id}
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: idx * 0.03 }}
+                  className={`absolute ${card.pos} ${card.rotation} w-32 sm:w-40 bg-white dark:bg-neutral-900 p-2 pb-3.5 shadow-[0_15px_35px_rgba(0,0,0,0.22)] rounded-sm border border-neutral-200 dark:border-neutral-800 transform hover:scale-115 hover:z-50 transition-all duration-300 cursor-default group`}
+                >
+                  {/* Polaroid Image Container */}
+                  <div className="relative h-24 sm:h-28 w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800 rounded-xs">
+                    <img
+                      src={card.image}
+                      alt={card.name}
+                      className="h-full w-full object-cover filter contrast-[1.05] group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-1 right-1 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-full text-[8.5px] font-bold text-white">
+                      {card.rating}
+                    </div>
+                  </div>
 
-              {/* Weather badge */}
-              <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/40 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
-                <WeatherIcon className="h-4 w-4" />
-                {activeDest.weather.label}
-              </span>
-
-              {/* Rating badge */}
-              <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-background/90 px-3 py-1.5 text-xs font-bold text-foreground backdrop-blur-md">
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                {activeDest.rating}
-              </span>
-
-              {/* Bottom overlay text on image */}
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <p className="text-xs font-medium text-white/80 uppercase tracking-widest">{activeDest.country}</p>
-                <h3 className="font-heading text-3xl font-extrabold leading-tight">{activeDest.name}</h3>
-              </div>
+                  {/* Polaroid Frame Footer Caption */}
+                  <div className="mt-2 px-0.5 text-left">
+                    <h4 className="font-heading text-[10px] sm:text-[11px] font-extrabold text-neutral-900 dark:text-white truncate flex items-center gap-1">
+                      <span className="text-rose-500">📍</span> {card.name}
+                    </h4>
+                    <p className="text-[8.5px] sm:text-[9.5px] text-neutral-500 dark:text-neutral-400 mt-0.5 truncate font-sans">
+                      {card.vibe}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
 
-            {/* Content Details Display */}
-            <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
-              
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-widest text-primary">Destination Spotlight</span>
-                  <span className="text-xs font-medium text-muted-foreground">{currentIndex + 1} of {destinations.length}</span>
-                </div>
+          </div>
 
-                <h3 className="mt-2 font-heading text-3xl font-bold text-foreground">
-                  {activeDest.name}, <span className="text-muted-foreground font-normal">{activeDest.country}</span>
-                </h3>
+          {/* RIGHT SIDE: High-Impact Editorial Text & Features */}
+          <div className="lg:col-span-5 space-y-7 text-left">
+            
+            <div className="space-y-3">
+              <span className="font-heading text-xs font-bold uppercase tracking-widest text-primary block">
+                EXPLORE PLACES WITH TRIPNEST
+              </span>
 
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {activeDest.description}
-                </p>
+              <h2 className="font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl leading-[1.08]">
+                Trending This Season
+              </h2>
+            </div>
 
-                {/* Stats */}
-                <div className="mt-6 grid grid-cols-2 gap-4">
-                  <div className="rounded-2xl border border-border bg-background p-3.5">
-                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
-                      <Wallet className="h-4 w-4 text-emerald" />
-                      Est. Budget
-                    </span>
-                    <span className="mt-1 block font-heading text-lg font-bold text-foreground">
-                      {activeDest.budget} <span className="text-xs font-normal text-muted-foreground">/ person</span>
-                    </span>
+            <p className="font-sans text-base sm:text-lg leading-relaxed text-muted-foreground font-normal">
+              Find which place calls you, plan your itinerary, and just Pack your Bags!
+            </p>
+
+            {/* Exciting High-Impact Feature Breakdown (No SVGs) */}
+            <div className="space-y-4 pt-2">
+              {[
+                {
+                  number: "01",
+                  title: "Handpicked Escape Collections",
+                  desc: "105+ hand-curated destinations across tropical coastlines, snowy alpine valleys, and royal palace forts."
+                },
+                {
+                  number: "02",
+                  title: "Transparent Realistic Trip Budgets",
+                  desc: "Clear stay, dining, and transport estimates calculated upfront so you plan without price surprises."
+                },
+                {
+                  number: "03",
+                  title: "Dynamic Itinerary Optimization",
+                  desc: "Drag, reorder, and schedule spots with live distance routes, opening hours, and travel timing."
+                }
+              ].map((feat, i) => (
+                <div key={i} className="flex items-start gap-4 p-4 rounded-2xl border border-border/70 bg-card/80 shadow-sm hover:border-primary/40 transition-colors">
+                  <span className="font-heading text-xl font-extrabold text-primary shrink-0 leading-none mt-0.5">
+                    {feat.number}
+                  </span>
+                  <div>
+                    <h4 className="font-heading text-sm font-extrabold text-foreground uppercase tracking-wider">
+                      {feat.title}
+                    </h4>
+                    <p className="font-sans text-xs text-muted-foreground mt-1 leading-relaxed">
+                      {feat.desc}
+                    </p>
                   </div>
-
-                  <div className="rounded-2xl border border-border bg-background p-3.5">
-                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
-                      <Clock className="h-4 w-4 text-primary" />
-                      Trip Length
-                    </span>
-                    <span className="mt-1 block font-heading text-lg font-bold text-foreground">
-                      {activeDest.duration}
-                    </span>
-                  </div>
                 </div>
-
-                {/* Tags */}
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {activeDest.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Navigation Controls */}
-              <div className="flex items-center justify-between border-t border-border/60 pt-4">
-                <div className="flex gap-1.5">
-                  {destinations.map((d, idx) => (
-                    <button
-                      key={d.id}
-                      onClick={() => setCurrentIndex(idx)}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        idx === currentIndex ? "w-8 bg-primary" : "w-2 bg-muted-foreground/30"
-                      }`}
-                      aria-label={`Go to slide ${idx + 1}`}
-                    />
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handlePrev}
-                    aria-label="Previous destination"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-accent transition-colors"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={handleNext}
-                    aria-label="Next destination"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-accent transition-colors"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-
+              ))}
             </div>
 
           </div>

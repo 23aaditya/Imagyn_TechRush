@@ -290,30 +290,29 @@ export function AiChatbot({ currentView, onNavigate }) {
         <AnimatePresence>
           {!isOpen && (
             <motion.button
+              type="button"
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 1.08 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
-              className="group relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary via-primary/80 to-amber-500 p-0.5 shadow-[0_0_30px_rgba(var(--primary),0.5)] transition-all hover:shadow-[0_0_40px_rgba(var(--primary),0.7)] focus:outline-none ring-4 ring-primary/30"
+              className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-background border-2 border-primary/40 shadow-xl shadow-primary/30 transition-all hover:shadow-primary/50 focus:outline-none overflow-hidden"
               aria-label="Open Boots AI Assistant"
             >
-              {/* Outer pulsing aura ring */}
-              <span className="absolute -inset-1.5 rounded-full bg-primary/40 animate-ping opacity-60" />
+              {/* Outer pulsing ring */}
+              <span className="absolute -inset-1 rounded-full bg-primary/30 animate-ping opacity-75" />
 
-              <div className="relative h-full w-full rounded-full bg-background overflow-hidden border border-primary/40 p-0.5">
-                <img
-                  src="/boots-avatar.jpg"
-                  alt="Boots AI Chatbot"
-                  className="h-full w-full rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-              </div>
+              <img
+                src="/boots-avatar.jpg"
+                alt="Boots AI Chatbot"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+              />
 
               {/* Status indicator dot */}
-              <span className="absolute top-0 right-0 flex h-4 w-4">
+              <span className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-background" />
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-background" />
               </span>
             </motion.button>
           )}
@@ -348,14 +347,13 @@ export function AiChatbot({ currentView, onNavigate }) {
                 <div>
                   <h3 className="font-heading text-base font-bold text-foreground flex items-center gap-2">
                     Boots
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground bg-primary px-2.5 py-0.5 rounded-full shadow-sm">
-                      <Sparkles className="h-3 w-3" />
-                      AI Concierge
+                    <span className="text-[10px] font-normal text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-full text-primary">
+                      AI Chatbot
                     </span>
                   </h3>
-                  <p className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    Live Intelligent Travel Assistant
+                  <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    Your Personal Travel Assistant
                   </p>
                 </div>
               </div>

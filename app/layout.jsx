@@ -1,17 +1,19 @@
 import { Analytics } from '@vercel/analytics/next'
-import { Inter, Sora } from 'next/font/google'
+import { Inter, Cascadia_Code } from 'next/font/google'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import './globals.css'
-
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  fallback: ['system-ui', 'sans-serif'],
 })
 
-const sora = Sora({
+const cascadia = Cascadia_Code({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
+  fallback: ['Cascadia Code', 'Consolas', 'monospace'],
 })
 
 export const metadata = {
@@ -48,7 +50,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${sora.variable} bg-background`}>
+    <html lang="en" className={`${inter.variable} ${cascadia.variable} bg-background`}>
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
