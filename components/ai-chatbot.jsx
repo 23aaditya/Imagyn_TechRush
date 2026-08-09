@@ -61,7 +61,7 @@ const CATEGORIZED_PROMPTS = {
 }
 
 export function AiChatbot({ currentView, onNavigate }) {
-  const { itinerary, addSpotToItinerary, destination } = useTrip()
+  const { itinerary, addSpotToItinerary, destination, setDestination } = useTrip()
 
   const [isOpen, setIsOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -129,8 +129,49 @@ export function AiChatbot({ currentView, onNavigate }) {
     if (!textToSend) setInputMessage("")
     setIsLoading(true)
 
-    // Check if user is requesting Boots to add a location to the planner
     const lowerText = messageText.toLowerCase()
+
+    // Check if user is requesting navigation linking
+    const isNavIntent = ["go to", "open", "show", "take me to", "navigate", "switch to", "view"].some((kw) => lowerText.includes(kw))
+    if (isNavIntent) {
+      let targetView = null
+      let viewName = ""
+      if (lowerText.includes("budget")) {
+        targetView = "budget"
+        viewName = "Budget Calculator"
+      } else if (lowerText.includes("expense")) {
+        targetView = "expenses"
+        viewName = "Expense Tracker"
+      } else if (lowerText.includes("planner") || lowerText.includes("itinerary")) {
+        targetView = "itinerary"
+        viewName = "Itinerary Planner Workspace"
+      } else if (lowerText.includes("explore") || lowerText.includes("world")) {
+        targetView = "explore"
+        viewName = "Explore World"
+      } else if (lowerText.includes("package")) {
+        targetView = "packages"
+        viewName = "Package Comparison"
+      } else if (lowerText.includes("profile") || lowerText.includes("passport")) {
+        targetView = "profile"
+        viewName = "User Profile & Passport"
+      }
+
+      if (targetView) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: `**[Category: 🚀 Quick Action]**\n\nSure! Click below to jump directly to **${viewName}**:\n[ACTION:navigate:${targetView}]`,
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ])
+        setIsLoading(false)
+        return
+      }
+    }
+
+    // Check if user is requesting Boots to add a location to the planner
     const isAddIntent = ["add", "put", "include", "insert", "schedule", "place"].some((kw) => lowerText.includes(kw))
 
     if (isAddIntent) {
@@ -274,6 +315,45 @@ export function AiChatbot({ currentView, onNavigate }) {
     return lines.map((line, idx) => {
       let cleanLine = line.trim()
       if (!cleanLine) return <div key={idx} className="h-1.5" />
+
+      // Check for ACTION linking tags e.g. [ACTION:navigate:itinerary:Goa]
+      if (cleanLine.includes("[ACTION:navigate:")) {
+        const actionMatch = cleanLine.match(/\[ACTION:navigate:([^:\]]+)(?::([^\]]+))?\]/)
+        if (actionMatch) {
+          const targetView = actionMatch[1] // 'itinerary' | 'budget' | 'expenses' | 'explore' | 'packages' | 'profile'
+          const targetDest = actionMatch[2] // optional destination
+
+          const viewLabels = {
+            itinerary: `🚀 Open Planner ${targetDest ? `for ${targetDest}` : ""}`,
+            budget: "💰 Open Budget Calculator",
+            expenses: "📊 Open Expense Tracker",
+            explore: `🌍 Explore ${targetDest || "World Destinations"}`,
+            packages: "📦 Compare Tour Packages",
+            profile: "👤 View Profile & Passport"
+          }
+
+          const btnText = viewLabels[targetView] || `Open ${targetView}`
+
+          return (
+            <div key={idx} className="mt-2.5 mb-1">
+              <Button
+                size="sm"
+                onClick={() => {
+                  if (targetDest) {
+                    setDestination(targetDest)
+                  }
+                  onNavigate?.(targetView)
+                  setIsOpen(false)
+                }}
+                className="w-full rounded-2xl bg-amber-400 text-[#0D2B45] hover:bg-amber-300 font-extrabold text-xs py-2 shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-[1.02]"
+              >
+                <Compass className="h-4 w-4" />
+                {btnText}
+              </Button>
+            </div>
+          )
+        }
+      }
 
       // Check for Category Badge header (e.g. **[Category: ...]** or [Category: ...])
       if (cleanLine.includes("[Category:") || cleanLine.includes("Category:")) {
@@ -578,6 +658,30 @@ export function AiChatbot({ currentView, onNavigate }) {
               )}
 
               <div ref={chatEndRef} />
+            </div>
+
+            {/* Quick Workspace Linking Chips Bar */}
+            <div className="flex items-center gap-1.5 overflow-x-auto px-3 py-2 bg-card/90 border-t border-border/40 scrollbar-none text-[11px] font-bold">
+              <span className="text-[10px] text-muted-foreground uppercase font-extrabold shrink-0 mr-1">Quick Links:</span>
+              {[
+                { label: "🗺️ Planner", view: "itinerary" },
+                { label: "💰 Budget", view: "budget" },
+                { label: "📊 Expenses", view: "expenses" },
+                { label: "🌍 Explore", view: "explore" },
+                { label: "📦 Packages", view: "packages" },
+                { label: "👤 Profile", view: "profile" },
+              ].map((lk) => (
+                <button
+                  key={lk.view}
+                  onClick={() => {
+                    onNavigate?.(lk.view)
+                    setIsOpen(false)
+                  }}
+                  className="shrink-0 rounded-full bg-primary/10 border border-primary/20 hover:bg-amber-400 hover:text-[#0D2B45] hover:border-amber-400 px-2.5 py-1 text-primary text-[10px] font-bold transition-all cursor-pointer shadow-xs"
+                >
+                  {lk.label}
+                </button>
+              ))}
             </div>
 
             {/* Input Form Bar */}

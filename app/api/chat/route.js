@@ -54,8 +54,15 @@ Guidelines:
 2. Always start your response with a clear category header on line 1, e.g. **[Category: 🗓️ Day Plan]** or **[Category: ☀️ Peak Season & Weather]** or **[Category: 👥 Crowd Control]** or **[Category: 💰 Budget & Food]**.
 3. For Day Plans, clearly structure with Morning, Afternoon, Evening suggestions and estimated timing.
 4. For Peak Season & Weather, highlight high season months, shoulder season savings, weather warnings, and crowd levels (out of 100).
-5. Be friendly, energetic, and practical. Use bullet points and emoji formatting to make responses easy to read.
-6. Keep answers concise yet highly informative.`
+5. When relevant, end your response with an action linking tag:
+   - Link to Itinerary Planner: [ACTION:navigate:itinerary:DestinationName]
+   - Link to Budget Calculator: [ACTION:navigate:budget]
+   - Link to Expense Tracker: [ACTION:navigate:expenses]
+   - Link to Explore World: [ACTION:navigate:explore]
+   - Link to Tour Packages: [ACTION:navigate:packages]
+   - Link to User Profile: [ACTION:navigate:profile]
+6. Be friendly, energetic, and practical. Use bullet points and emoji formatting to make responses easy to read.
+7. Keep answers concise yet highly informative.`
 
     // Format chat history for Gemini REST API (v1beta generateContent)
     const formattedContents = messages.map((msg) => ({
