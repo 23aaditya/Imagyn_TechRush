@@ -34,7 +34,11 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
     totalBudget,
     budgetOverrides,
     setBudgetCategoryOverride,
-    resetBudgetCategoryOverride
+    resetBudgetCategoryOverride,
+    selectedPackage,
+    packageBaseCost,
+    additionalExpenses,
+    estimatedTotalTripCost
   } = useTrip()
 
   const [editingCategory, setEditingCategory] = useState(null)
@@ -97,10 +101,27 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
           <h2 className="text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-foreground">
             {isWorkspace ? "Interactive Trip Budget Calculator" : "Plan Every Rupee With Confidence"}
           </h2>
-          <p className="mt-3 text-pretty text-muted-foreground leading-relaxed">
-            Automatically synchronized with your AI Itinerary. Adjust sliders or manually override any category budget.
-          </p>
         </div>
+
+        {/* Selected Package Callout Banner */}
+        {selectedPackage && (
+          <div className="mx-auto mb-10 max-w-4xl rounded-3xl border border-teal-500/30 bg-[#0D2B45] p-5 md:p-6 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-500/20 text-teal-300 px-3 py-0.5 text-xs font-bold border border-teal-400/30">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Selected Package Active</span>
+              </div>
+              <h4 className="font-heading text-xl font-extrabold">{selectedPackage.name}</h4>
+              <p className="text-xs text-slate-300">
+                Base Package Price: <strong className="text-white">₹{packageBaseCost.toLocaleString("en-IN")}</strong> • Extra Attractions: <strong className="text-amber-400">+₹{additionalExpenses.toLocaleString("en-IN")}</strong>
+              </p>
+            </div>
+            <div className="sm:text-right border-t sm:border-t-0 sm:border-l border-white/20 pt-3 sm:pt-0 sm:pl-6">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Est. Cost</span>
+              <span className="font-heading text-2xl font-extrabold text-teal-300">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
+            </div>
+          </div>
+        )}
 
         {/* Interactive Workspace Sliders Control (Only in Workspace Mode) */}
         {isWorkspace && (

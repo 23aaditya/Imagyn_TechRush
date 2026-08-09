@@ -282,6 +282,11 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
     setStayTier,
     customTargetBudget,
     setCustomTargetBudget,
+    selectedPackage,
+    packageBaseCost,
+    additionalExpenses,
+    estimatedTotalTripCost,
+    clearSelectedPackage,
     itinerary,
     setItinerary,
     addSpotToItinerary,
@@ -1047,6 +1052,46 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               </div>
             ) : (
               <>
+                {/* Imported Package Banner */}
+                {selectedPackage && (
+                  <div className="rounded-3xl border border-teal-500/30 bg-gradient-to-r from-[#0D2B45] via-[#10385C] to-[#0D2B45] p-6 text-white shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="space-y-1.5">
+                      <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-500/20 text-teal-300 px-3 py-1 text-xs font-bold border border-teal-400/30">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        <span>Imported Package — Customize Your Trip</span>
+                      </div>
+                      <h3 className="font-heading text-2xl font-extrabold">{selectedPackage.name} — {selectedPackage.destination}</h3>
+                      <p className="text-xs text-slate-300 font-medium">
+                        Hotel: <strong className="text-white">{selectedPackage.hotelCategory || "4-Star Resort"}</strong> • Meals: <strong className="text-white">{selectedPackage.meals || "Included Meals"}</strong> • Transport: <strong className="text-white">{selectedPackage.transport || "Private Transport"}</strong>
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-5 border-t md:border-t-0 md:border-l border-white/20 pt-4 md:pt-0 md:pl-6">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Package Base Price</span>
+                        <span className="font-heading text-xl font-extrabold text-white">₹{packageBaseCost.toLocaleString("en-IN")}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">+ Extra Expenses</span>
+                        <span className="font-heading text-xl font-extrabold text-amber-400">+₹{additionalExpenses.toLocaleString("en-IN")}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Estimated Total Cost</span>
+                        <span className="font-heading text-2xl font-extrabold text-teal-300">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => clearSelectedPackage()}
+                        className="rounded-xl border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5"
+                      >
+                        Clear Package
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Trip Meta Header Card */}
                 <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-border bg-card p-5 shadow-md">
                   <div>
@@ -1226,6 +1271,17 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                         <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
                                           {act.cost}
                                         </span>
+                                        {selectedPackage && (
+                                          act.isFromPackage ? (
+                                            <span className="font-bold text-[10px] text-teal-700 dark:text-teal-400 bg-teal-500/10 px-2.5 py-0.5 rounded-full border border-teal-500/20">
+                                              Package Included
+                                            </span>
+                                          ) : (
+                                            <span className="font-bold text-[10px] text-amber-700 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                                              Custom Added (+₹{(act.numericCost || 0).toLocaleString("en-IN")})
+                                            </span>
+                                          )
+                                        )}
                                       </h4>
 
                                       <button
