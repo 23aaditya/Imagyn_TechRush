@@ -21,6 +21,7 @@ import { ExploreWorkspace } from "@/components/explore-workspace"
 import { ProfileWorkspace } from "@/components/profile-workspace"
 import { HomeBackground } from "@/components/home-background"
 import { AiChatbot } from "@/components/ai-chatbot"
+import { SavedTripsModal } from "@/components/saved-trips-modal"
 
 function MainApp() {
   const { destination, setDestination } = useTrip()
@@ -201,6 +202,9 @@ function MainApp() {
           <ProfileWorkspace onBack={() => handleViewChange("home")} />
         </div>
       )}
+
+      {/* Saved Trips & Offline Summary Report Modal */}
+      <SavedTripsModal onSelectDestination={handleSelectDestination} />
 
       {/* Floating AI Travel Concierge Assistant */}
       <AiChatbot currentView={activeView} onNavigate={handleViewChange} />

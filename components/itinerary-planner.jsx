@@ -286,7 +286,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
     setItinerary,
     addSpotToItinerary,
     removeSpotFromItinerary,
-    updateSpotCostInItinerary
+    updateSpotCostInItinerary,
+    saveCurrentTrip
   } = useTrip()
 
   // Main Workspace State
@@ -646,7 +647,19 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
             <span className="font-medium text-foreground text-sm">Itinerary Planner Workspace</span>
           </div>
 
-
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => {
+                saveCurrentTrip()
+                setSaved(true)
+                setTimeout(() => setSaved(false), 3000)
+              }}
+              className="rounded-xl bg-amber-400 text-[#0D2B45] hover:bg-amber-300 font-extrabold text-xs px-4 py-2 shadow flex items-center gap-2 cursor-pointer"
+            >
+              <Bookmark className="h-4 w-4" />
+              {saved ? "Saved! Opening Report Pass..." : "Save Trip & Offline Pass"}
+            </Button>
+          </div>
         </div>
 
         {/* Title Header & Live Search Bar */}

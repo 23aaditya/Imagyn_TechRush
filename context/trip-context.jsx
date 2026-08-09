@@ -119,6 +119,40 @@ export function TripProvider({ children }) {
   // Centralized Itinerary State
   const [itinerary, setItinerary] = useState([])
 
+  // SAVED TRIPS & OFFLINE REPORT STATE
+  const [savedTrips, setSavedTrips] = useState([])
+  const [savedTripsModalOpen, setSavedTripsModalOpen] = useState(false)
+  const [activeReportTrip, setActiveReportTrip] = useState(null)
+
+  // Load saved trips from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("tripnest_saved_trips")
+      if (stored) {
+        setSavedTrips(JSON.parse(stored))
+      } else {
+        // Fallback default saved trip for quick demo
+        const defaultSaved = [
+          {
+            id: "trip-goa-demo",
+            destination: "Goa (India)",
+            startDate: "2026-08-15",
+            endDate: "2026-08-17",
+            days: 3,
+            travelers: 2,
+            stayTier: "Standard",
+            totalBudget: 18500,
+            itinerary: initialItinerary,
+            createdAt: "Aug 15, 2026"
+          }
+        ]
+        setSavedTrips(defaultSaved)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }, [])
+
   // Manual Category Budget Overrides (User can override in Budget Planner)
   const [budgetOverrides, setBudgetOverrides] = useState({})
 
@@ -437,6 +471,52 @@ export function TripProvider({ children }) {
     setActualExpenses((prev) => prev.filter((item) => item.id !== id))
   }
 
+  // Save Trip & Delete Trip Handlers
+  const saveCurrentTrip = () => {
+    const destName = destination || "Goa (India)"
+    const newTrip = {
+      id: `trip-${Date.now()}`,
+      destination: destName,
+      startDate: startDate || "2026-08-15",
+      endDate: endDate || "2026-08-17",
+      days: days || 3,
+      travelers: travelers || 2,
+      stayTier: stayTier || "Standard",
+      totalBudget: totalBudget || 18500,
+      itinerary: itinerary && itinerary.length > 0 ? itinerary : initialItinerary,
+      createdAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    }
+
+    setSavedTrips((prev) => {
+      const filtered = prev.filter((t) => t.destination.toLowerCase() !== destName.toLowerCase())
+      const updated = [newTrip, ...filtered]
+      try {
+        localStorage.setItem("tripnest_saved_trips", JSON.stringify(updated))
+      } catch (e) {
+        console.error(e)
+      }
+      return updated
+    })
+
+    setActiveReportTrip(newTrip)
+    return newTrip
+  }
+
+  const deleteSavedTrip = (id) => {
+    setSavedTrips((prev) => {
+      const updated = prev.filter((t) => t.id !== id)
+      try {
+        localStorage.setItem("tripnest_saved_trips", JSON.stringify(updated))
+      } catch (e) {
+        console.error(e)
+      }
+      return updated
+    })
+    if (activeReportTrip && activeReportTrip.id === id) {
+      setActiveReportTrip(null)
+    }
+  }
+
   const value = {
     destination,
     setDestination,
@@ -460,6 +540,15 @@ export function TripProvider({ children }) {
     addSpotToItinerary,
     removeSpotFromItinerary,
     updateSpotCostInItinerary,
+
+    savedTrips,
+    setSavedTrips,
+    savedTripsModalOpen,
+    setSavedTripsModalOpen,
+    activeReportTrip,
+    setActiveReportTrip,
+    saveCurrentTrip,
+    deleteSavedTrip,
 
     budgetOverrides,
     setBudgetCategoryOverride,

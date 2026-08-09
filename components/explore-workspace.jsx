@@ -129,7 +129,7 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
       </div>
 
       <div ref={scrollRef}
-        className="flex items-start gap-8 overflow-x-auto overflow-y-visible pt-4 pb-6 px-4 explore-scrollbar-hide"
+        className="flex items-start gap-8 overflow-x-auto py-20 px-6 explore-scrollbar-hide"
         style={{ scrollbarWidth: "none" }}>
         {destinations.map((item) => (
           <ArchCard
@@ -647,8 +647,8 @@ export function ExploreWorkspace({ onBack, onSelectDestination }) {
         {/* Active Filter Pills */}
         <FilterPills activeFilters={activeFilters} setActiveFilters={setActiveFilters} />
 
-        {/* Destinations Grid */}
-        <div className="rounded-3xl border border-border/80 bg-gradient-to-b from-card/80 to-card p-6 shadow-xl backdrop-blur-xl overflow-visible">
+        {/* Destinations Grid (Free-Floating Cards without Restricting White Canvas Box) */}
+        <div className="py-4 space-y-4 overflow-visible">
           {filteredDestinations.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}

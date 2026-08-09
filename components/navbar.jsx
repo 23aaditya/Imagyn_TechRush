@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Moon, Sun, Menu, X, Sparkles, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useTrip } from "@/context/trip-context"
 
 const navLinks = [
   { label: "Overview", view: "home" },
@@ -16,6 +17,7 @@ const navLinks = [
 ]
 
 export function Navbar({ activeView = "home", setActiveView, user, onLogout, onOpenAuth }) {
+  const { setSavedTripsModalOpen } = useTrip()
   const [scrolled, setScrolled] = useState(false)
   const [isDark, setIsDark] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -148,7 +150,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                     <button
                       onClick={() => {
                         setUserDropdown(false)
-                        handleNavClick("itinerary")
+                        setSavedTripsModalOpen(true)
                       }}
                       className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-white/80 hover:bg-white/15 hover:text-white"
                     >
