@@ -116,6 +116,21 @@ export function TripProvider({ children }) {
   const [stayTier, setStayTier] = useState("Standard") // Economy | Standard | Luxury
   const [customTargetBudget, setCustomTargetBudget] = useState(null) // Custom entered budget amount in INR (₹)
 
+  // Centralized Selected Package State
+  const [selectedPackage, setSelectedPackage] = useState(null)
+
+  // Load selected package from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedPkg = localStorage.getItem("tripnest_selected_package")
+      if (savedPkg) {
+        setSelectedPackage(JSON.parse(savedPkg))
+      }
+    } catch (e) {
+      console.error("Failed to load saved package:", e)
+    }
+  }, [])
+
   // Centralized Itinerary State
   const [itinerary, setItinerary] = useState([])
 
@@ -441,7 +456,210 @@ export function TripProvider({ children }) {
     })
   }
 
-  // 6. Expense Tracker Handlers
+  // Package Cost and Additional Expenses Calculation
+  const packageBaseCost = useMemo(() => {
+    if (!selectedPackage) return 0
+    return selectedPackage.numericPrice || parseInt(String(selectedPackage.price).replace(/[^\d]/g, "")) || 0
+  }, [selectedPackage])
+
+  const additionalExpenses = useMemo(() => {
+    if (!selectedPackage) return 0
+    return allItinerarySpots
+      .filter((s) => !s.isFromPackage)
+      .reduce((sum, s) => sum + (s.numericCost || parseInt(String(s.cost).replace(/[^\d]/g, "")) || 0), 0)
+  }, [allItinerarySpots, selectedPackage])
+
+  const estimatedTotalTripCost = useMemo(() => {
+    if (selectedPackage) {
+      return packageBaseCost + additionalExpenses
+    }
+    return totalBudget
+  }, [selectedPackage, packageBaseCost, additionalExpenses, totalBudget])
+
+  // Select Package and Auto-Generate Day-Wise Itinerary
+  const selectPackageAndBuildTrip = (pkg) => {
+    if (!pkg) return
+    setSelectedPackage(pkg)
+    try {
+      localStorage.setItem("tripnest_selected_package", JSON.stringify(pkg))
+    } catch (e) {
+      console.error(e)
+    }
+
+    if (pkg.destination) {
+      setDestination(pkg.destination)
+    }
+    const totalDays = pkg.durationDays || pkg.days || 3
+    setDays(totalDays)
+
+    let newItinerary = []
+
+    if (pkg.dayWiseItinerary && Array.isArray(pkg.dayWiseItinerary) && pkg.dayWiseItinerary.length > 0) {
+      newItinerary = pkg.dayWiseItinerary.map((d, dIdx) => ({
+        day: dIdx + 1,
+        date: d.date || `Day ${dIdx + 1}`,
+        title: d.title || `Day ${dIdx + 1}: ${pkg.name || pkg.destination}`,
+        activities: (d.activities || []).map((act, aIdx) => ({
+          id: act.id || `pkg-${pkg.id || 'custom'}-d${dIdx + 1}-a${aIdx + 1}`,
+          time: act.time || (aIdx === 0 ? "09:00 AM" : aIdx === 1 ? "01:30 PM" : "06:00 PM"),
+          openingHours: act.openingHours || "08:00 AM - 08:00 PM",
+          type: act.type || (aIdx === 0 ? "Sightseeing" : aIdx === 1 ? "Activities" : "Food"),
+          category: act.category || "Package Attraction",
+          title: act.title,
+          desc: act.desc || `Included in ${pkg.name}`,
+          cost: act.cost || "Included in Package",
+          numericCost: act.isExtra ? (act.numericCost || parseInt(String(act.cost).replace(/[^\d]/g, "")) || 0) : 0,
+          isFromPackage: true,
+          lat: act.lat || (15.5 + dIdx * 0.02),
+          lng: act.lng || (73.7 + aIdx * 0.02),
+          images: act.images || [pkg.image || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"]
+        }))
+      }))
+    } else {
+      // Generate standard day-wise itinerary using package attractions and activities
+      const attractions = pkg.attractionsList || pkg.attractions || ["Popular Sightseeing Spot", "Heritage Landmark", "Scenic Viewpoint"]
+      const activities = pkg.activitiesList || pkg.activities || ["Water Activity / Trek", "Local Cultural Trail", "Sunset Cruise"]
+      const img = pkg.image || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+
+      for (let d = 1; d <= totalDays; d++) {
+        let dayActivities = []
+
+        if (d === 1) {
+          dayActivities = [
+            {
+              id: `pkg-${pkg.id}-d1-a1`,
+              time: "09:30 AM",
+              openingHours: "08:00 AM - 08:00 PM",
+              type: "Sightseeing",
+              category: "Accommodation",
+              title: `Arrival & Hotel Check-in (${pkg.hotelCategory || "Resort"})`,
+              desc: `Private transport pick-up & check-in at your ${pkg.hotelCategory || "hotel"}.`,
+              cost: "Included in Package",
+              numericCost: 0,
+              isFromPackage: true,
+              images: [img]
+            },
+            {
+              id: `pkg-${pkg.id}-d1-a2`,
+              time: "02:00 PM",
+              openingHours: "09:00 AM - 06:30 PM",
+              type: "Sightseeing",
+              category: "Activities",
+              title: typeof attractions[0] === "string" ? attractions[0] : attractions[0]?.name || `${pkg.destination} Primary Attraction`,
+              desc: `Explore ${typeof attractions[0] === "string" ? attractions[0] : attractions[0]?.name || "the top attraction"} included in your package.`,
+              cost: "Included in Package",
+              numericCost: 0,
+              isFromPackage: true,
+              images: [img]
+            },
+            {
+              id: `pkg-${pkg.id}-d1-a3`,
+              time: "07:30 PM",
+              openingHours: "07:00 PM - 11:00 PM",
+              type: "Food",
+              category: "Food & Dining",
+              title: `Welcome Dinner (${pkg.meals || "Included Meals"})`,
+              desc: `Enjoy delicious regional dining included in your package plan.`,
+              cost: "Included in Package",
+              numericCost: 0,
+              isFromPackage: true,
+              images: ["https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&auto=format&fit=crop&q=80"]
+            }
+          ]
+        } else if (d === 2) {
+          dayActivities = [
+            {
+              id: `pkg-${pkg.id}-d2-a1`,
+              time: "09:00 AM",
+              openingHours: "08:00 AM - 06:00 PM",
+              type: "Sightseeing",
+              category: "Activities",
+              title: typeof attractions[1] === "string" ? attractions[1] : attractions[1]?.name || `${pkg.destination} Heritage Sight`,
+              desc: `Morning sightseeing tour included in package itinerary.`,
+              cost: "Included in Package",
+              numericCost: 0,
+              isFromPackage: true,
+              images: [img]
+            },
+            {
+              id: `pkg-${pkg.id}-d2-a2`,
+              time: "01:30 PM",
+              openingHours: "10:00 AM - 07:00 PM",
+              type: "Activities",
+              category: "Activities",
+              title: typeof activities[0] === "string" ? activities[0] : activities[0]?.name || `${pkg.destination} Water Sports / Adventure`,
+              desc: `Curated package activity experience with all gear included.`,
+              cost: "Included in Package",
+              numericCost: 0,
+              isFromPackage: true,
+              images: [img]
+            },
+            {
+              id: `pkg-${pkg.id}-d2-a3`,
+              time: "06:00 PM",
+              openingHours: "05:00 PM - 09:00 PM",
+              type: "Sunset",
+              category: "Activities",
+              title: typeof attractions[2] === "string" ? attractions[2] : attractions[2]?.name || `${pkg.destination} Sunset Point`,
+              desc: `Relaxing sunset experience and evening leisure.`,
+              cost: "Included in Package",
+              numericCost: 0,
+              isFromPackage: true,
+              images: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80"]
+            }
+          ]
+        } else {
+          dayActivities = [
+            {
+              id: `pkg-${pkg.id}-d${d}-a1`,
+              time: "10:00 AM",
+              openingHours: "09:00 AM - 08:00 PM",
+              type: "Sightseeing",
+              category: "Shopping",
+              title: typeof attractions[3] === "string" ? attractions[3] : attractions[3]?.name || `${pkg.destination} Heritage Market`,
+              desc: `Guided local market visit and souvenir shopping.`,
+              cost: "Included in Package",
+              numericCost: 0,
+              isFromPackage: true,
+              images: [img]
+            },
+            {
+              id: `pkg-${pkg.id}-d${d}-a2`,
+              time: "02:00 PM",
+              openingHours: "12:00 PM - 05:00 PM",
+              type: "Food",
+              category: "Food & Dining",
+              title: `Local Culinary Experience & Departure Transport`,
+              desc: `Final local meal and scheduled transfer to airport/station.`,
+              cost: "Included in Package",
+              numericCost: 0,
+              isFromPackage: true,
+              images: ["https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=80"]
+            }
+          ]
+        }
+
+        newItinerary.push({
+          day: d,
+          date: `Day ${d}`,
+          title: `Day ${d}: ${pkg.name} — ${d === 1 ? "Arrival & Highlights" : d === 2 ? "Adventure & Culture" : "Exploration & Departure"}`,
+          activities: dayActivities
+        })
+      }
+    }
+
+    setItinerary(newItinerary)
+  }
+
+  const clearSelectedPackage = () => {
+    setSelectedPackage(null)
+    try {
+      localStorage.removeItem("tripnest_selected_package")
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   const addActualExpense = (expense) => {
     const newEntry = {
       id: Date.now(),
@@ -532,6 +750,14 @@ export function TripProvider({ children }) {
     setStayTier,
     customTargetBudget,
     setCustomTargetBudget,
+
+    selectedPackage,
+    setSelectedPackage,
+    selectPackageAndBuildTrip,
+    clearSelectedPackage,
+    packageBaseCost,
+    additionalExpenses,
+    estimatedTotalTripCost,
 
     itinerary,
     setItinerary,
