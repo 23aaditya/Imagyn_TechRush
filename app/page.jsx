@@ -18,6 +18,7 @@ import { Footer } from "@/components/footer"
 import { AuthModal } from "@/components/auth-modal"
 import { ItineraryPlanner } from "@/components/itinerary-planner"
 import { ExploreWorkspace } from "@/components/explore-workspace"
+import { ProfileWorkspace } from "@/components/profile-workspace"
 import { HomeBackground } from "@/components/home-background"
 import { AiChatbot } from "@/components/ai-chatbot"
 
@@ -75,8 +76,8 @@ function MainApp() {
       setDestination(pendingDestination)
       setPendingDestination(null)
     }
-    // Always jump straight to Overview (Itinerary Planner) workspace after login/signup
-    setActiveView("itinerary")
+    // Respect pendingView if available, otherwise default to requested view or profile
+    setActiveView(pendingView || "profile")
     setPendingView(null)
   }
 
@@ -191,6 +192,13 @@ function MainApp() {
       {activeView === "packages" && (
         <div className="relative z-10 animate-in fade-in duration-300 pt-20">
           <PackageComparison onNavigateView={handleViewChange} onSelectDestination={handleSelectDestination} onOpenAuth={openAuth} />
+        </div>
+      )}
+
+      {/* Dedicated Workspace: User Profile & Passport */}
+      {activeView === "profile" && (
+        <div className="relative z-10 animate-in fade-in duration-300">
+          <ProfileWorkspace onBack={() => handleViewChange("home")} />
         </div>
       )}
 

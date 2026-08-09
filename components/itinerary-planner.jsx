@@ -33,7 +33,10 @@ import {
   Send,
   SlidersHorizontal,
   Star,
-  Plus
+  Plus,
+  CheckSquare,
+  FileText,
+  Check
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
@@ -308,12 +311,34 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
   const [isMapVisible, setIsMapVisible] = useState(false)
   const [nearbyCategory, setNearbyCategory] = useState(null)
 
-  // Search & Auto-Suggest State
+  // Search & Auto-Suggest & Mini Google Tab Widget State
   const [searchQuery, setSearchQuery] = useState("")
   const [searchSuggestions, setSearchSuggestions] = useState([])
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   const [miniGoogleOpen, setMiniGoogleOpen] = useState(false)
-  const [miniGoogleResults, setMiniGoogleResults] = useState([])
+  const [miniGoogleTabQuery, setMiniGoogleTabQuery] = useState("")
+  const [activeGoogleTabUrl, setActiveGoogleTabUrl] = useState("https://www.google.com/search?q=top+attractions+in+goa&igu=1")
+
+  // ITINERARY CHECKLIST STATE (Destination-Aware Presets)
+  const [checklistOpen, setChecklistOpen] = useState(false)
+  const [newChecklistItem, setNewChecklistItem] = useState("")
+  const [checklistItems, setChecklistItems] = useState([
+    { id: 1, text: "Sunscreen SPF 50 & Beach Lotion 🧴", checked: false, category: "Goa Presets" },
+    { id: 2, text: "Polarized Sunglasses & Beach Hat 👒", checked: true, category: "Goa Presets" },
+    { id: 3, text: "Waterproof Phone Pouch & Flip Flops 🩴", checked: false, category: "Goa Presets" },
+    { id: 4, text: "Passport / Government ID Proof 🪪", checked: true, category: "Essential Documents" },
+    { id: 5, text: "10,000mAh Power Bank & Fast Charger ⚡", checked: true, category: "Electronics" },
+    { id: 6, text: "Emergency Cash & Driving License 💳", checked: false, category: "Essential Documents" }
+  ])
+
+  // PERSONAL NOTES SCRATCHPAD STATE
+  const [notesOpen, setNotesOpen] = useState(false)
+  const [newNoteTitle, setNewNoteTitle] = useState("")
+  const [newNoteText, setNewNoteText] = useState("")
+  const [personalNotes, setPersonalNotes] = useState([
+    { id: 101, title: "Scooter Rental Agency Contact", text: "Rahul Scooter Rental Anjuna: +91 98221 54321. Deposit ₹1000 + Driving License.", date: "Aug 14" },
+    { id: 102, title: "Thalassa Sunset Table Reservation", text: "Booked cliffside table for Day 1 at 06:15 PM under name Aaditya.", date: "Aug 15" }
+  ])
 
   // Bot State
   const [botOpen, setBotOpen] = useState(false)
@@ -325,7 +350,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
   ])
   const [botInput, setBotInput] = useState("")
 
-  // Synchronize itinerary whenever destination changes
+  // Synchronize itinerary & load destination-aware checklist presets
   useEffect(() => {
     if (destination) {
       const isAlreadyMatching = itinerary && itinerary.length > 0 && itinerary[0]?.title?.toLowerCase().includes(destination.toLowerCase())
@@ -334,6 +359,36 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         setItinerary(newPlan)
         setActiveDayIndex(0)
       }
+
+      // Load destination-specific checklist items
+      const destLower = destination.toLowerCase()
+      let presets = []
+      if (destLower.includes("goa") || destLower.includes("bali") || destLower.includes("maldives") || destLower.includes("kerala") || destLower.includes("thailand")) {
+        presets = [
+          { id: Date.now() + 1, text: "Sunscreen SPF 50 & Beach Lotion 🧴", checked: false, category: `${destination} Coastal` },
+          { id: Date.now() + 2, text: "Polarized Sunglasses & Wide Straw Hat 👒", checked: true, category: `${destination} Coastal` },
+          { id: Date.now() + 3, text: "Waterproof Phone Pouch & Flip Flops 🩴", checked: false, category: `${destination} Coastal` }
+        ]
+      } else if (destLower.includes("manali") || destLower.includes("ladakh") || destLower.includes("shimla") || destLower.includes("switzerland")) {
+        presets = [
+          { id: Date.now() + 1, text: "Heavy Puffer Jacket & Thermal Innerwear 🧥", checked: false, category: `${destination} Alpine` },
+          { id: Date.now() + 2, text: "Waterproof Snow Boots & Woolen Socks 🥾", checked: true, category: `${destination} Alpine` },
+          { id: Date.now() + 3, text: "Woolen Beanie, Gloves & Cold Lip Balm 🧤", checked: false, category: `${destination} Alpine` }
+        ]
+      } else {
+        presets = [
+          { id: Date.now() + 1, text: "Comfortable Heritage Walking Shoes 👟", checked: false, category: `${destination} Culture` },
+          { id: Date.now() + 2, text: "Universal Power Adapter & Camera 📷", checked: true, category: `${destination} Culture` },
+          { id: Date.now() + 3, text: "City Transit Card & Museum Passes 🎟️", checked: false, category: `${destination} Culture` }
+        ]
+      }
+
+      setChecklistItems([
+        ...presets,
+        { id: Date.now() + 4, text: "Government ID / Passport Copies 🪪", checked: true, category: "Essentials" },
+        { id: Date.now() + 5, text: "10,000mAh Power Bank & Charger ⚡", checked: true, category: "Electronics" },
+        { id: Date.now() + 6, text: "Emergency Cash & Driving License 💳", checked: false, category: "Essentials" }
+      ])
     } else {
       setItinerary([])
     }
@@ -605,64 +660,43 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
             </p>
           </div>
 
-          {/* Search Bar with Mini Google Integration (Req 2) */}
-          <div className="relative min-w-[290px] sm:min-w-[360px]">
-            <form onSubmit={handleGoogleSearchSubmit} className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search more places with Google..."
-                value={searchQuery}
-                onChange={(e) => handleSearchInputChange(e.target.value)}
-                onFocus={() => searchQuery.trim() && setShowSearchDropdown(true)}
-                className="w-full rounded-2xl border border-border bg-card pl-10 pr-24 py-2.5 text-xs font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm"
-              />
+          {/* Single Streamlined Search Google Bar */}
+          <div className="relative min-w-[290px] sm:min-w-[380px]">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                if (!searchQuery.trim()) return
+                const query = encodeURIComponent(searchQuery.trim())
+                setActiveGoogleTabUrl(`https://www.google.com/search?q=${query}&igu=1`)
+                setMiniGoogleTabQuery(searchQuery.trim())
+                setShowSearchDropdown(false)
+                setMiniGoogleOpen(true)
+              }}
+              className="relative flex items-center gap-2"
+            >
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search Google live for any spot or place..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearchInputChange(e.target.value)}
+                  onFocus={() => searchQuery.trim() && setShowSearchDropdown(true)}
+                  className="w-full rounded-2xl border border-border bg-card pl-10 pr-4 py-2.5 text-xs font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm"
+                />
+              </div>
+
               <Button
                 type="submit"
                 size="sm"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-xl bg-primary text-[11px] font-semibold px-3 py-1 text-primary-foreground shadow"
+                className="rounded-2xl bg-amber-400 text-[#0D2B45] hover:bg-amber-300 font-extrabold text-xs px-4 py-2.5 shadow flex items-center gap-1.5 shrink-0 cursor-pointer"
+                title="Search Google Live"
               >
-                Search
+                <Globe className="h-4 w-4" />
+                Google
               </Button>
             </form>
 
-            {/* Live Search Suggestions Dropdown */}
-            {showSearchDropdown && searchSuggestions.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-border bg-card shadow-2xl p-2 space-y-1 max-h-72 overflow-y-auto"
-              >
-                <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                  Destination Suggestions ({searchSuggestions.length})
-                </div>
-                {searchSuggestions.map((dest) => (
-                  <div
-                    key={dest.id}
-                    onClick={() => handleSelectSearchDestination(dest)}
-                    className="flex items-center justify-between p-2 rounded-xl hover:bg-accent cursor-pointer transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={dest.image}
-                        alt={dest.name}
-                        className="h-10 w-10 rounded-lg object-cover border"
-                      />
-                      <div>
-                        <div className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                          {dest.name}
-                          <span className="text-[10px] font-medium text-muted-foreground">({dest.country})</span>
-                        </div>
-                        <span className="text-[10px] text-muted-foreground">{dest.subtitle}</span>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                      {dest.startingBudget}
-                    </span>
-                  </div>
-                ))}
-              </motion.div>
-            )}
           </div>
         </div>
 
@@ -793,43 +827,77 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                       <motion.div
                         initial={{ opacity: 0, y: 5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-3 p-4 rounded-2xl border border-border bg-background shadow-xl space-y-3"
+                        className="mt-3 p-4 rounded-2xl border border-border bg-background shadow-2xl space-y-3"
                       >
-                        <div className="flex justify-between items-center text-xs font-bold text-foreground">
-                          <span>Select Date Range</span>
-                          <Button variant="ghost" size="sm" onClick={() => setCalendarOpen(false)} className="h-6 w-6 p-0">
+                        <div className="flex justify-between items-center text-xs font-bold text-foreground border-b border-border/60 pb-2">
+                          <span className="flex items-center gap-1.5 text-primary">
+                            <Calendar className="h-4 w-4" />
+                            Single Range Calendar (August 2026)
+                          </span>
+                          <Button variant="ghost" size="sm" onClick={() => setCalendarOpen(false)} className="h-6 w-6 p-0 rounded-full">
                             <X className="h-3.5 w-3.5" />
                           </Button>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <span className="text-[10px] text-muted-foreground uppercase font-semibold">Start Date</span>
-                            <input
-                              type="date"
-                              value={startDate}
-                              onChange={(e) => setStartDate(e.target.value)}
-                              className="mt-1 w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground outline-none"
-                            />
+                        {/* Single Month Grid (31 Days) */}
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-7 text-center text-[10px] font-extrabold text-muted-foreground uppercase">
+                            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
                           </div>
-                          <div>
-                            <span className="text-[10px] text-muted-foreground uppercase font-semibold">End Date</span>
-                            <input
-                              type="date"
-                              value={endDate}
-                              onChange={(e) => setEndDate(e.target.value)}
-                              className="mt-1 w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground outline-none"
-                            />
+
+                          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold">
+                            {/* Empty offset cells for August 2026 (Starts on Saturday) */}
+                            <span /><span /><span /><span /><span /><span />
+
+                            {Array.from({ length: 31 }, (_, i) => {
+                              const dayNum = i + 1
+                              const startDayNum = parseInt(startDate.split("-")[2] || "15", 10)
+                              const endDayNum = parseInt(endDate.split("-")[2] || "17", 10)
+
+                              const isStart = dayNum === startDayNum
+                              const isEnd = dayNum === endDayNum
+                              const isInRange = dayNum > startDayNum && dayNum < endDayNum
+
+                              return (
+                                <button
+                                  key={dayNum}
+                                  type="button"
+                                  onClick={() => {
+                                    if (dayNum < startDayNum) {
+                                      setStartDate(`2026-08-${String(dayNum).padStart(2, "0")}`)
+                                      setDays(Math.max(1, endDayNum - dayNum + 1))
+                                    } else {
+                                      setEndDate(`2026-08-${String(dayNum).padStart(2, "0")}`)
+                                      setDays(Math.max(1, dayNum - startDayNum + 1))
+                                    }
+                                  }}
+                                  className={`py-1.5 text-xs font-bold transition-all ${
+                                    isStart || isEnd
+                                      ? "bg-[#0D2B45] text-amber-400 rounded-lg font-extrabold shadow-md scale-105"
+                                      : isInRange
+                                      ? "bg-amber-400/25 text-[#0D2B45] font-bold rounded-sm border-y border-amber-400/40"
+                                      : "hover:bg-accent text-foreground rounded-lg"
+                                  }`}
+                                >
+                                  {dayNum}
+                                </button>
+                              )
+                            })}
                           </div>
                         </div>
 
-                        <Button
-                          size="sm"
-                          onClick={() => setCalendarOpen(false)}
-                          className="w-full rounded-xl bg-primary text-xs font-semibold text-primary-foreground py-1.5"
-                        >
-                          Confirm Range
-                        </Button>
+                        <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-amber-500 bg-amber-400/10 px-2.5 py-0.5 rounded-full">
+                            Aug {startDate.split("-")[2]} → Aug {endDate.split("-")[2]} ({days} Days Tube)
+                          </span>
+                          <Button
+                            size="sm"
+                            onClick={() => setCalendarOpen(false)}
+                            className="rounded-xl bg-[#0D2B45] text-xs font-bold text-white px-4 py-1.5 hover:bg-[#12395b]"
+                          >
+                            Set Range
+                          </Button>
+                        </div>
                       </motion.div>
                     )}
                   </div>
@@ -1303,15 +1371,15 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
       </div>
 
-      {/* FLOATING CORNER GLOBE BUTTON / PLAN ITINERARY TOGGLE (In Bottom-Left Corner) */}
+      {/* FLOATING CORNER CONTROLS: MAP TOGGLE, CHECKLIST & PERSONAL NOTES (Req 4) */}
       <div className="fixed bottom-6 left-6 z-50 flex items-center gap-3">
         {!isMapVisible ? (
           <Button
             onClick={() => setIsMapVisible(true)}
-            className="rounded-full h-14 w-14 bg-blue-600 text-white shadow-2xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-background animate-bounce-slow"
+            className="rounded-full h-14 w-14 bg-[#0D2B45] text-white shadow-2xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-background"
             title="Open Interactive Map"
           >
-            <Globe className="h-7 w-7" />
+            <Globe className="h-6 w-6 text-amber-400" />
           </Button>
         ) : (
           <Button
@@ -1322,62 +1390,321 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
             Plan Itinerary Mode
           </Button>
         )}
+
+        {/* Checklist Button */}
+        <Button
+          onClick={() => setChecklistOpen(true)}
+          className="rounded-full h-14 w-14 bg-white text-[#0D2B45] border-2 border-amber-400/40 shadow-2xl hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
+          title="Itinerary Checklist & Packing List"
+        >
+          <CheckSquare className="h-6 w-6 text-amber-500" />
+        </Button>
+
+        {/* Personal Notes Button */}
+        <Button
+          onClick={() => setNotesOpen(true)}
+          className="rounded-full h-14 w-14 bg-white text-[#0D2B45] border-2 border-blue-400/40 shadow-2xl hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
+          title="Personal Travel Reference Notes"
+        >
+          <FileText className="h-6 w-6 text-blue-600" />
+        </Button>
       </div>
 
-      {/* Mini Google Search Popup Modal */}
-      {miniGoogleOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-2xl rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto"
-          >
-            <div className="flex items-center justify-between border-b border-border/60 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold font-heading text-primary">Google</span>
-                <span className="text-xs text-muted-foreground">Search Results</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMiniGoogleOpen(false)}
-                className="h-8 w-8 p-0 rounded-full"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="space-y-4">
-              {miniGoogleResults.map((res, i) => (
-                <div key={i} className="rounded-2xl border border-border/60 p-4 bg-background/60 space-y-2">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <span className="text-[10px] text-muted-foreground truncate block">{res.url}</span>
-                      <h4 className="font-heading text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline">
-                        {res.title}
-                      </h4>
-                    </div>
-                    <span className="text-xs font-semibold text-emerald-600 shrink-0">{res.rating}</span>
-                  </div>
-
-                  <p className="text-xs text-muted-foreground leading-relaxed">{res.snippet}</p>
-
-                  <div className="pt-2 flex items-center justify-between">
-                    <img src={res.img} alt="Thumbnail" className="h-12 w-20 object-cover rounded-lg border" />
-                    <Button
-                      size="sm"
-                      onClick={() => addSearchedPlaceToItinerary(searchQuery)}
-                      className="rounded-xl bg-primary text-xs font-semibold text-primary-foreground px-3 py-1"
-                    >
-                      + Add to Day {activeDayIndex + 1}
-                    </Button>
-                  </div>
+      {/* ─────────────────────────────────────────────
+          ITINERARY CHECKLIST MODAL (Destination-Aware Presets)
+         ───────────────────────────────────────────── */}
+      <AnimatePresence>
+        {checklistOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-neutral-200 bg-white text-neutral-900 shadow-2xl p-6 sm:p-8 space-y-5"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
+                <div>
+                  <h3 className="font-heading text-xl font-extrabold text-[#0D2B45] flex items-center gap-2">
+                    <CheckSquare className="h-5 w-5 text-amber-500" />
+                    Itinerary & Packing Checklist
+                  </h3>
+                  <p className="text-xs text-neutral-500 mt-0.5 font-medium">
+                    Auto-tuned for <span className="font-bold text-[#0D2B45]">{destination || "Trip"}</span>
+                  </p>
                 </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      )}
+                <button
+                  onClick={() => setChecklistOpen(false)}
+                  className="rounded-full p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Add Custom Item Form */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (!newChecklistItem.trim()) return
+                  setChecklistItems([
+                    ...checklistItems,
+                    { id: Date.now(), text: newChecklistItem.trim(), checked: false, category: "Custom Items" }
+                  ])
+                  setNewChecklistItem("")
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="text"
+                  placeholder={`Add new packing item for ${destination || "trip"}...`}
+                  value={newChecklistItem}
+                  onChange={(e) => setNewChecklistItem(e.target.value)}
+                  className="flex-1 rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-xs text-neutral-900 outline-none focus:border-[#0D2B45] focus:bg-white"
+                />
+                <Button type="submit" className="rounded-2xl bg-[#0D2B45] text-white px-4 py-2.5 text-xs font-bold hover:bg-[#12395b]">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </form>
+
+              {/* Checklist Items List */}
+              <div className="max-h-72 overflow-y-auto space-y-2 pr-1">
+                {checklistItems.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      setChecklistItems(
+                        checklistItems.map((i) => (i.id === item.id ? { ...i, checked: !i.checked } : i))
+                      )
+                    }}
+                    className={`flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer ${
+                      item.checked
+                        ? "bg-emerald-50 border-emerald-200 text-emerald-900 opacity-75"
+                        : "bg-neutral-50/80 border-neutral-200 text-neutral-900 hover:bg-white hover:shadow-md"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`h-5 w-5 rounded-lg border flex items-center justify-center transition-colors ${
+                        item.checked ? "bg-emerald-500 border-emerald-500 text-white" : "border-neutral-300 bg-white"
+                      }`}>
+                        {item.checked && <Check className="h-3.5 w-3.5" />}
+                      </div>
+                      <div>
+                        <span className={`text-xs font-semibold block ${item.checked ? "line-through" : ""}`}>
+                          {item.text}
+                        </span>
+                        <span className="text-[9px] font-bold text-neutral-400">{item.category}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setChecklistItems(checklistItems.filter((i) => i.id !== item.id))
+                      }}
+                      className="text-neutral-400 hover:text-rose-500 p-1"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ─────────────────────────────────────────────
+          PERSONAL NOTES SCRATCHPAD MODAL
+         ───────────────────────────────────────────── */}
+      <AnimatePresence>
+        {notesOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-neutral-200 bg-white text-neutral-900 shadow-2xl p-6 sm:p-8 space-y-5"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
+                <div>
+                  <h3 className="font-heading text-xl font-extrabold text-[#0D2B45] flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-blue-600" />
+                    Personal Reference Notes
+                  </h3>
+                  <p className="text-xs text-neutral-500 mt-0.5 font-medium">
+                    Quick travel notebook for flight PNRs, hotel notes & contacts
+                  </p>
+                </div>
+                <button
+                  onClick={() => setNotesOpen(false)}
+                  className="rounded-full p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Add New Note Form */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (!newNoteTitle.trim()) return
+                  setPersonalNotes([
+                    {
+                      id: Date.now(),
+                      title: newNoteTitle.trim(),
+                      text: newNoteText.trim() || "No extra note content.",
+                      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                    },
+                    ...personalNotes
+                  ])
+                  setNewNoteTitle("")
+                  setNewNoteText("")
+                }}
+                className="space-y-3 bg-neutral-50 p-3.5 rounded-2xl border border-neutral-200"
+              >
+                <input
+                  type="text"
+                  placeholder="Note Title (e.g. Driver Phone Number...)"
+                  value={newNoteTitle}
+                  onChange={(e) => setNewNoteTitle(e.target.value)}
+                  className="w-full rounded-xl border border-neutral-200 bg-white p-2.5 text-xs font-bold text-neutral-900 outline-none focus:border-[#0D2B45]"
+                />
+                <textarea
+                  placeholder="Note Details / References..."
+                  value={newNoteText}
+                  onChange={(e) => setNewNoteText(e.target.value)}
+                  rows={2}
+                  className="w-full rounded-xl border border-border bg-white p-2.5 text-xs text-neutral-800 outline-none focus:border-[#0D2B45]"
+                />
+                <Button type="submit" className="w-full rounded-xl bg-[#0D2B45] text-white py-2 text-xs font-bold hover:bg-[#12395b]">
+                  Save Note
+                </Button>
+              </form>
+
+              {/* Notes List */}
+              <div className="max-h-60 overflow-y-auto space-y-3 pr-1">
+                {personalNotes.map((note) => (
+                  <div key={note.id} className="p-3.5 rounded-2xl border border-neutral-200 bg-white shadow-sm space-y-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-xs text-[#0D2B45]">{note.title}</h4>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-neutral-400 font-semibold">{note.date}</span>
+                        <button
+                          type="button"
+                          onClick={() => setPersonalNotes(personalNotes.filter((n) => n.id !== note.id))}
+                          className="text-neutral-400 hover:text-rose-500 p-0.5"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-neutral-600 leading-relaxed">{note.text}</p>
+                  </div>
+                ))}
+              </div>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ─────────────────────────────────────────────
+          MINIATURE SQUARE GOOGLE SEARCH TAB WIDGET (Active & Non-Blocking)
+         ───────────────────────────────────────────── */}
+      <AnimatePresence>
+        {miniGoogleOpen && (
+          <div className="fixed top-24 right-6 z-40 w-full max-w-xl h-[560px] pointer-events-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="w-full h-full rounded-3xl border-2 border-[#0D2B45]/20 bg-white text-neutral-900 shadow-2xl overflow-hidden flex flex-col"
+            >
+              {/* Mini Google Tab Bar Header (Yellow 80% Opacity, Clean Dark Typography, No 3 Circles) */}
+              <div className="flex items-center justify-between bg-amber-400/80 backdrop-blur-md text-[#0D2B45] px-5 py-3 border-b border-amber-500/30">
+                <div className="flex items-center gap-2">
+                  <span className="font-heading font-extrabold text-sm text-[#0D2B45] flex items-center gap-1.5">
+                    <Globe className="h-4 w-4 text-[#0D2B45]" />
+                    Google Search
+                  </span>
+                </div>
+                <button
+                  onClick={() => setMiniGoogleOpen(false)}
+                  className="rounded-full p-1 text-[#0D2B45]/80 hover:bg-[#0D2B45]/10 hover:text-[#0D2B45] transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Mini Google URL & Search Input Bar */}
+              <div className="bg-neutral-100 p-3 border-b border-neutral-200">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    if (!miniGoogleTabQuery.trim()) return
+                    const query = encodeURIComponent(miniGoogleTabQuery.trim())
+                    setActiveGoogleTabUrl(`https://www.google.com/search?q=${query}&igu=1`)
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400" />
+                    <input
+                      type="text"
+                      placeholder="Type anything to search Google live..."
+                      value={miniGoogleTabQuery}
+                      onChange={(e) => setMiniGoogleTabQuery(e.target.value)}
+                      className="w-full rounded-xl border border-neutral-300 bg-white pl-9 pr-3 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-[#0D2B45] focus:ring-2 focus:ring-[#0D2B45]/10"
+                    />
+                  </div>
+                  <Button type="submit" size="sm" className="rounded-xl bg-[#0D2B45] text-white text-xs font-bold px-4 py-2 hover:bg-[#12395b]">
+                    Search Google
+                  </Button>
+                </form>
+              </div>
+
+              {/* Square Miniature Google Iframe / Web Frame View */}
+              <div className="flex-1 w-full bg-white relative">
+                <iframe
+                  src={activeGoogleTabUrl}
+                  title="Google Search Tab"
+                  className="w-full h-full border-none"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                />
+              </div>
+
+              {/* Bottom Quick Search Suggestions */}
+              <div className="bg-neutral-50 px-4 py-2 border-t border-neutral-200 flex items-center justify-between text-[11px] text-neutral-500 font-semibold">
+                <span>Quick Google Searches:</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setMiniGoogleTabQuery(`best spots in ${destination || "goa"}`)
+                      setActiveGoogleTabUrl(`https://www.google.com/search?q=best+spots+in+${encodeURIComponent(destination || "goa")}&igu=1`)
+                    }}
+                    className="text-[#0D2B45] font-bold hover:underline"
+                  >
+                    Places in {destination || "Goa"}
+                  </button>
+                  <span>•</span>
+                  <button
+                    onClick={() => {
+                      setMiniGoogleTabQuery(`best food in ${destination || "goa"}`)
+                      setActiveGoogleTabUrl(`https://www.google.com/search?q=best+food+in+${encodeURIComponent(destination || "goa")}&igu=1`)
+                    }}
+                    className="text-[#0D2B45] font-bold hover:underline"
+                  >
+                    Top Foods
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* AI Copilot Drawer */}
       {botOpen && (

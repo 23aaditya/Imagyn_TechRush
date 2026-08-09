@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Moon, Sun, Menu, X, Sparkles, LogOut } from "lucide-react"
+import { Moon, Sun, Menu, X, Sparkles, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -132,6 +132,19 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                       <p className="text-xs font-bold text-white truncate">{user.name}</p>
                       <p className="text-[11px] text-white/60 truncate">{user.email}</p>
                     </div>
+                    
+                    {/* Profile Option Above Saved Trips */}
+                    <button
+                      onClick={() => {
+                        setUserDropdown(false)
+                        handleNavClick("profile")
+                      }}
+                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-bold text-amber-400 hover:bg-white/15 hover:text-amber-300 transition-colors"
+                    >
+                      <User className="h-3.5 w-3.5 text-amber-400" />
+                      Profile & Passport
+                    </button>
+
                     <button
                       onClick={() => {
                         setUserDropdown(false)
@@ -157,7 +170,16 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
               </AnimatePresence>
             </div>
           ) : (
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                onClick={() => handleNavClick("profile")}
+                className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1.5 text-xs font-bold text-amber-400 hover:bg-amber-400/20 transition-all cursor-pointer"
+                title="User Profile & Passport"
+              >
+                <User className="h-4 w-4 text-amber-400" />
+                <span className="hidden sm:inline">Profile</span>
+              </button>
+
               <Button
                 onClick={() => onOpenAuth("signup")}
                 className="rounded-md bg-white text-[#0D2B45] text-xs font-extrabold hover:bg-white/90 sm:text-sm px-5 py-2 shadow-md transition-all"
