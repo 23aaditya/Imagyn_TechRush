@@ -61,7 +61,7 @@ const CATEGORIZED_PROMPTS = {
 }
 
 export function AiChatbot({ currentView, onNavigate }) {
-  const { itinerary, addSpotToItinerary, destination, setDestination } = useTrip()
+  const { itinerary, addSpotToItinerary, removeSpotByName, reorderDayActivities, generateTripItinerary, destination, setDestination } = useTrip()
 
   const [isOpen, setIsOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -131,6 +131,41 @@ export function AiChatbot({ currentView, onNavigate }) {
 
     const lowerText = messageText.toLowerCase()
 
+    // Check if user is requesting Boots to GENERATE / PLAN A MULTI-DAY TRIP ITINERARY
+    const isMultiDayIntent = ["plan", "create itinerary", "build itinerary", "make plan", "generate itinerary", "trip for", "days trip", "day trip"].some((kw) => lowerText.includes(kw))
+    if (isMultiDayIntent && (lowerText.includes("trip") || lowerText.includes("itinerary") || lowerText.includes("plan") || lowerText.includes("days"))) {
+      let targetDest = destination || "Goa (India)"
+
+      // Parse days count (e.g. 3 days, 5 day)
+      let numDays = 3
+      const daysMatch = lowerText.match(/(\d+)\s*days?/)
+      if (daysMatch && daysMatch[1]) {
+        numDays = parseInt(daysMatch[1], 10)
+      }
+
+      // Parse destination name
+      const destMatch = messageText.match(/(?:for|to|in)\s+([A-Za-z\s]+?)(?:\s+and|\s+trip|\s+for|\s+days?|$)/i)
+      if (destMatch && destMatch[1] && destMatch[1].trim().length >= 2) {
+        targetDest = destMatch[1].trim().replace(/\b(?:the|a|an)\b/gi, "").trim()
+        targetDest = targetDest.charAt(0).toUpperCase() + targetDest.slice(1)
+      }
+
+      generateTripItinerary(targetDest, numDays)
+      onNavigate?.("itinerary")
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: `🎉 **Created a ${numDays}-Day Custom Itinerary for ${targetDest}!**\n\nI have populated your Itinerary Planner and synchronized your live route map. Click below to view your full day-by-day plan! [ACTION:navigate:itinerary:${targetDest}]`,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        },
+      ])
+      setIsLoading(false)
+      return
+    }
+
     // Check if user is requesting navigation linking
     const isNavIntent = ["go to", "open", "show", "take me to", "navigate", "switch to", "view"].some((kw) => lowerText.includes(kw))
     if (isNavIntent) {
@@ -171,7 +206,71 @@ export function AiChatbot({ currentView, onNavigate }) {
       }
     }
 
-    // Check if user is requesting Boots to add a location to the planner
+    // Check if user is requesting Boots to REMOVE a location from the itinerary
+    const isRemoveIntent = ["remove", "delete", "drop", "take out", "cancel", "erase"].some((kw) => lowerText.includes(kw))
+    if (isRemoveIntent) {
+      let spotName = messageText
+        .replace(/can\s+you\s+/i, "")
+        .replace(/(?:please\s+)?(?:remove|delete|drop|take out|cancel|erase)\s+/i, "")
+        .replace(/\s+(?:from|in|into|on)\s+(?:the\s+)?(?:plan|itinerary|trip|schedule).*/i, "")
+        .replace(/\s+(?:on|from)\s+day\s*\d+.*/i, "")
+        .replace(/["']/g, "")
+        .trim()
+
+      if (spotName && spotName.length >= 2) {
+        const wasRemoved = removeSpotByName(spotName)
+        let actionReply = ""
+        if (wasRemoved) {
+          actionReply = `🗑️ **Removed "${spotName}"** from your Itinerary Planner! Your live route map has been updated. [ACTION:navigate:itinerary]`
+        } else {
+          actionReply = `⚠️ Couldn't find **"${spotName}"** in your current itinerary. Please check the spot title in the planner!`
+        }
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: actionReply,
+            isLocationAction: true,
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ])
+        setIsLoading(false)
+        return
+      }
+    }
+
+    // Check if user is requesting OFFBEAT PLACES / RECOMMENDATIONS
+    const isOffbeatIntent = ["suggest", "recommend", "offbeat", "hidden gems", "places to visit", "top spots", "things to do"].some((kw) => lowerText.includes(kw))
+    if (isOffbeatIntent && !lowerText.includes("remove") && !lowerText.includes("delete")) {
+      let targetLoc = destination || "Goa"
+      const locMatch = messageText.match(/(?:in|near|around|for)\s+([A-Za-z\s]+?)(?:\s+place|\s+spots|\s+gems|\s+trip|$)/i)
+      if (locMatch && locMatch[1] && locMatch[1].trim().length >= 2) {
+        targetLoc = locMatch[1].trim()
+      }
+
+      const offbeatSpots = [
+        { title: `Chorao Island & Salim Ali Bird Sanctuary`, loc: targetLoc, type: "Nature & Sanctuary", cost: "₹450", desc: `Tranquil mangrove kayaking & rare migratory bird watching.` },
+        { title: `Harvalem Waterfall & Rock-Cut Caves`, loc: targetLoc, type: "Hidden Waterfall", cost: "₹350", desc: `Scenic 6th-century ancient cave complex & lush cascading falls.` },
+        { title: `Netravali Bubble Lake & Spice Plantation`, loc: targetLoc, type: "Eco-Trail & Spice", cost: "₹750", desc: `Mysterious bubbling natural freshwater lake surrounded by spice groves.` }
+      ]
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: `🌟 **Top Offbeat Places in ${targetLoc}:**\n\nHere are 3 unique hidden gems away from crowd bottlenecks. Click **"➕ Add to Itinerary"** below any spot to schedule it directly!`,
+          suggestedSpots: offbeatSpots,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        },
+      ])
+      setIsLoading(false)
+      return
+    }
+
+    // Check if user is requesting Boots to ADD a location to the planner
     const isAddIntent = ["add", "put", "include", "insert", "schedule", "place"].some((kw) => lowerText.includes(kw))
 
     if (isAddIntent) {
@@ -219,7 +318,7 @@ export function AiChatbot({ currentView, onNavigate }) {
             cost: "₹750",
             numericCost: 750
           })
-          actionReply = `✅ **Added "${spotName}"** to **Day ${targetDayIdx + 1}** ${specifiedTime ? `at ${specifiedTime}` : ""} in your Itinerary Planner!`
+          actionReply = `✅ **Added "${spotName}"** to **Day ${targetDayIdx + 1}** ${specifiedTime ? `at ${specifiedTime}` : ""} in your Itinerary Planner! [ACTION:navigate:itinerary]`
         }
 
         setMessages((prev) => [
@@ -614,6 +713,41 @@ export function AiChatbot({ currentView, onNavigate }) {
                               <p>☀️ <strong>Afternoon:</strong> {msg.dayPlanCard.afternoon}</p>
                               <p>🌙 <strong>Evening:</strong> {msg.dayPlanCard.evening}</p>
                             </div>
+                          </div>
+                        )}
+
+                        {/* Interactive Suggested Offbeat Spot Cards */}
+                        {msg.suggestedSpots && (
+                          <div className="mt-3 space-y-2">
+                            {msg.suggestedSpots.map((spot, idx) => (
+                              <div key={idx} className="p-3 rounded-2xl border border-primary/20 bg-background/90 shadow-sm space-y-1 text-left">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-bold text-xs text-foreground">{spot.title}</span>
+                                  <span className="text-[10px] font-extrabold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2 py-0.5 rounded-md">
+                                    {spot.cost}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-muted-foreground">{spot.desc}</p>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  onClick={() => {
+                                    addSpotToItinerary(0, {
+                                      title: spot.title,
+                                      time: "02:30 PM",
+                                      desc: spot.desc,
+                                      cost: spot.cost,
+                                      numericCost: parseInt(spot.cost.replace(/[^\d]/g, ""), 10) || 500
+                                    })
+                                    onNavigate?.("itinerary")
+                                  }}
+                                  className="mt-1 w-full rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-[11px] py-1 shadow-sm flex items-center justify-center gap-1 cursor-pointer"
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                  Add to Itinerary (Day 1)
+                                </Button>
+                              </div>
+                            ))}
                           </div>
                         )}
 

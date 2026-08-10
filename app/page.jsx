@@ -24,7 +24,7 @@ import { AiChatbot } from "@/components/ai-chatbot"
 import { SavedTripsModal } from "@/components/saved-trips-modal"
 
 function MainApp() {
-  const { destination, setDestination } = useTrip()
+  const { destination, setDestination, days, generateTripItinerary } = useTrip()
   const [activeView, setActiveView] = useState("home") // 'home' | 'itinerary' | 'explore' | 'destinations' | 'budget' | 'expenses' | 'packages'
   const [user, setUser] = useState(null)
   const [authModalOpen, setAuthModalOpen] = useState(false)
@@ -44,12 +44,13 @@ function MainApp() {
     }
   }, [])
 
-  // Guarded View Transition: Require auth for non-home features
+  // Guarded View Transition: Require auth for profile/saved features, allow free exploration for planner
   const handleViewChange = (view, destName) => {
     if (destName) {
       setDestination(destName)
+      generateTripItinerary(destName, days || 3)
     }
-    if (view !== "home" && !user) {
+    if (view === "profile" && !user) {
       setPendingView(view)
       if (destName) setPendingDestination(destName)
       setAuthInitialTab("login")
@@ -59,11 +60,12 @@ function MainApp() {
     setActiveView(view)
   }
 
-  const handleSelectDestination = (destName) => {
-    if (destName) {
-      setDestination(destName)
-    }
-    handleViewChange("itinerary", destName)
+  const handleSelectDestination = (destName, numDays) => {
+    const targetDest = destName || destination || "Goa (India)"
+    const targetDays = numDays || days || 3
+    setDestination(targetDest)
+    generateTripItinerary(targetDest, targetDays)
+    setActiveView("itinerary")
   }
 
   const handleAuthSuccess = (userData) => {
@@ -128,7 +130,7 @@ function MainApp() {
       {/* Dynamic View Router */}
       {activeView === "home" && (
         <div className="relative z-10 animate-in fade-in duration-300">
-          <Hero onStartPlanning={(view) => handleViewChange(view || "itinerary")} />
+          <Hero onStartPlanning={(view, targetDest) => handleSelectDestination(targetDest || destination || "Goa (India)")} />
           <TrendingDestinations onNavigateView={handleViewChange} onSelectDestination={handleSelectDestination} />
           <WhyTripNest onNavigateView={handleViewChange} />
           <ExploreWorld onNavigateView={handleViewChange} onSelectDestination={handleSelectDestination} />
@@ -165,6 +167,7 @@ function MainApp() {
           <ExploreWorkspace
             onBack={() => handleViewChange("home")}
             onSelectDestination={handleSelectDestination}
+            onNavigateView={handleViewChange}
           />
         </div>
       )}

@@ -838,16 +838,19 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
       {/* ─────────────────────────────────────────────
           FLOATING QUICK ADD [ + ] BUTTON (Bottom-Left Corner)
          ───────────────────────────────────────────── */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setQuickModalOpen(true)}
-        className="fixed bottom-6 left-6 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0D2B45] text-white shadow-2xl shadow-[#0D2B45]/50 border-2 border-amber-400/40 hover:bg-[#12395b] transition-all cursor-pointer"
-        aria-label="Add New Expense"
-        title="Quick Add Expense"
-      >
-        <Plus className="h-7 w-7 text-amber-400" />
-      </motion.button>
+      {/* FLOATING QUICK ADD [ + ] BUTTON (Only in Expense Tracker Page Workspace) */}
+      {isWorkspace && (
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setQuickModalOpen(true)}
+          className="fixed bottom-6 left-6 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#5A8CB2] text-white shadow-2xl border-2 border-white/40 hover:bg-[#4A7CA2] transition-all cursor-pointer"
+          aria-label="Add New Expense"
+          title="Quick Add Expense"
+        >
+          <Plus className="h-7 w-7 text-white" />
+        </motion.button>
+      )}
 
       {/* ─────────────────────────────────────────────
           DYNAMIC STEP EXPENSE MODAL

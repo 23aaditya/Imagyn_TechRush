@@ -71,8 +71,8 @@ export function SavedTripsModal({ onSelectDestination }) {
               {/* Header */}
               <div className="flex items-center justify-between border-b border-neutral-200 pb-4 shrink-0">
                 <div>
-                  <h3 className="font-heading text-2xl font-extrabold text-[#0D2B45] flex items-center gap-2">
-                    <Sparkles className="h-6 w-6 text-amber-500" />
+                  <h3 className="font-heading text-2xl font-extrabold text-[#1E293B] flex items-center gap-2">
+                    <Sparkles className="h-6 w-6 text-[#5A8CB2]" />
                     My Saved Trips & Offline Itineraries
                   </h3>
                   <p className="text-xs text-neutral-500 mt-0.5 font-medium">
@@ -99,15 +99,15 @@ export function SavedTripsModal({ onSelectDestination }) {
                   savedTrips.map((trip) => (
                     <div
                       key={trip.id}
-                      className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5 shadow-sm hover:border-[#0D2B45]/40 hover:bg-white transition-all space-y-3"
+                      className="rounded-2xl border border-neutral-200 bg-[#F5F3EB]/60 p-4 sm:p-5 shadow-sm hover:border-[#5A8CB2]/40 hover:bg-white transition-all space-y-3"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-heading text-lg font-extrabold text-[#0D2B45]">
+                            <span className="font-heading text-lg font-extrabold text-[#1E293B]">
                               {trip.destination}
                             </span>
-                            <span className="rounded-full bg-amber-400/20 text-amber-600 text-[10px] font-extrabold px-2.5 py-0.5 border border-amber-400/30">
+                            <span className="rounded-full bg-[#C8D9E6] text-[#1E293B] text-[10px] font-extrabold px-2.5 py-0.5 border border-[#5A8CB2]/30">
                               {trip.days} Days Itinerary
                             </span>
                           </div>
@@ -139,7 +139,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                         <Button
                           size="sm"
                           onClick={() => setActiveReportTrip(trip)}
-                          className="rounded-xl bg-amber-400 text-[#0D2B45] hover:bg-amber-300 font-extrabold text-xs px-4 py-2 shadow flex items-center gap-1.5"
+                          className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-extrabold text-xs px-4 py-2 shadow flex items-center gap-1.5 cursor-pointer"
                         >
                           <FileText className="h-4 w-4" />
                           View Offline Report Pass
@@ -149,7 +149,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                           size="sm"
                           variant="outline"
                           onClick={() => handleLoadTrip(trip)}
-                          className="rounded-xl border-neutral-300 text-[#0D2B45] text-xs font-bold px-4 py-2 hover:bg-neutral-100 flex items-center gap-1.5"
+                          className="rounded-xl border-neutral-300 text-[#1E293B] text-xs font-bold px-4 py-2 hover:bg-neutral-100 flex items-center gap-1.5 cursor-pointer"
                         >
                           Open in Planner
                           <ChevronRight className="h-4 w-4" />
@@ -174,19 +174,19 @@ export function SavedTripsModal({ onSelectDestination }) {
               initial={{ opacity: 0, scale: 0.94, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 15 }}
-              className="relative w-full max-w-3xl overflow-hidden rounded-3xl border-2 border-[#0D2B45]/20 bg-white text-neutral-900 shadow-2xl p-6 sm:p-8 space-y-6 my-auto print:shadow-none print:border-none print:w-full print:max-w-none print:rounded-none"
+              className="relative w-full max-w-3xl overflow-hidden rounded-3xl border-2 border-[#5A8CB2]/30 bg-white text-neutral-900 shadow-2xl p-6 sm:p-8 space-y-6 my-auto print:shadow-none print:border-none print:w-full print:max-w-none print:rounded-none"
             >
               {/* Header Bar */}
               <div className="flex items-center justify-between border-b-2 border-neutral-200 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-2xl bg-[#0D2B45] flex items-center justify-center text-amber-400 font-extrabold text-lg shadow-md">
+                  <div className="h-10 w-10 rounded-2xl bg-[#5A8CB2] flex items-center justify-center text-white font-extrabold text-lg shadow-md">
                     TN
                   </div>
                   <div>
-                    <h2 className="font-heading text-xl sm:text-2xl font-extrabold text-[#0D2B45]">
+                    <h2 className="font-heading text-xl sm:text-2xl font-extrabold text-[#1E293B]">
                       OFFLINE TRAVEL SUMMARY REPORT
                     </h2>
-                    <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">
+                    <p className="text-[11px] font-bold text-[#5A8CB2] uppercase tracking-wider">
                       TripNest Official Itinerary Pass • Save / Take Screenshot for Zero-Network Areas
                     </p>
                   </div>
@@ -196,7 +196,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                   <Button
                     size="sm"
                     onClick={handlePrintReport}
-                    className="rounded-xl bg-[#0D2B45] text-white text-xs font-bold px-3.5 py-2 hover:bg-[#12395b] shadow flex items-center gap-1.5"
+                    className="rounded-xl bg-[#5A8CB2] text-white text-xs font-bold px-3.5 py-2 hover:bg-[#4A7CA2] shadow flex items-center gap-1.5 cursor-pointer"
                   >
                     <Printer className="h-4 w-4" />
                     Print / Save PDF
@@ -211,28 +211,28 @@ export function SavedTripsModal({ onSelectDestination }) {
               </div>
 
               {/* Trip Key Details Card */}
-              <div className="rounded-2xl bg-[#0D2B45] text-white p-5 shadow-lg grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="rounded-2xl bg-[#5A8CB2] text-white p-5 shadow-lg grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
-                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">Destination</span>
+                  <span className="text-[10px] font-bold text-[#C8D9E6] uppercase tracking-wider block">Destination</span>
                   <span className="font-heading font-extrabold text-base sm:text-lg text-white block truncate">
                     {activeReportTrip.destination}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">Travel Dates</span>
+                  <span className="text-[10px] font-bold text-[#C8D9E6] uppercase tracking-wider block">Travel Dates</span>
                   <span className="font-bold text-xs sm:text-sm text-white block">
                     {activeReportTrip.startDate} → {activeReportTrip.endDate}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">Duration</span>
+                  <span className="text-[10px] font-bold text-[#C8D9E6] uppercase tracking-wider block">Duration</span>
                   <span className="font-bold text-xs sm:text-sm text-white block">
                     {activeReportTrip.days} Days ({activeReportTrip.travelers || 2} Travelers)
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">Est. Budget</span>
-                  <span className="font-extrabold text-sm sm:text-base text-amber-300 block">
+                  <span className="text-[10px] font-bold text-[#C8D9E6] uppercase tracking-wider block">Est. Budget</span>
+                  <span className="font-extrabold text-sm sm:text-base text-white block">
                     ₹{(activeReportTrip.totalBudget || 18500).toLocaleString("en-IN")}
                   </span>
                 </div>
@@ -240,16 +240,16 @@ export function SavedTripsModal({ onSelectDestination }) {
 
               {/* Day-by-Day Summary Schedule Table */}
               <div className="space-y-4">
-                <h3 className="font-heading text-base font-extrabold text-[#0D2B45] uppercase tracking-wider flex items-center gap-2 border-b pb-2">
-                  <Calendar className="h-4 w-4 text-amber-500" />
+                <h3 className="font-heading text-base font-extrabold text-[#1E293B] uppercase tracking-wider flex items-center gap-2 border-b pb-2">
+                  <Calendar className="h-4 w-4 text-[#5A8CB2]" />
                   Day-by-Day Offline Itinerary Schedule
                 </h3>
 
                 <div className="space-y-3">
                   {(activeReportTrip.itinerary || []).map((dayPlan, dIdx) => (
-                    <div key={dIdx} className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 space-y-2">
+                    <div key={dIdx} className="rounded-2xl border border-neutral-200 bg-[#F5F3EB]/60 p-4 space-y-2">
                       <div className="flex items-center justify-between border-b border-neutral-200 pb-1.5">
-                        <span className="font-heading text-xs font-extrabold text-[#0D2B45] uppercase tracking-wider">
+                        <span className="font-heading text-xs font-extrabold text-[#1E293B] uppercase tracking-wider">
                           Day {dayPlan.day || dIdx + 1} ({dayPlan.date || `Day ${dIdx + 1}`})
                         </span>
                         <span className="text-[10px] font-bold text-neutral-500">
@@ -260,7 +260,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                       <div className="grid gap-2 sm:grid-cols-2">
                         {(dayPlan.activities || []).map((act, aIdx) => (
                           <div key={aIdx} className="p-2.5 rounded-xl bg-white border border-neutral-200/80 shadow-xs flex items-start gap-2.5">
-                            <span className="text-xs font-bold text-amber-600 shrink-0 mt-0.5">
+                            <span className="text-xs font-bold text-[#5A8CB2] shrink-0 mt-0.5">
                               {act.time || "09:00 AM"}
                             </span>
                             <div className="min-w-0 flex-1">
@@ -269,7 +269,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                               </h4>
                               <p className="text-[10px] text-neutral-500 line-clamp-1">{act.desc}</p>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[9px] font-extrabold text-[#0D2B45] bg-neutral-100 px-2 py-0.5 rounded-md">
+                                <span className="text-[9px] font-extrabold text-[#1E293B] bg-[#C8D9E6]/40 px-2 py-0.5 rounded-md">
                                   {act.category || act.type || "Sightseeing"}
                                 </span>
                                 <span className="text-[9px] font-bold text-emerald-600">

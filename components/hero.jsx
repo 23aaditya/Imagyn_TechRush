@@ -32,29 +32,28 @@ const heroBackgrounds = [
 const HERO_TRAVEL_VIDEOS = [
   {
     id: "cloudinary-video-1",
-    title: "Editorial Journey Escape",
-    url: "https://res.cloudinary.com/dowusjxd4/video/upload/22938-360_uxzdx5.mp4",
-    embedUrl: "https://player.cloudinary.com/embed/?cloud_name=dowusjxd4&public_id=22938-360_uxzdx5"
+    title: "Tropical Paradise Lagoon",
+    url: "https://res.cloudinary.com/dowusjxd4/video/upload/v1786104548/15058719_2560_1440_30fps_stgxzv.mp4"
   },
   {
-    id: "beach-resort",
-    title: "Côte d'Azur & Tropical Beach Lagoon",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-resort-and-the-ocean-43282-large.mp4"
+    id: "cloudinary-video-2",
+    title: "Mountain Horizon & Scenic Heights",
+    url: "https://res.cloudinary.com/dowusjxd4/video/upload/v1786104542/5937512-uhd_3840_2160_25fps_hnfdea.mp4"
   },
   {
-    id: "alpine-peaks",
-    title: "Alpine Peaks & Snow-Capped Mist",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-snow-capped-mountains-43265-large.mp4"
+    id: "cloudinary-video-3",
+    title: "Alpine Valley & Emerald Nature",
+    url: "https://res.cloudinary.com/dowusjxd4/video/upload/v1786104443/20716609-uhd_3840_2160_30fps_x44ztv.mp4"
   },
   {
-    id: "palm-haven",
-    title: "St. Tropez Private Beach & Yacht Haven",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-resort-swimming-pool-and-palm-trees-43283-large.mp4"
+    id: "cloudinary-video-4",
+    title: "Coastal Sunset & Golden Shores",
+    url: "https://res.cloudinary.com/dowusjxd4/video/upload/v1786104407/8747385-uhd_4096_2160_30fps_sijvgc.mp4"
   },
   {
-    id: "coastal-sunset",
-    title: "Golden Hour Coastal Escape & Waters",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-drone-view-of-a-coastal-city-at-sunset-43279-large.mp4"
+    id: "cloudinary-video-5",
+    title: "Wanderlust Horizons & Serene Waters",
+    url: "https://res.cloudinary.com/dowusjxd4/video/upload/v1786104324/39912-360_o5piy4.mp4"
   }
 ]
 
@@ -85,9 +84,25 @@ const fadeUp = {
 export function Hero({ onStartPlanning }) {
   const [activeSlide, setActiveSlide] = useState(0)
 
-  // Video Playlist State
+  // Video Playlist State (Zero-Gap Instant Playback Engine)
   const [currentVideoIdx, setCurrentVideoIdx] = useState(0)
-  const videoRef = useRef(null)
+  const videoRefs = useRef([])
+
+  // Instantly play active video when currentVideoIdx updates and preload all videos
+  useEffect(() => {
+    videoRefs.current.forEach((vEl, idx) => {
+      if (!vEl) return
+      if (idx === currentVideoIdx) {
+        vEl.currentTime = 0
+        const playPromise = vEl.play()
+        if (playPromise !== undefined) {
+          playPromise.catch((e) => console.log("Auto-play error:", e))
+        }
+      } else {
+        vEl.pause()
+      }
+    })
+  }, [currentVideoIdx])
 
   // Search autocomplete state
   const [query, setQuery] = useState("")
@@ -269,41 +284,35 @@ export function Hero({ onStartPlanning }) {
       {/* 2. FULL SCREEN VIDEO SEARCH HERO SECTION (Appears smoothly on scroll down) */}
       <section id="search-video-hero" className="relative min-h-screen w-full overflow-hidden select-none flex flex-col items-center justify-center py-12 px-4 sm:px-6 space-y-6">
         
-        {/* Fullscreen Video Background Playlist */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={HERO_TRAVEL_VIDEOS[currentVideoIdx].id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.0 }}
-              className="absolute inset-0 h-full w-full"
-            >
-              {HERO_TRAVEL_VIDEOS[currentVideoIdx].embedUrl ? (
-                <iframe
-                  src={`${HERO_TRAVEL_VIDEOS[currentVideoIdx].embedUrl}&autoplay=true&loop=true&controls=false`}
-                  title={HERO_TRAVEL_VIDEOS[currentVideoIdx].title}
-                  allow="autoplay; fullscreen"
-                  className="h-full w-full object-cover filter brightness-[0.85] contrast-[1.08] pointer-events-none scale-125"
-                />
-              ) : (
-                <video
-                  ref={videoRef}
-                  src={HERO_TRAVEL_VIDEOS[currentVideoIdx].url}
-                  autoPlay
-                  muted
-                  playsInline
-                  onEnded={handleVideoEnded}
-                  onError={handleVideoEnded}
-                  className="h-full w-full object-cover filter brightness-[0.85] contrast-[1.08]"
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
-
+        {/* Fullscreen Video Background Playlist (Zero-Gap Instant Switch) */}
+        <div className="absolute inset-0 z-0 overflow-hidden bg-black">
+          {HERO_TRAVEL_VIDEOS.map((vid, idx) => {
+            const isActive = idx === currentVideoIdx
+            return (
+              <video
+                key={vid.id}
+                ref={(el) => (videoRefs.current[idx] = el)}
+                src={vid.url}
+                preload="auto"
+                muted
+                playsInline
+                onEnded={handleVideoEnded}
+                onError={handleVideoEnded}
+                className={`absolute inset-0 h-full w-full object-cover filter brightness-[0.85] contrast-[1.08] transition-opacity duration-300 ${
+                  isActive ? "opacity-100 z-10 pointer-events-auto" : "opacity-0 z-0 pointer-events-none"
+                }`}
+              />
+            )
+          })}
           {/* Minimal Dark Overlay for High Contrast Text */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/75 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/75 z-20 pointer-events-none" />
+        </div>
+
+        {/* Video Playlist Indicator Bar */}
+        <div className="absolute top-6 right-6 z-30 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 text-white text-xs font-semibold">
+          <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+          <span>Video {currentVideoIdx + 1} of {HERO_TRAVEL_VIDEOS.length}:</span>
+          <span className="font-bold text-amber-300 truncate max-w-[200px]">{HERO_TRAVEL_VIDEOS[currentVideoIdx].title}</span>
         </div>
 
         {/* Section Header Prompt (Tight spacing to dialogue box) */}

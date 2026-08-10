@@ -9,8 +9,8 @@ import { useTrip } from "@/context/trip-context"
 
 const navLinks = [
   { label: "Overview", view: "home" },
-  { label: "Planner", view: "itinerary" },
   { label: "Explore", view: "explore" },
+  { label: "Planner", view: "itinerary" },
   { label: "Budget", view: "budget" },
   { label: "Expenses", view: "expenses" },
   { label: "Packages", view: "packages" },
@@ -53,9 +53,9 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
         "fixed inset-x-0 top-0 z-50 w-full transition-all duration-300",
         activeView === "home"
           ? scrolled
-            ? "bg-[#0D2B45]/90 backdrop-blur-xl border-b border-white/10 text-white shadow-lg"
-            : "bg-gradient-to-b from-black/85 via-black/40 to-transparent text-white border-none shadow-none"
-          : "bg-[#0D2B45] text-white border-b border-white/10 shadow-md"
+            ? "bg-[#E5F0FA]/95 backdrop-blur-xl border-b border-[#5A8CB2]/20 text-[#1E293B] shadow-md"
+            : "bg-gradient-to-b from-[#1E293B]/80 via-[#1E293B]/30 to-transparent text-white border-none shadow-none"
+          : "bg-[#E5F0FA] text-[#1E293B] border-b border-[#5A8CB2]/20 shadow-md"
       )}
     >
       <nav className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3.5">
@@ -68,7 +68,10 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
           <img
             src="/images/tripnest-logo.png"
             alt="TripNest Imagyn"
-            className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105 mix-blend-screen filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]"
+            className={cn(
+              "h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]",
+              activeView === "home" && !scrolled ? "mix-blend-screen" : ""
+            )}
           />
         </button>
 
@@ -76,15 +79,18 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
         <ul className="hidden items-center gap-1.5 xl:flex">
           {navLinks.map((link) => {
             const isActive = activeView === link.view
+            const isTransparentHome = activeView === "home" && !scrolled
             return (
-              <li key={link.view}>
+              <li key={link.view} className="relative overflow-visible">
                 <button
                   onClick={() => handleNavClick(link.view)}
                   className={cn(
-                    "rounded-md px-3.5 py-2 text-xs font-bold transition-all",
+                    "relative overflow-visible rounded-full px-4 py-2 text-xs font-bold transition-all duration-200 cursor-pointer",
                     isActive
-                      ? "bg-white/20 text-white shadow-sm"
-                      : "text-white/80 hover:bg-white/15 hover:text-white",
+                      ? "bg-[#5A8CB2] text-white shadow-md"
+                      : isTransparentHome
+                      ? "text-white/90 hover:bg-white/15 hover:text-white hover:scale-105"
+                      : "text-[#1E293B]/80 hover:bg-[#5A8CB2]/15 hover:text-[#1E293B] hover:scale-105"
                   )}
                 >
                   {link.label}
@@ -102,9 +108,12 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             size="icon"
             aria-label="Toggle dark mode"
             onClick={toggleTheme}
-            className="text-white/80 hover:text-white hover:bg-white/15"
+            className={cn(
+              "hover:bg-[#5A8CB2]/15",
+              activeView === "home" && !scrolled ? "text-white hover:text-white" : "text-[#1E293B] hover:text-[#1E293B]"
+            )}
           >
-            {isDark ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5 text-white" />}
+            {isDark ? <Sun className="h-5 w-5 text-amber-500" /> : <Moon className="h-5 w-5" />}
           </Button>
 
           {/* User Profile / Auth Button */}
@@ -112,12 +121,12 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             <div className="relative">
               <button
                 onClick={() => setUserDropdown(!userDropdown)}
-                className="flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-2.5 py-1.5 shadow-sm hover:border-white/40 transition-all text-white"
+                className="flex items-center gap-2 rounded-md border border-[#5A8CB2]/30 bg-[#5A8CB2]/10 px-2.5 py-1.5 shadow-sm hover:border-[#5A8CB2]/60 transition-all text-[#1E293B]"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-sm bg-white text-xs font-bold text-[#0D2B45]">
+                <span className="flex h-7 w-7 items-center justify-center rounded-sm bg-[#5A8CB2] text-xs font-bold text-white">
                   {user.initials || "U"}
                 </span>
-                <span className="hidden text-xs font-semibold text-white sm:inline-block max-w-[100px] truncate">
+                <span className="hidden text-xs font-semibold text-[#1E293B] sm:inline-block max-w-[100px] truncate">
                   {user.name}
                 </span>
               </button>
@@ -128,11 +137,11 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                     initial={{ opacity: 0, y: 8, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-48 rounded-md border border-white/20 bg-neutral-900/95 p-2 shadow-2xl backdrop-blur-2xl z-50 text-white"
+                    className="absolute right-0 mt-2 w-48 rounded-md border border-border bg-card p-2 shadow-2xl backdrop-blur-2xl z-50 text-foreground"
                   >
-                    <div className="border-b border-white/15 px-3 py-2">
-                      <p className="text-xs font-bold text-white truncate">{user.name}</p>
-                      <p className="text-[11px] text-white/60 truncate">{user.email}</p>
+                    <div className="border-b border-border/40 px-3 py-2">
+                      <p className="text-xs font-bold text-foreground truncate">{user.name}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
                     </div>
                     
                     {/* Profile Option Above Saved Trips */}
@@ -141,9 +150,9 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                         setUserDropdown(false)
                         handleNavClick("profile")
                       }}
-                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-bold text-amber-400 hover:bg-white/15 hover:text-amber-300 transition-colors"
+                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-bold text-foreground hover:bg-accent transition-colors cursor-pointer"
                     >
-                      <User className="h-3.5 w-3.5 text-amber-400" />
+                      <User className="h-3.5 w-3.5 text-[#5A8CB2]" />
                       Profile & Passport
                     </button>
 
@@ -152,9 +161,9 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                         setUserDropdown(false)
                         setSavedTripsModalOpen(true)
                       }}
-                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-white/80 hover:bg-white/15 hover:text-white"
+                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-foreground hover:bg-accent cursor-pointer"
                     >
-                      <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                      <Sparkles className="h-3.5 w-3.5 text-[#5A8CB2]" />
                       My Saved Trips
                     </button>
                     <button
@@ -162,7 +171,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                         setUserDropdown(false)
                         onLogout()
                       }}
-                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/20"
+                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-rose-500 hover:bg-rose-500/10 cursor-pointer"
                     >
                       <LogOut className="h-3.5 w-3.5" />
                       Sign Out
@@ -175,16 +184,21 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={() => handleNavClick("profile")}
-                className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1.5 text-xs font-bold text-amber-400 hover:bg-amber-400/20 transition-all cursor-pointer"
+                className={cn(
+                  "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-sm",
+                  activeView === "home" && !scrolled
+                    ? "border-white/30 bg-white/15 text-white hover:bg-white/25"
+                    : "border-[#5A8CB2]/30 bg-[#5A8CB2]/10 text-[#1E293B] hover:bg-[#5A8CB2]/20"
+                )}
                 title="User Profile & Passport"
               >
-                <User className="h-4 w-4 text-amber-400" />
+                <User className="h-4 w-4" />
                 <span className="hidden sm:inline">Profile</span>
               </button>
 
               <Button
                 onClick={() => onOpenAuth("signup")}
-                className="rounded-md bg-white text-[#0D2B45] text-xs font-extrabold hover:bg-white/90 sm:text-sm px-5 py-2 shadow-md transition-all"
+                className="rounded-full bg-[#5A8CB2] text-white text-xs font-extrabold hover:bg-[#4A7CA2] sm:text-sm px-5 py-2 shadow-md transition-all cursor-pointer"
               >
                 Get Started
               </Button>

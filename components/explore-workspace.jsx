@@ -31,41 +31,42 @@ import {
   TrendingUp,
   Gem,
   Plane,
-  Filter
+  Filter,
+  Sparkles,
+  ExternalLink,
+  ArrowRightLeft
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useTrip } from "@/context/trip-context"
 import destinationsData from "@/destinations_105.json"
 
 /* ─────────────────────────────────────────────
    105 DESTINATIONS (DYNAMICAL IMPORT FROM JSON)
    ───────────────────────────────────────────── */
-const allDestinations = destinationsData.map((d, index) => ({
-  ...d,
-  id: `${d.id || d.name.toLowerCase().replace(/\s+/g, '-')}-${index}`
-}))
+const allDestinations = destinationsData
 
 /* ─────────────────────────────────────────────
    FILTER CATEGORIES & OPTIONS
    ───────────────────────────────────────────── */
 const filterCategories = [
   {
-    key: "weather", label: "Weather", icon: "☀️",
-    options: ["Summers", "Winters", "Monsoon"],
+    key: "vibe", label: "Vibe", icon: "✨",
+    options: ["Relaxation", "Adventure", "Party", "Heritage", "Romantic", "Nature", "Luxury", "Budget"],
+    color: "#5A8CB2", bgTint: "rgba(90,140,178,0.06)"
+  },
+  {
+    key: "bestTime", label: "Best Season", icon: "☀️",
+    options: ["Nov - Feb", "Oct - Mar", "Nov - Mar", "Mar - May", "Jun - Sep", "Dec - Feb", "Apr - Oct"],
     color: "#F59E0B", bgTint: "rgba(245,158,11,0.06)"
   },
   {
-    key: "company", label: "Company", icon: "👥",
-    options: ["Friends", "Family", "Solo"],
-    color: "#3B82F6", bgTint: "rgba(59,130,246,0.06)"
+    key: "company", label: "Ideal For", icon: "👥",
+    options: ["Friends & Couples", "Families & Culture", "Youth & Couples", "Culture & Couples", "Snow & Couples", "Beach Lovers"],
+    color: "#8B5CF6", bgTint: "rgba(139,92,246,0.06)"
   },
   {
-    key: "mood", label: "Mood", icon: "🎭",
-    options: ["Party", "Relax", "Adventure"],
-    color: "#A855F7", bgTint: "rgba(168,85,247,0.06)"
-  },
-  {
-    key: "budget", label: "Budget", icon: "💰",
-    options: ["Economy", "Luxury"],
+    key: "budget", label: "Budget Tier", icon: "💰",
+    options: ["Budget Friendly", "Mid Range", "Luxury", "Ultra Luxury"],
     color: "#10B981", bgTint: "rgba(16,185,129,0.06)"
   },
   {
@@ -76,15 +77,15 @@ const filterCategories = [
 ]
 
 /* ─────────────────────────────────────────────
-   PETAL INFO CONFIG
+   PETAL INFO CONFIG (COMPACT RADIAL DISTANCE TO PREVENT CLIPPING)
    ───────────────────────────────────────────── */
 const petalConfig = [
-  { key: "minDays", label: "Duration", angle: -90, distance: 148 },
-  { key: "mood", label: "Vibe", angle: -30, distance: 154 },
-  { key: "specialty", label: "Highlight", angle: 30, distance: 154 },
-  { key: "weather", label: "Best Season", angle: 90, distance: 148 },
-  { key: "budget", label: "Budget", angle: 150, distance: 154 },
-  { key: "company", label: "Ideal For", angle: 210, distance: 154 },
+  { key: "minDays", label: "Duration", angle: -90, distance: 112 },
+  { key: "mood", label: "Vibe", angle: -32, distance: 115 },
+  { key: "specialty", label: "Highlight", angle: 32, distance: 115 },
+  { key: "weather", label: "Best Season", angle: 90, distance: 112 },
+  { key: "budget", label: "Budget", angle: 148, distance: 115 },
+  { key: "company", label: "Ideal For", angle: 212, distance: 115 },
 ]
 
 /* ─────────────────────────────────────────────
@@ -107,30 +108,40 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
   }
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-3 px-2">
+    <div className="mb-2">
+      <div className="flex items-center justify-between mb-2 px-2">
         <h3 className="flex items-center gap-2 font-heading text-xl font-bold text-foreground">
-          <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+          <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-[#5A8CB2]/10 text-[#5A8CB2]">
             {icon}
           </span>
           {label}
           <span className="ml-2 text-xs font-normal text-muted-foreground">({destinations.length})</span>
         </h3>
         <div className="flex items-center gap-2">
-          <button onClick={() => handleScroll("left")} aria-label="Scroll left"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-md transition-all hover:bg-emerald-500 hover:text-white hover:scale-105">
-            <ChevronLeft className="h-5 w-5" />
+          <button
+            type="button"
+            onClick={() => handleScroll("left")}
+            aria-label="Scroll left"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-md transition-all hover:bg-[#5A8CB2] hover:text-white hover:scale-105 cursor-pointer"
+          >
+            <ChevronLeft className="h-4 w-4" />
           </button>
-          <button onClick={() => handleScroll("right")} aria-label="Scroll right"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-md transition-all hover:bg-emerald-500 hover:text-white hover:scale-105">
-            <ChevronRight className="h-5 w-5" />
+          <button
+            type="button"
+            onClick={() => handleScroll("right")}
+            aria-label="Scroll right"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-md transition-all hover:bg-[#5A8CB2] hover:text-white hover:scale-105 cursor-pointer"
+          >
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <div ref={scrollRef}
-        className="flex items-start gap-8 overflow-x-auto py-20 px-6 explore-scrollbar-hide"
-        style={{ scrollbarWidth: "none" }}>
+      <div
+        ref={scrollRef}
+        className="flex items-start gap-8 overflow-x-auto py-12 px-14 explore-scrollbar-hide"
+        style={{ scrollbarWidth: "none" }}
+      >
         {destinations.map((item) => (
           <ArchCard
             key={item.id}
@@ -256,109 +267,262 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
 /* ─────────────────────────────────────────────
    DETAIL PANEL
    ───────────────────────────────────────────── */
-function DetailPanel({ destination, position, onClose, onExplore }) {
-  const isRight = position === "right"
+function DetailPanel({ destination, position, onClose, onExplore, onNavigateView }) {
+  const [showPackagesView, setShowPackagesView] = useState(false)
+  const { addPackageToCompare } = useTrip()
 
-  useEffect(() => {
-    const handleKey = (e) => { if (e.key === "Escape") onClose() }
-    window.addEventListener("keydown", handleKey)
-    return () => window.removeEventListener("keydown", handleKey)
-  }, [onClose])
+  const companyPackages = [
+    {
+      id: `${destination.name.toLowerCase().replace(/\s+/g, '-')}-mmt`,
+      provider: "MakeMyTrip",
+      name: `${destination.name} Grand Escape & Resort Stay`,
+      destination: destination.name,
+      country: destination.country || "India",
+      duration: "4 Days / 3 Nights",
+      price: "₹14,999",
+      numericPrice: 14999,
+      rating: "4.8 ★",
+      highlights: "Resort Stay, Airport Transfers, Daily Breakfast & Sightseeing",
+      url: "https://www.makemytrip.com/holidays-india/",
+      hotelCategory: "4-Star Beach/City Resort",
+      meals: "Breakfast & Sightseeing Included",
+      transport: "Private AC Cab & Airport Transfer"
+    },
+    {
+      id: `${destination.name.toLowerCase().replace(/\s+/g, '-')}-veena`,
+      provider: "Veena World",
+      name: `${destination.name} Heritage & Family Signature Tour`,
+      destination: destination.name,
+      country: destination.country || "India",
+      duration: "5 Days / 4 Nights",
+      price: "₹18,500",
+      numericPrice: 18500,
+      rating: "4.9 ★",
+      highlights: "All-inclusive meals, Guided Heritage Walks, Private Cab",
+      url: "https://www.veenaworld.com/",
+      hotelCategory: "Heritage & Family Resort",
+      meals: "All Meals Included",
+      transport: "Dedicated Private SUV"
+    },
+    {
+      id: `${destination.name.toLowerCase().replace(/\s+/g, '-')}-kesari`,
+      provider: "Kesari Tours",
+      name: `${destination.name} Luxury Panorama & Sunset Special`,
+      destination: destination.name,
+      country: destination.country || "India",
+      duration: "6 Days / 5 Nights",
+      price: "₹22,900",
+      numericPrice: 22900,
+      rating: "4.8 ★",
+      highlights: "5-Star Hotel Stay, Sunset Cruise, Gourmet Dining",
+      url: "https://www.kesari.in/",
+      hotelCategory: "5-Star Luxury Resort",
+      meals: "Gourmet Breakfast & Dinner",
+      transport: "Private Luxury SUV & Sunset Cruise"
+    },
+    {
+      id: `${destination.name.toLowerCase().replace(/\s+/g, '-')}-sotc`,
+      provider: "SOTC Holidays",
+      name: `${destination.name} Adventure & Coastal Trail`,
+      destination: destination.name,
+      country: destination.country || "India",
+      duration: "4 Days / 3 Nights",
+      price: "₹16,400",
+      numericPrice: 16400,
+      rating: "4.7 ★",
+      highlights: "Attraction Tickets, Speedboat Activity, Beachside Resort",
+      url: "https://www.sotc.in/",
+      hotelCategory: "Coastal Beach Resort",
+      meals: "Breakfast & Entry Tickets Included",
+      transport: "Speedboat & AC Cab"
+    },
+    {
+      id: `${destination.name.toLowerCase().replace(/\s+/g, '-')}-thomascook`,
+      provider: "Thomas Cook",
+      name: `${destination.name} Royal Experience & Food Trail`,
+      destination: destination.name,
+      country: destination.country || "India",
+      duration: "5 Days / 4 Nights",
+      price: "₹24,500",
+      numericPrice: 24500,
+      rating: "4.9 ★",
+      highlights: "Boutique Villa Stay, Culinary Tasting Tour, Personal Escort",
+      url: "https://www.thomascook.in/",
+      hotelCategory: "Boutique Heritage Villa",
+      meals: "Culinary Tasting & All Breakfasts",
+      transport: "Personal Chauffeur Escort"
+    }
+  ]
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4"
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-md" onClick={onClose} />
-
-      {/* Panel */}
       <motion.div
-        initial={{ x: isRight ? 450 : -450, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: isRight ? 450 : -450, opacity: 0 }}
-        transition={{ type: "spring", stiffness: 280, damping: 28 }}
-        className={`relative z-10 w-full max-w-md mx-4 ${isRight ? "ml-auto mr-8" : "ml-8 mr-auto"}`}
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        onClick={(e) => e.stopPropagation()}
+        className={`w-full max-w-lg overflow-hidden rounded-3xl border border-border bg-card shadow-2xl ${
+          position === "left" ? "md:mr-auto md:ml-12" : "md:ml-auto md:mr-12"
+        }`}
       >
-        <div className="rounded-3xl border border-border/80 bg-background/95 backdrop-blur-2xl shadow-2xl overflow-hidden">
-          {/* Image Banner */}
-          <div className="relative h-48 overflow-hidden">
-            <img src={destination.image} alt={destination.name} className="h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-            
-            {/* Working Close Button */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                onClose()
-              }}
-              aria-label="Close detail panel"
-              className="absolute top-3 right-3 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black/90 hover:scale-110 active:scale-95 cursor-pointer border border-white/20 shadow-xl"
+        {/* Header Image */}
+        <div className="relative h-48 w-full overflow-hidden">
+          <img
+            src={destination.image}
+            alt={destination.name}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close detail panel"
+            className="absolute top-3 right-3 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black/90 hover:scale-110 active:scale-95 cursor-pointer border border-white/20 shadow-xl"
+          >
+            <X className="h-5 w-5 stroke-[2.5]" />
+          </button>
+
+          <div className="absolute bottom-3 left-4">
+            <span
+              className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1"
+              style={{ background: `${destination.color || "#10B981"}30`, color: destination.color || "#10B981" }}
             >
-              <X className="h-5 w-5 stroke-[2.5]" />
-            </button>
-
-            <div className="absolute bottom-3 left-4">
-              <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1"
-                style={{ background: `${destination.color || "#10B981"}30`, color: destination.color || "#10B981" }}>
-                {destination.country}
-              </span>
-              <h3 className="font-heading text-2xl font-bold text-foreground">{destination.name}</h3>
-              <p className="text-sm text-muted-foreground">{destination.subtitle}</p>
-            </div>
+              {destination.country}
+            </span>
+            <h3 className="font-heading text-2xl font-bold text-foreground">{destination.name}</h3>
+            <p className="text-sm text-muted-foreground">{destination.subtitle}</p>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="p-6">
-            <p className="text-xs text-muted-foreground leading-relaxed mb-5">{destination.description}</p>
+        {/* Content */}
+        <div className="p-6 max-h-[60vh] overflow-y-auto">
+          {!showPackagesView ? (
+            <>
+              <p className="text-xs text-muted-foreground leading-relaxed mb-5">{destination.description}</p>
 
-            {/* Key Details Grid */}
-            <div className="grid grid-cols-2 gap-2.5 mb-5">
-              {[
-                { icon: <Users className="h-4 w-4" />, label: "Age Group", value: destination.ageGroup || "All Ages", color: "var(--primary)" },
-                { icon: <HeartHandshake className="h-4 w-4" />, label: "Vibe", value: destination.vibe || "Culture", color: destination.color || "#10B981" },
-                { icon: <Clock className="h-4 w-4" />, label: "Best Season", value: destination.bestTime || "All Year", color: "#F59E0B" },
-                { icon: <Coins className="h-4 w-4" />, label: "Budget", value: destination.startingBudget || "₹8,500", color: "#10B981" },
-              ].map((detail, i) => (
-                <div key={i} className="rounded-xl border border-border bg-card p-3 text-center">
-                  <div className="mx-auto mb-1 flex h-7 w-7 items-center justify-center rounded-lg"
-                    style={{ background: `${detail.color}15`, color: detail.color }}>
-                    {detail.icon}
+              <div className="grid grid-cols-2 gap-2.5 mb-5">
+                {[
+                  { icon: <Users className="h-4 w-4" />, label: "Age Group", value: destination.ageGroup || "All Ages", color: "var(--primary)" },
+                  { icon: <HeartHandshake className="h-4 w-4" />, label: "Vibe", value: destination.vibe || "Culture", color: destination.color || "#10B981" },
+                  { icon: <Clock className="h-4 w-4" />, label: "Best Season", value: destination.bestTime || "All Year", color: "#F59E0B" },
+                  { icon: <Coins className="h-4 w-4" />, label: "Budget", value: destination.startingBudget || "₹8,500", color: "#10B981" },
+                ].map((detail, i) => (
+                  <div key={i} className="rounded-xl border border-border bg-card p-3 text-center">
+                    <div
+                      className="mx-auto mb-1 flex h-7 w-7 items-center justify-center rounded-lg"
+                      style={{ background: `${detail.color}15`, color: detail.color }}
+                    >
+                      {detail.icon}
+                    </div>
+                    <span className="block text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{detail.label}</span>
+                    <span className="mt-0.5 block text-xs font-extrabold text-foreground truncate">{detail.value}</span>
                   </div>
-                  <span className="block text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{detail.label}</span>
-                  <span className="mt-0.5 block text-xs font-extrabold text-foreground truncate">{detail.value}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* Stats Row */}
-            <div className="flex items-center justify-around rounded-xl bg-secondary/60 p-3 mb-5 text-center">
-              {[
-                { value: destination.attractions || 25, label: "Attractions" },
-                { value: destination.hotels || 40, label: "Hotels" },
-                { value: destination.foodSpots || 30, label: "Food" },
-                { value: destination.itineraryIdeas || 12, label: "Itineraries" },
-              ].map((stat, i) => (
-                <div key={i} className="flex flex-col">
-                  <span className="font-extrabold text-foreground text-sm">{stat.value}</span>
-                  <span className="text-muted-foreground text-[10px] font-medium">{stat.label}</span>
-                </div>
-              ))}
-            </div>
+              <div className="flex flex-col gap-2.5">
+                <Button
+                  onClick={() => setShowPackagesView(true)}
+                  className="w-full rounded-xl py-3 font-bold text-white shadow-xl transition hover:opacity-95 bg-[#5A8CB2] hover:bg-[#4A7CA2] cursor-pointer"
+                >
+                  Explore Company Packages for {destination.name}
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => onExplore(destination.name)}
+                  className="w-full rounded-xl py-2.5 font-bold border-border text-foreground hover:bg-accent cursor-pointer"
+                >
+                  <Sparkles className="mr-1.5 h-4 w-4 text-[#5A8CB2]" />
+                  Customize Itinerary directly in Planner
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-border pb-2">
+                <h4 className="font-heading text-sm font-extrabold text-foreground flex items-center gap-1.5">
+                  <Ticket className="h-4 w-4 text-[#5A8CB2]" />
+                  Verified Packages for {destination.name}
+                </h4>
+                <span className="text-[10px] font-bold text-[#5A8CB2] bg-[#C8D9E6]/40 px-2 py-0.5 rounded-full">
+                  5 Top Companies
+                </span>
+              </div>
 
-            {/* CTA */}
-            <Button onClick={() => onExplore(destination.name)}
-              className="w-full rounded-xl py-3 font-bold text-white shadow-xl transition hover:opacity-95"
-              style={{ background: destination.color || "#10B981", boxShadow: `0 8px 24px ${destination.color || "#10B981"}35` }}>
-              Explore {destination.name}
-              <ChevronRight className="ml-1 h-4 w-4" />
-            </Button>
-          </div>
+              <div className="space-y-3">
+                {companyPackages.map((pkg, idx) => (
+                  <div key={idx} className="p-3.5 rounded-2xl border border-border bg-background hover:border-[#5A8CB2]/50 transition-all space-y-2 shadow-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-extrabold text-white bg-[#5A8CB2] px-2.5 py-0.5 rounded-md">
+                        {pkg.provider}
+                      </span>
+                      <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400">
+                        {pkg.price} / person
+                      </span>
+                    </div>
+                    <h5 className="font-bold text-xs text-foreground">{pkg.name}</h5>
+                    <p className="text-[10px] text-muted-foreground">{pkg.highlights}</p>
+                    
+                    <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground pt-1 border-t border-border/40">
+                      <span>⏱️ {pkg.duration}</span>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={pkg.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[10px] font-bold text-[#5A8CB2] hover:underline"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          Official Site
+                        </a>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            addPackageToCompare(pkg)
+                            onClose()
+                            onNavigateView?.("packages")
+                          }}
+                          className="rounded-lg border-[#5A8CB2]/40 text-[#5A8CB2] hover:bg-[#5A8CB2]/10 text-[10px] font-bold px-2 py-0.5 flex items-center gap-1 cursor-pointer h-7"
+                        >
+                          <ArrowRightLeft className="h-3 w-3" />
+                          Compare
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between gap-3 pt-3 border-t border-border">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPackagesView(false)}
+                  className="rounded-xl border-border text-xs font-bold px-4 py-2 hover:bg-accent cursor-pointer"
+                >
+                  <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
+                  Back
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => onExplore(destination.name)}
+                  className="rounded-xl bg-[#5A8CB2] text-white text-xs font-bold px-4 py-2 hover:bg-[#4A7CA2] cursor-pointer"
+                >
+                  <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                  Customize Itinerary
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>
@@ -568,7 +732,7 @@ function FilterPills({ activeFilters, setActiveFilters }) {
 /* ─────────────────────────────────────────────
    MAIN EXPLORE WORKSPACE COMPONENT
    ───────────────────────────────────────────── */
-export function ExploreWorkspace({ onBack, onSelectDestination }) {
+export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }) {
   const [hoveredId, setHoveredId] = useState(null)
   const [activeFilters, setActiveFilters] = useState({})
   const [selectedDest, setSelectedDest] = useState(null)

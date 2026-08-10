@@ -36,7 +36,8 @@ import {
   Plus,
   CheckSquare,
   FileText,
-  Check
+  Check,
+  GripVertical
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
@@ -291,6 +292,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
     setItinerary,
     addSpotToItinerary,
     removeSpotFromItinerary,
+    reorderDayActivities,
     updateSpotCostInItinerary,
     saveCurrentTrip
   } = useTrip()
@@ -659,7 +661,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 setSaved(true)
                 setTimeout(() => setSaved(false), 3000)
               }}
-              className="rounded-xl bg-amber-400 text-[#0D2B45] hover:bg-amber-300 font-extrabold text-xs px-4 py-2 shadow flex items-center gap-2 cursor-pointer"
+              className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-extrabold text-xs px-4 py-2 shadow flex items-center gap-2 cursor-pointer"
             >
               <Bookmark className="h-4 w-4" />
               {saved ? "Saved! Opening Report Pass..." : "Save Trip & Offline Pass"}
@@ -667,19 +669,23 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
           </div>
         </div>
 
-        {/* Title Header & Live Search Bar */}
+        {/* Title Header & Single Streamlined Search Bar */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#5A8CB2] text-white shadow-sm mb-2">
+              <Sparkles className="h-3.5 w-3.5" />
+              Total {itinerary?.length || days || 3} Day Itinerary to {destination || "Goa (India)"}
+            </span>
             <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Design Your Personalized Itinerary
+              Design Your Personalized Trip
             </h1>
             <p className="mt-1 text-sm text-muted-foreground max-w-xl">
-              Select preferences, reorder spots, view synchronized live map routes & explore nearby places.
+              Drag to reorder spots, sync with live map, optimize routes & add custom spots.
             </p>
           </div>
 
-          {/* Single Streamlined Search Google Bar */}
-          <div className="relative min-w-[290px] sm:min-w-[380px]">
+          {/* Single Streamlined Search Bar */}
+          <div className="relative min-w-[280px] sm:min-w-[360px]">
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -690,36 +696,30 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 setShowSearchDropdown(false)
                 setMiniGoogleOpen(true)
               }}
-              className="relative flex items-center gap-2"
+              className="relative flex items-center rounded-2xl border border-border bg-card shadow-sm p-1"
             >
-              <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search Google live for any spot or place..."
-                  value={searchQuery}
-                  onChange={(e) => handleSearchInputChange(e.target.value)}
-                  onFocus={() => searchQuery.trim() && setShowSearchDropdown(true)}
-                  className="w-full rounded-2xl border border-border bg-card pl-10 pr-4 py-2.5 text-xs font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm"
-                />
-              </div>
-
+              <Search className="h-4 w-4 text-muted-foreground ml-3 shrink-0" />
+              <input
+                type="text"
+                placeholder="Search any location or spot live..."
+                value={searchQuery}
+                onChange={(e) => handleSearchInputChange(e.target.value)}
+                onFocus={() => searchQuery.trim() && setShowSearchDropdown(true)}
+                className="w-full bg-transparent px-3 py-2 text-xs font-medium text-foreground outline-none placeholder:text-muted-foreground"
+              />
               <Button
                 type="submit"
                 size="sm"
-                className="rounded-2xl bg-amber-400 text-[#0D2B45] hover:bg-amber-300 font-extrabold text-xs px-4 py-2.5 shadow flex items-center gap-1.5 shrink-0 cursor-pointer"
-                title="Search Google Live"
+                className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs px-4 py-2 shadow shrink-0 cursor-pointer"
               >
-                <Globe className="h-4 w-4" />
-                Google
+                Search
               </Button>
             </form>
-
           </div>
         </div>
 
-        {/* MAIN WORKSPACE GRID: Left Side (Trip Preference OR Map) + Right Side (Itinerary Timeline) */}
-        <div className="grid gap-8 lg:grid-cols-12 mb-16 items-start">
+        {/* Dynamic Left/Right Split Workspace */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
           {/* LEFT SIDE (4 OR 6 COLS): Interactive Map (When Globe Clicked) OR Trip Preferences Form */}
           <AnimatePresence mode="wait">
@@ -733,52 +733,14 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 transition={{ duration: 0.35 }}
                 className="lg:col-span-6 flex flex-col space-y-3 sticky top-24"
               >
-                <div className="rounded-3xl border border-border bg-card p-4 shadow-xl flex flex-col h-[620px] relative overflow-hidden">
-                  
-                  {/* Compact "See Nearby" Toolbar (Hotels, Cafes, Restaurants, Petrol, Medicals) */}
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2 z-10 bg-background/90 backdrop-blur-md p-2.5 rounded-2xl border border-border/60">
-                    <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                      <Filter className="h-3.5 w-3.5 text-primary" />
-                      See Nearby:
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {[
-                        { key: "hotels", label: "Hotels", icon: Hotel },
-                        { key: "cafes", label: "Cafes", icon: Coffee },
-                        { key: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
-                        { key: "petrol_pumps", label: "Petrol Pumps", icon: Fuel },
-                        { key: "medicals", label: "Medical Stores", icon: Stethoscope }
-                      ].map((cat) => {
-                        const IconC = cat.icon
-                        const isActive = nearbyCategory === cat.key
-                        return (
-                          <button
-                            key={cat.key}
-                            type="button"
-                            onClick={() => setNearbyCategory(isActive ? null : cat.key)}
-                            className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-colors border ${
-                              isActive
-                                ? "bg-rose-500 text-white border-rose-500 shadow-sm"
-                                : "bg-card border-border text-muted-foreground hover:bg-accent"
-                            }`}
-                          >
-                            <IconC className="h-3 w-3" />
-                            {cat.label}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Leaflet Map Component */}
-                  <div className="flex-1 w-full rounded-2xl overflow-hidden shadow-inner z-0">
-                    <TripMap
-                      spots={activeSpots}
-                      nearbyPlaces={activeNearbyPlaces}
-                      hoveredSpotId={hoveredSpotId}
-                      onSpotClick={handleMapSpotClick}
-                    />
-                  </div>
+                <div className="rounded-3xl border-2 border-border/80 bg-card shadow-2xl flex flex-col h-[680px] relative overflow-hidden">
+                  {/* Next-Gen Edge-to-Edge Leaflet Map */}
+                  <TripMap
+                    spots={activeSpots}
+                    nearbyPlaces={activeNearbyPlaces}
+                    hoveredSpotId={hoveredSpotId}
+                    onSpotClick={handleMapSpotClick}
+                  />
                 </div>
               </motion.div>
             ) : (
@@ -789,89 +751,61 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -30 }}
                 transition={{ duration: 0.35 }}
-                className="lg:col-span-4"
+                className="lg:col-span-4 rounded-3xl border border-border bg-card p-6 shadow-xl space-y-6 sticky top-24"
               >
-                <div className="rounded-3xl border border-border bg-card p-6 shadow-xl space-y-6">
-                  <div className="flex items-center justify-between border-b border-border/60 pb-4">
-                    <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-                      <Filter className="h-4 w-4 text-primary" />
-                      Trip Preferences
-                    </h3>
-                    <span className="text-xs text-muted-foreground">Parameters</span>
-                  </div>
+                <div className="border-b border-border pb-4">
+                  <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Trip Preferences
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">Customize your travel dates and stay tier.</p>
+                </div>
 
-                  {/* Destination Dropdown */}
-                  <div>
+                <div className="space-y-4">
+                  {/* Single Unified Calendar Range Picker */}
+                  <div className="relative">
                     <label className="mb-2 block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Select Destination
+                      Trip Dates & Duration
                     </label>
-                    <select
-                      value={destination}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        setDestination(val)
-                        if (!val) setItinerary([])
-                      }}
-                      className="w-full rounded-xl border border-border bg-background p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
-                    >
-                      <option value="">-- Select a Destination --</option>
-                      {destinationsData.map((d) => (
-                        <option key={d.id} value={d.name}>
-                          {d.name} ({d.country})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Calendar Date Range Picker */}
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Travel Dates ({days} Days)
-                    </label>
-                    <div
+                    <button
+                      type="button"
                       onClick={() => setCalendarOpen(!calendarOpen)}
-                      className="flex items-center justify-between rounded-xl border border-border bg-background p-3 text-xs font-semibold text-foreground cursor-pointer hover:border-primary/50 transition-colors"
+                      className="w-full flex items-center justify-between rounded-2xl border border-border bg-background px-4 py-3 text-xs font-bold text-foreground shadow-sm hover:border-primary transition-all"
                     >
-                      <span className="flex items-center gap-2">
+                      <div className="flex items-center gap-2.5">
                         <Calendar className="h-4 w-4 text-primary" />
-                        {startDate} → {endDate}
-                      </span>
-                      <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                        {days} Days
-                      </span>
-                    </div>
+                        <span>
+                          {startDate} → {endDate} ({days} {days === 1 ? "Day" : "Days"})
+                        </span>
+                      </div>
+                      <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${calendarOpen ? "rotate-90" : ""}`} />
+                    </button>
 
+                    {/* Single Unified Calendar Modal */}
                     {calendarOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 5 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-3 p-4 rounded-2xl border border-border bg-background shadow-2xl space-y-3"
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute left-0 right-0 top-16 z-50 rounded-2xl border border-border bg-card p-4 shadow-2xl space-y-3"
                       >
-                        <div className="flex justify-between items-center text-xs font-bold text-foreground border-b border-border/60 pb-2">
-                          <span className="flex items-center gap-1.5 text-primary">
-                            <Calendar className="h-4 w-4" />
-                            Single Range Calendar (August 2026)
+                        <div className="flex items-center justify-between border-b border-border/80 pb-2">
+                          <span className="text-xs font-bold text-foreground">Select Travel Date Range</span>
+                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                            Single Calendar
                           </span>
-                          <Button variant="ghost" size="sm" onClick={() => setCalendarOpen(false)} className="h-6 w-6 p-0 rounded-full">
-                            <X className="h-3.5 w-3.5" />
-                          </Button>
                         </div>
 
-                        {/* Single Month Grid (31 Days) */}
                         <div className="space-y-2">
-                          <div className="grid grid-cols-7 text-center text-[10px] font-extrabold text-muted-foreground uppercase">
-                            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                          <div className="grid grid-cols-7 text-center text-[10px] font-bold text-muted-foreground">
+                            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+                              <span key={d}>{d}</span>
+                            ))}
                           </div>
-
-                          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold">
-                            {/* Empty offset cells for August 2026 (Starts on Saturday) */}
-                            <span /><span /><span /><span /><span /><span />
-
-                            {Array.from({ length: 31 }, (_, i) => {
-                              const dayNum = i + 1
-                              const startDayNum = parseInt(startDate.split("-")[2] || "15", 10)
-                              const endDayNum = parseInt(endDate.split("-")[2] || "17", 10)
-
+                          <div className="grid grid-cols-7 gap-1">
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map((dayNum) => {
+                              const startDayNum = parseInt(startDate.split("-")[2], 10)
+                              const endDayNum = parseInt(endDate.split("-")[2], 10)
                               const isStart = dayNum === startDayNum
                               const isEnd = dayNum === endDayNum
                               const isInRange = dayNum > startDayNum && dayNum < endDayNum
@@ -891,9 +825,9 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                   }}
                                   className={`py-1.5 text-xs font-bold transition-all ${
                                     isStart || isEnd
-                                      ? "bg-[#0D2B45] text-amber-400 rounded-lg font-extrabold shadow-md scale-105"
+                                      ? "bg-[#5A8CB2] text-white rounded-lg font-extrabold shadow-md scale-105"
                                       : isInRange
-                                      ? "bg-amber-400/25 text-[#0D2B45] font-bold rounded-sm border-y border-amber-400/40"
+                                      ? "bg-[#C8D9E6]/50 text-[#1E293B] font-bold rounded-sm border-y border-[#5A8CB2]/30"
                                       : "hover:bg-accent text-foreground rounded-lg"
                                   }`}
                                 >
@@ -905,13 +839,13 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                         </div>
 
                         <div className="pt-2 border-t border-border/60 flex items-center justify-between">
-                          <span className="text-[11px] font-bold text-amber-500 bg-amber-400/10 px-2.5 py-0.5 rounded-full">
+                          <span className="text-[11px] font-bold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2.5 py-0.5 rounded-full">
                             Aug {startDate.split("-")[2]} → Aug {endDate.split("-")[2]} ({days} Days Tube)
                           </span>
                           <Button
                             size="sm"
                             onClick={() => setCalendarOpen(false)}
-                            className="rounded-xl bg-[#0D2B45] text-xs font-bold text-white px-4 py-1.5 hover:bg-[#12395b]"
+                            className="rounded-xl bg-[#5A8CB2] text-xs font-bold text-white px-4 py-1.5 hover:bg-[#4A7CA2]"
                           >
                             Set Range
                           </Button>
@@ -1242,38 +1176,61 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                               ref={(el) => (spotRefs.current[act.id] = el)}
                               className="relative"
                             >
-                              {/* Spot Card Box */}
+                              {/* Spot Card Box (Drag & Drop Reorderable) */}
                               <div
+                                draggable
+                                onDragStart={(e) => {
+                                  e.dataTransfer.setData("text/plain", idx.toString())
+                                  e.dataTransfer.effectAllowed = "move"
+                                }}
+                                onDragOver={(e) => {
+                                  e.preventDefault()
+                                  e.dataTransfer.dropEffect = "move"
+                                }}
+                                onDrop={(e) => {
+                                  e.preventDefault()
+                                  const fromIdx = parseInt(e.dataTransfer.getData("text/plain"), 10)
+                                  if (!isNaN(fromIdx) && fromIdx !== idx) {
+                                    reorderDayActivities(activeDayIndex, fromIdx, idx)
+                                  }
+                                }}
                                 onMouseEnter={() => handleSpotMouseEnter(act.id, spotImages.length)}
                                 onMouseLeave={() => handleSpotMouseLeave(act.id)}
-                                className={`group relative flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-2xl border p-4 transition-all ${
+                                className={`group relative flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-2xl border p-4 transition-all cursor-grab active:cursor-grabbing ${
                                   isHovered
                                     ? "border-primary bg-primary/5 shadow-xl scale-[1.01]"
                                     : "border-border/70 bg-background/80 hover:border-primary/50 hover:bg-background hover:shadow-lg"
                                 }`}
                               >
                                 <div className="flex items-start gap-3 flex-1 min-w-0">
-                                  {/* Drag Reorder Handles */}
-                                  <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                                    <button
-                                      type="button"
-                                      onClick={() => moveSpot(activeDayIndex, idx, -1)}
-                                      disabled={idx === 0}
-                                      className="hover:text-primary disabled:opacity-30 p-0.5"
-                                    >
-                                      <MoveUp className="h-3.5 w-3.5" />
-                                    </button>
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-xs">
+                                  {/* Drag Reorder Handle & Grip Icon */}
+                                  <div className="flex flex-col items-center justify-center gap-1 text-muted-foreground shrink-0 pt-0.5">
+                                    <div className="p-1 rounded-md text-amber-500 bg-amber-400/10 cursor-grab hover:bg-amber-400/20" title="Drag with mouse to reorder spot">
+                                      <GripVertical className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-primary/10 text-primary font-extrabold text-xs">
                                       {idx + 1}
                                     </div>
-                                    <button
-                                      type="button"
-                                      onClick={() => moveSpot(activeDayIndex, idx, 1)}
-                                      disabled={idx === itinerary[activeDayIndex].activities.length - 1}
-                                      className="hover:text-primary disabled:opacity-30 p-0.5"
-                                    >
-                                      <MoveDown className="h-3.5 w-3.5" />
-                                    </button>
+                                    <div className="flex items-center gap-0.5">
+                                      <button
+                                        type="button"
+                                        onClick={() => moveSpot(activeDayIndex, idx, -1)}
+                                        disabled={idx === 0}
+                                        className="hover:text-primary disabled:opacity-30 p-0.5"
+                                        title="Move Up"
+                                      >
+                                        <MoveUp className="h-3 w-3" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => moveSpot(activeDayIndex, idx, 1)}
+                                        disabled={idx === itinerary[activeDayIndex].activities.length - 1}
+                                        className="hover:text-primary disabled:opacity-30 p-0.5"
+                                        title="Move Down"
+                                      >
+                                        <MoveDown className="h-3 w-3" />
+                                      </button>
+                                    </div>
                                   </div>
 
                                   <div className="flex-1 min-w-0">
@@ -1366,6 +1323,67 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                             </div>
                           )
                         })}
+                      </div>
+
+                      {/* Manual Add Custom Spot & Add Extra Day Action Bar */}
+                      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border/60">
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            const spotTitle = prompt(`Enter custom place name to add to Day ${activeDayIndex + 1}:`)
+                            if (spotTitle && spotTitle.trim()) {
+                              addSpotToItinerary(activeDayIndex, {
+                                title: spotTitle.trim(),
+                                time: "02:30 PM",
+                                desc: `Custom added spot in ${destination || "your trip"}.`,
+                                cost: "₹500",
+                                numericCost: 500
+                              })
+                            }
+                          }}
+                          className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs px-4 py-2.5 shadow-md flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Add Custom Spot to Day {activeDayIndex + 1}
+                        </Button>
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            const nextDayNum = (itinerary?.length || days || 3) + 1
+                            setDays(nextDayNum)
+                            setItinerary((prev) => [
+                              ...(prev || []),
+                              {
+                                day: nextDayNum,
+                                title: `Day ${nextDayNum} Local Explorations`,
+                                date: `Aug ${15 + nextDayNum - 1}`,
+                                activities: [
+                                  {
+                                    id: `spot-extra-d${nextDayNum}-s1-${Date.now()}`,
+                                    time: "10:00 AM",
+                                    openingHours: "09:00 AM - 06:00 PM",
+                                    type: "Sightseeing",
+                                    category: "Activities",
+                                    title: `${destination || "Trip"} Day ${nextDayNum} Highlight`,
+                                    desc: `Curated local attraction for Day ${nextDayNum}.`,
+                                    cost: "₹650",
+                                    numericCost: 650,
+                                    lat: 15.55 + nextDayNum * 0.01,
+                                    lng: 73.75 + nextDayNum * 0.01,
+                                    images: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"]
+                                  }
+                                ]
+                              }
+                            ])
+                            setActiveDayIndex(nextDayNum - 1)
+                          }}
+                          className="rounded-xl border border-border text-foreground hover:bg-accent font-bold text-xs px-4 py-2.5 flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Plus className="h-4 w-4 text-[#5A8CB2]" />
+                          Add Extra Day (Day {(itinerary?.length || days || 3) + 1})
+                        </Button>
                       </div>
 
                     </motion.div>

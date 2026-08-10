@@ -134,6 +134,9 @@ export function TripProvider({ children }) {
   // Centralized Itinerary State
   const [itinerary, setItinerary] = useState([])
 
+  // BASE STAY / BASE HOTEL STATE
+  const [baseStay, setBaseStay] = useState(null)
+
   // SAVED TRIPS & OFFLINE REPORT STATE
   const [savedTrips, setSavedTrips] = useState([])
   const [savedTripsModalOpen, setSavedTripsModalOpen] = useState(false)
@@ -415,6 +418,127 @@ export function TripProvider({ children }) {
       }
       return updated
     })
+  }
+
+  // Remove spot by matching title/name
+  const removeSpotByName = (spotName) => {
+    if (!spotName) return false
+    let removed = false
+
+    setItinerary((prev) => {
+      if (!prev) return prev
+      const lowerQuery = spotName.toLowerCase().trim()
+      return prev.map((dayPlan) => {
+        const remaining = (dayPlan.activities || []).filter((act) => {
+          const titleLower = (act.title || "").toLowerCase()
+          const match = titleLower.includes(lowerQuery) || lowerQuery.includes(titleLower)
+          if (match) removed = true
+          return !match
+        })
+        return {
+          ...dayPlan,
+          activities: remaining
+        }
+      })
+    })
+
+    return removed
+  }
+
+  // Reorder spots in a specific day's itinerary
+  const reorderDayActivities = (dayIndex, fromIndex, toIndex) => {
+    setItinerary((prev) => {
+      if (!prev || !prev[dayIndex]) return prev
+      const updated = [...prev]
+      const activities = [...updated[dayIndex].activities]
+      if (fromIndex < 0 || fromIndex >= activities.length || toIndex < 0 || toIndex >= activities.length) {
+        return prev
+      }
+      const [movedItem] = activities.splice(fromIndex, 1)
+      activities.splice(toIndex, 0, movedItem)
+      updated[dayIndex] = {
+        ...updated[dayIndex],
+        activities
+      }
+      return updated
+    })
+  }
+
+  // Generate Full Multi-Day Itinerary and Populate State Globally
+  const generateTripItinerary = (cityName, totalDays = 3, startStr = "2026-08-15") => {
+    const destName = cityName || destination || "Goa (India)"
+    const numDays = Number(totalDays) || 3
+
+    setDestination(destName)
+    setDays(numDays)
+
+    const baseLat = 15.55
+    const baseLng = 73.75
+    const img = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+
+    const generated = []
+    for (let d = 1; d <= numDays; d++) {
+      const currentDate = new Date(startStr)
+      currentDate.setDate(currentDate.getDate() + (d - 1))
+      const dateFormatted = currentDate.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      })
+
+      generated.push({
+        day: d,
+        title: d === 1 ? `Arrival & Historic Highlights of ${destName}` : d === 2 ? `Cultural Exploration & Local Cuisines` : d === 3 ? `Scenic Panoramas & Sunset Relaxation` : `Day ${d} Local Discoveries`,
+        date: dateFormatted,
+        activities: [
+          {
+            id: `spot-${destName.toLowerCase()}-d${d}-s1-${Date.now()}`,
+            time: "09:30 AM",
+            openingHours: "08:30 AM - 06:00 PM",
+            type: "Sightseeing",
+            category: "Activities",
+            title: `${destName} Heritage & Landmark Tour - Day ${d}`,
+            desc: `Explore top iconic landmarks, culture, and architecture in ${destName}.`,
+            cost: "₹750",
+            numericCost: 750,
+            lat: baseLat + (d * 0.015) + 0.005,
+            lng: baseLng + (d * 0.01) + 0.005,
+            images: [img]
+          },
+          {
+            id: `spot-${destName.toLowerCase()}-d${d}-s2-${Date.now()}`,
+            time: "01:30 PM",
+            openingHours: "11:30 AM - 11:00 PM",
+            type: "Food",
+            category: "Food & Dining",
+            title: `Authentic ${destName} Culinary & Tasting Trail`,
+            desc: `Savor regional delicacies, street food markets, and top rated eateries.`,
+            cost: "₹950",
+            numericCost: 950,
+            lat: baseLat - (d * 0.01) + 0.01,
+            lng: baseLng + (d * 0.015) - 0.005,
+            images: ["https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=80"]
+          },
+          {
+            id: `spot-${destName.toLowerCase()}-d${d}-s3-${Date.now()}`,
+            time: "06:00 PM",
+            openingHours: "04:30 PM - 09:30 PM",
+            type: "Sunset",
+            category: "Activities",
+            title: `${destName} Golden Hour Promenade & Sunset Viewpoint`,
+            desc: `Scenic evening views and relaxing stroll at ${destName}.`,
+            cost: "₹450",
+            numericCost: 450,
+            lat: baseLat + (d * 0.005) - 0.015,
+            lng: baseLng - (d * 0.01) + 0.02,
+            images: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80"]
+          }
+        ]
+      })
+    }
+
+    setItinerary(generated)
+    return generated
   }
 
   // 4. Update Spot Cost in Itinerary
@@ -735,6 +859,23 @@ export function TripProvider({ children }) {
     }
   }
 
+  // Comparison Packages State
+  const [comparisonPackages, setComparisonPackages] = useState([])
+
+  const addPackageToCompare = (pkg) => {
+    if (!pkg) return
+    setComparisonPackages((prev) => {
+      const exists = prev.some((p) => p.id === pkg.id || p.provider === pkg.provider)
+      if (exists) {
+        return prev.map((p) => (p.provider === pkg.provider ? pkg : p))
+      }
+      if (prev.length >= 3) {
+        return [prev[1], prev[2], pkg]
+      }
+      return [...prev, pkg]
+    })
+  }
+
   const value = {
     destination,
     setDestination,
@@ -759,13 +900,23 @@ export function TripProvider({ children }) {
     additionalExpenses,
     estimatedTotalTripCost,
 
+    comparisonPackages,
+    setComparisonPackages,
+    addPackageToCompare,
+
     itinerary,
     setItinerary,
+    generateTripItinerary,
     allItinerarySpots,
     updateItinerary,
     addSpotToItinerary,
     removeSpotFromItinerary,
+    removeSpotByName,
+    reorderDayActivities,
     updateSpotCostInItinerary,
+
+    baseStay,
+    setBaseStay,
 
     savedTrips,
     setSavedTrips,
