@@ -37,7 +37,7 @@ export function BudgetVisualization({ onNavigateView }) {
             </p>
 
             {/* Interactive Slider Box */}
-            <div className="rounded-3xl border border-border bg-[#F4F6F6] p-5 shadow-xl space-y-4">
+            <div className="rounded-3xl border border-border bg-card p-5 shadow-xl space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase text-muted-foreground">Trip Budget Goal</span>
                 <span className="font-heading text-2xl font-extrabold text-[#6B4423]">
@@ -72,7 +72,7 @@ export function BudgetVisualization({ onNavigateView }) {
 
           {/* Right Column: Category Allocation Visual Chart */}
           <div className="lg:col-span-7">
-            <div className="rounded-3xl border border-border bg-[#F4F6F6] p-6 shadow-2xl space-y-5">
+            <div className="rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-5">
               <div className="flex items-center justify-between border-b border-border/60 pb-3">
                 <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
                   <Wallet className="h-5 w-5 text-[#6B4423]" />

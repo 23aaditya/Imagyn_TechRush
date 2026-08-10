@@ -1,22 +1,17 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Check,
   X,
   ArrowRightLeft,
-  ChevronLeft,
   ChevronRight,
-  Compass,
-  DollarSign,
-  Hotel,
   Sparkles,
   Star,
   Plus,
   Eye,
   CheckCircle2,
-  ArrowRight,
   Calendar,
   MapPin,
   Car,
@@ -26,12 +21,25 @@ import {
   Mountain,
   Landmark,
   Trees,
-  Users
+  Users,
+  Compass,
+  DollarSign,
+  Hotel,
+  Award,
+  AlertTriangle,
+  Info,
+  ShieldCheck,
+  Clock,
+  Zap,
+  TrendingDown,
+  Layers
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
 
-// Vacation Categories Configuration (Emojis removed)
+/* ─────────────────────────────────────────────
+   VACATION CATEGORIES CONFIG
+   ───────────────────────────────────────────── */
 const VACATION_CATEGORIES = [
   { id: "beach", name: "Beach & Relaxation", icon: Palmtree },
   { id: "adventure", name: "Adventure & Mountains", icon: Mountain },
@@ -41,7 +49,20 @@ const VACATION_CATEGORIES = [
   { id: "family", name: "Family Vacation", icon: Users }
 ]
 
-// Packages Database categorized by Vacation Type
+/* ─────────────────────────────────────────────
+   USER PRIORITIES CONFIG
+   ───────────────────────────────────────────── */
+const USER_PRIORITIES = [
+  { id: "budget", label: "Budget", icon: "💰", tagline: "Prioritize lower cost & high value" },
+  { id: "experiences", label: "Experiences", icon: "🏖", tagline: "Prioritize rich activities & sights" },
+  { id: "relaxation", label: "Relaxation", icon: "🌿", tagline: "Prioritize free time & unhurried pace" },
+  { id: "comfort", label: "Comfort", icon: "🏨", tagline: "Prioritize 4/5-Star stay & dining" },
+  { id: "adventure", label: "Adventure", icon: "⚡", tagline: "Prioritize thrill & active exploration" }
+]
+
+/* ─────────────────────────────────────────────
+   RICH PACKAGE DATASET (DATA-DRIVEN DECISION ENGINE)
+   ───────────────────────────────────────────── */
 const PACKAGE_DATA = {
   beach: [
     {
@@ -50,19 +71,54 @@ const PACKAGE_DATA = {
       destination: "Goa",
       country: "India",
       image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80",
-      duration: "3 Days / 2 Nights",
-      durationDays: 3,
-      price: "₹9,999",
-      numericPrice: 9999,
-      hotelCategory: "4-Star Beach Resort",
-      meals: "Breakfast & Dinner Included",
-      transport: "Private AC Sedan Included",
-      attractionsCount: 5,
-      activitiesCount: 3,
+      duration: "5 Days / 4 Nights",
+      durationDays: 5,
+      price: "₹24,999",
+      numericPrice: 24999,
+      estimatedTotalCost: 30500,
+      costBreakdown: { taxes: "₹2,500", localExpenses: "₹3,001" },
       rating: 4.8,
-      description: "Sun-drenched beaches, cliffside shacks, Portuguese heritage, and watersports.",
-      attractionsList: ["Baga & Calangute Beach", "Fort Aguada", "Fontainhas Latin Quarter", "Dudhsagar Waterfalls", "Anjuna Flea Market"],
-      activitiesList: ["Parasailing & Jet Ski", "Mandovi Sunset Cruise", "Spice Plantation Buffet"]
+      reviewsCount: 142,
+      reviewsBreakdown: { cleanliness: 4.8, transport: 4.7, stay: 4.8, value: 4.6, activities: 4.9 },
+      accommodation: {
+        category: "4-Star Beach Resort",
+        rating: 4.7,
+        location: "Vagator Cliff & Beach Side",
+        distanceToHub: "300m to Vagator Beach",
+        meals: "Breakfast & Dinner Included",
+        hotelChanges: 1
+      },
+      experiences: {
+        activitiesCount: 4,
+        attractionsCount: 6,
+        breakdown: { adventure: 75, nature: 85, culture: 70, food: 95, shopping: 80, nightlife: 85 },
+        attractionsList: ["Baga & Calangute Beach", "Fort Aguada", "Fontainhas Latin Quarter", "Dudhsagar Waterfalls", "Anjuna Flea Market", "Mandovi River"],
+        activitiesList: ["Parasailing & Jet Ski", "Mandovi Sunset Cruise", "Spice Plantation Feast & Elephant Tour", "Fontainhas Heritage Photo Walk"]
+      },
+      pace: {
+        type: "relaxed",
+        label: "Relaxed",
+        icon: "🌿",
+        actPerDay: 2,
+        freeTimeHrs: 5,
+        lateNight: false,
+        desc: "2-3 activities/day • Generous free time for beach lounging"
+      },
+      convenience: {
+        airportTransfers: "Private AC SUV Included",
+        localTransport: "Dedicated AC Sedan",
+        hotelChanges: 1,
+        avgDailyTravelMins: 40,
+        transportType: "Private AC"
+      },
+      weatherSuitability: {
+        status: "excellent",
+        label: "Excellent",
+        icon: "☀",
+        title: "Sunny Skies & Cool Sea Breeze",
+        reason: "Optimal dry season window (Nov-Feb) with calm waters for watersports."
+      },
+      description: "Sun-drenched beaches, cliffside shacks, Portuguese heritage, and private watersports."
     },
     {
       id: "gokarna-getaway",
@@ -70,881 +126,1040 @@ const PACKAGE_DATA = {
       destination: "Gokarna",
       country: "Karnataka, India",
       image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop&q=80",
-      duration: "3 Days / 2 Nights",
-      durationDays: 3,
-      price: "₹11,200",
-      numericPrice: 11200,
-      hotelCategory: "Heritage Beach Cottage",
-      meals: "All Meals Included",
-      transport: "Cab & Boat Transfer",
-      attractionsCount: 4,
-      activitiesCount: 4,
-      rating: 4.9,
-      description: "Pristine Om Beach, cliff treks, Mahabaleshwar Temple, and peaceful ocean sunsets.",
-      attractionsList: ["Om Beach", "Half Moon Beach", "Kuddle Beach", "Mahabaleshwar Temple"],
-      activitiesList: ["Five Beach Trek", "Cliffside Yoga Session", "Sunset Boat Ride", "Beach Stargazing Fire"]
+      duration: "4 Days / 3 Nights",
+      durationDays: 4,
+      price: "₹18,500",
+      numericPrice: 18500,
+      estimatedTotalCost: 23200,
+      costBreakdown: { taxes: "₹1,800", localExpenses: "₹2,900" },
+      rating: 4.6,
+      reviewsCount: 88,
+      reviewsBreakdown: { cleanliness: 4.5, transport: 4.4, stay: 4.6, value: 4.8, activities: 4.5 },
+      accommodation: {
+        category: "Eco Heritage Beach Resort",
+        rating: 4.5,
+        location: "Kudle Beach",
+        distanceToHub: "100m to Kudle Shore",
+        meals: "All Meals Included (Farm-to-Table)",
+        hotelChanges: 1
+      },
+      experiences: {
+        activitiesCount: 5,
+        attractionsCount: 5,
+        breakdown: { adventure: 80, nature: 95, culture: 85, food: 75, shopping: 60, nightlife: 40 },
+        attractionsList: ["Kudle Beach", "Om Beach", "Half Moon Beach", "Mahabaleshwar Temple", "Yana Caves"],
+        activitiesList: ["5-Beach Coastal Trek", "Cliff Yoga & Meditation", "Sunset Boat Ride", "Temple Heritage Walk", "Bio-Luminescent Night Watch"]
+      },
+      pace: {
+        type: "balanced",
+        label: "Balanced",
+        icon: "⚖️",
+        actPerDay: 3,
+        freeTimeHrs: 3.5,
+        lateNight: false,
+        desc: "3 activities/day • Balanced coastal trekking & beach relaxation"
+      },
+      convenience: {
+        airportTransfers: "Shared AC Coach",
+        localTransport: "Private AC Cab & Boat Transfer",
+        hotelChanges: 1,
+        avgDailyTravelMins: 55,
+        transportType: "Semi-Private"
+      },
+      weatherSuitability: {
+        status: "excellent",
+        label: "Excellent",
+        icon: "☀",
+        title: "Pleasant & Tropical",
+        reason: "Mild temperatures perfect for beach trekking and cliffside views."
+      },
+      description: "Pristine cliffside beaches, serene temple heritage, and guided coastal trekking."
     },
     {
-      id: "andaman-experience",
-      name: "Andaman Island Paradise",
-      destination: "Andaman & Nicobar",
+      id: "andaman-luxury",
+      name: "Andaman Island Paradise & Reefs",
+      destination: "Andaman",
       country: "India",
       image: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=800&auto=format&fit=crop&q=80",
       duration: "5 Days / 4 Nights",
       durationDays: 5,
-      price: "₹24,500",
-      numericPrice: 24500,
-      hotelCategory: "5-Star Island Resort",
-      meals: "Buffet Breakfast Included",
-      transport: "Ferry & Private AC Cabs",
-      attractionsCount: 7,
-      activitiesCount: 5,
+      price: "₹34,500",
+      numericPrice: 34500,
+      estimatedTotalCost: 41000,
+      costBreakdown: { taxes: "₹3,500", localExpenses: "₹3,000" },
       rating: 4.9,
-      description: "Radhanagar turquoise waters, coral reef snorkeling, and Cellular Jail light show.",
-      attractionsList: ["Radhanagar Beach Havelock", "Elephant Beach", "Cellular Jail National Memorial", "Ross Island Ruins", "Neil Island Natural Bridge", "Chidiya Tapu Sunset", "Kala Pathar Beach"],
-      activitiesList: ["Scuba Diving Trail", "Sea Walking", "Glass Bottom Boat Tour", "Coral Reef Snorkeling", "Light & Sound Heritage Show"]
+      reviewsCount: 115,
+      reviewsBreakdown: { cleanliness: 4.9, transport: 4.8, stay: 4.9, value: 4.7, activities: 4.9 },
+      accommodation: {
+        category: "5-Star Luxury Island Resort",
+        rating: 4.9,
+        location: "Radhanagar Beach, Havelock",
+        distanceToHub: "Direct Private Beach Access",
+        meals: "Full Board (Breakfast, Lunch & Dinner)",
+        hotelChanges: 2
+      },
+      experiences: {
+        activitiesCount: 6,
+        attractionsCount: 7,
+        breakdown: { adventure: 90, nature: 98, culture: 70, food: 85, shopping: 50, nightlife: 45 },
+        attractionsList: ["Radhanagar Beach", "Elephant Beach", "Cellular Jail", "Chidiya Tapu", "Ross Island", "Kalapathar Beach", "Baratang Caves"],
+        activitiesList: ["Scuba Diving with Certified Instructor", "Snorkeling at Elephant Beach", "Catamaran Cruise Transfer", "Light & Sound Show at Cellular Jail", "Sunset Glass Bottom Boat Ride"]
+      },
+      pace: {
+        type: "packed",
+        label: "Packed",
+        icon: "⚡",
+        actPerDay: 4,
+        freeTimeHrs: 2,
+        lateNight: true,
+        desc: "4 activities/day • High-energy island hopping & marine adventures"
+      },
+      convenience: {
+        airportTransfers: "Luxury Private Car & Express Ferry",
+        localTransport: "Private AC Cab & Speedboat",
+        hotelChanges: 2,
+        avgDailyTravelMins: 60,
+        transportType: "Private Luxury"
+      },
+      weatherSuitability: {
+        status: "good",
+        label: "Good",
+        icon: "🌤",
+        title: "Clear Waters & Ocean Sunshine",
+        reason: "Great underwater visibility for scuba diving with occasional tropical showers."
+      },
+      description: "Turquoise lagoons, white sand beaches, scuba diving, and luxury island catamaran cruises."
     }
   ],
   adventure: [
     {
-      id: "manali-adventure",
-      name: "Manali High-Pass Adventure",
+      id: "manali-snow",
+      name: "Manali & Solang Valley Snow Explorer",
       destination: "Manali",
-      country: "Himachal Pradesh, India",
-      image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&auto=format&fit=crop&q=80",
-      duration: "4 Days / 3 Nights",
-      durationDays: 4,
-      price: "₹14,500",
-      numericPrice: 14500,
-      hotelCategory: "Mountain View Resort",
-      meals: "Breakfast & Dinner Included",
-      transport: "4x4 SUV Mountain Transport",
-      attractionsCount: 6,
-      activitiesCount: 4,
-      rating: 4.9,
-      description: "Snowy Solang Valley, Atal Tunnel engineering feat, pine treks, and Beas rafting.",
-      attractionsList: ["Solang Valley", "Atal Tunnel Sissu", "Hadimba Cedar Temple", "Jogini Waterfalls", "Old Manali Cafe Trail", "Vashisht Hot Springs"],
-      activitiesList: ["Solang Paragliding", "Beas River White Water Rafting", "Alpine Pine Forest Trek", "Quad Biking"]
-    },
-    {
-      id: "himachal-explorer",
-      name: "Himachal Valley Explorer",
-      destination: "Shimla & Spiti",
-      country: "Himachal Pradesh, India",
+      country: "Himachal, India",
       image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&auto=format&fit=crop&q=80",
       duration: "5 Days / 4 Nights",
       durationDays: 5,
-      price: "₹18,999",
-      numericPrice: 18999,
-      hotelCategory: "Alpine Boutique Hotel",
-      meals: "All Meals Included",
-      transport: "Private SUV Coach",
-      attractionsCount: 8,
-      activitiesCount: 5,
-      rating: 4.8,
-      description: "Colonial Shimla Ridge, Kufri slopes, Apple Orchards, and majestic mountain vistas.",
-      attractionsList: ["The Ridge & Mall Road", "Jakhoo Hill Temple", "Kufri Adventure Park", "Chail Palace", "Narkanda Peak", "Hatu Peak Temple", "Viceregal Lodge", "Tara Devi Temple"],
-      activitiesList: ["Heritage Toy Train Ride", "Horse Riding in Kufri", "Apple Orchard Camping", "Zip-line Trail", "Ice Skating"]
-    },
-    {
-      id: "rishikesh-rafting",
-      name: "Rishikesh Rafting & Camping",
-      destination: "Rishikesh",
-      country: "Uttarakhand, India",
-      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop&q=80",
-      duration: "3 Days / 2 Nights",
-      durationDays: 3,
-      price: "₹8,500",
-      numericPrice: 8500,
-      hotelCategory: "Luxury Riverside Eco-Camp",
-      meals: "All Meals Included",
-      transport: "Private Pick & Drop Shuttles",
-      attractionsCount: 4,
-      activitiesCount: 6,
+      price: "₹16,999",
+      numericPrice: 16999,
+      estimatedTotalCost: 21500,
+      costBreakdown: { taxes: "₹1,700", localExpenses: "₹2,801" },
       rating: 4.7,
-      description: "Ganga white-water rapids, cliff jumping, Beatles Ashram, and evening Ganga Aarti.",
-      attractionsList: ["Laxman Jhula & Ram Jhula", "Beatles Ashram", "Triveni Ghat", "Neer Garh Waterfall"],
-      activitiesList: ["16km White Water Rafting", "Cliff Jumping", "Bungee Jumping", "Riverside Campfire & Music", "Sunrise Yoga Session", "Zipline across Ganga"]
-    }
-  ],
-  culture: [
-    {
-      id: "jaipur-royal",
-      name: "Royal Jaipur & Amber Heritage",
-      destination: "Jaipur",
-      country: "Rajasthan, India",
-      image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?w=800&auto=format&fit=crop&q=80",
-      duration: "3 Days / 2 Nights",
-      durationDays: 3,
-      price: "₹10,499",
-      numericPrice: 10499,
-      hotelCategory: "Heritage Palace Haveli",
-      meals: "Royal Breakfast & Dinner Included",
-      transport: "Private AC Cab & Local Guide",
-      attractionsCount: 6,
-      activitiesCount: 3,
-      rating: 4.8,
-      description: "Amber Fort Sheesh Mahal, Hawa Mahal windows, Johari Bazaar shopping, and Chokhi Dhani.",
-      attractionsList: ["Amber Fort Palace", "Hawa Mahal", "City Palace & Peacock Gate", "Jantar Mantar Sundial", "Nahargarh Fort", "Jal Mahal Lake View"],
-      activitiesList: ["Chokhi Dhani Rajasthani Village Feast", "Bazaars Craft & Bandhani Tour", "Heritage Light & Sound Show"]
+      reviewsCount: 165,
+      reviewsBreakdown: { cleanliness: 4.6, transport: 4.7, stay: 4.6, value: 4.8, activities: 4.9 },
+      accommodation: {
+        category: "3-Star Mountain View Resort",
+        rating: 4.6,
+        location: "Old Manali Woods",
+        distanceToHub: "1.2km to Mall Road",
+        meals: "Breakfast & Dinner Included",
+        hotelChanges: 1
+      },
+      experiences: {
+        activitiesCount: 6,
+        attractionsCount: 7,
+        breakdown: { adventure: 95, nature: 90, culture: 75, food: 70, shopping: 65, nightlife: 50 },
+        attractionsList: ["Solang Valley", "Atal Tunnel", "Sissu Waterfall", "Hadimba Temple", "Jogini Waterfalls", "Mall Road", "Vashisht Hot Springs"],
+        activitiesList: ["Paragliding in Solang", "Snow Scooter Ride", "Jogini Waterfall Trek", "Atal Tunnel Lahaul Excursion", "Vashisht Thermal Bath"]
+      },
+      pace: {
+        type: "packed",
+        label: "Packed",
+        icon: "⚡",
+        actPerDay: 4,
+        freeTimeHrs: 2,
+        lateNight: false,
+        desc: "4 activities/day • High thrill mountain adventures & snow sports"
+      },
+      convenience: {
+        airportTransfers: "Volvo Sleeper Coach from Delhi + Private Cab",
+        localTransport: "Private 4x4 Mountain SUV",
+        hotelChanges: 1,
+        avgDailyTravelMins: 50,
+        transportType: "Private 4x4"
+      },
+      weatherSuitability: {
+        status: "excellent",
+        label: "Excellent",
+        icon: "☀",
+        title: "Snowy Peaks & Alpine Chill",
+        reason: "Crisp winter weather with fresh snow in Solang Valley and Sissu."
+      },
+      description: "Paragliding in Solang, snow rides, Atal Tunnel adventure, and cozy fireside mountain stays."
     },
     {
-      id: "udaipur-romance",
-      name: "Udaipur Romantic Palaces",
-      destination: "Udaipur",
-      country: "Rajasthan, India",
-      image: "https://images.unsplash.com/photo-1615836245337-f5b9b2303f10?w=800&auto=format&fit=crop&q=80",
-      duration: "4 Days / 3 Nights",
-      durationDays: 4,
-      price: "₹16,200",
-      numericPrice: 16200,
-      hotelCategory: "Lakefront Heritage Resort",
-      meals: "Breakfast & Sunset Drinks Included",
-      transport: "Private AC Sedan & Boat",
-      attractionsCount: 5,
-      activitiesCount: 4,
-      rating: 4.9,
-      description: "Sunset boat cruise on Lake Pichola, City Palace royal courtyard, and rooftop lake dining.",
-      attractionsList: ["City Palace Complex", "Lake Pichola & Jagmandir", "Saheliyon Ki Bari", "Bagore Ki Haveli", "Sajjangarh Monsoon Palace"],
-      activitiesList: ["Lake Pichola Sunset Boat Cruise", "Dharohar Folk Cultural Dance", "Rooftop Candlelight Lake Dining", "Vintage Car Museum Walk"]
-    },
-    {
-      id: "varanasi-ghats",
-      name: "Varanasi Spiritual & Heritage Trail",
-      destination: "Varanasi",
-      country: "Uttar Pradesh, India",
-      image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&auto=format&fit=crop&q=80",
-      duration: "3 Days / 2 Nights",
-      durationDays: 3,
-      price: "₹9,200",
-      numericPrice: 9200,
-      hotelCategory: "Boutique Heritage Hotel",
-      meals: "Breakfast & Dinner Included",
-      transport: "Private Cab & Boat Transfer",
-      attractionsCount: 5,
-      activitiesCount: 3,
-      rating: 4.7,
-      description: "Subah-e-Banaras sunrise boat ride, Dashashwamedh Ganga Aarti, and Sarnath stupas.",
-      attractionsList: ["Dashashwamedh Ghat", "Kashi Vishwanath Temple", "Sarnath Deer Park & Stupa", "Assi Ghat", "Manikarnika Heritage Walk"],
-      activitiesList: ["Sunrise Wooden Boat Cruise", "Grand Evening Ganga Aarti Ceremony", "Banarasi Silk Weaver Trail"]
-    }
-  ],
-  nature: [
-    {
-      id: "kerala-backwaters",
-      name: "Kerala Backwaters & Munnar Tea",
-      destination: "Kerala",
+      id: "leh-ladakh",
+      name: "Leh Ladakh High Passes Odyssey",
+      destination: "Ladakh",
       country: "India",
-      image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&auto=format&fit=crop&q=80",
-      duration: "4 Days / 3 Nights",
-      durationDays: 4,
-      price: "₹17,800",
-      numericPrice: 17800,
-      hotelCategory: "Deluxe Houseboat & Tea Resort",
-      meals: "All Meals Included",
-      transport: "Private AC Cab & Houseboat",
-      attractionsCount: 6,
-      activitiesCount: 4,
+      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80",
+      duration: "6 Days / 5 Nights",
+      durationDays: 6,
+      price: "₹28,500",
+      numericPrice: 28500,
+      estimatedTotalCost: 34000,
+      costBreakdown: { taxes: "₹2,500", localExpenses: "₹3,000" },
       rating: 4.9,
-      description: "Overnight Alleppey houseboat, rolling Munnar tea gardens, and spice plantations.",
-      attractionsList: ["Alleppey Backwaters", "Munnar Tea Estates", "Eravikulam National Park", "Fort Kochi Chinese Fishing Nets", "Mattupetty Dam", "Spice Gardens Thekkady"],
-      activitiesList: ["Overnight Houseboat Stay & Feast", "Tea Processing Plantation Walk", "Ayurvedic Massage Session", "Kathakali Cultural Dance"]
-    },
-    {
-      id: "coorg-coffee",
-      name: "Coorg Coffee Trails & Wellness",
-      destination: "Coorg",
-      country: "Karnataka, India",
-      image: "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=800&auto=format&fit=crop&q=80",
-      duration: "3 Days / 2 Nights",
-      durationDays: 3,
-      price: "₹12,800",
-      numericPrice: 12800,
-      hotelCategory: "Coffee Plantation Villa",
-      meals: "Breakfast & Dinner Included",
-      transport: "Private SUV Transport",
-      attractionsCount: 4,
-      activitiesCount: 3,
-      rating: 4.8,
-      description: "Mist-covered coffee estates, Abbey Falls, Namdroling Monastery, and organic dining.",
-      attractionsList: ["Abbey Falls", "Raja's Seat Sunset View", "Namdroling Golden Temple Bylakuppe", "Dubare Elephant Camp"],
-      activitiesList: ["Guided Coffee Tasting & Estate Trail", "Elephant Interaction Session", "Raja's Seat Musical Fountain"]
-    },
-    {
-      id: "wayanad-rainforest",
-      name: "Wayanad Rainforest & Safari",
-      destination: "Wayanad",
-      country: "Kerala, India",
-      image: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=800&auto=format&fit=crop&q=80",
-      duration: "3 Days / 2 Nights",
-      durationDays: 3,
-      price: "₹11,500",
-      numericPrice: 11500,
-      hotelCategory: "Eco Lodge & Treehouse",
-      meals: "Breakfast & Dinner Included",
-      transport: "Private Cab & Jeep Safari",
-      attractionsCount: 5,
-      activitiesCount: 4,
-      rating: 4.7,
-      description: "Heart-shaped Chembra Lake trek, Edakkal caves, Banasura Sagar dam, and wildlife safari.",
-      attractionsList: ["Chembra Peak & Heart Lake", "Edakkal Prehistoric Caves", "Banasura Sagar Dam", "Muthanga Wildlife Sanctuary", "Meenmutty Waterfalls"],
-      activitiesList: ["Forest Jeep Safari", "Zip-line across Banasura Lake", "Bamboo Rafting", "Edakkal Cave Rock Petroglyphs Trail"]
-    }
-  ],
-  food: [
-    {
-      id: "delhi-food-crawl",
-      name: "Old Delhi Heritage & Street Food Crawl",
-      destination: "Delhi",
-      country: "India",
-      image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80",
-      duration: "2 Days / 1 Night",
-      durationDays: 2,
-      price: "₹7,999",
-      numericPrice: 7999,
-      hotelCategory: "Boutique Heritage Hotel",
-      meals: "All Food Crawls & Feast Included",
-      transport: "Guided E-Rickshaw & Private AC Cab",
-      attractionsCount: 6,
-      activitiesCount: 3,
-      rating: 4.8,
-      description: "Chandni Chowk legendary paranthas, Karim's kebabs, Red Fort, and Khari Baoli spice market.",
-      attractionsList: ["Chandni Chowk Food Lane", "Red Fort", "Jama Masjid & Karim's", "Khari Baoli Spice Market", "Humayun's Tomb", "Qutub Minar"],
-      activitiesList: ["Curated 10-Stop Paranthe Wali Gali Food Trail", "Spice Market Roof Tasting", "E-Rickshaw Heritage Ride"]
-    },
-    {
-      id: "amritsar-gourmet",
-      name: "Amritsar Golden Temple & Culinary Trail",
-      destination: "Amritsar",
-      country: "Punjab, India",
-      image: "https://images.unsplash.com/photo-1609949279531-cf48d64bed89?w=800&auto=format&fit=crop&q=80",
-      duration: "3 Days / 2 Nights",
-      durationDays: 3,
-      price: "₹8,999",
-      numericPrice: 8999,
-      hotelCategory: "4-Star City Hotel",
-      meals: "Dhaba Tastings & Langar Included",
-      transport: "Private AC Cab",
-      attractionsCount: 4,
-      activitiesCount: 3,
-      rating: 4.9,
-      description: "Golden Temple serenity, Kesar da Dhaba Amritsari Kulcha, and Wagah Border parade.",
-      attractionsList: ["Sri Harmandir Sahib (Golden Temple)", "Jallianwala Bagh Memorial", "Wagah Border Retreat", "Partition Museum"],
-      activitiesList: ["Golden Temple Mega Kitchen Langar Service", "Kesar Da Dhaba Culinary Trail", "Wagah Border Beating Retreat Ceremony"]
-    },
-    {
-      id: "pondicherry-gourmet",
-      name: "Pondicherry French Gourmet & Beach",
-      destination: "Pondicherry",
-      country: "India",
-      image: "https://images.unsplash.com/photo-1616843413587-9e3a37f7bbd8?w=800&auto=format&fit=crop&q=80",
-      duration: "3 Days / 2 Nights",
-      durationDays: 3,
-      price: "₹13,400",
-      numericPrice: 13400,
-      hotelCategory: "French Colonial Guest House",
-      meals: "Gourmet Breakfast & Bakery Tasting Included",
-      transport: "Private AC Sedan & Vintage Scooters",
-      attractionsCount: 5,
-      activitiesCount: 3,
-      rating: 4.8,
-      description: "French Quarter yellow villas, wood-fired artisan bakeries, Promenade Beach, and Matrimandir.",
-      attractionsList: ["White Town French Quarter", "Promenade Beach", "Auroville Matrimandir Dome", "Paradise Beach", "Sri Aurobindo Ashram"],
-      activitiesList: ["French Bakery & Croissant Tasting Crawl", "Auroville Organic Cafe Tour", "Heritage Villa Cycling Trail"]
-    }
-  ],
-  family: [
-    {
-      id: "ooty-family",
-      name: "Ooty & Kodaikanal Family Retreat",
-      destination: "Ooty",
-      country: "Tamil Nadu, India",
-      image: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=800&auto=format&fit=crop&q=80",
-      duration: "4 Days / 3 Nights",
-      durationDays: 4,
-      price: "₹15,999",
-      numericPrice: 15999,
-      hotelCategory: "Family Suite Resort",
-      meals: "Breakfast & Dinner Included",
-      transport: "Private AC Innova / Tempo",
-      attractionsCount: 7,
-      activitiesCount: 4,
-      rating: 4.8,
-      description: "Nilgiri Toy Train, Ooty Lake boating, Botanical Gardens, and Homemade Chocolate tasting.",
-      attractionsList: ["Ooty Botanical Gardens", "Ooty Lake & Boating", "Doddabetta Peak", "Tea Factory & Chocolate Museum", "Pykara Waterfalls", "Rose Garden", "Pine Forest"],
-      activitiesList: ["UNESCO Heritage Nilgiri Toy Train Ride", "Family Pedal Boating on Ooty Lake", "Homemade Chocolate Making Workshop", "Tea Plantation Walk"]
-    },
-    {
-      id: "kashmir-family",
-      name: "Kashmir Valley Family Magic",
-      destination: "Srinagar & Gulmarg",
-      country: "Jammu & Kashmir, India",
-      image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&auto=format&fit=crop&q=80",
-      duration: "5 Days / 4 Nights",
-      durationDays: 5,
-      price: "₹22,999",
-      numericPrice: 22999,
-      hotelCategory: "Premium Houseboat & Resort",
-      meals: "All Meals Included",
-      transport: "Private AC SUV",
-      attractionsCount: 8,
-      activitiesCount: 5,
-      rating: 4.9,
-      description: "Dal Lake Shikara ride, Gulmarg Gondola snow ride, Pahalgam Betaab Valley, and Mughal Gardens.",
-      attractionsList: ["Dal Lake Srinagar", "Gulmarg Snow Meadows", "Pahalgam Betaab Valley", "Shalimar Bagh Mughal Garden", "Nishat Bagh", "Chashme Shahi", "Aru Valley", "Sonamarg Glacier Point"],
-      activitiesList: ["Sunset Shikara Ride on Dal Lake", "Gulmarg Gondola Cable Car Ride", "Ponies Ride in Betaab Valley", "Saffron Farm Visit & Kahwa Tasting", "Overnight Luxury Houseboat Stay"]
-    },
-    {
-      id: "golden-triangle",
-      name: "Golden Triangle Express (Delhi-Agra-Jaipur)",
-      destination: "Delhi, Agra & Jaipur",
-      country: "India",
-      image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&auto=format&fit=crop&q=80",
-      duration: "5 Days / 4 Nights",
-      durationDays: 5,
-      price: "₹19,500",
-      numericPrice: 19500,
-      hotelCategory: "4-Star Family Hotels",
-      meals: "Buffet Breakfast Included",
-      transport: "Private AC Coach & Express Train",
-      attractionsCount: 9,
-      activitiesCount: 4,
-      rating: 4.8,
-      description: "Taj Mahal sunrise Wonder of World, Agra Fort, Jaipur Amber Fort, and Delhi monuments.",
-      attractionsList: ["Taj Mahal Agra", "Agra Fort", "Amber Fort Jaipur", "Hawa Mahal", "Qutub Minar Delhi", "India Gate", "Fatehpur Sikri", "City Palace Jaipur", "Humayun's Tomb"],
-      activitiesList: ["Sunrise Taj Mahal Guided Tour", "Marble Inlay Craft Workshop", "Vande Bharat Express Train Ride", "Jaipur Cultural Night"]
+      reviewsCount: 198,
+      reviewsBreakdown: { cleanliness: 4.8, transport: 4.9, stay: 4.7, value: 4.9, activities: 5.0 },
+      accommodation: {
+        category: "Deluxe Himalayan Camps & Hotel",
+        rating: 4.8,
+        location: "Leh & Pangong Lake Tents",
+        distanceToHub: "Direct Lakefront Campsite",
+        meals: "All Meals Included",
+        hotelChanges: 2
+      },
+      experiences: {
+        activitiesCount: 7,
+        attractionsCount: 8,
+        breakdown: { adventure: 100, nature: 100, culture: 85, food: 65, shopping: 50, nightlife: 20 },
+        attractionsList: ["Pangong Tso Lake", "Nubra Valley", "Khardung La Pass", "Magnetic Hill", "Shanti Stupa", "Diskit Monastery", "Confluence of Indus & Zanskar"],
+        activitiesList: ["Khardungla 18,380ft Pass Crossing", "Double-Hump Camel Safari in Hunder", "Stargazing over Pangong Tso", "Rafting in Zanskar River", "Monastery Chanting Experience"]
+      },
+      pace: {
+        type: "balanced",
+        label: "Balanced",
+        icon: "⚖️",
+        actPerDay: 3,
+        freeTimeHrs: 3,
+        lateNight: false,
+        desc: "3 activities/day • High mountain passes with mandatory acclimatization rest"
+      },
+      convenience: {
+        airportTransfers: "Private Leh Airport Cab",
+        localTransport: "Modified Oxygen-Equipped Scorpio/Innova",
+        hotelChanges: 2,
+        avgDailyTravelMins: 90,
+        transportType: "Private 4x4"
+      },
+      weatherSuitability: {
+        status: "excellent",
+        label: "Excellent",
+        icon: "☀",
+        title: "Clear Azure Skies & High Sun",
+        reason: "Peak summer season with accessible high passes and vibrant blue Pangong Lake."
+      },
+      description: "Highest motorable passes, Pangong Lake camping, Bactrian camel safaris, and raw Himalayan landscapes."
     }
   ]
 }
 
+/* ─────────────────────────────────────────────
+   ALGORITHMIC PERSONAL MATCH SCORE ENGINE
+   ───────────────────────────────────────────── */
+function calculatePersonalMatchScore(pkg, priority = "budget", userTargetBudget = 32000) {
+  if (!pkg) return { score: 75, reasons: [], warnings: [] }
+
+  let score = 75 // Base starting score
+  const reasons = []
+  const warnings = []
+
+  // 1. Price vs Budget Check
+  const priceDiff = userTargetBudget - pkg.numericPrice
+  if (priceDiff >= 0) {
+    score += 10
+    reasons.push(`Within your target budget of ₹${(userTargetBudget / 1000).toFixed(0)}K`)
+  } else {
+    score -= Math.min(15, Math.abs(Math.round(priceDiff / 1000)))
+    warnings.push(`Exceeds budget target by ₹${(Math.abs(priceDiff) / 1000).toFixed(1)}K`)
+  }
+
+  // 2. Rating & Value Check
+  if (pkg.rating >= 4.7) {
+    score += 8
+    reasons.push(`Outstanding ${pkg.rating}★ rating from ${pkg.reviewsCount}+ travelers`)
+  }
+
+  // 3. Priority Specific Score Tuning
+  if (priority === "budget") {
+    if (pkg.numericPrice < 20000) {
+      score += 12
+      reasons.push("Highly economical package price under ₹20,000")
+    } else if (pkg.numericPrice > 30000) {
+      score -= 10
+      warnings.push("Higher tier pricing compared to budget alternatives")
+    }
+    if (pkg.accommodation.meals.includes("All") || pkg.accommodation.meals.includes("Dinner")) {
+      score += 5
+      reasons.push("Meals included, reducing out-of-pocket dining costs")
+    }
+  } else if (priority === "experiences") {
+    const actCount = pkg.experiences.activitiesCount + pkg.experiences.attractionsCount
+    if (actCount >= 10) {
+      score += 14
+      reasons.push(`Packed with ${actCount} curated activities & top sight visits`)
+    } else {
+      score -= 5
+      warnings.push("Fewer total activities compared to experience-heavy tours")
+    }
+  } else if (priority === "relaxation") {
+    if (pkg.pace.type === "relaxed") {
+      score += 15
+      reasons.push(`Preferred relaxed pace (${pkg.pace.freeTimeHrs} hrs daily free time)`)
+    } else if (pkg.pace.type === "packed") {
+      score -= 12
+      warnings.push("Busy schedule with 4+ activities/day and minimal free time")
+    }
+    if (pkg.accommodation.hotelChanges <= 1) {
+      score += 5
+      reasons.push("Single hotel stay — zero stressful room check-outs")
+    } else {
+      warnings.push("Requires multiple hotel changes during the trip")
+    }
+  } else if (priority === "comfort") {
+    if (pkg.accommodation.category.includes("4-Star") || pkg.accommodation.category.includes("5-Star") || pkg.accommodation.category.includes("Luxury")) {
+      score += 15
+      reasons.push(`Includes premium ${pkg.accommodation.category}`)
+    } else {
+      score -= 8
+      warnings.push("Standard/3-Star accommodation tier")
+    }
+    if (pkg.convenience.transportType.includes("Private")) {
+      score += 6
+      reasons.push("Includes private AC vehicle transfers throughout")
+    }
+  } else if (priority === "adventure") {
+    if (pkg.experiences.breakdown.adventure >= 80) {
+      score += 15
+      reasons.push("High adventure score featuring watersports, treks & safaris")
+    } else {
+      score -= 10
+      warnings.push("Leaning more towards passive leisure than high thrill")
+    }
+  }
+
+  // Weather bonus
+  if (pkg.weatherSuitability.status === "excellent") {
+    score += 5
+    reasons.push(pkg.weatherSuitability.reason)
+  }
+
+  const finalScore = Math.min(99, Math.max(55, Math.round(score)))
+
+  return {
+    score: finalScore,
+    reasons,
+    warnings
+  }
+}
+
+/* ─────────────────────────────────────────────
+   MAIN PACKAGE COMPARISON COMPONENT
+   ───────────────────────────────────────────── */
 export function PackageComparison({ onNavigateView, onSelectDestination, onOpenAuth }) {
   const { selectPackageAndBuildTrip, selectedPackage } = useTrip()
 
   const [activeCategory, setActiveCategory] = useState("beach")
   const [selectedForCompare, setSelectedForCompare] = useState(["goa-escape", "gokarna-getaway"])
-  const [viewingPackageModal, setViewingPackageModal] = useState(null)
-  const [compareMode, setCompareMode] = useState(false)
+  const [userPriority, setUserPriority] = useState("relaxation")
+  const [userBudget] = useState(32000)
+
+  const [viewingModalPkg, setViewingModalPkg] = useState(null)
+  const [showingMatchDetailPkg, setShowingMatchDetailPkg] = useState(null)
+  const [showFullMatrix, setShowFullMatrix] = useState(false)
   const [toastMessage, setToastMessage] = useState(null)
 
-  // Current Category Packages
-  const currentCategoryPackages = useMemo(() => {
-    return PACKAGE_DATA[activeCategory] || PACKAGE_DATA.beach
-  }, [activeCategory])
-
-  // Get packages selected for comparison
+  // Combined Dataset
   const allPackages = useMemo(() => {
     return Object.values(PACKAGE_DATA).flat()
   }, [])
 
+  const currentCategoryPackages = useMemo(() => {
+    return PACKAGE_DATA[activeCategory] || PACKAGE_DATA.beach
+  }, [activeCategory])
+
+  // Packages currently selected for comparison
   const comparedPackagesList = useMemo(() => {
     return allPackages.filter((p) => selectedForCompare.includes(p.id))
   }, [allPackages, selectedForCompare])
 
-  // Toggle package selection for comparison
+  // Dynamic Decision Metrics Calculation
+  const decisionData = useMemo(() => {
+    if (comparedPackagesList.length === 0) return null
+
+    const scored = comparedPackagesList.map((pkg) => {
+      const match = calculatePersonalMatchScore(pkg, userPriority, userBudget)
+      const valueScore = (pkg.rating * 20 + pkg.experiences.activitiesCount * 5) / (pkg.numericPrice / 1000)
+      const expScore = pkg.experiences.activitiesCount * 10 + pkg.experiences.attractionsCount * 5 + (pkg.experiences.breakdown.adventure || 50)
+      return { pkg, match, valueScore, expScore }
+    })
+
+    // Sort to find winners
+    const bestForYouObj = [...scored].sort((a, b) => b.match.score - a.match.score)[0]
+    const bestValueObj = [...scored].sort((a, b) => b.valueScore - a.valueScore)[0]
+    const bestExperienceObj = [...scored].sort((a, b) => b.expScore - a.expScore)[0]
+
+    const runnerUpObj = scored.find((s) => s.pkg.id !== bestForYouObj.pkg.id) || scored[1] || scored[0]
+
+    // Formulate intelligent trade-off explanation
+    let rationale = `Recommended because it matches your preferred ${userPriority} focus`
+    if (bestForYouObj.match.reasons.length > 0) {
+      rationale += `, ${bestForYouObj.match.reasons[0].toLowerCase()}`
+      if (bestForYouObj.match.reasons[1]) {
+        rationale += `, and ${bestForYouObj.match.reasons[1].toLowerCase()}`
+      }
+    }
+
+    let tradeOff = ""
+    if (runnerUpObj && runnerUpObj.pkg.id !== bestForYouObj.pkg.id) {
+      if (runnerUpObj.pkg.numericPrice < bestForYouObj.pkg.numericPrice) {
+        tradeOff = `Choose ${runnerUpObj.pkg.name} instead if saving ₹${(bestForYouObj.pkg.numericPrice - runnerUpObj.pkg.numericPrice).toLocaleString("en-IN")} is your primary goal.`
+      } else if (runnerUpObj.pkg.experiences.activitiesCount > bestForYouObj.pkg.experiences.activitiesCount) {
+        tradeOff = `Choose ${runnerUpObj.pkg.name} instead if you prefer more total activities (+${runnerUpObj.pkg.experiences.activitiesCount - bestForYouObj.pkg.experiences.activitiesCount} extra).`
+      } else {
+        tradeOff = `Choose ${runnerUpObj.pkg.name} instead if you prefer ${runnerUpObj.pkg.destination}'s unique regional spots.`
+      }
+    }
+
+    return {
+      scored,
+      bestForYouId: bestForYouObj.pkg.id,
+      bestValueId: bestValueObj.pkg.id,
+      bestExperienceId: bestExperienceObj.pkg.id,
+      recommendedPkg: bestForYouObj.pkg,
+      recommendedMatch: bestForYouObj.match,
+      runnerUpPkg: runnerUpObj ? runnerUpObj.pkg : null,
+      rationale,
+      tradeOff
+    }
+  }, [comparedPackagesList, userPriority, userBudget])
+
   const toggleCompare = (pkgId) => {
     setSelectedForCompare((prev) => {
       if (prev.includes(pkgId)) {
+        if (prev.length <= 1) return prev // Keep at least 1
         return prev.filter((id) => id !== pkgId)
       }
       if (prev.length >= 3) {
-        return [prev[0], prev[1], pkgId]
+        return [prev[1], prev[2], pkgId]
       }
       return [...prev, pkgId]
     })
   }
 
-  // Handle Add to Trip
   const handleAddToTrip = (pkg) => {
     selectPackageAndBuildTrip(pkg)
-    setToastMessage(`✓ ${pkg.name} added to your itinerary!`)
-    setTimeout(() => {
-      setToastMessage(null)
-    }, 6000)
+    setToastMessage(`✓ ${pkg.name} added to your personal itinerary!`)
+    setTimeout(() => setToastMessage(null), 5000)
   }
 
   return (
-    <section id="packages" className="relative w-full min-h-screen py-16 md:py-24 bg-[#0D2B45] text-white select-none font-sans">
+    <section id="packages" className="relative w-full min-h-screen py-12 sm:py-16 md:py-20 bg-background text-foreground select-none font-sans transition-colors duration-300">
       
-      {/* Ambient Radial Gradient Background */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/30 via-[#0D2B45] to-[#0A2238] pointer-events-none" />
+      {/* Background Cartographic Radial Pattern */}
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/5 via-background to-background pointer-events-none" />
 
-      {/* Confirmation Toast Bar */}
+      {/* Confirmation Toast Banner */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
             initial={{ opacity: 0, y: -40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl bg-emerald-500 text-white px-6 py-3.5 shadow-2xl border border-white/20 text-sm font-semibold"
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl bg-emerald-600 text-white px-6 py-3.5 shadow-2xl border border-white/20 text-xs sm:text-sm font-semibold"
           >
-            <CheckCircle2 className="h-5 w-5" />
+            <CheckCircle2 className="h-5 w-5 shrink-0" />
             <span>{toastMessage}</span>
             <Button
               size="sm"
               onClick={() => onNavigateView && onNavigateView("itinerary")}
-              className="ml-2 rounded-xl bg-white text-emerald-950 hover:bg-emerald-50 font-bold text-xs px-3.5 py-1.5 shadow"
+              className="ml-2 rounded-xl bg-white text-emerald-950 hover:bg-emerald-50 font-extrabold text-xs px-3.5 py-1.5 shadow"
             >
-              View My Itinerary →
+              Open Planner →
             </Button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 space-y-12">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 space-y-10">
         
-        {/* 1. Header Section (Green badge removed as requested) */}
-        <div className="mx-auto max-w-3xl text-center space-y-4">
-          <h2 className="font-heading text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white uppercase leading-none drop-shadow-lg">
-            Find & Compare Packages
+        {/* 1. Header Title & Subtitle */}
+        <div className="mx-auto max-w-3xl text-center space-y-3">
+          <span className="font-heading text-xs font-bold uppercase tracking-[0.25em] text-[#C98B55] block">
+            TRIPNEST DECISION ENGINE
+          </span>
+          <h2 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground uppercase leading-none drop-shadow-sm">
+            Which Trip is Better for YOU?
           </h2>
-
-          <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-            Select your dream vacation style, compare packages side-by-side, and import seamlessly into your personal Itinerary.
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
+            Compare packages side-by-side and easily add them directly to your personal trip itinerary or saved trips.
           </p>
         </div>
 
-        {/* 2. Vacation Category Selector (Emojis removed) */}
+        {/* 3. DECISION RECOMMENDATION CARD (The "Best For You" Answer) */}
+        {decisionData && decisionData.recommendedPkg && (
+          <motion.div
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="rounded-3xl border-2 border-[#C98B55]/40 bg-card shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 relative"
+          >
+            <div className="absolute top-0 right-0 bg-[#C98B55] text-white text-[10px] font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-bl-2xl shadow-md flex items-center gap-1.5">
+              <Award className="h-3.5 w-3.5" />
+              Personalized Decision
+            </div>
+
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              
+              {/* Left Summary */}
+              <div className="space-y-3 flex-1">
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#C98B55]/15 px-3 py-1 text-xs font-extrabold text-[#C98B55] border border-[#C98B55]/30">
+                  <Award className="h-4 w-4" />
+                  🏆 BEST FOR YOU ({decisionData.recommendedMatch.score}% MATCH)
+                </div>
+
+                <h3 className="font-heading text-2xl sm:text-4xl font-extrabold text-foreground">
+                  {decisionData.recommendedPkg.name}
+                </h3>
+
+                <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed max-w-2xl font-medium border-l-2 border-[#C98B55] pl-3 py-0.5">
+                  "{decisionData.rationale}"
+                </p>
+
+                {/* Key Highlight Badges */}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
+                    <TrendingDown className="h-3.5 w-3.5" />
+                    Est. Total Cost: ₹{decisionData.recommendedPkg.estimatedTotalCost.toLocaleString("en-IN")}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-xl border border-amber-500/20">
+                    {decisionData.recommendedPkg.pace.icon} {decisionData.recommendedPkg.pace.label} Pace
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-xl border border-blue-500/20">
+                    <Car className="h-3.5 w-3.5" />
+                    {decisionData.recommendedPkg.convenience.transportType}
+                  </span>
+                </div>
+              </div>
+
+              {/* Right CTA Block */}
+              <div className="flex flex-col sm:flex-row md:flex-col items-center gap-3 shrink-0 w-full md:w-auto">
+                <Button
+                  onClick={() => handleAddToTrip(decisionData.recommendedPkg)}
+                  className="w-full sm:w-auto rounded-2xl bg-[#C98B55] hover:bg-[#b07847] text-white font-extrabold text-xs sm:text-sm px-6 py-3.5 shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Plus className="h-4 w-4" />
+                  Select {decisionData.recommendedPkg.destination} Trip
+                </Button>
+
+                <button
+                  onClick={() => setShowingMatchDetailPkg(decisionData.recommendedPkg)}
+                  className="text-xs font-bold text-[#C98B55] hover:underline flex items-center gap-1"
+                >
+                  <Info className="h-3.5 w-3.5" />
+                  Why {decisionData.recommendedMatch.score}% Match? (View Breakdown)
+                </button>
+              </div>
+            </div>
+
+            {/* Trade-Off Callout Note */}
+            {decisionData.tradeOff && (
+              <div className="rounded-2xl bg-secondary/60 border border-border p-3.5 text-xs text-muted-foreground flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                <span>
+                  <strong className="text-foreground">Honest Trade-off: </strong>
+                  {decisionData.tradeOff}
+                </span>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* 4. SIDE-BY-SIDE PACKAGE COMPARISON CARDS */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-heading text-xs uppercase tracking-widest text-slate-400 font-bold">
-              1. Select Vacation Category
+            <h3 className="font-heading text-xs uppercase tracking-widest text-[#C98B55] font-extrabold flex items-center gap-2">
+              <Layers className="h-4 w-4" />
+              Comparing {comparedPackagesList.length} Packages Side-by-Side
             </h3>
-            {selectedForCompare.length > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCompareMode(!compareMode)}
-                className={`rounded-xl border-white/20 text-xs font-semibold px-4 transition-all ${
-                  compareMode ? "bg-teal-500 text-slate-950 border-teal-400" : "bg-white/10 hover:bg-white/20 text-white"
-                }`}
-              >
-                <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" />
-                {compareMode ? "Back to Cards" : `Compare Selected (${selectedForCompare.length})`}
-              </Button>
-            )}
-          </div>
 
-          {/* Horizontal Scrollable Category Bar (Clean Icon + Text) */}
-          <div className="flex items-center gap-2.5 overflow-x-auto pb-3 scrollbar-none">
-            {VACATION_CATEGORIES.map((cat) => {
-              const IconComp = cat.icon
-              const isActive = activeCategory === cat.id
-              return (
+            {/* Category Filter Selector */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+              {VACATION_CATEGORIES.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => {
                     setActiveCategory(cat.id)
-                    setCompareMode(false)
+                    const catPkgs = PACKAGE_DATA[cat.id] || []
+                    if (catPkgs.length >= 2) {
+                      setSelectedForCompare([catPkgs[0].id, catPkgs[1].id])
+                    }
                   }}
-                  className={`flex items-center gap-2 rounded-2xl px-5 py-3 text-xs sm:text-sm font-bold whitespace-nowrap transition-all border ${
-                    isActive
-                      ? "bg-white text-slate-950 border-white shadow-xl scale-[1.02]"
-                      : "bg-white/10 text-slate-300 border-white/10 hover:bg-white/15 hover:text-white"
+                  className={`rounded-xl px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all border ${
+                    activeCategory === cat.id
+                      ? "bg-[#C98B55] text-white border-[#C98B55]"
+                      : "bg-card text-muted-foreground border-border hover:bg-secondary"
                   }`}
                 >
-                  <IconComp className="h-4 w-4 text-teal-400 shrink-0" />
-                  <span>{cat.name}</span>
+                  {cat.name}
                 </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Package Cards Grid */}
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {comparedPackagesList.map((pkg) => {
+              const matchObj = calculatePersonalMatchScore(pkg, userPriority, userBudget)
+              const isBestForYou = decisionData?.bestForYouId === pkg.id
+              const isBestValue = decisionData?.bestValueId === pkg.id
+              const isBestExp = decisionData?.bestExperienceId === pkg.id
+
+              return (
+                <div
+                  key={pkg.id}
+                  className={`group relative rounded-3xl border bg-card text-card-foreground p-5 sm:p-6 shadow-xl flex flex-col justify-between transition-all hover:border-[#C98B55] ${
+                    isBestForYou ? "border-2 border-[#C98B55] ring-2 ring-[#C98B55]/20" : "border-border"
+                  }`}
+                >
+                  <div className="space-y-4">
+                    
+                    {/* Top Badges (Best for You / Best Value / Best Experience) */}
+                    <div className="flex items-center justify-between gap-2 flex-wrap min-h-[28px]">
+                      {isBestForYou ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-white bg-[#C98B55] px-2.5 py-1 rounded-full shadow-sm">
+                          🏆 Best for You
+                        </span>
+                      ) : isBestValue ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-950 bg-emerald-400 px-2.5 py-1 rounded-full shadow-sm">
+                          💰 Best Value
+                        </span>
+                      ) : isBestExp ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-purple-950 bg-purple-300 px-2.5 py-1 rounded-full shadow-sm">
+                          ✨ Best Experience
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground bg-secondary px-2.5 py-1 rounded-full">
+                          <MapPin className="h-3 w-3" /> {pkg.destination}
+                        </span>
+                      )}
+
+                      {/* Clickable Personal Match Score Badge */}
+                      <button
+                        onClick={() => setShowingMatchDetailPkg(pkg)}
+                        className="flex items-center gap-1 bg-[#C98B55]/15 hover:bg-[#C98B55]/25 border border-[#C98B55]/30 text-[#C98B55] px-2.5 py-0.5 rounded-full text-xs font-extrabold transition-all cursor-pointer"
+                        title="Click to view why this score matches you"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        <span>{matchObj.score}% Match</span>
+                      </button>
+                    </div>
+
+                    {/* Package Image & Hero Overlay */}
+                    <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-border/80">
+                      <img
+                        src={pkg.image}
+                        alt={pkg.name}
+                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      
+                      <div className="absolute top-3 left-3">
+                        <span className="rounded-xl bg-black/70 backdrop-blur-md text-white font-heading font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 border border-white/20">
+                          {pkg.duration}
+                        </span>
+                      </div>
+
+                      <div className="absolute bottom-3 left-3 right-3 text-white">
+                        <h4 className="font-heading text-lg font-extrabold leading-tight drop-shadow-md truncate">
+                          {pkg.name}
+                        </h4>
+                        <div className="flex items-center justify-between text-[11px] opacity-90 mt-0.5">
+                          <span>⭐ {pkg.rating} ({pkg.reviewsCount} reviews)</span>
+                          <span>{pkg.pace.icon} {pkg.pace.label}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Price & Estimated Actual Trip Cost */}
+                    <div className="rounded-2xl bg-secondary/50 p-3.5 border border-border/60 space-y-1">
+                      <div className="flex items-baseline justify-between">
+                        <div>
+                          <span className="text-[9.5px] uppercase tracking-widest text-muted-foreground font-bold block">Package Base Price</span>
+                          <span className="font-heading text-2xl font-extrabold text-foreground">{pkg.price}</span>
+                          <span className="text-[11px] text-muted-foreground font-medium"> / person</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[9.5px] uppercase tracking-widest text-muted-foreground font-bold block">Est. Actual Trip Cost</span>
+                          <span className="font-extrabold text-sm text-emerald-600 dark:text-emerald-400">
+                            ₹{pkg.estimatedTotalCost.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick Feature Highlights */}
+                    <div className="space-y-2 text-xs">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Hotel className="h-4 w-4 text-[#C98B55] shrink-0" />
+                        <span className="truncate font-semibold text-foreground">{pkg.accommodation.category}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Compass className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span className="truncate font-semibold text-foreground">
+                          {pkg.experiences.activitiesCount} Activities • {pkg.experiences.attractionsCount} Attractions
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Car className="h-4 w-4 text-blue-500 shrink-0" />
+                        <span className="truncate font-semibold text-foreground">{pkg.convenience.airportTransfers}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Sun className="h-4 w-4 text-amber-500 shrink-0" />
+                        <span className="truncate font-semibold text-foreground">{pkg.weatherSuitability.title}</span>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Bottom Card Actions */}
+                  <div className="mt-5 pt-3 border-t border-border space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setViewingModalPkg(pkg)}
+                        className="rounded-xl border-border hover:bg-secondary font-bold text-xs cursor-pointer"
+                      >
+                        <Eye className="mr-1.5 h-3.5 w-3.5" />
+                        Details
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toggleCompare(pkg.id)}
+                        className={`rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                          selectedForCompare.includes(pkg.id)
+                            ? "bg-secondary border-border text-foreground"
+                            : "border-border text-muted-foreground"
+                        }`}
+                      >
+                        <X className="mr-1 h-3.5 w-3.5" />
+                        Remove
+                      </Button>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      onClick={() => handleAddToTrip(pkg)}
+                      className={`w-full rounded-xl font-extrabold text-xs py-2.5 shadow-md flex items-center justify-center gap-1.5 cursor-pointer ${
+                        isBestForYou
+                          ? "bg-[#C98B55] hover:bg-[#b07847] text-white"
+                          : "bg-secondary text-foreground hover:bg-secondary/80 border border-border"
+                      }`}
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>+ Add to My Trip</span>
+                    </Button>
+                  </div>
+                </div>
               )
             })}
           </div>
         </div>
 
-        {/* 3. Package Cards View */}
-        {!compareMode && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="font-heading text-xs uppercase tracking-widest text-slate-400 font-bold">
-                2. Featured Packages — {VACATION_CATEGORIES.find((c) => c.id === activeCategory)?.name}
-              </h3>
-              <span className="text-xs text-slate-400 font-medium">Showing 3 curated packages</span>
-            </div>
+        {/* 5. PROGRESSIVE DISCLOSURE: VIEW FULL DETAILED COMPARISON MATRIX */}
+        <div className="pt-4 text-center">
+          <Button
+            variant="outline"
+            onClick={() => setShowFullMatrix(!showFullMatrix)}
+            className="rounded-2xl border-border bg-card hover:bg-secondary text-foreground font-bold text-xs sm:text-sm px-6 py-3 shadow-md cursor-pointer inline-flex items-center gap-2"
+          >
+            <Layers className="h-4 w-4 text-[#C98B55]" />
+            {showFullMatrix ? "Hide Detailed Comparison Matrix" : "View Full Detailed Category Comparison Matrix"}
+            <ChevronRight className={`h-4 w-4 transition-transform ${showFullMatrix ? "rotate-90" : ""}`} />
+          </Button>
+        </div>
 
-            {/* Package Cards Grid */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {currentCategoryPackages.map((pkg) => {
-                const isSelectedForCompare = selectedForCompare.includes(pkg.id)
-                const isCurrentlyActiveTrip = selectedPackage?.id === pkg.id
-
-                return (
-                  <motion.div
-                    key={pkg.id}
-                    layout
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className={`group relative rounded-3xl border bg-white text-slate-900 p-6 shadow-2xl flex flex-col justify-between transition-all hover:border-teal-400 hover:shadow-teal-500/10 ${
-                      isCurrentlyActiveTrip ? "ring-2 ring-teal-500 border-teal-500" : "border-white"
-                    }`}
-                  >
-                    <div className="space-y-4">
-                      {/* Top Bar: Rating & Destination */}
-                      <div className="flex items-center justify-between">
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200 uppercase tracking-wider">
-                          <MapPin className="h-3 w-3 text-teal-600" />
-                          {pkg.destination}
-                        </span>
-
-                        <div className="flex items-center gap-1 text-amber-500 font-bold text-xs bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-                          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                          <span>{pkg.rating}</span>
-                        </div>
-                      </div>
-
-                      {/* Image Banner */}
-                      <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-slate-200">
-                        <img
-                          src={pkg.image}
-                          alt={pkg.name}
-                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-3 left-3">
-                          <span className="rounded-xl bg-slate-950/80 backdrop-blur-md text-white font-heading font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 border border-white/20">
-                            {pkg.duration}
-                          </span>
-                        </div>
-
-                        {isCurrentlyActiveTrip && (
-                          <div className="absolute top-3 right-3">
-                            <span className="rounded-xl bg-teal-500 text-slate-950 font-bold text-[10px] uppercase tracking-wider px-3 py-1 shadow-md">
-                              Active Trip
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Title & Description */}
-                      <div className="space-y-1">
-                        <h4 className="font-heading text-xl font-extrabold text-slate-900 leading-tight">
-                          {pkg.name}
-                        </h4>
-                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                          {pkg.description}
-                        </p>
-                      </div>
-
-                      {/* Key Features Matrix Pill */}
-                      <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                        <div className="flex items-center gap-1.5 text-slate-700">
-                          <Hotel className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                          <span className="truncate font-semibold text-[11px]">{pkg.hotelCategory}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-slate-700">
-                          <Utensils className="h-3.5 w-3.5 text-amber-600 shrink-0" />
-                          <span className="truncate font-semibold text-[11px]">{pkg.meals.split(" ")[0]} Meals</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-slate-700">
-                          <Car className="h-3.5 w-3.5 text-blue-600 shrink-0" />
-                          <span className="truncate font-semibold text-[11px]">{pkg.transport.split(" ")[0]} Transport</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-slate-700">
-                          <Sparkles className="h-3.5 w-3.5 text-purple-600 shrink-0" />
-                          <span className="truncate font-semibold text-[11px]">{pkg.attractionsCount} Sights • {pkg.activitiesCount} Acts</span>
-                        </div>
-                      </div>
-
-                      {/* Price Display (True Trip Cost removed) */}
-                      <div className="flex items-baseline justify-between pt-1">
-                        <div>
-                          <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block">Package Price</span>
-                          <span className="font-heading text-2xl font-extrabold text-slate-900">{pkg.price}</span>
-                          <span className="text-[11px] text-slate-500 font-medium"> / person</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="mt-5 space-y-2 pt-3 border-t border-slate-200">
-                      <div className="grid grid-cols-2 gap-2">
-                        {/* View Details */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setViewingPackageModal(pkg)}
-                          className="rounded-xl border-slate-300 text-slate-800 hover:bg-slate-100 font-bold text-xs"
-                        >
-                          <Eye className="mr-1.5 h-3.5 w-3.5 text-slate-600" />
-                          Details
-                        </Button>
-
-                        {/* Compare Toggle */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => toggleCompare(pkg.id)}
-                          className={`rounded-xl font-bold text-xs transition-all ${
-                            isSelectedForCompare
-                              ? "bg-slate-900 text-white border-slate-900 hover:bg-slate-800"
-                              : "border-slate-300 text-slate-800 hover:bg-slate-100"
-                          }`}
-                        >
-                          <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" />
-                          {isSelectedForCompare ? "✓ Added" : "Compare"}
-                        </Button>
-                      </div>
-
-                      {/* Add to My Trip CTA */}
-                      <Button
-                        size="sm"
-                        onClick={() => handleAddToTrip(pkg)}
-                        className="w-full rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-extrabold text-xs py-2.5 shadow-md transition-all flex items-center justify-center gap-1.5"
-                      >
-                        <Plus className="h-4 w-4" />
-                        <span>+ Add to My Trip</span>
-                      </Button>
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* 4. Package Comparison View Matrix */}
-        {(compareMode || selectedForCompare.length > 0) && (
-          <div className="space-y-8 pt-4">
-            
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <div>
-                <h3 className="font-heading text-2xl font-extrabold text-white uppercase">
-                  Multi-Package Comparison Matrix
-                </h3>
-                <p className="text-xs text-slate-300">
-                  Comparing {comparedPackagesList.length} packages side-by-side
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCompareMode(!compareMode)}
-                  className="rounded-xl border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold"
-                >
-                  {compareMode ? "Hide Matrix" : "Show Full Matrix"}
-                </Button>
-              </div>
-            </div>
-
-            {/* Matrix Table */}
-            <div className="overflow-hidden rounded-3xl border border-white/20 bg-white text-slate-900 shadow-2xl">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[750px] font-sans">
-                  
-                  {/* Table Header */}
-                  <thead>
-                    <tr className="border-b border-slate-200 bg-slate-100">
-                      <th className="p-5 font-heading text-xs font-extrabold uppercase tracking-widest text-slate-500 w-1/4">
-                        Comparison Factor
+        {showFullMatrix && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="overflow-hidden rounded-3xl border border-border bg-card shadow-2xl text-card-foreground"
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[700px]">
+                <thead>
+                  <tr className="border-b border-border bg-secondary/50">
+                    <th className="p-4 font-heading text-xs font-extrabold uppercase tracking-widest text-muted-foreground w-1/4">
+                      Comparison Category
+                    </th>
+                    {comparedPackagesList.map((pkg) => (
+                      <th key={pkg.id} className="p-4 text-center border-l border-border w-1/4">
+                        <span className="font-heading text-base font-extrabold text-foreground block truncate">{pkg.name}</span>
+                        <span className="font-extrabold text-sm text-[#C98B55] block">{pkg.price}</span>
                       </th>
-                      {comparedPackagesList.map((pkg) => (
-                        <th key={pkg.id} className="p-5 text-center border-l border-slate-200 w-1/4">
-                          <div className="space-y-2">
-                            <span className="font-heading text-lg font-extrabold text-slate-900 uppercase block">
-                              {pkg.name}
-                            </span>
-                            <span className="font-heading text-xl font-extrabold text-teal-700 block">
-                              {pkg.price}
-                            </span>
-                            <Button
-                              size="sm"
-                              onClick={() => handleAddToTrip(pkg)}
-                              className="rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-3 py-1 shadow"
-                            >
-                              + Add to Trip
-                            </Button>
-                          </div>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
+                    ))}
+                  </tr>
+                </thead>
 
-                  <tbody className="divide-y divide-slate-200 text-xs sm:text-sm">
-                    
-                    {/* Basic Comparison Factor Rows */}
-                    <tr>
-                      <td className="p-5 font-semibold text-slate-800">Destination & Country</td>
-                      {comparedPackagesList.map((pkg) => (
-                        <td key={pkg.id} className="p-5 text-center font-medium border-l border-slate-200">
-                          {pkg.destination}, {pkg.country}
-                        </td>
-                      ))}
-                    </tr>
+                <tbody className="divide-y divide-border text-xs sm:text-sm">
+                  {/* Category: Cost */}
+                  <tr className="bg-secondary/20">
+                    <td colSpan={comparedPackagesList.length + 1} className="p-3 font-heading font-extrabold text-[#C98B55] uppercase text-[10px] tracking-widest">
+                      💰 A. COST & VALUE
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Package Base Price</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-extrabold text-foreground border-l border-border">{pkg.price}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Taxes & Mandatory Fees</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-medium border-l border-border">{pkg.costBreakdown.taxes}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Est. Additional Expenses</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-medium border-l border-border">{pkg.costBreakdown.localExpenses}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Est. Total Trip Expenditure</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400 border-l border-border">₹{pkg.estimatedTotalCost.toLocaleString("en-IN")}</td>
+                    ))}
+                  </tr>
 
-                    <tr>
-                      <td className="p-5 font-semibold text-slate-800">Package Price</td>
-                      {comparedPackagesList.map((pkg) => (
-                        <td key={pkg.id} className="p-5 text-center font-extrabold text-teal-700 text-base border-l border-slate-200">
-                          {pkg.price}
-                        </td>
-                      ))}
-                    </tr>
+                  {/* Category: Accommodation */}
+                  <tr className="bg-secondary/20">
+                    <td colSpan={comparedPackagesList.length + 1} className="p-3 font-heading font-extrabold text-[#C98B55] uppercase text-[10px] tracking-widest">
+                      🏨 B. ACCOMMODATION & MEALS
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Hotel Tier Category</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-bold text-foreground border-l border-border">{pkg.accommodation.category}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Location & Accessibility</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-medium border-l border-border">{pkg.accommodation.location} ({pkg.accommodation.distanceToHub})</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Meals Included</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-medium border-l border-border">{pkg.accommodation.meals}</td>
+                    ))}
+                  </tr>
 
-                    <tr>
-                      <td className="p-5 font-semibold text-slate-800">Duration</td>
-                      {comparedPackagesList.map((pkg) => (
-                        <td key={pkg.id} className="p-5 text-center font-bold text-slate-900 border-l border-slate-200">
-                          {pkg.duration}
-                        </td>
-                      ))}
-                    </tr>
+                  {/* Category: Trip Pace */}
+                  <tr className="bg-secondary/20">
+                    <td colSpan={comparedPackagesList.length + 1} className="p-3 font-heading font-extrabold text-[#C98B55] uppercase text-[10px] tracking-widest">
+                      🌿 C. TRIP PACE & SCHEDULE
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Pace Classification</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-bold border-l border-border">{pkg.pace.icon} {pkg.pace.label}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Activities per Day</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-medium border-l border-border">{pkg.pace.actPerDay} activities/day</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Average Daily Free Time</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-medium border-l border-border">{pkg.pace.freeTimeHrs} hours free time/day</td>
+                    ))}
+                  </tr>
 
-                    <tr>
-                      <td className="p-5 font-semibold text-slate-800">Accommodation</td>
-                      {comparedPackagesList.map((pkg) => (
-                        <td key={pkg.id} className="p-5 text-center font-medium border-l border-slate-200">
-                          {pkg.hotelCategory}
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr>
-                      <td className="p-5 font-semibold text-slate-800">Meals Included</td>
-                      {comparedPackagesList.map((pkg) => (
-                        <td key={pkg.id} className="p-5 text-center font-medium border-l border-slate-200">
-                          {pkg.meals}
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr>
-                      <td className="p-5 font-semibold text-slate-800">Transportation</td>
-                      {comparedPackagesList.map((pkg) => (
-                        <td key={pkg.id} className="p-5 text-center font-medium border-l border-slate-200">
-                          {pkg.transport}
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr>
-                      <td className="p-5 font-semibold text-slate-800">Attractions Included</td>
-                      {comparedPackagesList.map((pkg) => (
-                        <td key={pkg.id} className="p-5 text-center border-l border-slate-200">
-                          <div className="flex flex-wrap justify-center gap-1">
-                            {pkg.attractionsList.map((att, i) => (
-                              <span key={i} className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-800 border border-slate-200">
-                                {att}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr>
-                      <td className="p-5 font-semibold text-slate-800">Activities Included</td>
-                      {comparedPackagesList.map((pkg) => (
-                        <td key={pkg.id} className="p-5 text-center border-l border-slate-200">
-                          <div className="flex flex-wrap justify-center gap-1">
-                            {pkg.activitiesList.map((act, i) => (
-                              <span key={i} className="rounded-md bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-900 border border-teal-200">
-                                {act}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr>
-                      <td className="p-5 font-semibold text-slate-800">User Rating</td>
-                      {comparedPackagesList.map((pkg) => (
-                        <td key={pkg.id} className="p-5 text-center font-bold text-amber-600 border-l border-slate-200 text-sm">
-                          ⭐ {pkg.rating} / 5.0
-                        </td>
-                      ))}
-                    </tr>
-
-                  </tbody>
-                </table>
-              </div>
+                  {/* Category: Convenience */}
+                  <tr className="bg-secondary/20">
+                    <td colSpan={comparedPackagesList.length + 1} className="p-3 font-heading font-extrabold text-[#C98B55] uppercase text-[10px] tracking-widest">
+                      🚗 D. CONVENIENCE & LOGISTICS
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Airport Transfers</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-medium border-l border-border">{pkg.convenience.airportTransfers}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Local Transport Vehicle</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-medium border-l border-border">{pkg.convenience.localTransport}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-semibold text-muted-foreground">Hotel Changes</td>
+                    {comparedPackagesList.map((pkg) => (
+                      <td key={pkg.id} className="p-4 text-center font-medium border-l border-border">{pkg.convenience.hotelChanges} Stay Location</td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
-
-          </div>
+          </motion.div>
         )}
 
       </div>
 
-      {/* 5. Package Details Modal */}
+      {/* 6. PERSONAL MATCH SCORE BREAKDOWN DIALOG MODAL */}
       <AnimatePresence>
-        {viewingPackageModal && (
+        {showingMatchDetailPkg && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-2xl rounded-3xl bg-white text-slate-900 p-6 md:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto"
+              className="relative w-full max-w-lg rounded-3xl bg-card border border-border text-card-foreground p-6 sm:p-8 shadow-2xl space-y-5"
             >
-              {/* Close Button */}
               <button
-                onClick={() => setViewingPackageModal(null)}
-                className="absolute top-5 right-5 h-9 w-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700"
+                onClick={() => setShowingMatchDetailPkg(null)}
+                className="absolute top-5 right-5 p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="space-y-3 border-b border-slate-200 pb-4">
-                <span className="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-200 uppercase tracking-wider">
-                  {viewingPackageModal.duration} • {viewingPackageModal.destination}
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C98B55]">
+                  Score Transparency Report
                 </span>
-                <h3 className="font-heading text-2xl md:text-3xl font-extrabold text-slate-900">
-                  {viewingPackageModal.name}
+                <h3 className="font-heading text-2xl font-extrabold flex items-center gap-2">
+                  <span>{showingMatchDetailPkg.name}</span>
+                  <span className="text-[#C98B55]">
+                    ({calculatePersonalMatchScore(showingMatchDetailPkg, userPriority, userBudget).score}% Match)
+                  </span>
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  {viewingPackageModal.description}
+              </div>
+
+              {/* Reasons List */}
+              <div className="space-y-3 pt-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Why this matches your {userPriority} preference ({calculatePersonalMatchScore(showingMatchDetailPkg, userPriority, userBudget).reasons.length})
+                </h4>
+
+                <ul className="space-y-2 text-xs text-foreground">
+                  {calculatePersonalMatchScore(showingMatchDetailPkg, userPriority, userBudget).reasons.map((r, i) => (
+                    <li key={i} className="flex items-start gap-2 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/20">
+                      <span className="text-emerald-500 font-bold">✓</span>
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Warnings List */}
+              {calculatePersonalMatchScore(showingMatchDetailPkg, userPriority, userBudget).warnings.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                    <AlertTriangle className="h-4 w-4" />
+                    Potential Trade-offs to Consider
+                  </h4>
+
+                  <ul className="space-y-2 text-xs text-foreground">
+                    {calculatePersonalMatchScore(showingMatchDetailPkg, userPriority, userBudget).warnings.map((w, i) => (
+                      <li key={i} className="flex items-start gap-2 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20">
+                        <span className="text-amber-500 font-bold">⚠</span>
+                        <span>{w}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <Button
+                onClick={() => setShowingMatchDetailPkg(null)}
+                className="w-full rounded-2xl bg-[#C98B55] text-white hover:bg-[#b07847] font-bold text-xs py-3 shadow-md cursor-pointer"
+              >
+                Close Breakdown
+              </Button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* 7. PACKAGE DETAILS MODAL */}
+      <AnimatePresence>
+        {viewingModalPkg && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-2xl rounded-3xl bg-card border border-border text-card-foreground p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto"
+            >
+              <button
+                onClick={() => setViewingModalPkg(null)}
+                className="absolute top-5 right-5 p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              <div className="space-y-2 border-b border-border pb-4">
+                <span className="text-xs font-bold text-[#C98B55] bg-[#C98B55]/15 px-3 py-1 rounded-full border border-[#C98B55]/30 uppercase tracking-wider">
+                  {viewingModalPkg.duration} • {viewingModalPkg.destination}
+                </span>
+                <h3 className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground">
+                  {viewingModalPkg.name}
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  {viewingModalPkg.description}
                 </p>
               </div>
 
-              {/* Image */}
-              <div className="relative h-52 w-full rounded-2xl overflow-hidden border border-slate-200">
-                <img
-                  src={viewingPackageModal.image}
-                  alt={viewingPackageModal.name}
-                  className="h-full w-full object-cover"
-                />
+              <div className="relative h-52 w-full rounded-2xl overflow-hidden border border-border">
+                <img src={viewingModalPkg.image} alt={viewingModalPkg.name} className="h-full w-full object-cover" />
               </div>
 
-              {/* Included Attractions List */}
-              <div className="space-y-3">
-                <h4 className="font-heading text-xs font-extrabold uppercase tracking-widest text-slate-500">
-                  Included Attractions ({viewingPackageModal.attractionsList.length})
+              <div className="space-y-2">
+                <h4 className="font-heading text-xs font-extrabold uppercase tracking-widest text-[#C98B55]">
+                  Included Attractions ({viewingModalPkg.experiences.attractionsList.length})
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {viewingPackageModal.attractionsList.map((att, idx) => (
-                    <span key={idx} className="rounded-xl bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-800">
+                  {viewingModalPkg.experiences.attractionsList.map((att, idx) => (
+                    <span key={idx} className="rounded-xl bg-secondary border border-border px-3 py-1 text-xs font-semibold text-foreground">
                       📍 {att}
                     </span>
                   ))}
                 </div>
               </div>
 
-              {/* Included Activities List */}
-              <div className="space-y-3">
-                <h4 className="font-heading text-xs font-extrabold uppercase tracking-widest text-slate-500">
-                  Included Curated Activities ({viewingPackageModal.activitiesList.length})
+              <div className="space-y-2">
+                <h4 className="font-heading text-xs font-extrabold uppercase tracking-widest text-[#C98B55]">
+                  Included Curated Activities ({viewingModalPkg.experiences.activitiesList.length})
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {viewingPackageModal.activitiesList.map((act, idx) => (
-                    <span key={idx} className="rounded-xl bg-teal-50 border border-teal-200 px-3 py-1 text-xs font-semibold text-teal-900">
+                  {viewingModalPkg.experiences.activitiesList.map((act, idx) => (
+                    <span key={idx} className="rounded-xl bg-[#C98B55]/15 border border-[#C98B55]/30 px-3 py-1 text-xs font-semibold text-[#C98B55]">
                       ✨ {act}
                     </span>
                   ))}
                 </div>
               </div>
 
-              {/* Bottom Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+              <div className="flex items-center justify-between pt-4 border-t border-border">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Package Price</span>
-                  <span className="font-heading text-2xl font-extrabold text-slate-900">{viewingPackageModal.price}</span>
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground block">Package Price</span>
+                  <span className="font-heading text-2xl font-extrabold text-foreground">{viewingModalPkg.price}</span>
                 </div>
 
                 <Button
                   onClick={() => {
-                    handleAddToTrip(viewingPackageModal)
-                    setViewingPackageModal(null)
+                    handleAddToTrip(viewingModalPkg)
+                    setViewingModalPkg(null)
                   }}
-                  className="rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-extrabold text-sm px-6 py-3 shadow-lg"
+                  className="rounded-2xl bg-[#C98B55] hover:bg-[#b07847] text-white font-extrabold text-xs sm:text-sm px-6 py-3 shadow-lg cursor-pointer"
                 >
                   + Add to My Trip
                 </Button>

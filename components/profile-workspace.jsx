@@ -138,7 +138,7 @@ export function ProfileWorkspace({ onBack }) {
   }
 
   return (
-    <section className="min-h-screen bg-[#F4F6F6] text-[#2F3E4E] pt-24 pb-28">
+    <section className="min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-28">
       <div className="mx-auto max-w-6xl px-4 md:px-6 space-y-8">
         
         {/* Navigation Top Bar */}

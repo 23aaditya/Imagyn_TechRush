@@ -11,6 +11,7 @@ import { HowItWorks } from "@/components/how-it-works"
 import { PackageComparison } from "@/components/package-comparison"
 import { BudgetCalculator } from "@/components/budget-calculator"
 import { ExpenseTracker } from "@/components/expense-tracker"
+import { AvailableFeatures } from "@/components/available-features"
 import { Testimonials } from "@/components/testimonials"
 import { FAQ } from "@/components/faq"
 import { FinalCTA } from "@/components/final-cta"
@@ -102,7 +103,7 @@ function MainApp() {
   }
 
   return (
-    <main className={`relative min-h-screen ${activeView === "home" ? "bg-background" : "bg-[#F4F6F6] text-[#2F3E4E]"}`}>
+    <main className={`relative min-h-screen ${activeView === "home" ? "bg-background" : "bg-background dark:bg-[#11100E] text-foreground dark:text-[#F1ECE2]"}`} suppressHydrationWarning>
       {/* Dynamic low-opacity travel background */}
       {activeView === "home" && <HomeBackground />}
 
@@ -135,15 +136,7 @@ function MainApp() {
           <WhyTripNest onNavigateView={handleViewChange} />
           <ExploreWorld onNavigateView={handleViewChange} onSelectDestination={handleSelectDestination} />
           <HowItWorks onNavigateView={handleViewChange} />
-          <PackageComparison onNavigateView={handleViewChange} onSelectDestination={handleSelectDestination} onOpenAuth={openAuth} />
-          <BudgetCalculator
-            isWorkspace={false}
-            onOpenWorkspace={() => handleViewChange("budget")}
-          />
-          <ExpenseTracker
-            isWorkspace={false}
-            onOpenWorkspace={() => handleViewChange("expenses")}
-          />
+          <AvailableFeatures />
           <Testimonials />
           <FAQ />
           <FinalCTA onNavigateView={handleViewChange} />

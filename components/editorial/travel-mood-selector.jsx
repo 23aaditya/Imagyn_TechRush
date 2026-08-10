@@ -63,7 +63,7 @@ export function TravelMoodSelector({ onNavigateView }) {
           <Button
             onClick={() => onNavigateView("explore")}
             variant="outline"
-            className="rounded-full border-foreground/20 bg-[#F4F6F6] text-xs font-bold text-foreground shadow-sm hover:bg-[#F4F6F6] hover:border-foreground/40 self-start md:self-auto"
+            className="rounded-full border-foreground/20 bg-slate-50 dark:bg-card text-xs font-bold text-foreground shadow-sm hover:bg-slate-100 dark:hover:bg-card/80 hover:border-foreground/40 self-start md:self-auto"
           >
             Explore All Vibe Collections
             <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
@@ -81,8 +81,8 @@ export function TravelMoodSelector({ onNavigateView }) {
                 onClick={() => setActiveMood(m.id)}
                 className={`flex flex-col items-center justify-center rounded-3xl border p-4 text-center transition-all select-none ${
                   isActive
-                    ? "border-primary bg-[#F4F6F6] ring-2 ring-primary/20 shadow-xl shadow-primary/10 scale-105"
-                    : "border-border/60 bg-[#F4F6F6]/70 hover:border-primary/40 hover:bg-[#F4F6F6]"
+                    ? "border-primary bg-card ring-2 ring-primary/20 shadow-xl shadow-primary/10 scale-105"
+                    : "border-border/60 bg-card/90 hover:border-primary/40 hover:bg-card"
                 }`}
               >
                 <span className={`flex h-10 w-10 items-center justify-center rounded-2xl mb-2 ${

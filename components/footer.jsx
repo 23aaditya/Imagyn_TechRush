@@ -11,13 +11,15 @@ export function Footer({ onNavigateView }) {
             onNavigateView?.("home")
             window.scrollTo({ top: 0, behavior: "smooth" })
           }}
-          className="flex items-center gap-2.5 text-left focus:outline-none group"
+          className="flex items-center text-left focus:outline-none group cursor-pointer"
         >
-          <img
-            src="/images/tripnest-logo.png"
-            alt="TripNest Imagyn"
-            className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
-          />
+          <div className="rounded-2xl bg-white/95 backdrop-blur-md px-3.5 py-2 border border-border shadow-sm transition-transform group-hover:scale-105">
+            <img
+              src="/tripnest-logo.png"
+              alt="TripNest Imagyn"
+              className="h-7 w-auto object-contain"
+            />
+          </div>
         </button>
 
         {/* Essential Navigation Links */}

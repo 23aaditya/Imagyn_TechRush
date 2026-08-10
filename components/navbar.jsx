@@ -24,6 +24,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
   const [userDropdown, setUserDropdown] = useState(false)
 
   useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"))
     const onScroll = () => setScrolled(window.scrollY > 16)
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
@@ -53,26 +54,25 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
         "fixed inset-x-0 top-0 z-50 w-full transition-all duration-300",
         activeView === "home"
           ? scrolled
-            ? "bg-[#E5F0FA]/95 backdrop-blur-xl border-b border-[#5A8CB2]/20 text-[#1E293B] shadow-md"
+            ? "bg-[#E5F0FA]/95 backdrop-blur-xl border-b border-[#5A8CB2]/20 text-[#1E293B] shadow-md dark:bg-[#181613]/95 dark:text-[#F1ECE2] dark:border-[rgba(235,226,208,0.12)]"
             : "bg-gradient-to-b from-[#1E293B]/80 via-[#1E293B]/30 to-transparent text-white border-none shadow-none"
-          : "bg-[#E5F0FA] text-[#1E293B] border-b border-[#5A8CB2]/20 shadow-md"
+          : "bg-[#E5F0FA] text-[#1E293B] border-b border-[#5A8CB2]/20 shadow-md dark:bg-[#181613] dark:text-[#F1ECE2] dark:border-[rgba(235,226,208,0.12)]"
       )}
     >
       <nav className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3.5">
         {/* Official TripNest Imagyn Logo */}
         <button
           onClick={() => handleNavClick("home")}
-          className="flex items-center text-left focus:outline-none group py-1 bg-transparent border-none"
+          className="flex items-center text-left focus:outline-none group py-0.5 bg-transparent border-none cursor-pointer"
           aria-label="TripNest Homepage"
         >
-          <img
-            src="/images/tripnest-logo.png"
-            alt="TripNest Imagyn"
-            className={cn(
-              "h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]",
-              activeView === "home" && !scrolled ? "mix-blend-screen" : ""
-            )}
-          />
+          <div className="rounded-2xl bg-white/95 backdrop-blur-md px-3 py-1.5 border border-white/40 shadow-sm transition-transform group-hover:scale-105">
+            <img
+              src="/tripnest-logo.png"
+              alt="TripNest Imagyn"
+              className="h-7 sm:h-8 w-auto object-contain"
+            />
+          </div>
         </button>
 
         {/* Center links */}
@@ -87,10 +87,10 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                   className={cn(
                     "relative overflow-visible rounded-full px-4 py-2 text-xs font-bold transition-all duration-200 cursor-pointer",
                     isActive
-                      ? "bg-[#5A8CB2] text-white shadow-md"
+                      ? "bg-[#5A8CB2] text-white shadow-md dark:bg-[#C98B55] dark:text-[#11100E]"
                       : isTransparentHome
                       ? "text-white/90 hover:bg-white/15 hover:text-white hover:scale-105"
-                      : "text-[#1E293B]/80 hover:bg-[#5A8CB2]/15 hover:text-[#1E293B] hover:scale-105"
+                      : "text-[#1E293B]/80 hover:bg-[#5A8CB2]/15 hover:text-[#1E293B] hover:scale-105 dark:text-[#F1ECE2]/80 dark:hover:bg-[#C98B55]/15 dark:hover:text-[#F1ECE2]"
                   )}
                 >
                   {link.label}
@@ -109,8 +109,8 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             aria-label="Toggle dark mode"
             onClick={toggleTheme}
             className={cn(
-              "hover:bg-[#5A8CB2]/15",
-              activeView === "home" && !scrolled ? "text-white hover:text-white" : "text-[#1E293B] hover:text-[#1E293B]"
+              "hover:bg-[#5A8CB2]/15 dark:hover:bg-[#C98B55]/20",
+              activeView === "home" && !scrolled ? "text-white hover:text-white" : "text-[#1E293B] dark:text-[#F1ECE2] hover:text-[#1E293B] dark:hover:text-[#F1ECE2]"
             )}
           >
             {isDark ? <Sun className="h-5 w-5 text-amber-500" /> : <Moon className="h-5 w-5" />}
@@ -121,12 +121,12 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             <div className="relative">
               <button
                 onClick={() => setUserDropdown(!userDropdown)}
-                className="flex items-center gap-2 rounded-md border border-[#5A8CB2]/30 bg-[#5A8CB2]/10 px-2.5 py-1.5 shadow-sm hover:border-[#5A8CB2]/60 transition-all text-[#1E293B]"
+                className="flex items-center gap-2 rounded-md border border-[#5A8CB2]/30 bg-[#5A8CB2]/10 px-2.5 py-1.5 shadow-sm hover:border-[#5A8CB2]/60 transition-all text-[#1E293B] dark:text-[#F1ECE2] dark:border-[#C98B55]/30 dark:bg-[#C98B55]/10"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-sm bg-[#5A8CB2] text-xs font-bold text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-sm bg-[#5A8CB2] text-xs font-bold text-white dark:bg-[#C98B55] dark:text-[#11100E]">
                   {user.initials || "U"}
                 </span>
-                <span className="hidden text-xs font-semibold text-[#1E293B] sm:inline-block max-w-[100px] truncate">
+                <span className="hidden text-xs font-semibold text-[#1E293B] dark:text-[#F1ECE2] sm:inline-block max-w-[100px] truncate">
                   {user.name}
                 </span>
               </button>
@@ -152,7 +152,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                       }}
                       className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-bold text-foreground hover:bg-accent transition-colors cursor-pointer"
                     >
-                      <User className="h-3.5 w-3.5 text-[#5A8CB2]" />
+                      <User className="h-3.5 w-3.5 text-[#5A8CB2] dark:text-[#C98B55]" />
                       Profile & Passport
                     </button>
 
@@ -163,7 +163,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                       }}
                       className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-foreground hover:bg-accent cursor-pointer"
                     >
-                      <Sparkles className="h-3.5 w-3.5 text-[#5A8CB2]" />
+                      <Sparkles className="h-3.5 w-3.5 text-[#5A8CB2] dark:text-[#C98B55]" />
                       My Saved Trips
                     </button>
                     <button
@@ -188,7 +188,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                   "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-sm",
                   activeView === "home" && !scrolled
                     ? "border-white/30 bg-white/15 text-white hover:bg-white/25"
-                    : "border-[#5A8CB2]/30 bg-[#5A8CB2]/10 text-[#1E293B] hover:bg-[#5A8CB2]/20"
+                    : "border-[#5A8CB2]/30 bg-[#5A8CB2]/10 text-[#1E293B] dark:text-[#F1ECE2] dark:border-[#C98B55]/30 dark:bg-[#C98B55]/10 hover:bg-[#5A8CB2]/20"
                 )}
                 title="User Profile & Passport"
               >
@@ -198,7 +198,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
 
               <Button
                 onClick={() => onOpenAuth("signup")}
-                className="rounded-full bg-[#5A8CB2] text-white text-xs font-extrabold hover:bg-[#4A7CA2] sm:text-sm px-5 py-2 shadow-md transition-all cursor-pointer"
+                className="rounded-full bg-[#5A8CB2] text-white text-xs font-extrabold hover:bg-[#4A7CA2] dark:bg-[#C98B55] dark:text-[#11100E] dark:hover:bg-[#b07847] sm:text-sm px-5 py-2 shadow-md transition-all cursor-pointer"
               >
                 Get Started
               </Button>

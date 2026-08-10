@@ -175,7 +175,7 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
       style={{ zIndex: isHovered ? 40 : 1 }}
     >
       {/* Petal Bubbles */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {isHovered && petalConfig.map((petal, i) => {
           const rad = (petal.angle * Math.PI) / 180
           const x = Math.cos(rad) * petal.distance
@@ -196,15 +196,15 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-50"
             >
               <div
-                className="flex flex-col items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-2xl min-w-[80px] px-3 py-2 backdrop-blur-2xl text-center"
+                className="flex flex-col items-center justify-center rounded-2xl border border-neutral-200 dark:border-white/15 bg-white dark:bg-[#181613]/95 shadow-2xl min-w-[80px] px-3 py-2 backdrop-blur-2xl text-center"
                 style={{
                   boxShadow: `0 12px 30px rgba(0,0,0,0.18), 0 0 0 1px ${item.color || "#10B981"}30`,
                 }}
               >
-                <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest block leading-none">
+                <span className="text-[9px] font-bold text-neutral-400 dark:text-[#A9A092] uppercase tracking-widest block leading-none">
                   {petal.label}
                 </span>
-                <span className="text-xs font-extrabold text-[#0D2B45] mt-1 whitespace-nowrap max-w-[85px] truncate block leading-tight">
+                <span className="text-xs font-extrabold text-[#0D2B45] dark:text-[#F1ECE2] mt-1 whitespace-nowrap max-w-[85px] truncate block leading-tight">
                   {getPetalValue(petal.key)}
                 </span>
               </div>
@@ -458,7 +458,15 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
 
               <div className="space-y-3">
                 {companyPackages.map((pkg, idx) => (
-                  <div key={idx} className="p-3.5 rounded-2xl border border-border bg-background hover:border-[#5A8CB2]/50 transition-all space-y-2 shadow-xs">
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      addPackageToCompare(pkg)
+                      onClose()
+                      onNavigateView?.("packages")
+                    }}
+                    className="p-3.5 rounded-2xl border border-border bg-background hover:border-[#5A8CB2]/70 hover:shadow-md transition-all space-y-2 cursor-pointer group"
+                  >
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-extrabold text-white bg-[#5A8CB2] px-2.5 py-0.5 rounded-md">
                         {pkg.provider}
@@ -467,21 +475,25 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                         {pkg.price} / person
                       </span>
                     </div>
-                    <h5 className="font-bold text-xs text-foreground">{pkg.name}</h5>
+                    <h5 className="font-bold text-xs text-foreground group-hover:text-[#5A8CB2] transition-colors">{pkg.name}</h5>
                     <p className="text-[10px] text-muted-foreground">{pkg.highlights}</p>
                     
                     <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground pt-1 border-t border-border/40">
                       <span>⏱️ {pkg.duration}</span>
                       <div className="flex items-center gap-2">
-                        <a
-                          href={pkg.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[10px] font-bold text-[#5A8CB2] hover:underline"
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => {
+                            addPackageToCompare(pkg)
+                            onClose()
+                            onNavigateView?.("packages")
+                          }}
+                          className="rounded-lg bg-[#5A8CB2] hover:bg-[#4A7CA2] text-white text-[10px] font-extrabold px-3 py-1 flex items-center gap-1 cursor-pointer h-7 shadow-sm"
                         >
-                          <ExternalLink className="h-3 w-3" />
-                          Official Site
-                        </a>
+                          <Sparkles className="h-3 w-3 text-amber-300" />
+                          View Package Details
+                        </Button>
                         <Button
                           type="button"
                           size="sm"
@@ -800,8 +812,7 @@ export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }
         {/* Section Heading */}
         <div className="mb-8 text-center md:text-left">
           <h1 className="font-heading text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-            Explore the World{" "}
-            <span className="font-serif italic text-emerald-600 dark:text-emerald-400 font-normal">Your Way</span>
+            Explore the World Your Way
           </h1>
           <p className="mt-2 text-base text-muted-foreground max-w-2xl font-medium">
             Hover to discover quick info petals • Click to see full details • Filter using Customize below

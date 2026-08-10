@@ -275,7 +275,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
   }
 
   return (
-    <section id="tracker" className={`relative w-full ${isWorkspace ? "min-h-screen bg-[#F4F6F6] text-[#2F3E4E] pt-24 pb-28" : "py-20 md:py-28 bg-background"}`}>
+    <section id="tracker" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-28" : "py-20 md:py-28 bg-background"}`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Workspace Top Navigation Bar */}
@@ -314,95 +314,30 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
           </p>
         </div>
 
-        {/* ─────────────────────────────────────────────
-            CLEAN LUXURY TOP 2 PROFILE CARDS (Uncluttered)
-           ───────────────────────────────────────────── */}
-        <div className="mb-8 grid gap-5 md:grid-cols-2">
-          
-          {/* Profile Card 1: Current Trip Tracker */}
-          <motion.div
-            whileHover={{ scale: 1.01 }}
-            onClick={() => setActiveProfile("current")}
-            className={`cursor-pointer rounded-3xl border-2 p-6 transition-all shadow-md relative overflow-hidden ${
-              activeProfile === "current"
-                ? "border-[#0D2B45] bg-[#0D2B45] text-white shadow-xl"
-                : "border-border bg-card text-foreground hover:border-[#0D2B45]/40"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <span className={`text-[11px] font-bold uppercase tracking-wider block ${
-                  activeProfile === "current" ? "text-amber-400" : "text-muted-foreground"
-                }`}>
-                  Live Trip Analytics
-                </span>
-                <h3 className="font-heading text-2xl font-bold mt-1">Current Trip Tracker</h3>
-              </div>
-
-              <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
-                activeProfile === "current" ? "border-amber-400 bg-amber-400" : "border-muted-foreground"
-              }`}>
-                {activeProfile === "current" && <div className="h-2 w-2 rounded-full bg-[#0D2B45]" />}
-              </div>
-            </div>
-
-            <p className="mt-3 text-xs opacity-85 leading-relaxed">
-              Real-time expenditure & day-by-day comparison linked directly to your {destination || "active"} itinerary spots.
-            </p>
-
-            <div className="mt-5 flex items-center justify-between pt-4 border-t border-white/10 text-xs">
-              <div>
-                <span className="opacity-70 text-[10px] uppercase font-semibold block">Spent / Planned</span>
-                <span className="font-bold text-sm text-amber-400">₹{totalSpent.toLocaleString("en-IN")} / ₹{totalBudget.toLocaleString("en-IN")}</span>
-              </div>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-amber-400">
-                {pctSpent}% Used
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Profile Card 2: Past Trips Comparison */}
-          <motion.div
-            whileHover={{ scale: 1.01 }}
-            onClick={() => setActiveProfile("past")}
-            className={`cursor-pointer rounded-3xl border-2 p-6 transition-all shadow-md relative overflow-hidden ${
-              activeProfile === "past"
-                ? "border-[#0D2B45] bg-[#0D2B45] text-white shadow-xl"
-                : "border-border bg-card text-foreground hover:border-[#0D2B45]/40"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <span className={`text-[11px] font-bold uppercase tracking-wider block ${
-                  activeProfile === "past" ? "text-amber-400" : "text-muted-foreground"
-                }`}>
-                  Historical Analysis
-                </span>
-                <h3 className="font-heading text-2xl font-bold mt-1">Past Trips Comparison</h3>
-              </div>
-
-              <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
-                activeProfile === "past" ? "border-amber-400 bg-amber-400" : "border-muted-foreground"
-              }`}>
-                {activeProfile === "past" && <div className="h-2 w-2 rounded-full bg-[#0D2B45]" />}
-              </div>
-            </div>
-
-            <p className="mt-3 text-xs opacity-85 leading-relaxed">
-              Compare category expenditure and average daily spending across your current trip and past travel vacations.
-            </p>
-
-            <div className="mt-5 flex items-center justify-between pt-4 border-t border-white/10 text-xs">
-              <div>
-                <span className="opacity-70 text-[10px] uppercase font-semibold block">Historical Journeys</span>
-                <span className="font-bold text-sm text-amber-400">3 Past Trips Logged</span>
-              </div>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">
-                Comparison View
-              </span>
-            </div>
-          </motion.div>
-
+        {/* View Switcher Pill (Current Trip vs Past Trips) */}
+        <div className="mb-6 flex items-center justify-center">
+          <div className="inline-flex items-center gap-1 rounded-2xl bg-secondary/60 p-1.5 border border-border shadow-sm">
+            <button
+              onClick={() => setActiveProfile("current")}
+              className={`rounded-xl px-5 py-2 text-xs font-extrabold transition-all cursor-pointer ${
+                activeProfile === "current"
+                  ? "bg-[#0D2B45] text-white shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Current Trip Tracker
+            </button>
+            <button
+              onClick={() => setActiveProfile("past")}
+              className={`rounded-xl px-5 py-2 text-xs font-extrabold transition-all cursor-pointer ${
+                activeProfile === "past"
+                  ? "bg-[#0D2B45] text-white shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Past Trips Comparison
+            </button>
+          </div>
         </div>
 
         {/* ─────────────────────────────────────────────
@@ -410,7 +345,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
            ───────────────────────────────────────────── */}
         <AnimatePresence mode="wait">
           
-          {/* PROFILE 1: CURRENT TRIP ANALYTICS (100% Synced with Itinerary) */}
+          {/* PROFILE 1: CURRENT TRIP ANALYTICS */}
           {activeProfile === "current" ? (
             <motion.div
               key="profile-current"
@@ -420,52 +355,43 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               transition={{ duration: 0.3 }}
               className="space-y-8"
             >
-              {/* Summary Metrics Cards */}
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+              {/* Simplified 3-Stat Metric Cards */}
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Planned Budget</span>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Planned Budget</span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
                       <Wallet className="h-4 w-4" />
                     </span>
                   </div>
-                  <p className="mt-2 font-heading text-2xl font-bold text-foreground">₹{totalBudget.toLocaleString("en-IN")}</p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">Derived from Budget Planner</p>
+                  <p className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground">₹{totalBudget.toLocaleString("en-IN")}</p>
+                  <p className="text-[11px] text-muted-foreground font-medium">Derived from Itinerary Plan</p>
                 </div>
 
-                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Actual Spent</span>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-400/10 text-amber-500 dark:text-amber-400">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Actual Spent</span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-400/15 text-amber-600 dark:text-amber-400">
                       <TrendingUp className="h-4 w-4" />
                     </span>
                   </div>
-                  <p className="mt-2 font-heading text-2xl font-bold text-foreground">₹{totalSpent.toLocaleString("en-IN")}</p>
-                  <p className="mt-0.5 text-[11px] text-amber-500 dark:text-amber-400 font-semibold">{pctSpent}% of budget used</p>
+                  <p className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground">₹{totalSpent.toLocaleString("en-IN")}</p>
+                  <p className="text-[11px] font-extrabold text-amber-600 dark:text-amber-400">{pctSpent}% of budget logged</p>
                 </div>
 
-                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Remaining Margin</span>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Remaining Balance</span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                       <PiggyBank className="h-4 w-4" />
                     </span>
                   </div>
-                  <p className="mt-2 font-heading text-2xl font-bold text-amber-500 dark:text-amber-400">₹{remainingBudget.toLocaleString("en-IN")}</p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">Available balance</p>
-                </div>
-
-                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Budget Variance</span>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
-                      <Receipt className="h-4 w-4" />
-                    </span>
-                  </div>
-                  <p className={`mt-2 font-heading text-2xl font-bold ${budgetDifference >= 0 ? "text-amber-500 dark:text-amber-400" : "text-destructive"}`}>
-                    {budgetDifference >= 0 ? `+₹${budgetDifference.toLocaleString("en-IN")}` : `-₹${Math.abs(budgetDifference).toLocaleString("en-IN")}`}
+                  <p className={`font-heading text-2xl sm:text-3xl font-extrabold ${remainingBudget >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"}`}>
+                    ₹{remainingBudget.toLocaleString("en-IN")}
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">{budgetDifference >= 0 ? "Under budget goal" : "Exceeded planned budget"}</p>
+                  <p className="text-[11px] font-semibold text-muted-foreground">
+                    {remainingBudget >= 0 ? "Available travel funds" : "Over budget limit"}
+                  </p>
                 </div>
               </div>
 

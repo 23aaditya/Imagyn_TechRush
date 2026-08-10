@@ -39,7 +39,7 @@ export function InteractiveTravelMap({ onNavigateView }) {
           <Button
             onClick={() => onNavigateView("explore")}
             variant="outline"
-            className="rounded-full border-foreground/20 bg-[#F4F6F6] text-xs font-bold text-foreground shadow-sm hover:bg-[#F4F6F6] hover:border-foreground/40 self-start md:self-auto"
+            className="rounded-full border-foreground/20 bg-slate-50 dark:bg-card text-xs font-bold text-foreground shadow-sm hover:bg-slate-100 dark:hover:bg-card/80 hover:border-foreground/40 self-start md:self-auto"
           >
             Open World Explorer
             <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
@@ -83,7 +83,7 @@ export function InteractiveTravelMap({ onNavigateView }) {
                   className={`absolute -translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-all shadow-xl select-none z-10 ${
                     isSelected
                       ? "bg-primary text-primary-foreground ring-4 ring-primary/30 scale-110 z-20"
-                      : "bg-[#F4F6F6]/90 text-foreground hover:bg-[#F4F6F6] hover:scale-105"
+                      : "bg-white/90 dark:bg-card/90 text-foreground hover:bg-white dark:hover:bg-card hover:scale-105"
                   }`}
                 >
                   <MapPin className={`h-3.5 w-3.5 ${isSelected ? "text-white" : "text-[#6B4423]"}`} />
@@ -102,7 +102,7 @@ export function InteractiveTravelMap({ onNavigateView }) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
-                className="overflow-hidden rounded-3xl border border-border bg-[#F4F6F6] p-5 shadow-2xl space-y-4"
+                className="overflow-hidden rounded-3xl border border-border bg-card p-5 shadow-2xl space-y-4"
               >
                 <div className="relative h-44 w-full overflow-hidden rounded-2xl">
                   <img src={selectedPin.image} alt={selectedPin.name} className="h-full w-full object-cover" />
