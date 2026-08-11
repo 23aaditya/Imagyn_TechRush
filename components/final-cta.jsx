@@ -34,7 +34,7 @@ export function FinalCTA({ onNavigateView }) {
             className="font-serif-editorial text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-[0.95] drop-shadow-md"
           >
             PLAN LESS.<br />
-            <span className="font-heading font-extrabold text-amber-300 italic lowercase">travel</span><br />
+            <span className="font-heading font-extrabold text-white italic lowercase">travel</span><br />
             MORE.
           </motion.h2>
 

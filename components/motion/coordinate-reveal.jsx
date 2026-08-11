@@ -24,7 +24,7 @@ export function CoordinateReveal({ coordinates, destinationName, children, class
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: EASE_TRAVEL, delay: 0.25 }}
-          className="font-serif-editorial text-3xl sm:text-5xl font-black text-foreground uppercase tracking-tight leading-none"
+          className="font-serif-editorial text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground uppercase tracking-wider leading-none"
         >
           {destinationName}
         </motion.h2>

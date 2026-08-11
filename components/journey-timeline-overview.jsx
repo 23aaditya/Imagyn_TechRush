@@ -107,7 +107,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
             className="font-serif-editorial text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground uppercase leading-[0.92]"
           >
             PLAN THE JOURNEY.<br />
-            <span className="font-heading font-extrabold text-[#C98B55] italic lowercase">not just the</span><br />
+            <span className="font-heading font-extrabold text-foreground italic lowercase">not just the</span><br />
             DESTINATION.
           </motion.h2>
 
@@ -120,14 +120,14 @@ export function JourneyTimelineOverview({ onNavigateView }) {
         <div className="absolute left-4 lg:left-1/2 top-84 bottom-56 -translate-x-1/2 w-[2px] bg-border/40 pointer-events-none z-0">
           <motion.div
             style={{ scaleY, transformOrigin: "top" }}
-            className="w-full h-full bg-[#C98B55] shadow-xs"
+            className="w-full h-full bg-foreground shadow-xs"
           />
         </div>
 
         {/* ROUTE STARTING POINT MARKER */}
         <div className="relative flex justify-start lg:justify-center pl-10 lg:pl-0 mb-12 z-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#C98B55]/50 bg-background px-4 py-1.5 font-mono-tech text-[11px] font-bold uppercase tracking-widest text-[#C98B55] shadow-sm">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#C98B55] animate-pulse" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-foreground/30 bg-background px-4 py-1.5 font-mono-tech text-[11px] font-bold uppercase tracking-widest text-foreground shadow-sm">
+            <span className="h-2.5 w-2.5 rounded-full bg-foreground animate-pulse" />
             <span>START OF JOURNEY</span>
           </div>
         </div>
@@ -137,7 +137,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
           
           {/* STAGE 01 — EXPLORE */}
           <TimelineStage
-            label="01 / EXPLORE"
+            label="EXPLORE"
             heading={`WHERE SHOULD\nWE GO?`}
             descriptionLines={[
               "Discover handpicked destinations tailored to your travel mood, budget, and style.",
@@ -199,7 +199,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
 
           {/* STAGE 02 — PLAN (Uploaded Image 3: Planner) */}
           <TimelineStage
-            label="02 / PLAN"
+            label="PLAN"
             heading={`TURN THE IDEA\nINTO A JOURNEY.`}
             descriptionLines={[
               "Turn your ideas into a structured, day-by-day travel schedule.",
@@ -220,7 +220,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
 
           {/* STAGE 03 — BUDGET (Uploaded Image 2: Budget Calculator) */}
           <TimelineStage
-            label="03 / BUDGET"
+            label="BUDGET"
             heading={`WHAT WILL\nTHE JOURNEY COST?`}
             descriptionLines={[
               "Get full financial transparency across accommodation, travel, food, and activities.",
@@ -241,7 +241,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
 
           {/* STAGE 04 — EXPENSES (Uploaded Image 1: Expense Tracker - 100% Clear, NO Bot Symbol) */}
           <TimelineStage
-            label="04 / EXPENSES"
+            label="EXPENSES"
             heading={`WHERE DID\nTHE MONEY GO?`}
             descriptionLines={[
               "Track your real-world spending seamlessly throughout your entire journey.",
@@ -262,7 +262,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
 
           {/* STAGE 05 — PACKAGES */}
           <TimelineStage
-            label="05 / PACKAGES"
+            label="PACKAGES"
             heading={`WHICH JOURNEY\nFEELS RIGHT?`}
             descriptionLines={[
               "Compare realistic, curated travel package spectrums side-by-side with full clarity.",
@@ -285,7 +285,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
                   <div className="absolute bottom-2.5 left-2.5 right-2.5 text-white">
                     <span className="font-sans text-base font-bold tracking-wide text-white block">GOA</span>
-                    <span className="font-sans text-[11px] font-semibold text-amber-300 block">05 DAYS · ₹14,500</span>
+                    <span className="font-sans text-[11px] font-semibold text-white/90 block">05 DAYS · ₹14,500</span>
                   </div>
                 </div>
               </div>
@@ -300,7 +300,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
                   <div className="absolute bottom-2.5 left-2.5 right-2.5 text-white">
                     <span className="font-sans text-base font-bold tracking-wide text-white block">MANALI</span>
-                    <span className="font-sans text-[11px] font-semibold text-amber-300 block">05 DAYS · ₹18,900</span>
+                    <span className="font-sans text-[11px] font-semibold text-white/90 block">05 DAYS · ₹18,900</span>
                   </div>
                 </div>
               </div>
@@ -315,7 +315,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
                   <div className="absolute bottom-2.5 left-2.5 right-2.5 text-white">
                     <span className="font-sans text-base font-bold tracking-wide text-white block">JAIPUR</span>
-                    <span className="font-sans text-[11px] font-semibold text-amber-300 block">04 DAYS · ₹12,200</span>
+                    <span className="font-sans text-[11px] font-semibold text-white/90 block">04 DAYS · ₹12,200</span>
                   </div>
                 </div>
               </div>
@@ -327,8 +327,8 @@ export function JourneyTimelineOverview({ onNavigateView }) {
 
         {/* ROUTE ENDING POINT MARKER */}
         <div className="relative flex justify-start lg:justify-center pl-10 lg:pl-0 mt-12 mb-6 z-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#C98B55]/50 bg-background px-4 py-1.5 font-mono-tech text-[11px] font-bold uppercase tracking-widest text-[#C98B55] shadow-sm">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#C98B55]" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-foreground/30 bg-background px-4 py-1.5 font-mono-tech text-[11px] font-bold uppercase tracking-widest text-foreground shadow-sm">
+            <span className="h-2.5 w-2.5 rounded-full bg-foreground" />
             <span>END OF JOURNEY</span>
           </div>
         </div>
@@ -338,7 +338,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
           <div className="space-y-2 pt-4">
             <h3 className="font-serif-editorial text-2xl sm:text-4xl font-black text-foreground uppercase tracking-tight">
               ONE JOURNEY.<br />
-              <span className="font-heading font-extrabold text-[#C98B55] italic lowercase">five</span><br />
+              <span className="font-heading font-extrabold text-foreground italic lowercase">five</span><br />
               MOMENTS.
             </h3>
             

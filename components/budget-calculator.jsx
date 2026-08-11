@@ -72,7 +72,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
         
         {/* Workspace Top Bar */}
         {isWorkspace && (
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-5">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-4">
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
@@ -86,21 +86,48 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
               <span className="text-muted-foreground">/</span>
               <span className="font-medium text-foreground text-sm">Interactive Budget Workspace</span>
             </div>
-
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary border border-primary/20">
-                <Sparkles className="h-3.5 w-3.5" />
-                Live Synced with AI Itinerary & Expenses
-              </span>
-            </div>
           </div>
         )}
 
-        {/* Section Title */}
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-foreground">
-            {isWorkspace ? "Interactive Trip Budget Calculator" : "Plan Every Rupee With Confidence"}
-          </h2>
+        {/* 100% EDGE-TO-EDGE HORIZONTAL RECTANGULAR VIDEO HERO BANNER */}
+        <div className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mb-12 overflow-hidden h-[240px] sm:h-[300px] lg:h-[360px] flex items-center justify-center border-y border-border/40 select-none shadow-2xl bg-black">
+          {/* Autoplay Loop Muted YouTube Background Video */}
+          <iframe
+            src="https://www.youtube.com/embed/gVQo-F8TVuk?autoplay=1&mute=1&controls=0&loop=1&playlist=gVQo-F8TVuk&playsinline=1&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3"
+            title="TripNest Budget Header Video"
+            className="absolute inset-0 w-full h-[140%] -top-[20%] object-cover pointer-events-none scale-125 opacity-75"
+            allow="autoplay; encrypted-media"
+          />
+
+          {/* Translucent Dark Gradient Overlay for Maximum Contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
+
+          {/* White Font BUDGET Title & Subtitle Overlay */}
+          <div className="relative z-10 text-center px-4 max-w-3xl">
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="font-heading text-xs sm:text-sm font-extrabold uppercase tracking-[0.25em] text-[#5B8DEF] block mb-2"
+            >
+              FINANCIAL TRAVEL ARCHITECT
+            </motion.span>
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="font-serif-editorial text-5xl sm:text-7xl lg:text-8xl font-black text-white uppercase tracking-wider leading-none drop-shadow-2xl"
+            >
+              BUDGET
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="font-sans text-xs sm:text-sm font-semibold text-white/90 uppercase tracking-widest mt-3 drop-shadow-md"
+            >
+              Transparent Realistic Cost Allocation & Category Breakdown
+            </motion.p>
+          </div>
         </div>
 
         {/* Selected Package Callout Banner */}

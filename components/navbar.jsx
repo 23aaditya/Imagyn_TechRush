@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Moon, Sun, Menu, X, Sparkles, LogOut, User } from "lucide-react"
+import { Moon, Sun, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTrip } from "@/context/trip-context"
@@ -20,28 +20,57 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
   const { setSavedTripsModalOpen } = useTrip()
   const [scrolled, setScrolled] = useState(false)
   const [isDark, setIsDark] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [isLightBg, setIsLightBg] = useState(false)
   const [userDropdown, setUserDropdown] = useState(false)
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains("dark"))
-    const onScroll = () => setScrolled(window.scrollY > 16)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 16)
+
+      // In dark mode, always keep text white for high contrast
+      if (document.documentElement.classList.contains("dark")) {
+        setIsLightBg(false)
+        return
+      }
+
+      // Check section element under navbar
+      const el = document.elementFromPoint(window.innerWidth / 2, 35)
+      if (el) {
+        const section = el.closest("section, footer, div[id]")
+        if (section) {
+          const secId = section.id
+          // Dark sections: home, search-video-hero, final-cta
+          const isDarkSec = secId === "home" || secId === "search-video-hero" || secId === "final-cta"
+          setIsLightBg(!isDarkSec)
+          return
+        }
+      }
+
+      // Fallback scroll position check if on home view:
+      if (activeView === "home") {
+        setIsLightBg(window.scrollY > 1400)
+      } else {
+        setIsLightBg(true)
+      }
+    }
+
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
-  }, [])
+  }, [activeView])
 
   const toggleTheme = () => {
     setIsDark((prev) => {
       const next = !prev
       document.documentElement.classList.toggle("dark", next)
+      if (next) setIsLightBg(false)
       return next
     })
   }
 
   const handleNavClick = (view) => {
     setActiveView(view)
-    setMobileOpen(false)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
@@ -54,14 +83,19 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
         "fixed inset-x-0 top-0 z-50 w-full transition-all duration-300 bg-transparent border-none text-foreground"
       )}
     >
-      <nav className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3">
+      <nav className="w-full max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4 px-4 sm:px-6 py-3">
         {/* Official TripNest Imagyn Logo */}
         <button
           onClick={() => handleNavClick("home")}
-          className="flex items-center text-left focus:outline-none group py-0.5 bg-transparent border-none cursor-pointer"
+          className="flex items-center text-left focus:outline-none group py-0.5 bg-transparent border-none cursor-pointer shrink-0"
           aria-label="TripNest Homepage"
         >
-          <div className="rounded-md bg-white/20 backdrop-blur-md px-3 py-1.5 border border-white/30 shadow-sm transition-opacity hover:bg-white/30">
+          <div className={cn(
+            "rounded-md px-3 py-1.5 border shadow-sm transition-all backdrop-blur-md",
+            isLightBg
+              ? "bg-neutral-900/10 border-neutral-900/20 hover:bg-neutral-900/20"
+              : "bg-white/20 border-white/30 hover:bg-white/30"
+          )}>
             <img
               src="/tripnest-logo.png"
               alt="TripNest Imagyn"
@@ -70,22 +104,23 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
           </div>
         </button>
 
-        {/* Center links */}
-        <ul className="hidden items-center gap-1 xl:flex">
+        {/* Top Navbar Menu Links (Clean underline for active view, no blue background) */}
+        <ul className="flex items-center gap-1 sm:gap-2.5 overflow-x-auto scrollbar-none py-1">
           {navLinks.map((link) => {
             const isActive = activeView === link.view
-            const isTransparentHome = activeView === "home" && !scrolled
             return (
-              <li key={link.view} className="relative overflow-visible">
+              <li key={link.view} className="shrink-0">
                 <button
                   onClick={() => handleNavClick(link.view)}
                   className={cn(
-                    "relative rounded-sm px-3.5 py-1.5 text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer",
-                    isActive
-                      ? "bg-[#5A8CB2]/40 backdrop-blur-md border border-[#5A8CB2]/60 text-white shadow-sm"
-                      : isTransparentHome
-                      ? "text-white/90 hover:bg-white/15 hover:text-white"
-                      : "text-[#1E293B]/80 hover:bg-[#5A8CB2]/15 hover:text-[#1E293B] dark:text-[#F1ECE2]/80 dark:hover:bg-[#C98B55]/15 dark:hover:text-[#F1ECE2]"
+                    "relative px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-extrabold tracking-wider uppercase transition-all cursor-pointer border-b-2",
+                    isLightBg
+                      ? isActive
+                        ? "text-neutral-900 border-neutral-900 font-black"
+                        : "text-neutral-600 border-transparent hover:text-neutral-900 hover:border-neutral-400"
+                      : isActive
+                        ? "text-white border-white font-black"
+                        : "text-white/80 border-transparent hover:text-white hover:border-white/40"
                   )}
                 >
                   {link.label}
@@ -95,8 +130,8 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
           })}
         </ul>
 
-        {/* Right actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Right Actions */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Dark / Light Toggle */}
           <Button
             variant="ghost"
@@ -104,11 +139,13 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             aria-label="Toggle dark mode"
             onClick={toggleTheme}
             className={cn(
-              "hover:bg-[#5A8CB2]/15 dark:hover:bg-[#C98B55]/20 rounded-sm",
-              activeView === "home" && !scrolled ? "text-white hover:text-white" : "text-[#1E293B] dark:text-[#F1ECE2] hover:text-[#1E293B] dark:hover:text-[#F1ECE2]"
+              "rounded-full transition-colors cursor-pointer",
+              isLightBg
+                ? "text-neutral-900 hover:bg-neutral-200/70"
+                : "text-white hover:bg-white/20 hover:text-white"
             )}
           >
-            {isDark ? <Sun className="h-5 w-5 text-amber-500" /> : <Moon className="h-5 w-5" />}
+            {isDark ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5" />}
           </Button>
 
           {/* User Profile / Auth Button */}
@@ -116,12 +153,17 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             <div className="relative">
               <button
                 onClick={() => setUserDropdown(!userDropdown)}
-                className="flex items-center gap-2 rounded-sm border border-[#5A8CB2]/30 bg-[#5A8CB2]/10 px-2.5 py-1.5 hover:border-[#5A8CB2]/60 transition-all text-[#1E293B] dark:text-[#F1ECE2] dark:border-[#C98B55]/30 dark:bg-[#C98B55]/10 cursor-pointer"
+                className={cn(
+                  "flex items-center gap-2 rounded-full border px-2.5 py-1.5 transition-all cursor-pointer",
+                  isLightBg
+                    ? "border-neutral-900/20 bg-neutral-900/10 text-neutral-900 hover:bg-neutral-900/20"
+                    : "border-white/30 bg-white/15 text-white hover:bg-white/25"
+                )}
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-xs bg-[#5A8CB2] text-xs font-bold text-white dark:bg-[#C98B55] dark:text-[#11100E]">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#5B8DEF] text-[10px] font-bold text-[#0F172A]">
                   {user.initials || "U"}
                 </span>
-                <span className="hidden text-xs font-semibold text-[#1E293B] dark:text-[#F1ECE2] sm:inline-block max-w-[100px] truncate">
+                <span className="hidden text-xs font-bold sm:inline-block max-w-[90px] truncate">
                   {user.name}
                 </span>
               </button>
@@ -132,14 +174,13 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                     initial={{ opacity: 0, y: 6, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.98 }}
-                    className="absolute right-0 mt-2 w-48 rounded-md border border-border bg-card p-2 shadow-lg backdrop-blur-2xl z-50 text-foreground"
+                    className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card p-2 shadow-lg backdrop-blur-2xl z-50 text-foreground"
                   >
                     <div className="border-b border-border/40 px-3 py-2">
                       <p className="text-xs font-bold text-foreground truncate">{user.name}</p>
                       <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
                     </div>
                     
-                    {/* Profile Option Above Saved Trips */}
                     <button
                       onClick={() => {
                         setUserDropdown(false)
@@ -147,7 +188,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                       }}
                       className="flex w-full items-center gap-2 rounded-xs px-3 py-2 text-xs font-bold text-foreground hover:bg-accent transition-colors cursor-pointer"
                     >
-                      <User className="h-3.5 w-3.5 text-[#5A8CB2] dark:text-[#C98B55]" />
+                      <User className="h-3.5 w-3.5 text-[#5B8DEF]" />
                       Profile & Passport
                     </button>
 
@@ -179,75 +220,27 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
               <button
                 onClick={() => handleNavClick("profile")}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer",
-                  activeView === "home" && !scrolled
-                    ? "border-white/30 bg-white/15 text-white hover:bg-white/25"
-                    : "border-[#5A8CB2]/30 bg-[#5A8CB2]/10 text-[#1E293B] dark:text-[#F1ECE2] dark:border-[#C98B55]/30 dark:bg-[#C98B55]/10 hover:bg-[#5A8CB2]/20"
+                  "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold tracking-wide uppercase transition-all cursor-pointer",
+                  isLightBg
+                    ? "border-neutral-900/20 bg-neutral-900/10 text-neutral-900 hover:bg-neutral-900/20"
+                    : "border-white/30 bg-white/15 text-white hover:bg-white/25"
                 )}
                 title="User Profile & Passport"
               >
-                <User className="h-4 w-4" />
+                <User className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Profile</span>
               </button>
 
               <Button
                 onClick={() => onOpenAuth("signup")}
-                className="rounded-full bg-[#5B8DEF] text-[#0F172A] text-xs font-bold uppercase tracking-wider hover:bg-[#487AE0] shadow-md shadow-[#5B8DEF]/25 sm:text-xs px-5 py-2 transition-all cursor-pointer"
+                className="rounded-full bg-[#5B8DEF] text-[#0F172A] text-xs font-bold uppercase tracking-wider hover:bg-[#487AE0] shadow-md shadow-[#5B8DEF]/25 sm:text-xs px-4 sm:px-5 py-2 transition-all cursor-pointer"
               >
                 Get Started
               </Button>
             </div>
           )}
-
-          {/* Mobile hamburger menu toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Toggle menu"
-            onClick={() => setMobileOpen((o) => !o)}
-            className="text-foreground xl:hidden rounded-sm"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
         </div>
       </nav>
-
-      {/* Mobile drawer */}
-      {mobileOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mx-auto mt-2 max-w-7xl rounded-md border border-border/60 bg-background/95 p-3 shadow-lg backdrop-blur-xl xl:hidden"
-        >
-          <ul className="flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <li key={link.view}>
-                <button
-                  onClick={() => handleNavClick(link.view)}
-                  className={cn(
-                    "block w-full rounded-sm px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider transition-colors",
-                    activeView === link.view
-                      ? "bg-primary/10 font-bold text-primary"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                  )}
-                >
-                  {link.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-          {!user && (
-            <div className="mt-2 border-t border-border/60 pt-3">
-              <Button
-                onClick={() => { setMobileOpen(false); onOpenAuth("signup"); }}
-                className="w-full rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 text-xs uppercase tracking-wider py-2 font-semibold"
-              >
-                Get Started
-              </Button>
-            </div>
-          )}
-        </motion.div>
-      )}
     </motion.header>
   )
 }

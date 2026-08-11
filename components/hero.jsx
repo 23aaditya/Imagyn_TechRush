@@ -9,6 +9,8 @@ import {
   Compass,
   Search,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Flame,
   Sparkles,
@@ -110,11 +112,15 @@ export function Hero({ onStartPlanning }) {
   const [recentSearches, setRecentSearches] = useState([])
   const dropdownRef = useRef(null)
 
-  // Date range picker state
+  // Single Range Calendar state
   const [fromDate, setFromDate] = useState("")
   const [toDate, setToDate] = useState("")
   const [dateError, setDateError] = useState("")
   const [tripDuration, setTripDuration] = useState(null)
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const [calendarMonth, setCalendarMonth] = useState(7) // August (0-indexed)
+  const [calendarYear, setCalendarYear] = useState(2026)
+  const calendarRef = useRef(null)
 
   // Budget state
   const [selectedBudget, setSelectedBudget] = useState("Any budget")
@@ -138,11 +144,14 @@ export function Hero({ onStartPlanning }) {
     return () => clearInterval(timer)
   }, [])
 
-  // Handle outside click for search dropdown
+  // Handle outside click for search dropdown and range calendar
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setIsDropdownOpen(false)
+      }
+      if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+        setIsCalendarOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -248,7 +257,7 @@ export function Hero({ onStartPlanning }) {
             className="font-serif-editorial text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.93] tracking-tight text-white drop-shadow-lg uppercase"
           >
             Journeys,<br />
-            <span className="font-heading font-extrabold italic text-amber-200 lowercase">quietly</span><br />
+            <span className="font-heading font-extrabold italic text-white lowercase">quietly</span><br />
             well-planned.
           </motion.h1>
 
@@ -314,7 +323,7 @@ export function Hero({ onStartPlanning }) {
         <div className="relative z-20 mx-auto max-w-4xl text-center space-y-3">
           <h2 className="font-serif-editorial text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-[0.93] drop-shadow-md">
             WHERE SHOULD<br />
-            <span className="font-heading font-extrabold text-amber-300 italic lowercase">we go?</span>
+            <span className="font-heading font-extrabold text-white italic lowercase">we go?</span>
           </h2>
           <p className="font-sans text-xs sm:text-sm text-white/80 max-w-lg mx-auto font-medium tracking-wide">
             Select your destination, travel dates, and budget to generate your day-by-day plan.
@@ -457,27 +466,154 @@ export function Hero({ onStartPlanning }) {
                 </AnimatePresence>
               </div>
 
-              {/* 2. Date Range Picker (From Date & To Date) */}
-              <div className="md:col-span-2 grid grid-cols-2 gap-2">
-                <label className="flex cursor-pointer flex-col justify-center rounded-md border border-white/30 bg-white/15 backdrop-blur-xl px-3.5 py-2.5 transition-all focus-within:border-white hover:bg-white/20 shadow-sm">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">From Date</span>
-                  <input
-                    type="date"
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                    className="w-full bg-transparent text-xs font-semibold text-white focus:outline-none invert dark:invert-0"
-                  />
-                </label>
+              {/* 2. Single Range Calendar Input & Dropdown */}
+              <div className="md:col-span-2 relative" ref={calendarRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                  className="w-full h-full flex flex-col justify-center text-left rounded-md border border-white/30 bg-white/15 backdrop-blur-xl px-3.5 py-2.5 transition-all hover:bg-white/20 shadow-sm cursor-pointer"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/80 flex items-center justify-between">
+                    <span>Travel Dates</span>
+                    <Calendar className="h-3.5 w-3.5 text-white/70" />
+                  </span>
+                  <div className="text-xs font-semibold text-white mt-0.5 truncate">
+                    {fromDate && toDate ? (
+                      <span>
+                        {new Date(fromDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} – {new Date(toDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        {tripDuration ? ` (${tripDuration} Days)` : ""}
+                      </span>
+                    ) : fromDate ? (
+                      <span>{new Date(fromDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} → Select End Date</span>
+                    ) : (
+                      <span className="text-white/60">dd-mm-yyyy → dd-mm-yyyy</span>
+                    )}
+                  </div>
+                </button>
 
-                <label className="flex cursor-pointer flex-col justify-center rounded-md border border-white/30 bg-white/15 backdrop-blur-xl px-3.5 py-2.5 transition-all focus-within:border-white hover:bg-white/20 shadow-sm">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">To Date</span>
-                  <input
-                    type="date"
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                    className="w-full bg-transparent text-xs font-semibold text-white focus:outline-none invert dark:invert-0"
-                  />
-                </label>
+                {/* Range Calendar Modal Dropdown */}
+                <AnimatePresence>
+                  {isCalendarOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      className="absolute left-0 right-0 top-full z-50 mt-2 rounded-xl border border-white/25 bg-black/90 p-4 shadow-2xl backdrop-blur-2xl text-white select-none min-w-[280px]"
+                    >
+                      {/* Month Header Navigation */}
+                      <div className="flex items-center justify-between mb-3 border-b border-white/15 pb-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (calendarMonth === 0) {
+                              setCalendarMonth(11)
+                              setCalendarYear((prev) => prev - 1)
+                            } else {
+                              setCalendarMonth((prev) => prev - 1)
+                            }
+                          }}
+                          className="p-1 rounded-md hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <span className="text-xs font-bold uppercase tracking-wider text-white">
+                          {new Date(calendarYear, calendarMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (calendarMonth === 11) {
+                              setCalendarMonth(0)
+                              setCalendarYear((prev) => prev + 1)
+                            } else {
+                              setCalendarMonth((prev) => prev + 1)
+                            }
+                          }}
+                          className="p-1 rounded-md hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      {/* Day Name Labels */}
+                      <div className="grid grid-cols-7 text-center text-[10px] font-bold text-white/60 mb-2">
+                        {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+                          <span key={d}>{d}</span>
+                        ))}
+                      </div>
+
+                      {/* Days Grid */}
+                      <div className="grid grid-cols-7 gap-y-1">
+                        {/* Empty padding cells for first day of month */}
+                        {Array.from({ length: new Date(calendarYear, calendarMonth, 1).getDay() }).map((_, i) => (
+                          <div key={`pad-${i}`} />
+                        ))}
+
+                        {/* Month Days */}
+                        {Array.from({ length: new Date(calendarYear, calendarMonth + 1, 0).getDate() }, (_, i) => i + 1).map((dayNum) => {
+                          const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`
+                          const isStart = dateStr === fromDate
+                          const isEnd = dateStr === toDate
+                          const inRange = fromDate && toDate && dateStr > fromDate && dateStr < toDate
+
+                          return (
+                            <button
+                              key={dayNum}
+                              type="button"
+                              onClick={() => {
+                                if (!fromDate || (fromDate && toDate)) {
+                                  setFromDate(dateStr)
+                                  setToDate("")
+                                } else {
+                                  if (dateStr < fromDate) {
+                                    setFromDate(dateStr)
+                                    setToDate("")
+                                  } else {
+                                    setToDate(dateStr)
+                                  }
+                                }
+                              }}
+                              className={`py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                                isStart && isEnd
+                                  ? "bg-stone-600 text-white font-black rounded-md shadow-sm border border-white/40"
+                                  : isStart
+                                  ? "bg-stone-600 text-white font-black rounded-l-md shadow-sm border-l border-y border-white/40"
+                                  : isEnd
+                                  ? "bg-stone-600 text-white font-black rounded-r-md shadow-sm border-r border-y border-white/40"
+                                  : inRange
+                                  ? "bg-stone-500/25 text-white font-bold backdrop-blur-xs border-y border-stone-400/20"
+                                  : "hover:bg-white/20 text-white/90 rounded-md"
+                              }`}
+                            >
+                              {dayNum}
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      {/* Footer Actions */}
+                      <div className="flex items-center justify-between border-t border-white/15 pt-2.5 mt-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFromDate("")
+                            setToDate("")
+                          }}
+                          className="text-[11px] font-semibold text-white/60 hover:text-white underline cursor-pointer"
+                        >
+                          Clear
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsCalendarOpen(false)}
+                          className="rounded-md bg-stone-600 hover:bg-stone-500 text-white text-[11px] font-bold px-3 py-1 cursor-pointer transition-colors"
+                        >
+                          Done
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* 3. Budget Picker in INR */}
