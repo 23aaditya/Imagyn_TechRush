@@ -11,7 +11,7 @@ const features = [
     tagline: "Find Your Perfect Vibe",
     desc: "Discover handpicked spots matching your mood, budget, and travel dreams effortlessly.",
     img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1200&auto=format&fit=crop&q=80",
-    badge: "01 / Discovery"
+    badge: "Discovery"
   },
   {
     id: 2,
@@ -19,7 +19,7 @@ const features = [
     tagline: "Transparent Side-by-Side Analysis",
     desc: "Weigh stays, transport, dining costs, and activity value before making any booking.",
     img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&auto=format&fit=crop&q=80",
-    badge: "02 / Comparison"
+    badge: "Comparison"
   },
   {
     id: 3,
@@ -27,7 +27,7 @@ const features = [
     tagline: "Bespoke Routes & Timings",
     desc: "Your journey, day-by-day, optimized with opening hours, route distances, and rest spots.",
     img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&auto=format&fit=crop&q=80",
-    badge: "03 / Itineraries"
+    badge: "Itineraries"
   },
   {
     id: 4,
@@ -35,7 +35,7 @@ const features = [
     tagline: "Know Your Costs Upfront",
     desc: "Up-to-date regional expenditure breakdowns for accommodation, meals, and local transit.",
     img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&auto=format&fit=crop&q=80",
-    badge: "04 / Budgeting"
+    badge: "Budgeting"
   },
   {
     id: 5,
@@ -43,7 +43,7 @@ const features = [
     tagline: "Landmarks to Hidden Gems",
     desc: "Everything around you—from iconic views to secret eateries—right when you need it.",
     img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&auto=format&fit=crop&q=80",
-    badge: "05 / Navigation"
+    badge: "Navigation"
   },
   {
     id: 6,
@@ -51,7 +51,7 @@ const features = [
     tagline: "Stay Stress-Free On the Go",
     desc: "Log daily spending live in your local currency and track remaining travel funds in real time.",
     img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&auto=format&fit=crop&q=80",
-    badge: "06 / Expense Tracking"
+    badge: "Expense Tracking"
   }
 ]
 

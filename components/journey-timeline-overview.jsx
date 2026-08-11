@@ -137,7 +137,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
           
           {/* STAGE 01 — EXPLORE */}
           <TimelineStage
-            label="01 / EXPLORE"
+            label="EXPLORE"
             heading={`WHERE SHOULD\nWE GO?`}
             descriptionLines={[
               "Discover handpicked destinations tailored to your travel mood, budget, and style.",
@@ -199,7 +199,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
 
           {/* STAGE 02 — PLAN (Uploaded Image 3: Planner) */}
           <TimelineStage
-            label="02 / PLAN"
+            label="PLAN"
             heading={`TURN THE IDEA\nINTO A JOURNEY.`}
             descriptionLines={[
               "Turn your ideas into a structured, day-by-day travel schedule.",
@@ -220,7 +220,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
 
           {/* STAGE 03 — BUDGET (Uploaded Image 2: Budget Calculator) */}
           <TimelineStage
-            label="03 / BUDGET"
+            label="BUDGET"
             heading={`WHAT WILL\nTHE JOURNEY COST?`}
             descriptionLines={[
               "Get full financial transparency across accommodation, travel, food, and activities.",
@@ -241,7 +241,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
 
           {/* STAGE 04 — EXPENSES (Uploaded Image 1: Expense Tracker - 100% Clear, NO Bot Symbol) */}
           <TimelineStage
-            label="04 / EXPENSES"
+            label="EXPENSES"
             heading={`WHERE DID\nTHE MONEY GO?`}
             descriptionLines={[
               "Track your real-world spending seamlessly throughout your entire journey.",
@@ -262,7 +262,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
 
           {/* STAGE 05 — PACKAGES */}
           <TimelineStage
-            label="05 / PACKAGES"
+            label="PACKAGES"
             heading={`WHICH JOURNEY\nFEELS RIGHT?`}
             descriptionLines={[
               "Compare realistic, curated travel package spectrums side-by-side with full clarity.",
