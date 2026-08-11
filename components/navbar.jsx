@@ -104,8 +104,8 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
           </div>
         </button>
 
-        {/* Top Navbar Menu Links (Integrated directly in Hero header, no separate panel!) */}
-        <ul className="flex items-center gap-0.5 sm:gap-1.5 overflow-x-auto scrollbar-none py-1">
+        {/* Top Navbar Menu Links (Clean underline for active view, no blue background) */}
+        <ul className="flex items-center gap-1 sm:gap-2.5 overflow-x-auto scrollbar-none py-1">
           {navLinks.map((link) => {
             const isActive = activeView === link.view
             return (
@@ -113,12 +113,14 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                 <button
                   onClick={() => handleNavClick(link.view)}
                   className={cn(
-                    "rounded-full px-3 sm:px-4 py-1.5 text-[11px] sm:text-xs font-extrabold tracking-wide uppercase transition-all cursor-pointer",
-                    isActive
-                      ? "bg-[#5B8DEF] text-[#0F172A] shadow-md shadow-[#5B8DEF]/25"
-                      : isLightBg
-                      ? "text-[#0F172A] hover:bg-neutral-200/70"
-                      : "text-white/90 hover:bg-white/20 hover:text-white"
+                    "relative px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-extrabold tracking-wider uppercase transition-all cursor-pointer border-b-2",
+                    isLightBg
+                      ? isActive
+                        ? "text-neutral-900 border-neutral-900 font-black"
+                        : "text-neutral-600 border-transparent hover:text-neutral-900 hover:border-neutral-400"
+                      : isActive
+                        ? "text-white border-white font-black"
+                        : "text-white/80 border-transparent hover:text-white hover:border-white/40"
                   )}
                 >
                   {link.label}
