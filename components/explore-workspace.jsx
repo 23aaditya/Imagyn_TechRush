@@ -406,8 +406,8 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                   { icon: <Coins className="h-4 w-4" />, label: "Budget", value: destination.startingBudget || "₹8,500", color: "#10B981" },
                 ].map((detail, i) => (
                   <div key={i} className="rounded-md border border-border bg-card p-2.5 text-center">
-                    <span className="block text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{detail.label}</span>
-                    <span className="mt-0.5 block text-xs font-bold text-foreground truncate">{detail.value}</span>
+                    <span className="block text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{detail.label}</span>
+                    <span className="mt-0.5 block text-xs font-semibold text-foreground truncate">{detail.value}</span>
                   </div>
                 ))}
               </div>
