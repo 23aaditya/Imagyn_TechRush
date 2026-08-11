@@ -192,7 +192,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
 
               <Button
                 onClick={() => onOpenAuth("signup")}
-                className="rounded-full bg-[#8B9BE4] text-[#182030] text-xs font-bold uppercase tracking-wider hover:bg-[#7888D6] shadow-md shadow-[#8B9BE4]/25 sm:text-xs px-5 py-2 transition-all cursor-pointer"
+                className="rounded-full bg-[#5B8DEF] text-[#0F172A] text-xs font-bold uppercase tracking-wider hover:bg-[#487AE0] shadow-md shadow-[#5B8DEF]/25 sm:text-xs px-5 py-2 transition-all cursor-pointer"
               >
                 Get Started
               </Button>
