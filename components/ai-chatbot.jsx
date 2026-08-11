@@ -71,7 +71,7 @@ const CATEGORIZED_PROMPTS = {
 
 export function AiChatbot({ currentView, onNavigate }) {
   const tripContext = useTrip()
-  const { itinerary, addSpotToItinerary, removeSpotByName, reorderDayActivities, generateTripItinerary, destination, setDestination } = tripContext
+  const { itinerary, addSpotToItinerary, removeSpotByName, reorderDayActivities, generateTripItinerary, destination, setDestination, setStartDate, setEndDate, setDays } = tripContext;
 
   const [isOpen, setIsOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -151,6 +151,35 @@ export function AiChatbot({ currentView, onNavigate }) {
       const daysMatch = lowerText.match(/(\d+)\s*days?/)
       if (daysMatch && daysMatch[1]) {
         numDays = parseInt(daysMatch[1], 10)
+      }
+
+      // Parse date range if present (e.g., "from 3 October to 5 October")
+      const dateRangeRegex = /(\d{1,2})\s*(january|february|march|april|may|june|july|august|september|october|november|december)\s*to\s*(\d{1,2})\s*(january|february|march|april|may|june|july|august|september|october|november|december)/i;
+      const dateMatch = lowerText.match(dateRangeRegex);
+      if (dateMatch) {
+        const monthMap = {
+          january: "01", february: "02", march: "03", april: "04", may: "05", june: "06",
+          july: "07", august: "08", september: "09", october: "10", november: "11", december: "12"
+        };
+        const startDay = dateMatch[1].padStart(2, "0");
+        const startMonth = monthMap[dateMatch[2].toLowerCase()];
+        const endDay = dateMatch[3].padStart(2, "0");
+        const endMonth = monthMap[dateMatch[4].toLowerCase()];
+        const year = new Date().getFullYear();
+        const startISO = `${year}-${startMonth}-${startDay}`;
+        const endISO = `${year}-${endMonth}-${endDay}`;
+        // Update context dates
+        setStartDate?.(startISO);
+        setEndDate?.(endISO);
+        // Compute number of days inclusive
+        const startDt = new Date(startISO);
+        const endDt = new Date(endISO);
+        const diff = (endDt - startDt) / (1000 * 60 * 60 * 24);
+        if (!isNaN(diff) && diff >= 0) {
+          const calculatedDays = Math.round(diff) + 1;
+          setDays(calculatedDays);
+          numDays = calculatedDays;
+        }
       }
 
       // Parse destination name
