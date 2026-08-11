@@ -92,6 +92,9 @@ const DISCOVERY_CATEGORIES = [
   { id: "medical", label: "Medical", icon: Stethoscope, color: "#ec4899", emoji: "🏥" }
 ]
 
+// ─── Smart Search Chips ──────────────────────────────────────────────────
+const SMART_SEARCH_CHIPS = ["Hotels", "Cafes", "Beach", "Restaurants", "Attractions"]
+
 // ─── Day Color Palette (for Itinerary Mode route lines) ─────────────────
 const DAY_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316"]
 
