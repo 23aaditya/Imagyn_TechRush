@@ -285,7 +285,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
                   <div className="absolute bottom-2.5 left-2.5 right-2.5 text-white">
                     <span className="font-sans text-base font-bold tracking-wide text-white block">GOA</span>
-                    <span className="font-sans text-[11px] font-semibold text-amber-300 block">05 DAYS · ₹14,500</span>
+                    <span className="font-sans text-[11px] font-semibold text-white/90 block">05 DAYS · ₹14,500</span>
                   </div>
                 </div>
               </div>
@@ -300,7 +300,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
                   <div className="absolute bottom-2.5 left-2.5 right-2.5 text-white">
                     <span className="font-sans text-base font-bold tracking-wide text-white block">MANALI</span>
-                    <span className="font-sans text-[11px] font-semibold text-amber-300 block">05 DAYS · ₹18,900</span>
+                    <span className="font-sans text-[11px] font-semibold text-white/90 block">05 DAYS · ₹18,900</span>
                   </div>
                 </div>
               </div>
@@ -315,7 +315,7 @@ export function JourneyTimelineOverview({ onNavigateView }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
                   <div className="absolute bottom-2.5 left-2.5 right-2.5 text-white">
                     <span className="font-sans text-base font-bold tracking-wide text-white block">JAIPUR</span>
-                    <span className="font-sans text-[11px] font-semibold text-amber-300 block">04 DAYS · ₹12,200</span>
+                    <span className="font-sans text-[11px] font-semibold text-white/90 block">04 DAYS · ₹12,200</span>
                   </div>
                 </div>
               </div>

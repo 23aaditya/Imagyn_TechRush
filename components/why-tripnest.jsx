@@ -157,14 +157,14 @@ export function WhyTripNest() {
 
                     {/* Top Editorial Label */}
                     <div className="absolute top-5 left-6 z-10">
-                      <span className="font-heading text-xs font-semibold uppercase tracking-widest text-amber-300 bg-black/60 border border-white/20 px-3 py-1 rounded-sm backdrop-blur-md">
+                      <span className="font-heading text-xs font-semibold uppercase tracking-widest text-white bg-black/60 border border-white/20 px-3 py-1 rounded-sm backdrop-blur-md">
                         {feat.badge}
                       </span>
                     </div>
 
                     {/* Bottom Editorial Content */}
                     <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 text-left space-y-2 z-10">
-                      <span className="font-sans text-xs sm:text-sm font-semibold uppercase tracking-wider text-amber-400 block">
+                      <span className="font-sans text-xs sm:text-sm font-semibold uppercase tracking-wider text-white block">
                         {feat.tagline}
                       </span>
 

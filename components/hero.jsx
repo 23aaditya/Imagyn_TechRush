@@ -248,7 +248,7 @@ export function Hero({ onStartPlanning }) {
             className="font-serif-editorial text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.93] tracking-tight text-white drop-shadow-lg uppercase"
           >
             Journeys,<br />
-            <span className="font-heading font-extrabold italic text-amber-200 lowercase">quietly</span><br />
+            <span className="font-heading font-extrabold italic text-white lowercase">quietly</span><br />
             well-planned.
           </motion.h1>
 
@@ -314,7 +314,7 @@ export function Hero({ onStartPlanning }) {
         <div className="relative z-20 mx-auto max-w-4xl text-center space-y-3">
           <h2 className="font-serif-editorial text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-[0.93] drop-shadow-md">
             WHERE SHOULD<br />
-            <span className="font-heading font-extrabold text-amber-300 italic lowercase">we go?</span>
+            <span className="font-heading font-extrabold text-white italic lowercase">we go?</span>
           </h2>
           <p className="font-sans text-xs sm:text-sm text-white/80 max-w-lg mx-auto font-medium tracking-wide">
             Select your destination, travel dates, and budget to generate your day-by-day plan.
