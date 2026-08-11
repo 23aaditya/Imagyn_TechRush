@@ -21,6 +21,8 @@ import {
   Wallet,
   MapPin,
   CheckCircle2,
+  Mic,
+  Radio,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,6 +30,7 @@ import { cn } from "@/lib/utils"
 import { generateFallbackResponse, DESTINATION_KNOWLEDGE } from "@/lib/ai-travel-knowledge"
 import { useTrip } from "@/context/trip-context"
 import { parseAndExecuteBotActions } from "@/lib/bot-action-executor"
+import { GeminiLiveAudioModal } from "@/components/gemini-live-audio-modal"
 
 // Categorized Prompt Chips for organized browsing
 const PROMPT_CATEGORIES = [
@@ -75,11 +78,67 @@ export function AiChatbot({ currentView, onNavigate }) {
 
   const [isOpen, setIsOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isLiveAudioOpen, setIsLiveAudioOpen] = useState(false)
+  const [isRecordingMic, setIsRecordingMic] = useState(false)
   const [apiKey, setApiKey] = useState("")
   const [showSettings, setShowSettings] = useState(false)
   const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeCategory, setActiveCategory] = useState("all")
+  const recognitionRef = useRef(null)
+
+  const toggleMicRecording = () => {
+    if (isRecordingMic) {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop() } catch (e) {}
+      }
+      setIsRecordingMic(false)
+      return
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      setIsLiveAudioOpen(true)
+      return
+    }
+
+    try {
+      const rec = new SpeechRecognition()
+      rec.continuous = false
+      rec.interimResults = true
+      rec.lang = "en-US"
+
+      rec.onstart = () => {
+        setIsRecordingMic(true)
+      }
+
+      rec.onresult = (e) => {
+        let transcript = ""
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          transcript += e.results[i][0].transcript
+        }
+        if (transcript) {
+          setInputMessage(transcript)
+        }
+      }
+
+      rec.onerror = (e) => {
+        console.warn("Mic recording error:", e.error)
+        setIsRecordingMic(false)
+      }
+
+      rec.onend = () => {
+        setIsRecordingMic(false)
+      }
+
+      recognitionRef.current = rec
+      rec.start()
+    } catch (e) {
+      console.error("Failed to start mic recording:", e)
+      setIsRecordingMic(false)
+      setIsLiveAudioOpen(true)
+    }
+  }
   
   const [messages, setMessages] = useState([
     {
@@ -203,6 +262,102 @@ export function AiChatbot({ currentView, onNavigate }) {
       ])
       setIsLoading(false)
       return
+    }
+
+    // Check if user is requesting to CHANGE TARGET TRIP BUDGET
+    const isBudgetChangeIntent = (lowerText.includes("budget") || lowerText.includes("cost limit") || lowerText.includes("target budget")) && (lowerText.includes("set") || lowerText.includes("change") || lowerText.includes("update") || lowerText.includes("make") || lowerText.includes("to") || lowerText.includes("limit"))
+    if (isBudgetChangeIntent) {
+      const amountMatch = lowerText.match(/(?:₹|rs\.?|inr)?\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)?/i)
+      if (amountMatch && amountMatch[1]) {
+        let amount = parseInt(amountMatch[1].replace(/,/g, ""), 10)
+        if (lowerText.includes("k") && amount < 1000) amount *= 1000
+        if (amount > 0 && tripContext.setCustomTargetBudget) {
+          tripContext.setCustomTargetBudget(amount)
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: (Date.now() + 1).toString(),
+              role: "assistant",
+              content: `💰 **Target Trip Budget updated to ₹${amount.toLocaleString()}!**\n\nYour category allocations and financial summaries have been synchronized. [ACTION:navigate:budget]`,
+              executedActions: [`💰 Target Budget set to ₹${amount.toLocaleString()}`],
+              timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            },
+          ])
+          setIsLoading(false)
+          return
+        }
+      }
+    }
+
+    // Check if user is requesting to LOG AN EXPENSE
+    const isExpenseLogIntent = (lowerText.includes("log") || lowerText.includes("record") || lowerText.includes("add")) && (lowerText.includes("expense") || lowerText.includes("paid") || lowerText.includes("spent"))
+    if (isExpenseLogIntent) {
+      const amountMatch = lowerText.match(/(?:₹|rs\.?|inr)?\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)?/i)
+      let amount = amountMatch && amountMatch[1] ? parseInt(amountMatch[1].replace(/,/g, ""), 10) : 500
+      if (lowerText.includes("k") && amount < 1000) amount *= 1000
+
+      let paidBy = "Rahul"
+      const paidMatch = messageText.match(/paid\s+by\s+([A-Za-z]+)/i) || messageText.match(/by\s+([A-Za-z]+)/i)
+      if (paidMatch && paidMatch[1]) paidBy = paidMatch[1].trim()
+
+      let cat = "Food & Dining"
+      if (lowerText.includes("transport") || lowerText.includes("cab") || lowerText.includes("taxi") || lowerText.includes("flight") || lowerText.includes("train")) cat = "Transport"
+      else if (lowerText.includes("hotel") || lowerText.includes("stay") || lowerText.includes("resort") || lowerText.includes("villa")) cat = "Accommodation"
+      else if (lowerText.includes("activity") || lowerText.includes("ticket") || lowerText.includes("tour") || lowerText.includes("park")) cat = "Activities"
+      else if (lowerText.includes("shopping") || lowerText.includes("souvenir") || lowerText.includes("clothes")) cat = "Shopping"
+
+      let title = "Expense"
+      const titleMatch = messageText.match(/(?:for|on)\s+([A-Za-z\s]+?)(?:\s+in|\s+paid|\s+by|\s+amount|\s+rs|\s+₹|$)/i)
+      if (titleMatch && titleMatch[1]) title = titleMatch[1].trim()
+      else if (cat) title = `${cat} Expense`
+
+      if (tripContext.addActualExpense) {
+        tripContext.addActualExpense({
+          title,
+          description: title,
+          amount,
+          category: cat,
+          paidBy,
+          date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        })
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: `🧾 **Logged Expense:** "${title}" (₹${amount.toLocaleString()}) paid by **${paidBy}** in **${cat}**!\n\nYour Expense Tracker balances have been refreshed. [ACTION:navigate:expenses]`,
+            executedActions: [`🧾 Logged ₹${amount.toLocaleString()} for ${title} paid by ${paidBy}`],
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ])
+        setIsLoading(false)
+        return
+      }
+    }
+
+    // Check if user is requesting to CHANGE STAY TIER
+    const isTierChangeIntent = lowerText.includes("tier") || lowerText.includes("luxury") || lowerText.includes("economy") || lowerText.includes("standard") || lowerText.includes("budget tier")
+    if (isTierChangeIntent && (lowerText.includes("set") || lowerText.includes("switch") || lowerText.includes("change") || lowerText.includes("to"))) {
+      let tier = "Standard"
+      if (lowerText.includes("luxury") || lowerText.includes("5 star") || lowerText.includes("premium")) tier = "Luxury"
+      else if (lowerText.includes("economy") || lowerText.includes("budget") || lowerText.includes("cheap")) tier = "Economy"
+
+      if (tripContext.setStayTier) {
+        tripContext.setStayTier(tier)
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: `🏨 **Stay Tier updated to ${tier}!**\n\nAccommodation costs and estimated trip totals have been updated. [ACTION:navigate:budget]`,
+            executedActions: [`🏨 Stay Tier changed to ${tier}`],
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ])
+        setIsLoading(false)
+        return
+      }
     }
 
     // Check if user is requesting navigation linking
@@ -730,7 +885,19 @@ export function AiChatbot({ currentView, onNavigate }) {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsLiveAudioOpen(true)}
+                  className="rounded-xl border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 font-extrabold text-[11px] h-8 px-2.5 flex items-center gap-1 shadow-xs transition-all"
+                  title="Open Gemini 2.5 Flash Native Audio Live Mode"
+                >
+                  <Radio className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
+                  <span>Live Voice</span>
+                </Button>
+
                 <Button
                   variant="ghost"
                   size="icon"
@@ -998,10 +1165,27 @@ export function AiChatbot({ currentView, onNavigate }) {
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Ask about day plans, peak season, crowds..."
+                  placeholder={isRecordingMic ? "🎙️ Listening to your voice..." : "Ask about day plans, peak season, crowds..."}
                   disabled={isLoading}
-                  className="h-10 rounded-md bg-background text-xs sm:text-sm border-border/80 focus-visible:ring-primary"
+                  className={cn(
+                    "h-10 rounded-xl bg-background text-xs sm:text-sm border-border/80 focus-visible:ring-primary transition-colors",
+                    isRecordingMic && "border-red-500 ring-2 ring-red-500/30 bg-red-500/5 text-red-600 dark:text-red-400 font-semibold"
+                  )}
                 />
+                <Button
+                  type="button"
+                  onClick={toggleMicRecording}
+                  title={isRecordingMic ? "Stop Voice Recording" : "Voice Recording (Speak Message)"}
+                  className={cn(
+                    "h-10 w-10 shrink-0 rounded-xl transition-all shadow-2xs",
+                    isRecordingMic
+                      ? "bg-red-500 text-white animate-pulse shadow-red-500/50"
+                      : "border border-amber-500/40 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+                  )}
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
+
                 <Button
                   type="submit"
                   disabled={!inputMessage.trim() || isLoading}
@@ -1014,6 +1198,15 @@ export function AiChatbot({ currentView, onNavigate }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Gemini 2.5 Flash Native Audio Multimodal Live Modal */}
+      <GeminiLiveAudioModal
+        isOpen={isLiveAudioOpen}
+        onClose={() => setIsLiveAudioOpen(false)}
+        tripContext={tripContext}
+        onNavigate={onNavigate}
+        apiKey={apiKey}
+      />
     </>
   )
 }
