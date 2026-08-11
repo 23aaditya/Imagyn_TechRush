@@ -434,7 +434,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       className: "search-result-marker",
       html: `
         <div style="position: relative; width: 36px; height: 44px; filter: drop-shadow(0px 4px 10px rgba(90,140,178,0.6));">
-          <svg viewBox="0 0 384 512" width="36" height="44" fill="#8493A5">
+          <svg viewBox="0 0 384 512" width="36" height="44" fill="#E60023">
             <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z"/>
           </svg>
           <div style="position: absolute; top: 8px; left: 50%; transform: translateX(-50%); font-size: 14px;">🔍</div>
@@ -491,7 +491,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
         className: "stay-anchor-marker",
         html: `
           <div style="position: relative; width: 48px; height: 56px; filter: drop-shadow(0px 6px 16px rgba(90,140,178,0.7));">
-            <svg viewBox="0 0 384 512" width="48" height="56" fill="#8493A5">
+            <svg viewBox="0 0 384 512" width="48" height="56" fill="#E60023">
               <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z"/>
             </svg>
             <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: 20px;">🏠</div>
@@ -597,7 +597,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       validSpots.forEach((spot, idx) => {
         const isHovered = spot.id === hoveredSpotId
         // Color code by day if showing all days
-        let markerColor = "#8493A5"
+        let markerColor = "#E60023"
         if (activeDayFilter === "all" && itinerary) {
           for (let d = 0; d < itinerary.length; d++) {
             if (itinerary[d].activities?.some((a) => a.id === spot.id)) {
@@ -643,14 +643,14 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
         // Stay → First stop
         const lineToFirst = L.polyline(
           [[activeStay.lat, activeStay.lng], [firstSpot.lat, firstSpot.lng]],
-          { color: "#8493A5", weight: 2.5, dashArray: "6, 8", opacity: 0.5 }
+          { color: "#E60023", weight: 2.5, dashArray: "6, 8", opacity: 0.5 }
         ).addTo(map)
         stayLinesRef.current.push(lineToFirst)
 
         // Last stop → Stay
         const lineFromLast = L.polyline(
           [[lastSpot.lat, lastSpot.lng], [activeStay.lat, activeStay.lng]],
-          { color: "#8493A5", weight: 2.5, dashArray: "6, 8", opacity: 0.5 }
+          { color: "#E60023", weight: 2.5, dashArray: "6, 8", opacity: 0.5 }
         ).addTo(map)
         stayLinesRef.current.push(lineFromLast)
       }
@@ -735,7 +735,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
             }}
             className="flex items-center gap-2 bg-background/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-border shadow-md"
           >
-            <Search className="h-4 w-4 text-[#8493A5] shrink-0" />
+            <Search className="h-4 w-4 text-[#E60023] shrink-0" />
             <input
               type="text"
               placeholder="Search location..."
@@ -751,7 +751,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
             <button
               type="submit"
               disabled={isSearching}
-              className="rounded-xl bg-[#8493A5] text-white hover:bg-[#728193] font-semibold text-[11px] uppercase tracking-wider px-3.5 py-1.5 shadow-xs shrink-0 cursor-pointer"
+              className="rounded-xl bg-[#E60023] text-white hover:bg-[#C8001E] font-semibold text-[11px] uppercase tracking-wider px-3.5 py-1.5 shrink-0 cursor-pointer"
             >
               {isSearching ? "..." : "Search"}
             </button>
@@ -801,7 +801,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               onClick={() => setMapMode("discovery")}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-extrabold rounded-full transition-all ${
                 mapMode === "discovery"
-                  ? "bg-[#8493A5] text-white shadow-sm"
+                  ? "bg-[#E60023] text-white"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               }`}
             >
@@ -813,7 +813,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               onClick={() => setMapMode("itinerary")}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-extrabold rounded-full transition-all ${
                 mapMode === "itinerary"
-                  ? "bg-[#8493A5] text-white shadow-sm"
+                  ? "bg-[#E60023] text-white"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               }`}
             >
@@ -824,13 +824,13 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
 
           {/* Day Selector (Itinerary Mode only) */}
           {mapMode === "itinerary" && (
-            <div className="flex items-center gap-1 bg-background/95 backdrop-blur-md p-1 rounded-full border border-border shadow-xl">
+            <div className="flex items-center gap-1 bg-background/95 backdrop-blur-md p-1 rounded-full border border-border">
               <button
                 type="button"
                 onClick={() => setActiveDayFilter("all")}
                 className={`px-2.5 py-1 text-[11px] font-extrabold rounded-full transition-all ${
                   activeDayFilter === "all"
-                    ? "bg-[#8493A5] text-white shadow-sm"
+                    ? "bg-[#E60023] text-white"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 }`}
               >
@@ -843,7 +843,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                   onClick={() => setActiveDayFilter(d.day.toString())}
                   className={`px-2.5 py-1 text-[11px] font-extrabold rounded-full transition-all ${
                     activeDayFilter === d.day.toString()
-                      ? "bg-[#8493A5] text-white shadow-sm"
+                      ? "bg-[#E60023] text-white"
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   }`}
                 >
@@ -857,11 +857,11 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
           <button
             type="button"
             onClick={() => setIsAddingStayMode(!isAddingStayMode)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-md border shadow-xl transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-md border transition-all cursor-pointer ${
               isAddingStayMode
                 ? "bg-rose-500 text-white border-rose-400 animate-pulse"
                 : activeStay
-                ? "bg-[#8493A5] text-white border-[#8493A5]"
+                ? "bg-[#E60023] text-white border-[#E60023]"
                 : "bg-background/90 text-foreground border-border hover:bg-accent"
             }`}
           >
@@ -918,15 +918,15 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
           {/* Discovery Side Panel */}
           {activeStay && discoveryPanelOpen && (
             <div className="absolute top-28 left-3 bottom-16 z-[1000] pointer-events-auto w-72 max-w-[calc(100%-24px)]">
-              <div className="bg-background/95 backdrop-blur-md rounded-2xl border border-border shadow-2xl h-full flex flex-col overflow-hidden">
+              <div className="bg-background/95 backdrop-blur-md rounded-2xl border border-border h-full flex flex-col overflow-hidden">
                 {/* Panel Header */}
                 <div className="p-3 border-b border-border flex items-center justify-between">
                   <div>
                     <h4 className="text-xs font-extrabold text-foreground flex items-center gap-1.5">
                       {isDiscoveryLoading ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin text-[#5A8CB2]" />
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-[#E60023]" />
                       ) : (
-                        <Sparkles className="h-3.5 w-3.5 text-[#5A8CB2]" />
+                        <Sparkles className="h-3.5 w-3.5 text-[#E60023]" />
                       )}
                       {DISCOVERY_CATEGORIES.find((c) => c.id === activeDiscoveryCategory)?.label || "Nearby"} near Stay
                     </h4>
@@ -947,7 +947,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                 <div className="px-3 py-2 border-b border-border">
                   <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground mb-1">
                     <span>Search Radius</span>
-                    <span className="text-[#5A8CB2] font-extrabold">{(discoveryRadius / 1000).toFixed(0)} km</span>
+                    <span className="text-[#E60023] font-extrabold">{(discoveryRadius / 1000).toFixed(0)} km</span>
                   </div>
                   <input
                     type="range"
@@ -958,7 +958,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                     onChange={(e) => setDiscoveryRadius(parseInt(e.target.value, 10))}
                     className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
                     style={{
-                      background: `linear-gradient(to right, #5A8CB2 ${((discoveryRadius - 1000) / 14000) * 100}%, #e5e7eb ${((discoveryRadius - 1000) / 14000) * 100}%)`
+                      background: `linear-gradient(to right, #E60023 ${((discoveryRadius - 1000) / 14000) * 100}%, #e5e7eb ${((discoveryRadius - 1000) / 14000) * 100}%)`
                     }}
                   />
                 </div>
@@ -967,7 +967,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                 <div className="flex-1 overflow-y-auto p-2 space-y-1.5 scrollbar-none">
                   {isDiscoveryLoading ? (
                     <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                      <Loader2 className="h-6 w-6 animate-spin text-[#5A8CB2] mb-2" />
+                      <Loader2 className="h-6 w-6 animate-spin text-[#E60023] mb-2" />
                       <span className="text-xs font-bold">Discovering nearby places...</span>
                     </div>
                   ) : activeDiscoveredPlaces.length === 0 ? (
@@ -991,7 +991,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                           }}
                           className={`w-full text-left p-2.5 rounded-xl transition-all ${
                             isSelected
-                              ? "bg-[#C8D9E6]/40 border-[#5A8CB2] border shadow-md"
+                              ? "bg-[#E60023]/10 border-[#E60023] border"
                               : "hover:bg-accent border border-transparent"
                           }`}
                         >
@@ -1026,16 +1026,16 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
             <button
               type="button"
               onClick={() => setDiscoveryPanelOpen(true)}
-              className="absolute top-28 left-3 z-[1000] pointer-events-auto bg-background/95 backdrop-blur-md p-2.5 rounded-2xl border border-border shadow-xl hover:bg-accent transition-colors"
+              className="absolute top-28 left-3 z-[1000] pointer-events-auto bg-background/95 backdrop-blur-md p-2.5 rounded-2xl border border-border hover:bg-accent transition-colors"
             >
-              <Sparkles className="h-4 w-4 text-[#5A8CB2]" />
+              <Sparkles className="h-4 w-4 text-[#E60023]" />
             </button>
           )}
 
           {/* No Stay Warning */}
           {!activeStay && (
             <div className="absolute top-16 left-3 right-3 z-[1000] pointer-events-auto">
-              <div className="bg-background/95 backdrop-blur-md p-3.5 rounded-2xl border border-amber-500/40 shadow-2xl flex items-center justify-between gap-3">
+              <div className="bg-background/95 backdrop-blur-md p-3.5 rounded-2xl border border-amber-500/40 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
                   <AlertTriangle className="h-4 w-4 shrink-0" />
                   <div>
@@ -1046,7 +1046,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                 <button
                   type="button"
                   onClick={() => setIsAddingStayMode(true)}
-                  className="bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs px-3 py-1.5 rounded-xl shadow-md shrink-0 cursor-pointer transition-colors"
+                  className="bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-colors"
                 >
                   📍 Pin Stay
                 </button>
@@ -1061,7 +1061,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
          ═════════════════════════════════════════════════════════════════ */}
       {selectedDiscoveryPlace && mapMode === "discovery" && (
         <div className="absolute bottom-16 left-3 z-[1000] pointer-events-auto max-w-xs w-full">
-          <div className="bg-background/95 backdrop-blur-md p-4 rounded-2xl border border-border shadow-2xl space-y-2.5 relative">
+          <div className="bg-background/95 backdrop-blur-md p-4 rounded-2xl border border-border space-y-2.5 relative">
             <button
               type="button"
               onClick={() => setSelectedDiscoveryPlace(null)}
@@ -1072,7 +1072,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
 
             <div className="flex items-start gap-2">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0"
-                   style={{ backgroundColor: CATEGORY_META[selectedDiscoveryPlace.category]?.color || "#5A8CB2" }}>
+                   style={{ backgroundColor: CATEGORY_META[selectedDiscoveryPlace.category]?.color || "#E60023" }}>
                 {CATEGORY_META[selectedDiscoveryPlace.category]?.emoji || "📍"}
               </div>
               <div className="flex-1 min-w-0">
@@ -1088,7 +1088,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               {getAllTransportEstimates(selectedDiscoveryPlace.distanceKm).filter(t => t.mode !== "bus").map((t) => (
                 <div key={t.mode} className="flex items-center gap-1 bg-accent/50 px-2 py-1 rounded-lg shrink-0">
                   <span className="text-[9px] font-bold text-foreground">{t.label}</span>
-                  <span className="text-[9px] font-extrabold text-[#5A8CB2]">₹{t.cost}</span>
+                  <span className="text-[9px] font-extrabold text-[#E60023]">₹{t.cost}</span>
                   <span className="text-[9px] text-muted-foreground">{t.duration}</span>
                 </div>
               ))}
@@ -1127,7 +1127,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               <button
                 type="button"
                 onClick={() => handleAddDiscoveredPlace(selectedDiscoveryPlace)}
-                className="flex-1 rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs py-1.5 shadow flex items-center justify-center gap-1 cursor-pointer"
+                className="flex-1 rounded-xl bg-[#E60023] text-white hover:bg-[#C8001E] font-bold text-xs py-1.5 flex items-center justify-center gap-1 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add to Itinerary
@@ -1152,7 +1152,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
          ═════════════════════════════════════════════════════════════════ */}
       {selectedMarkerSpot && !selectedDiscoveryPlace && (
         <div className="absolute bottom-16 left-3 z-[1000] pointer-events-auto max-w-xs w-full">
-          <div className="bg-background/95 backdrop-blur-md p-4 rounded-2xl border border-border shadow-xl space-y-2 relative">
+          <div className="bg-background/95 backdrop-blur-md p-4 rounded-2xl border border-border space-y-2 relative">
             <button
               type="button"
               onClick={() => setSelectedMarkerSpot(null)}
@@ -1164,7 +1164,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               <span className="text-sm font-bold text-foreground">{selectedMarkerSpot.title}</span>
             </div>
             <p className="text-[11px] text-muted-foreground line-clamp-2">{selectedMarkerSpot.desc || "Popular highlight on map"}</p>
-            <div className="flex items-center justify-between text-xs font-bold text-[#5A8CB2] pt-1">
+            <div className="flex items-center justify-between text-xs font-bold text-[#E60023] pt-1">
               <span>{selectedMarkerSpot.cost || "₹500"}</span>
               <span>⭐ 4.8 Rating</span>
             </div>
@@ -1185,7 +1185,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                     })
                     setSelectedMarkerSpot(null)
                   }}
-                  className="flex-1 rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs py-1.5 shadow flex items-center justify-center gap-1 cursor-pointer"
+                  className="flex-1 rounded-xl bg-[#E60023] text-white hover:bg-[#C8001E] font-bold text-xs py-1.5 flex items-center justify-center gap-1 cursor-pointer"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Add to Itinerary
@@ -1225,7 +1225,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                   onClick={() => setSelectedTransit(mode.id)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                     isActive
-                      ? "bg-[#8493A5] text-white shadow-md"
+                      ? "bg-[#E60023] text-white"
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   }`}
                 >
@@ -1236,7 +1236,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
             })}
 
             {totalStats.distanceKm > 0 && (
-              <div className="ml-2 pl-3 border-l border-border flex items-center gap-2 text-xs font-extrabold text-[#8493A5] shrink-0">
+              <div className="ml-2 pl-3 border-l border-border flex items-center gap-2 text-xs font-extrabold text-[#E60023] shrink-0">
                 {isRoutingLoading ? (
                   <span className="animate-pulse text-amber-500 font-bold text-[11px]">⚡ Calculating...</span>
                 ) : (
@@ -1253,8 +1253,8 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
 
         {/* Discovery Mode Bottom Info */}
         {mapMode === "discovery" && activeStay && (
-          <div className="flex items-center gap-2 bg-background/95 backdrop-blur-md p-2 rounded-2xl border border-border shadow-2xl pointer-events-auto">
-            <LocateFixed className="h-3.5 w-3.5 text-[#8493A5] shrink-0" />
+          <div className="flex items-center gap-2 bg-background/95 backdrop-blur-md p-2 rounded-2xl border border-border pointer-events-auto">
+            <LocateFixed className="h-3.5 w-3.5 text-[#E60023] shrink-0" />
             <span className="text-[11px] font-bold text-foreground line-clamp-1">
               {activeStay.name || "Your Stay"}
             </span>
@@ -1270,19 +1270,19 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
             <button
               type="button"
               onClick={handleCenterOnStay}
-              className="flex items-center justify-center h-10 w-10 bg-background/95 backdrop-blur-md rounded-2xl border border-border text-foreground shadow-2xl hover:bg-accent transition-transform hover:scale-105 shrink-0 cursor-pointer"
+              className="flex items-center justify-center h-10 w-10 bg-background/95 backdrop-blur-md rounded-2xl border border-border text-foreground hover:bg-accent transition-transform hover:scale-105 shrink-0 cursor-pointer"
               title="Center on Stay"
             >
-              <LocateFixed className="h-5 w-5 text-[#8493A5]" />
+              <LocateFixed className="h-5 w-5 text-[#E60023]" />
             </button>
           )}
           <button
             type="button"
             onClick={handleZoomIntoPlaces}
-            className="flex items-center justify-center h-10 w-10 bg-background/95 backdrop-blur-md rounded-2xl border border-border text-foreground shadow-2xl hover:bg-accent transition-transform hover:scale-105 shrink-0 cursor-pointer"
+            className="flex items-center justify-center h-10 w-10 bg-background/95 backdrop-blur-md rounded-2xl border border-border text-foreground hover:bg-accent transition-transform hover:scale-105 shrink-0 cursor-pointer"
             title="Fit Map to All"
           >
-            <Compass className="h-5 w-5 text-[#8493A5]" />
+            <Compass className="h-5 w-5 text-[#E60023]" />
           </button>
         </div>
       </div>
