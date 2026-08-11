@@ -13,7 +13,7 @@ export function Footer({ onNavigateView }) {
           }}
           className="flex items-center text-left focus:outline-none group cursor-pointer"
         >
-          <div className="rounded-2xl bg-white/95 backdrop-blur-md px-3.5 py-2 border border-border shadow-sm transition-transform group-hover:scale-105">
+          <div className="rounded-md bg-white/95 backdrop-blur-md px-3 py-1.5 border border-border shadow-xs transition-opacity hover:opacity-90">
             <img
               src="/tripnest-logo.png"
               alt="TripNest Imagyn"

@@ -239,15 +239,17 @@ export function Hero({ onStartPlanning }) {
         </div>
 
         {/* Hero Title & Subtext & Start Planning Button Grouped Together */}
-        <div className="relative z-10 mx-auto max-w-5xl text-center space-y-4 pt-12">
+        <div className="relative z-10 mx-auto max-w-5xl text-center space-y-5 pt-12">
           <motion.h1
             variants={fadeUp}
             custom={1}
             initial="hidden"
             animate="show"
-            className="font-heading text-5xl font-extrabold leading-[1.05] tracking-tight text-balance text-white drop-shadow-md sm:text-6xl lg:text-7xl"
+            className="font-serif-editorial text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.93] tracking-tight text-white drop-shadow-lg uppercase"
           >
-            Journeys, Quietly Well-Planned.
+            Journeys,<br />
+            <span className="font-heading font-extrabold italic text-amber-200 lowercase">quietly</span><br />
+            well-planned.
           </motion.h1>
 
           <motion.p
@@ -255,7 +257,7 @@ export function Hero({ onStartPlanning }) {
             custom={2}
             initial="hidden"
             animate="show"
-            className="mx-auto max-w-2xl text-base sm:text-lg leading-relaxed text-pretty text-white/90 drop-shadow-sm font-normal"
+            className="mx-auto max-w-2xl text-sm sm:text-base leading-relaxed text-white/90 drop-shadow-sm font-medium tracking-wide"
           >
             Explore handpicked destinations, compare realistic travel packages, and craft bespoke itineraries tailored to your pace.
           </motion.p>
@@ -265,20 +267,20 @@ export function Hero({ onStartPlanning }) {
             custom={3}
             initial="hidden"
             animate="show"
-            className="pt-4"
+            className="pt-2"
           >
             <button
               onClick={handleScrollDownToSearch}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-9 py-3.5 text-base font-bold text-neutral-900 shadow-2xl shadow-black/30 transition-all duration-300 hover:scale-105 hover:bg-white/95 focus:outline-none cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-sm bg-white px-8 py-3.5 text-xs font-bold uppercase tracking-[0.15em] text-neutral-900 shadow-md transition-all hover:bg-white/90 focus:outline-none cursor-pointer"
             >
               Start Planning
-              <ChevronDown className="h-5 w-5 animate-bounce" />
+              <ChevronDown className="h-4 w-4 animate-bounce" />
             </button>
           </motion.div>
         </div>
 
         {/* 1cm White Line at the very bottom of Landing Page */}
-        <div className="absolute bottom-0 inset-x-0 h-3 sm:h-3.5 bg-white shadow-md z-20" />
+        <div className="absolute bottom-0 inset-x-0 h-3 sm:h-3.5 bg-white shadow-xs z-20" />
       </section>
 
       {/* 2. FULL SCREEN VIDEO SEARCH HERO SECTION (Appears smoothly on scroll down) */}
@@ -308,45 +310,36 @@ export function Hero({ onStartPlanning }) {
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/75 z-20 pointer-events-none" />
         </div>
 
-        {/* Video Playlist Indicator Bar */}
-        <div className="absolute top-6 right-6 z-30 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 text-white text-xs font-semibold">
-          <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
-          <span>Video {currentVideoIdx + 1} of {HERO_TRAVEL_VIDEOS.length}:</span>
-          <span className="font-bold text-amber-300 truncate max-w-[200px]">{HERO_TRAVEL_VIDEOS[currentVideoIdx].title}</span>
-        </div>
-
         {/* Section Header Prompt (Tight spacing to dialogue box) */}
-        <div className="relative z-20 mx-auto max-w-3xl text-center space-y-2">
-          <span className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-amber-300 block">
-            LIVE TRAVEL SEARCH
-          </span>
-          <h2 className="font-heading text-3xl sm:text-5xl font-extrabold text-white tracking-tight drop-shadow-md">
-            Where would you like to escape?
+        <div className="relative z-20 mx-auto max-w-4xl text-center space-y-3">
+          <h2 className="font-serif-editorial text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-[0.93] drop-shadow-md">
+            WHERE SHOULD<br />
+            <span className="font-heading font-extrabold text-amber-300 italic lowercase">we go?</span>
           </h2>
-          <p className="font-sans text-sm sm:text-base text-white/80 max-w-lg mx-auto">
+          <p className="font-sans text-xs sm:text-sm text-white/80 max-w-lg mx-auto font-medium tracking-wide">
             Select your destination, travel dates, and budget to generate your day-by-day plan.
           </p>
         </div>
 
-        {/* Interactive Search Dialogue Box (Sharp Rectangle Design) */}
+        {/* Interactive Search Dialogue Box (Glassmorphism Container Design) */}
         <div className="relative z-20 mx-auto w-full max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-none border border-white/30 bg-black/80 p-5 sm:p-6 shadow-[0_25px_60px_rgba(0,0,0,0.7)] backdrop-blur-3xl text-white"
+            className="rounded-lg border border-white/30 bg-white/10 p-5 sm:p-6 shadow-2xl backdrop-blur-2xl text-white"
           >
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 text-left">
               
               {/* 1. Destination Search Input with Auto-complete */}
               <div className="relative md:col-span-2" ref={dropdownRef}>
-                <label className="flex cursor-text items-center gap-3 rounded-none border border-white/20 bg-white/10 px-4 py-3 transition-colors focus-within:border-white hover:bg-white/15">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-white/15 text-white">
+                <label className="flex cursor-text items-center gap-3 rounded-md border border-white/30 bg-white/15 backdrop-blur-xl px-4 py-3 transition-all focus-within:border-white hover:bg-white/20 shadow-sm">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-white/20 text-white backdrop-blur-md">
                     <MapPin className="h-4 w-4" />
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/70">Where To?</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">Where To?</span>
                     <input
                       type="text"
                       value={query}
@@ -368,7 +361,7 @@ export function Hero({ onStartPlanning }) {
                       initial={{ opacity: 0, y: 8, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                      className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-y-auto rounded-none border border-white/20 bg-neutral-900/95 p-3 shadow-2xl backdrop-blur-2xl text-white"
+                      className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-y-auto rounded-md border border-white/25 bg-black/85 p-3 shadow-2xl backdrop-blur-2xl text-white"
                     >
                       {/* Search Matches */}
                       {query.trim() !== "" && (
@@ -381,7 +374,7 @@ export function Hero({ onStartPlanning }) {
                               <button
                                 key={dest.name}
                                 onClick={() => handleSelectDestination(dest.name)}
-                                className="flex w-full items-center justify-between rounded-none px-3 py-2 text-left text-xs font-semibold text-white transition-colors hover:bg-white/15"
+                                className="flex w-full items-center justify-between rounded-xs px-3 py-2 text-left text-xs font-semibold text-white transition-colors hover:bg-white/15 cursor-pointer"
                               >
                                 <span className="flex items-center gap-2">
                                   <MapPin className="h-3.5 w-3.5 text-amber-400" />
@@ -399,8 +392,7 @@ export function Hero({ onStartPlanning }) {
                       {/* Recently Searched */}
                       {recentSearches.length > 0 && query.trim() === "" && (
                         <div className="mb-3 border-b border-white/15 pb-2">
-                          <p className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/60">
-                            <Clock className="h-3 w-3 text-emerald-400" />
+                          <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/60">
                             Recently Searched
                           </p>
                           <div className="flex flex-wrap gap-1.5 px-2 pt-1">
@@ -408,7 +400,7 @@ export function Hero({ onStartPlanning }) {
                               <button
                                 key={item}
                                 onClick={() => handleSelectDestination(item)}
-                                className="rounded-none bg-white/10 px-3 py-1 text-xs font-medium text-white hover:bg-white/20 transition-colors"
+                                className="rounded-xs bg-white/10 px-3 py-1 text-xs font-medium text-white hover:bg-white/20 transition-colors cursor-pointer"
                               >
                                 {item}
                               </button>
@@ -420,15 +412,14 @@ export function Hero({ onStartPlanning }) {
                       {/* Trending Suggestions */}
                       {query.trim() === "" && (
                         <div className="mb-3 border-b border-white/15 pb-2">
-                          <p className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/60">
-                            <Flame className="h-3 w-3 text-amber-500" />
+                          <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/60">
                             Trending Destinations
                           </p>
                           {trendingDestinations.map((dest) => (
                             <button
                               key={dest.name}
                               onClick={() => handleSelectDestination(dest.name)}
-                              className="flex w-full items-center justify-between rounded-none px-3 py-1.5 text-left text-xs font-medium text-white transition-colors hover:bg-white/15"
+                              className="flex w-full items-center justify-between rounded-xs px-3 py-1.5 text-left text-xs font-medium text-white transition-colors hover:bg-white/15 cursor-pointer"
                             >
                               <span className="flex items-center gap-2">
                                 <MapPin className="h-3.5 w-3.5 text-amber-500" />
@@ -443,15 +434,14 @@ export function Hero({ onStartPlanning }) {
                       {/* Popular Suggestions */}
                       {query.trim() === "" && (
                         <div>
-                          <p className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/60">
-                            <Sparkles className="h-3 w-3 text-sky-400" />
+                          <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/60">
                             Popular Choices
                           </p>
                           {popularDestinations.slice(0, 4).map((dest) => (
                             <button
                               key={dest.name}
                               onClick={() => handleSelectDestination(dest.name)}
-                              className="flex w-full items-center justify-between rounded-none px-3 py-1.5 text-left text-xs font-medium text-white transition-colors hover:bg-white/15"
+                              className="flex w-full items-center justify-between rounded-xs px-3 py-1.5 text-left text-xs font-medium text-white transition-colors hover:bg-white/15 cursor-pointer"
                             >
                               <span className="flex items-center gap-2">
                                 <MapPin className="h-3.5 w-3.5 text-sky-400" />
@@ -469,8 +459,8 @@ export function Hero({ onStartPlanning }) {
 
               {/* 2. Date Range Picker (From Date & To Date) */}
               <div className="md:col-span-2 grid grid-cols-2 gap-2">
-                <label className="flex cursor-pointer flex-col justify-center rounded-none border border-white/20 bg-white/10 px-3.5 py-2.5 transition-colors focus-within:border-white hover:bg-white/15">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/70">From Date</span>
+                <label className="flex cursor-pointer flex-col justify-center rounded-md border border-white/30 bg-white/15 backdrop-blur-xl px-3.5 py-2.5 transition-all focus-within:border-white hover:bg-white/20 shadow-sm">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">From Date</span>
                   <input
                     type="date"
                     value={fromDate}
@@ -479,8 +469,8 @@ export function Hero({ onStartPlanning }) {
                   />
                 </label>
 
-                <label className="flex cursor-pointer flex-col justify-center rounded-none border border-white/20 bg-white/10 px-3.5 py-2.5 transition-colors focus-within:border-white hover:bg-white/15">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/70">To Date</span>
+                <label className="flex cursor-pointer flex-col justify-center rounded-md border border-white/30 bg-white/15 backdrop-blur-xl px-3.5 py-2.5 transition-all focus-within:border-white hover:bg-white/20 shadow-sm">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">To Date</span>
                   <input
                     type="date"
                     value={toDate}
@@ -492,14 +482,11 @@ export function Hero({ onStartPlanning }) {
 
               {/* 3. Budget Picker in INR */}
               <div className="md:col-span-2">
-                <label className="flex cursor-pointer flex-col justify-center rounded-none border border-white/20 bg-white/10 px-3.5 py-2.5 transition-colors focus-within:border-white hover:bg-white/15">
-                  <span className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    <span className="flex items-center gap-1">
-                      <Wallet className="h-3 w-3 text-emerald-400" />
-                      Budget (₹)
-                    </span>
+                <label className="flex cursor-pointer flex-col justify-center rounded-md border border-white/30 bg-white/15 backdrop-blur-xl px-3.5 py-2.5 transition-all focus-within:border-white hover:bg-white/20 shadow-sm">
+                  <span className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-white/80">
+                    <span>Budget (₹)</span>
                     {selectedBudget === "Custom" && (
-                      <span className="text-[9px] font-bold text-amber-400">Custom</span>
+                      <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">Custom</span>
                     )}
                   </span>
 
@@ -517,7 +504,7 @@ export function Hero({ onStartPlanning }) {
                       <button
                         type="button"
                         onClick={() => setSelectedBudget("Any budget")}
-                        className="text-[10px] text-white/60 hover:text-white underline"
+                        className="text-[10px] text-white/60 hover:text-white underline cursor-pointer"
                       >
                         Reset
                       </button>
@@ -533,7 +520,7 @@ export function Hero({ onStartPlanning }) {
                       <option value="₹5,000 – ₹15,000" className="bg-neutral-900 text-white">₹5,000 – ₹15,000</option>
                       <option value="₹15,000 – ₹35,000" className="bg-neutral-900 text-white">₹15,000 – ₹35,000</option>
                       <option value="₹35,000+" className="bg-neutral-900 text-white">₹35,000+</option>
-                      <option value="Custom" className="bg-neutral-900 font-bold text-amber-400">✏️ Enter Custom Budget (₹)...</option>
+                      <option value="Custom" className="bg-neutral-900 font-bold text-amber-400">Enter Custom Budget (₹)...</option>
                     </select>
                   )}
                 </label>
@@ -541,9 +528,8 @@ export function Hero({ onStartPlanning }) {
 
               {/* 4. Travel Type */}
               <div className="md:col-span-2">
-                <label className="flex cursor-pointer flex-col justify-center rounded-none border border-white/20 bg-white/10 px-3.5 py-2.5 transition-colors focus-within:border-white hover:bg-white/15">
-                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    <Compass className="h-3 w-3 text-sky-400" />
+                <label className="flex cursor-pointer flex-col justify-center rounded-md border border-white/20 bg-white/10 px-3.5 py-2.5 transition-colors focus-within:border-white hover:bg-white/15">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/70">
                     Travel Type
                   </span>
                   <select className="w-full cursor-pointer bg-transparent text-xs font-semibold text-white focus:outline-none">
@@ -560,14 +546,14 @@ export function Hero({ onStartPlanning }) {
 
             {/* Validation & Duration Display */}
             {dateError && (
-              <div className="mt-3 flex items-center gap-2 rounded-none bg-rose-500/20 border border-rose-500/30 p-2.5 text-xs text-rose-200">
+              <div className="mt-3 flex items-center gap-2 rounded-sm bg-rose-500/20 border border-rose-500/30 p-2.5 text-xs text-rose-200">
                 <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
                 <span>{dateError}</span>
               </div>
             )}
 
             {tripDuration && !dateError && (
-              <div className="mt-3 flex items-center gap-2 rounded-none bg-emerald-500/20 border border-emerald-500/30 p-2.5 text-xs font-semibold text-emerald-300">
+              <div className="mt-3 flex items-center gap-2 rounded-sm bg-emerald-500/20 border border-emerald-500/30 p-2.5 text-xs font-semibold text-emerald-300">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
                 <span>Trip Duration Calculated: {tripDuration} {tripDuration === 1 ? "Day" : "Days"}</span>
               </div>
@@ -579,9 +565,9 @@ export function Hero({ onStartPlanning }) {
                 const targetDest = query.trim()
                 onStartPlanning?.("itinerary", targetDest)
               }}
-              className="mt-5 h-12 w-full rounded-none bg-white text-neutral-900 text-base font-extrabold uppercase tracking-wider shadow-xl hover:bg-white/90 transition-all"
+              className="mt-5 h-11 w-full rounded-sm bg-white text-neutral-900 text-xs font-bold uppercase tracking-wider shadow-sm hover:bg-white/90 transition-all cursor-pointer"
             >
-              <Search className="mr-1.5 h-5 w-5 text-primary" />
+              <Search className="mr-1.5 h-4 w-4 text-primary" />
               Plan Itinerary
             </Button>
           </motion.div>

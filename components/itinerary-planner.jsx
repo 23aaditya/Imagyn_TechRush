@@ -736,7 +736,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               variant="outline"
               size="sm"
               onClick={onBack}
-              className="rounded-xl border-border bg-background hover:bg-accent text-xs sm:text-sm"
+              className="rounded-sm border-border bg-background hover:bg-accent text-xs sm:text-sm cursor-pointer"
             >
               <ArrowLeft className="mr-1.5 h-4 w-4" />
               Back to Overview
@@ -751,7 +751,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowPreferences((prev) => !prev)}
-                className={`rounded-xl border-border text-xs font-bold px-3.5 py-2 flex items-center gap-1.5 cursor-pointer transition-all ${
+                className={`rounded-sm border-border text-xs font-bold px-3.5 py-2 flex items-center gap-1.5 cursor-pointer transition-all ${
                   showPreferences ? "bg-[#5A8CB2] text-white border-[#5A8CB2]" : "bg-card text-foreground hover:bg-accent"
                 }`}
               >
@@ -765,7 +765,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 setSaved(true)
                 setTimeout(() => setSaved(false), 3000)
               }}
-              className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-extrabold text-xs px-4 py-2 shadow flex items-center gap-2 cursor-pointer"
+              className="rounded-sm bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-semibold text-xs uppercase tracking-wider px-4 py-2 shadow-xs flex items-center gap-2 cursor-pointer"
             >
               <Bookmark className="h-4 w-4" />
               {saved ? "Saved! Opening Report Pass..." : "Save Trip & Offline Pass"}
@@ -776,14 +776,15 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         {/* Title Header & Single Streamlined Search Bar */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#5A8CB2] text-white shadow-sm mb-2">
-              <Sparkles className="h-3.5 w-3.5" />
-              Total {itinerary?.length || days || 3} Day Itinerary to {destination || "Goa (India)"}
+            <span className="font-mono-tech text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[#5A8CB2] block mb-1">
+              03 DAYS · 15°28′N 73°49′E · {destination ? destination.toUpperCase() : "GOA, INDIA"}
             </span>
-            <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Design Your Personalized Trip
+            <h1 className="font-serif-editorial text-3xl sm:text-5xl font-black tracking-tight text-foreground uppercase leading-[0.95]">
+              DESIGN YOUR<br />
+              <span className="font-heading font-extrabold text-[#5A8CB2] italic lowercase">personalized</span><br />
+              ITINERARY.
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground max-w-xl">
+            <p className="mt-2 text-xs sm:text-sm text-muted-foreground max-w-xl font-medium tracking-wide">
               Drag to reorder spots, sync with live map, optimize routes & add custom spots.
             </p>
           </div>
@@ -800,7 +801,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 setShowSearchDropdown(false)
                 setMiniGoogleOpen(true)
               }}
-              className="relative flex items-center rounded-2xl border border-border bg-card shadow-sm p-1"
+              className="relative flex items-center rounded-md border border-border bg-card shadow-xs p-1"
             >
               <Search className="h-4 w-4 text-muted-foreground ml-3 shrink-0" />
               <input
@@ -814,7 +815,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               <Button
                 type="submit"
                 size="sm"
-                className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs px-4 py-2 shadow shrink-0 cursor-pointer"
+                className="rounded-sm bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-semibold text-xs uppercase tracking-wider px-4 py-2 shadow-xs shrink-0 cursor-pointer"
               >
                 Search
               </Button>
@@ -837,7 +838,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 transition={{ duration: 0.35 }}
                 className="lg:col-span-6 flex flex-col space-y-3 sticky top-24"
               >
-                <div className="rounded-3xl border-2 border-border/80 bg-card shadow-2xl flex flex-col h-[680px] relative overflow-hidden">
+                <div className="rounded-xl border border-border bg-card shadow-lg flex flex-col h-[680px] relative overflow-hidden">
                   {/* Next-Gen Edge-to-Edge Leaflet Map */}
                   <TripMap
                     spots={activeSpots}
@@ -855,17 +856,16 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -30 }}
                 transition={{ duration: 0.35 }}
-                className="lg:col-span-4 rounded-3xl border border-border bg-card p-6 shadow-xl space-y-6 sticky top-24"
+                className="lg:col-span-4 rounded-xl border border-border bg-card p-6 shadow-xs space-y-6 sticky top-24"
               >
                 <div className="border-b border-border pb-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-[#5A8CB2]" />
+                    <h3 className="font-heading text-lg font-bold text-foreground">
                       Trip Preferences
                     </h3>
                     {destination && (
-                      <span className="text-[11px] font-extrabold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2.5 py-0.5 rounded-full">
-                        📍 {destination}
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#5A8CB2] bg-[#5A8CB2]/10 px-2 py-0.5 rounded-xs border border-[#5A8CB2]/20">
+                        {destination}
                       </span>
                     )}
                   </div>
@@ -873,30 +873,28 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
                   {/* DESTINATION SELECTION MODE: TWO OPTIONS (Explore Section vs Direct Custom Location) */}
                   <div className="pt-2 space-y-2">
-                    <label className="block text-[11px] font-extrabold text-muted-foreground uppercase tracking-wider">
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                       Planning Option
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
                         onClick={() => setDestPlanningMode("explore")}
-                        className={`flex items-center justify-center gap-1.5 rounded-2xl border p-2.5 text-xs font-bold transition-all cursor-pointer ${destPlanningMode === "explore"
-                            ? "border-[#5A8CB2] bg-[#5A8CB2]/15 text-[#5A8CB2] shadow-xs"
-                            : "border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+                        className={`flex items-center justify-center rounded-sm border p-2.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer backdrop-blur-md ${destPlanningMode === "explore"
+                            ? "border-[#5A8CB2]/80 bg-[#5A8CB2]/30 text-[#5A8CB2] dark:text-[#9BC2E6] shadow-sm"
+                            : "border-border/80 bg-background/50 text-muted-foreground hover:bg-accent/80 hover:text-foreground"
                           }`}
                       >
-                        <Compass className="h-4 w-4" />
                         <span>Plan via Explore</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setDestPlanningMode("custom")}
-                        className={`flex items-center justify-center gap-1.5 rounded-2xl border p-2.5 text-xs font-bold transition-all cursor-pointer ${destPlanningMode === "custom"
-                            ? "border-[#5A8CB2] bg-[#5A8CB2]/15 text-[#5A8CB2] shadow-xs"
-                            : "border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+                        className={`flex items-center justify-center rounded-sm border p-2.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer backdrop-blur-md ${destPlanningMode === "custom"
+                            ? "border-[#5A8CB2]/80 bg-[#5A8CB2]/30 text-[#5A8CB2] dark:text-[#9BC2E6] shadow-sm"
+                            : "border-border/80 bg-background/50 text-muted-foreground hover:bg-accent/80 hover:text-foreground"
                           }`}
                       >
-                        <MapPin className="h-4 w-4" />
                         <span>Direct Custom Location</span>
                       </button>
                     </div>
@@ -915,7 +913,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 setCustomDestInput(e.target.value)
                               }
                             }}
-                            className="w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2] cursor-pointer appearance-none"
+                            className="w-full rounded-md border border-border bg-background px-3.5 py-2.5 text-xs font-semibold text-foreground outline-none focus:border-[#5A8CB2] cursor-pointer appearance-none"
                           >
                             <option value="" disabled>-- Select a Destination from Explore --</option>
                             {destinationsData.map((d) => (
@@ -994,7 +992,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
                         {/* Auto-Suggestion Dropdown Bar */}
                         {showCustomSuggestions && customSuggestions.length > 0 && (
-                          <div className="absolute top-12 left-0 right-0 z-50 bg-background/95 backdrop-blur-md rounded-2xl border border-border shadow-2xl overflow-hidden max-h-48 overflow-y-auto p-1.5 space-y-1">
+                          <div className="absolute top-12 left-0 right-0 z-50 bg-background/95 backdrop-blur-md rounded-md border border-border shadow-2xl overflow-hidden max-h-48 overflow-y-auto p-1.5 space-y-1">
                             {customSuggestions.map((item, idx) => (
                               <button
                                 key={idx}
@@ -1003,14 +1001,14 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                   setCustomDestInput(item.name)
                                   setShowCustomSuggestions(false)
                                 }}
-                                className="flex items-center justify-between w-full text-left p-2 rounded-xl hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
+                                className="flex items-center justify-between w-full text-left p-2 rounded-xs hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
                               >
                                 <div className="flex items-center gap-2">
                                   <MapPin className="h-3.5 w-3.5 text-[#5A8CB2] shrink-0" />
                                   <span className="font-bold">{item.name}</span>
                                   <span className="text-[10px] text-muted-foreground">({item.country})</span>
                                 </div>
-                                <span className="text-[10px] font-bold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2 py-0.5 rounded-full shrink-0">
+                                <span className="text-[10px] font-bold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2 py-0.5 rounded-xs shrink-0">
                                   {item.vibe || item.type}
                                 </span>
                               </button>
@@ -1035,7 +1033,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     <button
                       type="button"
                       onClick={() => setCalendarOpen(!calendarOpen)}
-                      className="w-full flex items-center justify-between rounded-2xl border border-border bg-background px-4 py-3 text-xs font-bold text-foreground shadow-sm hover:border-primary transition-all"
+                      className="w-full flex items-center justify-between rounded-sm border border-border bg-background px-4 py-3 text-xs font-bold text-foreground shadow-xs hover:border-primary transition-all cursor-pointer"
                     >
                       <div className="flex items-center gap-2.5">
                         <Calendar className="h-4 w-4 text-primary" />
@@ -1052,11 +1050,11 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute left-0 right-0 top-16 z-50 rounded-2xl border border-border bg-card p-4 shadow-2xl space-y-3"
+                        className="absolute left-0 right-0 top-16 z-50 rounded-md border border-border bg-card p-4 shadow-xl space-y-3"
                       >
                         <div className="flex items-center justify-between border-b border-border/80 pb-2">
                           <span className="text-xs font-bold text-foreground">Select Travel Date Range</span>
-                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-xs">
                             Single Calendar
                           </span>
                         </div>
@@ -1089,10 +1087,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                     }
                                   }}
                                   className={`py-1.5 text-xs font-bold transition-all ${isStart || isEnd
-                                      ? "bg-[#5A8CB2] text-white rounded-lg font-extrabold shadow-md scale-105"
+                                      ? "bg-[#5A8CB2] text-white rounded-xs font-bold shadow-xs"
                                       : isInRange
-                                        ? "bg-[#C8D9E6]/50 text-[#1E293B] font-bold rounded-sm border-y border-[#5A8CB2]/30"
-                                        : "hover:bg-accent text-foreground rounded-lg"
+                                        ? "bg-[#C8D9E6]/50 text-[#1E293B] font-bold rounded-xs border-y border-[#5A8CB2]/30"
+                                        : "hover:bg-accent text-foreground rounded-xs"
                                     }`}
                                 >
                                   {dayNum}
@@ -1215,7 +1213,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   <Button
                     onClick={() => handleGenerate()}
                     disabled={isGenerating || (destPlanningMode === "custom" ? !customDestInput.trim() : !destination)}
-                    className="w-full rounded-xl bg-[#5A8CB2] py-3 font-extrabold text-white shadow-lg shadow-[#5A8CB2]/25 hover:bg-[#4A7CA2] disabled:opacity-50 cursor-pointer"
+                    className="w-full rounded-sm bg-[#5A8CB2] py-3 font-semibold text-xs uppercase tracking-wider text-white shadow-xs hover:bg-[#4A7CA2] disabled:opacity-50 cursor-pointer"
                   >
                     {isGenerating ? (
                       <span className="flex items-center gap-2">
@@ -1238,7 +1236,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
           <div className={`${isMapVisible ? "lg:col-span-6" : (showPreferences || !itinerary || itinerary.length === 0) ? "lg:col-span-8" : "lg:col-span-12"} space-y-6`}>
 
             {!itinerary || itinerary.length === 0 || !destination ? (
-              <div className="rounded-3xl border border-dashed border-border bg-card/60 p-12 text-center space-y-4 flex flex-col items-center justify-center min-h-[420px]">
+              <div className="rounded-xl border border-dashed border-border bg-card/60 p-12 text-center space-y-4 flex flex-col items-center justify-center min-h-[420px]">
                 <div className="h-16 w-16 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                   <Compass className="h-8 w-8 animate-pulse" />
                 </div>
@@ -1253,7 +1251,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 {destination && (
                   <Button
                     onClick={handleGenerate}
-                    className="rounded-xl bg-primary px-6 py-2.5 font-semibold text-primary-foreground shadow-md"
+                    className="rounded-sm bg-primary px-6 py-2.5 font-semibold text-xs uppercase tracking-wider text-primary-foreground shadow-xs cursor-pointer"
                   >
                     Generate {destination} Itinerary
                   </Button>
@@ -1262,11 +1260,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
             ) : (
               <>
                 {/* Live Budget & Expense Summary Card */}
-                <div className="rounded-3xl border border-border bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-[#1A2634] dark:via-[#16202C] dark:to-[#1A2634] p-5 sm:p-6 text-white shadow-xl space-y-4">
+                <div className="rounded-xl border border-border bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-[#1A2634] dark:via-[#16202C] dark:to-[#1A2634] p-5 sm:p-6 text-white shadow-xs space-y-4">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/15 pb-4">
                     <div className="space-y-1">
                       <div className="inline-flex items-center gap-1.5 rounded-full bg-[#5A8CB2]/25 text-[#9BC2E6] px-3 py-0.5 text-[11px] font-bold border border-[#5A8CB2]/30">
-                        <Coins className="h-3.5 w-3.5 text-amber-400" />
                         <span>Live Budget & Expense Overview</span>
                       </div>
                       <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-white">

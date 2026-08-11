@@ -533,7 +533,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
   }
 
   return (
-    <div className="h-full w-full relative overflow-hidden rounded-3xl min-h-[500px] sm:min-h-[620px] bg-card flex flex-col shadow-2xl border border-border">
+    <div className="h-full w-full relative overflow-hidden rounded-xl min-h-[500px] sm:min-h-[620px] bg-card flex flex-col shadow-lg border border-border">
       
       {/* ─────────────────────────────────────────────
           1. FLOATING SEARCH & DAY FILTER HEADER BAR
@@ -547,7 +547,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               e.preventDefault()
               handleMapLocationSearch()
             }}
-            className="flex items-center gap-2 bg-background/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-border shadow-xl"
+            className="flex items-center gap-2 bg-background/95 backdrop-blur-md px-3.5 py-2 rounded-md border border-border shadow-md"
           >
             <Search className="h-4 w-4 text-[#5A8CB2] shrink-0" />
             <input
@@ -569,7 +569,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
             <button
               type="submit"
               disabled={isSearching}
-              className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-extrabold text-[11px] px-3.5 py-1.5 shadow-xs shrink-0 cursor-pointer"
+              className="rounded-sm bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-semibold text-[11px] uppercase tracking-wider px-3.5 py-1.5 shadow-xs shrink-0 cursor-pointer"
             >
               {isSearching ? "Searching..." : "Search"}
             </button>
@@ -585,7 +585,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                   setMapSearchQuery(chip)
                   handleMapLocationSearch(chip)
                 }}
-                className="px-2.5 py-1 rounded-full bg-background/90 backdrop-blur-md border border-border text-[10px] font-bold text-foreground hover:bg-[#C8D9E6]/30 hover:border-[#5A8CB2] transition-colors shrink-0 shadow-xs cursor-pointer"
+                className="px-2.5 py-1 rounded-xs bg-background/90 backdrop-blur-md border border-border text-[10px] font-semibold text-foreground hover:bg-[#C8D9E6]/30 hover:border-[#5A8CB2] transition-colors shrink-0 shadow-xs cursor-pointer"
               >
                 {chip}
               </button>
@@ -594,13 +594,13 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
 
           {/* Autocomplete Dropdown */}
           {showResultsDropdown && searchResults.length > 0 && (
-            <div className="absolute top-12 left-0 right-0 bg-background/95 backdrop-blur-md rounded-2xl border border-border shadow-2xl overflow-hidden z-50 max-h-60 overflow-y-auto p-1.5 space-y-1">
+            <div className="absolute top-12 left-0 right-0 bg-background/95 backdrop-blur-md rounded-md border border-border shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto p-1.5 space-y-1">
               {searchResults.map((res, i) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => handleSelectSearchResult(res)}
-                  className="flex items-start gap-2 w-full text-left p-2 rounded-xl hover:bg-accent text-xs font-semibold text-foreground transition-colors"
+                  className="flex items-start gap-2 w-full text-left p-2 rounded-xs hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
                 >
                   <MapPin className="h-4 w-4 text-[#5A8CB2] shrink-0 mt-0.5" />
                   <span className="line-clamp-2">{res.display_name}</span>
@@ -613,13 +613,13 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
         {/* Right Side: Day Filter & Add Stay Button */}
         <div className="flex items-center gap-2 pointer-events-auto">
           {/* Day Selector Pill */}
-          <div className="flex items-center gap-1 bg-background/95 backdrop-blur-md p-1 rounded-full border border-border shadow-xl">
+          <div className="flex items-center gap-1 bg-background/95 backdrop-blur-md p-1 rounded-sm border border-border shadow-md">
             <button
               type="button"
               onClick={() => setActiveDayFilter("all")}
-              className={`px-2.5 py-1 text-[11px] font-extrabold rounded-full transition-all ${
+              className={`px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider rounded-xs transition-all cursor-pointer ${
                 activeDayFilter === "all"
-                  ? "bg-[#5A8CB2] text-white shadow-sm"
+                  ? "bg-[#5A8CB2] text-white shadow-xs"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               }`}
             >
@@ -630,9 +630,9 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                 key={d.day}
                 type="button"
                 onClick={() => setActiveDayFilter(d.day.toString())}
-                className={`px-2.5 py-1 text-[11px] font-extrabold rounded-full transition-all ${
+                className={`px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider rounded-xs transition-all cursor-pointer ${
                   activeDayFilter === d.day.toString()
-                    ? "bg-[#5A8CB2] text-white shadow-sm"
+                    ? "bg-[#5A8CB2] text-white shadow-xs"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 }`}
               >
@@ -645,7 +645,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
           <button
             type="button"
             onClick={() => setIsAddingStayMode(!isAddingStayMode)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-md border shadow-xl transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-sm backdrop-blur-md border shadow-md transition-all cursor-pointer ${
               baseStay
                 ? "bg-[#5A8CB2] text-white border-[#5A8CB2]"
                 : isAddingStayMode
@@ -669,11 +669,10 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
          ───────────────────────────────────────────── */}
       {!optimizationAlertDismissed && totalStats.distanceKm > 6 && (
         <div className="absolute top-20 left-3 right-3 sm:left-auto sm:right-3 z-[1000] pointer-events-auto max-w-sm">
-          <div className="bg-background/95 backdrop-blur-md p-3 rounded-2xl border border-amber-500/40 shadow-2xl space-y-2">
+          <div className="bg-background/95 backdrop-blur-md p-3 rounded-md border border-amber-500/40 shadow-xl space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                <Zap className="h-4 w-4" />
-                Smart Route Optimization Recommendation
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                Route Recommendation
               </span>
               <button
                 type="button"
@@ -692,7 +691,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                 reorderDayActivities(0, 0, 1)
                 setOptimizationAlertDismissed(true)
               }}
-              className="w-full rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs py-1.5 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full rounded-sm bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-semibold text-xs uppercase tracking-wider py-1.5 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Zap className="h-3.5 w-3.5" />
               Optimize Route Order
@@ -706,7 +705,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
          ───────────────────────────────────────────── */}
       {selectedMarkerSpot && (
         <div className="absolute bottom-16 left-3 z-[1000] pointer-events-auto max-w-xs w-full">
-          <div className="bg-background/95 backdrop-blur-md p-4 rounded-2xl border border-border shadow-2xl space-y-2 relative">
+          <div className="bg-background/95 backdrop-blur-md p-4 rounded-md border border-border shadow-xl space-y-2 relative">
             <button
               type="button"
               onClick={() => setSelectedMarkerSpot(null)}
@@ -715,7 +714,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               <X className="h-4 w-4" />
             </button>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-extrabold text-foreground">{selectedMarkerSpot.title}</span>
+              <span className="text-sm font-bold text-foreground">{selectedMarkerSpot.title}</span>
             </div>
             <p className="text-[11px] text-muted-foreground line-clamp-2">{selectedMarkerSpot.desc || "Popular highlight on map"}</p>
             <div className="flex items-center justify-between text-xs font-bold text-[#5A8CB2] pt-1">
@@ -738,7 +737,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                   })
                   setSelectedMarkerSpot(null)
                 }}
-                className="flex-1 rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs py-1.5 shadow flex items-center justify-center gap-1 cursor-pointer"
+                className="flex-1 rounded-sm bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-semibold text-xs uppercase tracking-wider py-1.5 shadow-xs flex items-center justify-center gap-1 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add to Itinerary
@@ -749,7 +748,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                   setWishlist((prev) => [...prev, selectedMarkerSpot.title])
                   alert(`❤️ Saved "${selectedMarkerSpot.title}" to Wishlist!`)
                 }}
-                className="p-2 rounded-xl border border-border hover:bg-accent text-rose-500 cursor-pointer"
+                className="p-2 rounded-sm border border-border hover:bg-accent text-rose-500 cursor-pointer"
                 title="Save to Wishlist"
               >
                 <Heart className="h-4 w-4 fill-rose-500" />
@@ -765,8 +764,8 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       <div className="absolute bottom-3 left-3 right-3 z-[1000] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pointer-events-none">
         
         {/* Transit Mode & Distance/Time Stats Pill */}
-        <div className="flex items-center gap-2 bg-background/95 backdrop-blur-md p-2 rounded-2xl border border-border shadow-2xl pointer-events-auto overflow-x-auto scrollbar-none">
-          <span className="text-[10px] font-extrabold uppercase text-muted-foreground px-1 shrink-0">Transit Mode:</span>
+        <div className="flex items-center gap-2 bg-background/95 backdrop-blur-md p-2 rounded-md border border-border shadow-xl pointer-events-auto overflow-x-auto scrollbar-none">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 shrink-0">Transit Mode:</span>
           {TRANSIT_MODES.map((mode) => {
             const Icon = mode.icon
             const isActive = selectedTransit === mode.id
@@ -775,9 +774,9 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                 key={mode.id}
                 type="button"
                 onClick={() => setSelectedTransit(mode.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer ${
                   isActive
-                    ? "bg-[#5A8CB2] text-white shadow-md"
+                    ? "bg-[#5A8CB2] text-white shadow-xs"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 }`}
               >
@@ -788,7 +787,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
           })}
 
           {totalStats.distanceKm > 0 && (
-            <div className="ml-2 pl-3 border-l border-border flex items-center gap-2 text-xs font-extrabold text-[#5A8CB2] shrink-0">
+            <div className="ml-2 pl-3 border-l border-border flex items-center gap-2 text-xs font-bold text-[#5A8CB2] shrink-0">
               {isRoutingLoading ? (
                 <span className="animate-pulse text-amber-500 font-bold text-[11px]">⚡ Calculating road route...</span>
               ) : (
@@ -804,7 +803,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
 
         {/* POI Filters & Fit Map Button */}
         <div className="flex items-center gap-2 pointer-events-auto">
-          <div className="flex items-center gap-1 bg-background/95 backdrop-blur-md p-1.5 rounded-2xl border border-border shadow-2xl overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-1 bg-background/95 backdrop-blur-md p-1.5 rounded-md border border-border shadow-xl overflow-x-auto scrollbar-none">
             {POI_CATEGORIES.map((cat) => {
               const Icon = cat.icon
               const isActive = selectedCategory === cat.id
@@ -813,9 +812,9 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                   key={cat.id}
                   type="button"
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all shrink-0 cursor-pointer ${
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xs text-[11px] font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer ${
                     isActive
-                      ? "bg-[#C8D9E6] text-[#1E293B] shadow-sm"
+                      ? "bg-[#C8D9E6] text-[#1E293B] shadow-xs"
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   }`}
                 >
@@ -829,7 +828,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
           <button
             type="button"
             onClick={handleZoomIntoPlaces}
-            className="flex items-center justify-center h-10 w-10 bg-background/95 backdrop-blur-md rounded-2xl border border-border text-foreground shadow-2xl hover:bg-accent transition-transform hover:scale-105 shrink-0 cursor-pointer"
+            className="flex items-center justify-center h-10 w-10 bg-background/95 backdrop-blur-md rounded-sm border border-border text-foreground shadow-xl hover:bg-accent transition-transform hover:scale-105 shrink-0 cursor-pointer"
             title="Fit Map to All Spots"
           >
             <Compass className="h-5 w-5 text-[#5A8CB2]" />

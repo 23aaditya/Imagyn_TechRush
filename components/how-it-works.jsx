@@ -46,24 +46,17 @@ export function HowItWorks() {
       <div className="mx-auto max-w-7xl">
         
         {/* Header */}
-        <div className="mx-auto max-w-2xl text-center space-y-3">
-          <motion.span
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-heading text-xs font-bold uppercase tracking-widest text-primary block"
-          >
-            SIMPLE FIVE-STEP PROCESS
-          </motion.span>
-
+        <div className="mx-auto max-w-4xl text-center space-y-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+            className="font-serif-editorial text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground uppercase leading-[0.95]"
           >
-            How TripNest Works
+            FIVE STEPS.<br />
+            <span className="font-heading font-extrabold text-[#C98B55] italic lowercase">zero</span><br />
+            STRESS.
           </motion.h2>
 
           <motion.p
@@ -71,7 +64,7 @@ export function HowItWorks() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="text-base sm:text-lg leading-relaxed text-muted-foreground font-sans max-w-xl mx-auto"
+            className="text-xs sm:text-sm leading-relaxed text-muted-foreground font-medium max-w-xl mx-auto tracking-wide"
           >
             From daydream to departure in five simple steps — planned with quiet precision.
           </motion.p>
@@ -99,7 +92,7 @@ export function HowItWorks() {
                 zIndex: 30,
                 transition: { duration: 0.25 }
               }}
-              className={`relative flex flex-col p-5 sm:p-6 rounded-2xl border ${step.color} ${step.rotation} shadow-lg shadow-black/10 cursor-default group transition-all duration-300 h-full`}
+              className={`relative flex flex-col p-5 sm:p-6 rounded-lg border ${step.color} ${step.rotation} shadow-sm cursor-default group transition-all duration-300 h-full`}
             >
               {/* Sticky Tape Header Strip */}
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/40 dark:bg-white/10 backdrop-blur-sm border border-white/40 rounded-xs shadow-xs" />

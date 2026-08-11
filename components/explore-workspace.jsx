@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { CoordinateReveal } from "@/components/motion/coordinate-reveal"
 import {
   ArrowLeft,
   ChevronRight,
@@ -111,7 +112,7 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
     <div className="mb-2">
       <div className="flex items-center justify-between mb-2 px-2">
         <h3 className="flex items-center gap-2 font-heading text-xl font-bold text-foreground">
-          <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-[#5A8CB2]/10 text-[#5A8CB2]">
+          <span className="flex items-center justify-center w-7 h-7 rounded-md bg-[#5A8CB2]/10 text-[#5A8CB2]">
             {icon}
           </span>
           {label}
@@ -122,7 +123,7 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
             type="button"
             onClick={() => handleScroll("left")}
             aria-label="Scroll left"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-md transition-all hover:bg-[#5A8CB2] hover:text-white hover:scale-105 cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#5A8CB2] hover:text-white cursor-pointer"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -130,7 +131,7 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
             type="button"
             onClick={() => handleScroll("right")}
             aria-label="Scroll right"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-md transition-all hover:bg-[#5A8CB2] hover:text-white hover:scale-105 cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#5A8CB2] hover:text-white cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -196,15 +197,12 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-50"
             >
               <div
-                className="flex flex-col items-center justify-center rounded-2xl border border-neutral-200 dark:border-white/15 bg-white dark:bg-[#181613]/95 shadow-2xl min-w-[80px] px-3 py-2 backdrop-blur-2xl text-center"
-                style={{
-                  boxShadow: `0 12px 30px rgba(0,0,0,0.18), 0 0 0 1px ${item.color || "#10B981"}30`,
-                }}
+                className="flex flex-col items-center justify-center rounded-md border border-neutral-200 dark:border-white/15 bg-white dark:bg-[#181613]/95 shadow-md min-w-[80px] px-2.5 py-1.5 backdrop-blur-2xl text-center"
               >
                 <span className="text-[9px] font-bold text-neutral-400 dark:text-[#A9A092] uppercase tracking-widest block leading-none">
                   {petal.label}
                 </span>
-                <span className="text-xs font-extrabold text-[#0D2B45] dark:text-[#F1ECE2] mt-1 whitespace-nowrap max-w-[85px] truncate block leading-tight">
+                <span className="text-xs font-extrabold text-[#0D2B45] dark:text-[#F1ECE2] mt-0.5 whitespace-nowrap max-w-[85px] truncate block leading-tight">
                   {getPetalValue(petal.key)}
                 </span>
               </div>
@@ -215,36 +213,32 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
 
       {/* Arch Shaped Image Card */}
       <motion.div
-        animate={{ scale: isHovered ? 1.08 : 1, y: isHovered ? -6 : 0 }}
+        animate={{ scale: isHovered ? 1.05 : 1, y: isHovered ? -4 : 0 }}
         transition={{ type: "spring", stiffness: 220, damping: 20 }}
         className="relative"
       >
         <div
-          className="h-64 w-48 sm:h-72 sm:w-52 rounded-t-[999px] rounded-b-2xl p-[4px] transition-all duration-500 shadow-xl relative"
+          className="h-64 w-48 sm:h-72 sm:w-52 rounded-t-[999px] rounded-b-lg p-[3px] transition-all duration-300 shadow-xs relative"
           style={{
             background: isHovered
-              ? `linear-gradient(135deg, ${item.color || "#10B981"}, ${item.color || "#10B981"}99, ${item.color || "#10B981"}44)`
+              ? `linear-gradient(135deg, ${item.color || "#10B981"}, ${item.color || "#10B981"}99)`
               : "var(--border)",
-            boxShadow: isHovered
-              ? `0 15px 45px ${(item.color || "#10B981")}50, 0 0 75px ${(item.color || "#10B981")}25`
-              : "0 8px 28px rgba(0,0,0,0.1)",
           }}
         >
-          <div className="h-full w-full overflow-hidden rounded-t-[999px] rounded-b-xl relative bg-neutral-900">
+          <div className="h-full w-full overflow-hidden rounded-t-[999px] rounded-b-md relative bg-neutral-900">
             <img
               src={item.image}
               alt={item.name}
-              className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110"
+              className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           </div>
 
           {/* Temperature badge */}
           <span
-            className="absolute top-2 right-2 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold text-white shadow-xl border border-white/40 z-10"
+            className="absolute top-2 right-2 flex items-center gap-1 rounded-xs px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-xs border border-white/30 z-10"
             style={{ background: item.color || "#10B981" }}
           >
-            <CloudSun className="h-3.5 w-3.5" />
             {item.temp || "25°C"}
           </span>
         </div>
@@ -253,7 +247,7 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
       {/* Name & Subtitle Below the Shape */}
       <div className="mt-3 text-center relative z-10">
         <h4
-          className="font-heading text-base sm:text-lg font-extrabold transition-colors"
+          className="font-heading text-base sm:text-lg font-bold transition-colors"
           style={{ color: isHovered ? (item.color || "#10B981") : "var(--foreground)" }}
         >
           {item.name}
@@ -363,11 +357,11 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4"
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        exit={{ opacity: 0, scale: 0.95, y: 15 }}
         onClick={(e) => e.stopPropagation()}
-        className={`w-full max-w-lg overflow-hidden rounded-3xl border border-border bg-card shadow-2xl ${
+        className={`w-full max-w-lg overflow-hidden rounded-xl border border-border bg-card shadow-lg ${
           position === "left" ? "md:mr-auto md:ml-12" : "md:ml-auto md:mr-12"
         }`}
       >
@@ -383,20 +377,18 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
             type="button"
             onClick={onClose}
             aria-label="Close detail panel"
-            className="absolute top-3 right-3 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black/90 hover:scale-110 active:scale-95 cursor-pointer border border-white/20 shadow-xl"
+            className="absolute top-3 right-3 z-50 flex h-8 w-8 items-center justify-center rounded-md bg-black/60 text-white backdrop-blur-md transition hover:bg-black/90 cursor-pointer border border-white/20 shadow-xs"
           >
-            <X className="h-5 w-5 stroke-[2.5]" />
+            <X className="h-4 w-4" />
           </button>
 
-          <div className="absolute bottom-3 left-4">
-            <span
-              className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1"
-              style={{ background: `${destination.color || "#10B981"}30`, color: destination.color || "#10B981" }}
+          <div className="absolute bottom-3 left-4 right-4">
+            <CoordinateReveal
+              coordinates={`15°28′N 73°49′E · ${destination.country?.toUpperCase() || "INDIA"}`}
+              destinationName={destination.name}
             >
-              {destination.country}
-            </span>
-            <h3 className="font-heading text-2xl font-bold text-foreground">{destination.name}</h3>
-            <p className="text-sm text-muted-foreground">{destination.subtitle}</p>
+              <p className="text-xs font-semibold text-white/90 drop-shadow">{destination.subtitle}</p>
+            </CoordinateReveal>
           </div>
         </div>
 
@@ -413,15 +405,9 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                   { icon: <Clock className="h-4 w-4" />, label: "Best Season", value: destination.bestTime || "All Year", color: "#F59E0B" },
                   { icon: <Coins className="h-4 w-4" />, label: "Budget", value: destination.startingBudget || "₹8,500", color: "#10B981" },
                 ].map((detail, i) => (
-                  <div key={i} className="rounded-xl border border-border bg-card p-3 text-center">
-                    <div
-                      className="mx-auto mb-1 flex h-7 w-7 items-center justify-center rounded-lg"
-                      style={{ background: `${detail.color}15`, color: detail.color }}
-                    >
-                      {detail.icon}
-                    </div>
+                  <div key={i} className="rounded-md border border-border bg-card p-2.5 text-center">
                     <span className="block text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{detail.label}</span>
-                    <span className="mt-0.5 block text-xs font-extrabold text-foreground truncate">{detail.value}</span>
+                    <span className="mt-0.5 block text-xs font-bold text-foreground truncate">{detail.value}</span>
                   </div>
                 ))}
               </div>
@@ -429,7 +415,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
               <div className="flex flex-col gap-2.5">
                 <Button
                   onClick={() => onExplore(destination.name)}
-                  className="w-full rounded-xl py-3 font-bold text-white shadow-xl transition hover:opacity-95 bg-[#5A8CB2] hover:bg-[#4A7CA2] cursor-pointer"
+                  className="w-full rounded-md py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-xs transition bg-[#5A8CB2] hover:bg-[#4A7CA2] cursor-pointer"
                 >
                   <Sparkles className="mr-1.5 h-4 w-4 text-amber-300" />
                   Customize Itinerary directly in Planner

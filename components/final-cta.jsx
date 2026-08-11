@@ -26,23 +26,16 @@ export function FinalCTA({ onNavigateView }) {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="space-y-5"
         >
-          <motion.span
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-heading text-xs font-bold uppercase tracking-[0.25em] text-amber-300 block"
-          >
-            YOUR ESCAPE AWAITS
-          </motion.span>
-
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="font-heading text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl drop-shadow-md"
+            className="font-serif-editorial text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-[0.95] drop-shadow-md"
           >
-            Ready for Your Next Adventure?
+            PLAN LESS.<br />
+            <span className="font-heading font-extrabold text-amber-300 italic lowercase">travel</span><br />
+            MORE.
           </motion.h2>
 
           <motion.p
@@ -50,7 +43,7 @@ export function FinalCTA({ onNavigateView }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="font-sans text-base sm:text-lg leading-relaxed text-white/90 font-normal drop-shadow-sm max-w-xl mx-auto"
+            className="font-sans text-xs sm:text-sm leading-relaxed text-white/90 font-medium tracking-wide drop-shadow-sm max-w-xl mx-auto"
           >
             Plan quietly, save time, and travel confidently with TripNest.
           </motion.p>
@@ -64,10 +57,10 @@ export function FinalCTA({ onNavigateView }) {
           >
             <button
               onClick={() => onNavigateView?.("itinerary")}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-10 py-4 text-base font-bold text-neutral-900 shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-white/95 focus:outline-none"
+              className="inline-flex items-center gap-2 rounded-sm bg-white px-8 py-3 text-xs font-bold uppercase tracking-wider text-neutral-900 shadow-md transition-all hover:bg-white/90 focus:outline-none cursor-pointer"
             >
               Plan My Trip Now
-              <ArrowRight className="h-5 w-5" />
+              <ArrowRight className="h-4 w-4" />
             </button>
           </motion.div>
         </motion.div>

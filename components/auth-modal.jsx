@@ -142,11 +142,11 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
 
         {/* Modal Outer Container with Mountain Background */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ type: "spring", duration: 0.55, bounce: 0.1 }}
-          className="relative z-10 w-full max-w-5xl overflow-hidden rounded-[32px] border border-white/20 shadow-[0_30px_90px_rgba(0,0,0,0.6)] min-h-[580px] flex flex-col md:flex-row items-stretch"
+          className="relative z-10 w-full max-w-5xl overflow-hidden rounded-lg border border-white/20 shadow-xl min-h-[580px] flex flex-col md:flex-row items-stretch"
         >
           {/* Background Image Layer */}
           <div className="absolute inset-0 z-0">
@@ -161,10 +161,10 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute right-5 top-5 z-30 rounded-full bg-black/40 p-2.5 text-white/80 transition-all hover:bg-black/70 hover:text-white border border-white/20"
+            className="absolute right-5 top-5 z-30 rounded-sm bg-black/40 p-2 text-white/80 transition-all hover:bg-black/70 hover:text-white border border-white/20 cursor-pointer"
             aria-label="Close dialog"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
 
           {/* LEFT SIDE: Hero Branding with TripNest Logo & Simple Tagline */}
@@ -204,18 +204,18 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
             </div>
           </div>
 
-          {/* RIGHT SIDE: Glassmorphism Auth Card (Exact Reference Design) */}
+          {/* RIGHT SIDE: Glassmorphism Auth Card */}
           <div className="relative z-10 w-full md:w-[440px] p-6 sm:p-10 flex items-center justify-center">
-            <div className="w-full rounded-3xl border border-white/30 bg-white/20 p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-2xl text-white">
+            <div className="w-full rounded-lg border border-white/30 bg-white/20 p-6 sm:p-8 shadow-lg backdrop-blur-2xl text-white">
               
               {/* Option Switcher: Create Account vs Log In */}
-              <div className="mb-6 flex rounded-xl bg-black/30 p-1 border border-white/20">
+              <div className="mb-6 flex rounded-sm bg-black/30 p-1 border border-white/20">
                 <button
                   type="button"
                   onClick={() => switchTab("signup")}
-                  className={`flex-1 rounded-lg py-2 text-xs font-bold transition-all ${
+                  className={`flex-1 rounded-xs py-1.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                     tab === "signup"
-                      ? "bg-white text-neutral-900 shadow-md"
+                      ? "bg-white text-neutral-900 shadow-xs"
                       : "text-white/80 hover:text-white"
                   }`}
                 >
@@ -224,9 +224,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                 <button
                   type="button"
                   onClick={() => switchTab("login")}
-                  className={`flex-1 rounded-lg py-2 text-xs font-bold transition-all ${
+                  className={`flex-1 rounded-xs py-1.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                     tab === "login"
-                      ? "bg-white text-neutral-900 shadow-md"
+                      ? "bg-white text-neutral-900 shadow-xs"
                       : "text-white/80 hover:text-white"
                   }`}
                 >
@@ -239,7 +239,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-4 flex items-center gap-2 rounded-xl bg-emerald-500/90 p-3 text-xs font-bold text-white shadow-md border border-white/30"
+                  className="mb-4 flex items-center gap-2 rounded-md bg-emerald-500/90 p-3 text-xs font-bold text-white shadow-md border border-white/30"
                 >
                   <CheckCircle2 className="h-4 w-4 shrink-0" />
                   <span>{successMsg}</span>
@@ -251,7 +251,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-4 flex flex-col gap-2 rounded-xl bg-rose-600/90 p-3.5 text-xs font-semibold text-white shadow-md border border-white/30"
+                  className="mb-4 flex flex-col gap-2 rounded-md bg-rose-600/90 p-3.5 text-xs font-semibold text-white shadow-md border border-white/30"
                 >
                   <div className="flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 shrink-0 text-amber-200" />
@@ -281,7 +281,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Alex Rivera"
-                      className="w-full rounded-xl border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
+                      className="w-full rounded-md border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
                     />
                   </div>
                 )}
@@ -294,7 +294,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="w-full rounded-xl border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
+                    className="w-full rounded-md border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
                   />
                 </div>
 
@@ -306,7 +306,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-xl border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
+                    className="w-full rounded-md border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
                   />
                 </div>
 
@@ -326,7 +326,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="mt-2 w-full rounded-md bg-[#0D2B45] hover:bg-[#0D2B45]/90 text-white py-3.5 text-xs font-extrabold uppercase tracking-wider shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="mt-2 w-full rounded-sm bg-[#0D2B45] hover:bg-[#0D2B45]/90 text-white py-3.5 text-xs font-semibold uppercase tracking-wider shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
                 >
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">

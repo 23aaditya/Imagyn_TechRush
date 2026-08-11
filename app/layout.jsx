@@ -1,20 +1,9 @@
 import { Analytics } from '@vercel/analytics/next'
-import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './globals.css'
 
-const fontHeading = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-heading',
-  display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
-})
-
-const fontSans = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-})
+const fontHeadingClass = "font-heading-var"
+const fontSansClass = "font-sans-var"
 
 export const metadata = {
   title: 'TripNest — Smart Travel Itinerary Planner & Night Atlas',
@@ -50,7 +39,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${fontHeading.variable} ${fontSans.variable} bg-background`} suppressHydrationWarning>
+    <html lang="en" className="bg-background" suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

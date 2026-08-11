@@ -63,16 +63,16 @@ export function SavedTripsModal({ onSelectDestination }) {
         {savedTripsModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md">
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
-              className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-neutral-200 dark:border-white/15 bg-white dark:bg-[#181613] text-neutral-900 dark:text-[#F1ECE2] shadow-2xl p-6 sm:p-8 space-y-6 max-h-[85vh] flex flex-col"
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="relative w-full max-w-2xl overflow-hidden rounded-xl border border-neutral-200 dark:border-white/15 bg-white dark:bg-[#181613] text-neutral-900 dark:text-[#F1ECE2] shadow-xl p-6 sm:p-8 space-y-6 max-h-[85vh] flex flex-col"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-neutral-200 dark:border-white/10 pb-4 shrink-0">
                 <div>
-                  <h3 className="font-heading text-2xl font-extrabold text-[#1E293B] dark:text-[#F1ECE2] flex items-center gap-2">
-                    <Sparkles className="h-6 w-6 text-[#5A8CB2] dark:text-[#C98B55]" />
+                  <h3 className="font-heading text-xl font-bold text-[#1E293B] dark:text-[#F1ECE2] flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-[#5A8CB2] dark:text-[#C98B55]" />
                     My Saved Trips & Offline Itineraries
                   </h3>
                   <p className="text-xs text-neutral-500 dark:text-[#A9A092] mt-0.5 font-medium">
@@ -81,7 +81,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                 </div>
                 <button
                   onClick={() => setSavedTripsModalOpen(false)}
-                  className="rounded-full p-2 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10 hover:text-neutral-700 dark:hover:text-white transition-colors"
+                  className="rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10 hover:text-neutral-700 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -91,7 +91,7 @@ export function SavedTripsModal({ onSelectDestination }) {
               <div className="flex-1 overflow-y-auto space-y-4 pr-1">
                 {savedTrips.length === 0 ? (
                   <div className="text-center py-12 space-y-3">
-                    <Sparkles className="h-12 w-12 text-neutral-300 dark:text-neutral-700 mx-auto" />
+                    <Sparkles className="h-10 w-10 text-neutral-300 dark:text-neutral-700 mx-auto" />
                     <p className="text-sm font-bold text-neutral-700 dark:text-neutral-300">No Saved Trips Found</p>
                     <p className="text-xs text-neutral-400 dark:text-neutral-500">Save your active itinerary to view offline reports here anytime.</p>
                   </div>
@@ -99,15 +99,15 @@ export function SavedTripsModal({ onSelectDestination }) {
                   savedTrips.map((trip) => (
                     <div
                       key={trip.id}
-                      className="rounded-2xl border border-neutral-200 dark:border-white/15 bg-slate-50/80 dark:bg-[#211E19]/80 p-4 sm:p-5 shadow-sm hover:border-[#5A8CB2]/40 hover:bg-white dark:hover:bg-[#181613] transition-all space-y-3"
+                      className="rounded-md border border-neutral-200 dark:border-white/15 bg-slate-50/80 dark:bg-[#211E19]/80 p-4 sm:p-5 shadow-xs hover:border-[#5A8CB2]/40 hover:bg-white dark:hover:bg-[#181613] transition-all space-y-3"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-heading text-lg font-extrabold text-[#1E293B] dark:text-[#F1ECE2]">
+                            <span className="font-heading text-base font-bold text-[#1E293B] dark:text-[#F1ECE2]">
                               {trip.destination}
                             </span>
-                            <span className="rounded-full bg-[#C8D9E6] dark:bg-[#C98B55]/20 text-[#1E293B] dark:text-[#F1ECE2] text-[10px] font-extrabold px-2.5 py-0.5 border border-[#5A8CB2]/30 dark:border-[#C98B55]/30">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#5A8CB2] dark:text-[#C98B55] bg-[#5A8CB2]/10 dark:bg-[#C98B55]/10 px-2 py-0.5 rounded-sm border border-[#5A8CB2]/20 dark:border-[#C98B55]/20">
                               {trip.days} Days Itinerary
                             </span>
                           </div>
@@ -139,7 +139,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                         <Button
                           size="sm"
                           onClick={() => setActiveReportTrip(trip)}
-                          className="rounded-xl bg-[#5A8CB2] dark:bg-[#C98B55] text-white dark:text-[#11100E] hover:bg-[#4A7CA2] dark:hover:bg-[#b07847] font-extrabold text-xs px-4 py-2 shadow flex items-center gap-1.5 cursor-pointer"
+                          className="rounded-sm bg-[#5A8CB2] dark:bg-[#C98B55] text-white dark:text-[#11100E] hover:bg-[#4A7CA2] dark:hover:bg-[#b07847] font-semibold text-xs uppercase tracking-wider px-4 py-2 shadow-xs flex items-center gap-1.5 cursor-pointer"
                         >
                           <FileText className="h-4 w-4" />
                           View Offline Report Pass
@@ -149,7 +149,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                           size="sm"
                           variant="outline"
                           onClick={() => handleLoadTrip(trip)}
-                          className="rounded-xl border-neutral-300 dark:border-white/20 text-[#1E293B] dark:text-[#F1ECE2] text-xs font-bold px-4 py-2 hover:bg-neutral-100 dark:hover:bg-white/10 flex items-center gap-1.5 cursor-pointer"
+                          className="rounded-sm border-neutral-300 dark:border-white/20 text-[#1E293B] dark:text-[#F1ECE2] text-xs font-semibold uppercase tracking-wider px-4 py-2 hover:bg-neutral-100 dark:hover:bg-white/10 flex items-center gap-1.5 cursor-pointer"
                         >
                           Open in Planner
                           <ChevronRight className="h-4 w-4" />
@@ -174,12 +174,12 @@ export function SavedTripsModal({ onSelectDestination }) {
               initial={{ opacity: 0, scale: 0.94, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 15 }}
-              className="relative w-full max-w-3xl overflow-hidden rounded-3xl border-2 border-[#5A8CB2]/30 dark:border-[#C98B55]/30 bg-white dark:bg-[#181613] text-neutral-900 dark:text-[#F1ECE2] shadow-2xl p-6 sm:p-8 space-y-6 my-auto print:shadow-none print:border-none print:w-full print:max-w-none print:rounded-none"
+              className="relative w-full max-w-3xl overflow-hidden rounded-xl border border-[#5A8CB2]/30 dark:border-[#C98B55]/30 bg-white dark:bg-[#181613] text-neutral-900 dark:text-[#F1ECE2] shadow-xl p-6 sm:p-8 space-y-6 my-auto print:shadow-none print:border-none print:w-full print:max-w-none print:rounded-none"
             >
               {/* Header Bar */}
               <div className="flex items-center justify-between border-b-2 border-neutral-200 dark:border-white/15 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-2xl bg-[#5A8CB2] dark:bg-[#C98B55] flex items-center justify-center text-white dark:text-[#11100E] font-extrabold text-lg shadow-md">
+                  <div className="h-10 w-10 rounded-md bg-[#5A8CB2] dark:bg-[#C98B55] flex items-center justify-center text-white dark:text-[#11100E] font-extrabold text-lg shadow-md">
                     TN
                   </div>
                   <div>
@@ -196,7 +196,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                   <Button
                     size="sm"
                     onClick={handlePrintReport}
-                    className="rounded-xl bg-[#5A8CB2] dark:bg-[#C98B55] text-white dark:text-[#11100E] text-xs font-bold px-3.5 py-2 hover:bg-[#4A7CA2] dark:hover:bg-[#b07847] shadow flex items-center gap-1.5 cursor-pointer"
+                    className="rounded-sm bg-[#5A8CB2] dark:bg-[#C98B55] text-white dark:text-[#11100E] text-xs font-semibold uppercase tracking-wider px-3.5 py-2 hover:bg-[#4A7CA2] dark:hover:bg-[#b07847] shadow-xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <Download className="h-3.5 w-3.5" />
                     Print / Export PDF

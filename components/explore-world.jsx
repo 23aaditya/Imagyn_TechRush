@@ -20,16 +20,17 @@ export function ExploreWorld({ onNavigateView }) {
       <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-[#0D2B45]/80 via-[#0D2B45]/40 to-[#0D2B45]/90" />
 
       {/* Content */}
-      <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center space-y-4">
-        
+      <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center space-y-4">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="font-heading text-4xl font-extrabold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl"
+          className="font-serif-editorial text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight uppercase leading-[0.95]"
         >
-          Don&apos;t know where to travel?
+          DISCOVER<br />
+          <span className="font-heading font-extrabold text-amber-300 italic lowercase">somewhere</span><br />
+          NEW.
         </motion.h2>
 
         <motion.p
@@ -37,9 +38,9 @@ export function ExploreWorld({ onNavigateView }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-lg text-base sm:text-lg leading-relaxed text-pretty text-white/80 font-sans"
+          className="max-w-lg text-xs sm:text-sm leading-relaxed text-white/80 font-medium tracking-wide"
         >
-          Explore destinations visually through interactive digital maps, animated routes, and location markers.
+          Explore destinations visually through interactive digital maps, animated routes, and location telemetry.
         </motion.p>
 
         {/* Action Button: "Explore" */}
@@ -53,11 +54,11 @@ export function ExploreWorld({ onNavigateView }) {
           <Button
             size="lg"
             onClick={() => onNavigateView?.("explore")}
-            className="h-14 rounded-full bg-white px-9 text-base font-bold text-neutral-900 shadow-2xl hover:bg-white/90 hover:scale-105 transition-all"
+            className="h-12 rounded-sm bg-white px-8 text-xs font-bold uppercase tracking-wider text-neutral-900 shadow-md hover:bg-white/90 transition-all cursor-pointer"
           >
-            <Map className="mr-2 h-5 w-5 text-primary" />
+            <Map className="mr-2 h-4 w-4 text-primary" />
             Explore Destinations
-            <ArrowRight className="ml-2 h-5 w-5" />
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </motion.div>
       </div>

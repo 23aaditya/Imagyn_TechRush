@@ -25,7 +25,6 @@ export function InteractiveTravelMap({ onNavigateView }) {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#6B4423]">
-              <Globe className="h-3.5 w-3.5" />
               Interactive Route Map
             </span>
             <h2 className="font-heading text-3xl sm:text-5xl font-extrabold text-foreground mt-2 tracking-tight">
@@ -109,7 +108,6 @@ export function InteractiveTravelMap({ onNavigateView }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                   
                   <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-black/60 border border-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-md">
-                    <Sun className="h-3 w-3 text-amber-400" />
                     {selectedPin.weather}
                   </div>
 
