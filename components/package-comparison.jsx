@@ -448,12 +448,12 @@ function calculatePersonalMatchScore(pkg, priority = "budget", userTargetBudget 
    MAIN PACKAGE COMPARISON COMPONENT
    ───────────────────────────────────────────── */
 export function PackageComparison({ onNavigateView, onSelectDestination, onOpenAuth }) {
-  const { selectPackageAndBuildTrip, selectedPackage } = useTrip()
+  const { selectPackageAndBuildTrip, selectedPackage, customTargetBudget, totalBudget } = useTrip()
 
   const [activeCategory, setActiveCategory] = useState("beach")
   const [selectedForCompare, setSelectedForCompare] = useState(["goa-escape", "gokarna-getaway"])
   const [userPriority, setUserPriority] = useState("relaxation")
-  const [userBudget] = useState(32000)
+  const userBudget = customTargetBudget || totalBudget || 32000
 
   const [viewingModalPkg, setViewingModalPkg] = useState(null)
   const [showingMatchDetailPkg, setShowingMatchDetailPkg] = useState(null)

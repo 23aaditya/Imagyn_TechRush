@@ -177,28 +177,29 @@ export function AiChatbot({ currentView, onNavigate }) {
     }
 
     // Check if user is requesting navigation linking
-    const isNavIntent = ["go to", "open", "show", "take me to", "navigate", "switch to", "view"].some((kw) => lowerText.includes(kw))
+    const isNavIntent = ["go to", "open", "show", "take me to", "navigate", "switch to", "view"].some((kw) => lowerText.includes(kw)) || lowerText.includes("workspace") || lowerText.includes("workplace")
     if (isNavIntent) {
       let targetView = null
       let viewName = ""
       if (lowerText.includes("budget")) {
         targetView = "budget"
-        viewName = "Budget Calculator"
+        viewName = "Budget Calculator Workspace"
       } else if (lowerText.includes("expense")) {
         targetView = "expenses"
-        viewName = "Expense Tracker"
-      } else if (lowerText.includes("planner") || lowerText.includes("itinerary")) {
-        targetView = "itinerary"
-        viewName = "Itinerary Planner Workspace"
+        viewName = "Expense Tracker Workspace"
       } else if (lowerText.includes("explore") || lowerText.includes("world")) {
         targetView = "explore"
-        viewName = "Explore World"
+        viewName = "Explore World Workspace"
       } else if (lowerText.includes("package")) {
         targetView = "packages"
-        viewName = "Package Comparison"
+        viewName = "Package Comparison Workspace"
       } else if (lowerText.includes("profile") || lowerText.includes("passport")) {
         targetView = "profile"
-        viewName = "User Profile & Passport"
+        viewName = "User Profile & Passport Workspace"
+      } else {
+        // Default "open workplace/workspace/planner/itinerary" to Itinerary Planner Workspace
+        targetView = "itinerary"
+        viewName = "Itinerary Planner Workspace"
       }
 
       if (targetView) {
@@ -208,17 +209,46 @@ export function AiChatbot({ currentView, onNavigate }) {
             id: (Date.now() + 1).toString(),
             role: "assistant",
             content: `**[Category: 🚀 Quick Action]**\n\nSure! Click below to jump directly to **${viewName}**:\n[ACTION:navigate:${targetView}]`,
+            executedActions: [`🚀 Switched view to ${targetView.toUpperCase()}`],
             timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           },
         ])
+        onNavigate?.(targetView)
         setIsLoading(false)
         return
       }
     }
 
-    // Check if user is requesting Boots to REMOVE a location from the itinerary
+    // Check if user is requesting Boots to REMOVE a location or DAY from the itinerary
     const isRemoveIntent = ["remove", "delete", "drop", "take out", "cancel", "erase"].some((kw) => lowerText.includes(kw))
     if (isRemoveIntent) {
+      // Check if user is asking to remove a DAY (e.g. "remove day 2", "delete day 3", "remove this day")
+      const isDayRemove = lowerText.includes("day") || lowerText.includes("this day")
+      if (isDayRemove && !lowerText.includes("spot") && !lowerText.includes("place") && !lowerText.includes("attraction")) {
+        const dayMatch = lowerText.match(/day\s*(\d+)/i)
+        const dayNum = dayMatch && dayMatch[1] ? parseInt(dayMatch[1], 10) : (itinerary?.length || 1)
+
+        if (tripContext.removeDayFromItinerary) {
+          const wasRemoved = tripContext.removeDayFromItinerary(dayNum)
+          const actionReply = wasRemoved
+            ? `🗑️ **Removed Day ${dayNum}** from your Itinerary Planner! Remaining days have been renumbered and live route map synchronized. [ACTION:navigate:itinerary]`
+            : `⚠️ Couldn't find **Day ${dayNum}** in your current itinerary.`
+
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: (Date.now() + 1).toString(),
+              role: "assistant",
+              content: actionReply,
+              executedActions: wasRemoved ? [`🗑️ Removed Day ${dayNum} from itinerary planner`] : [],
+              timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            },
+          ])
+          setIsLoading(false)
+          return
+        }
+      }
+
       let spotName = messageText
         .replace(/can\s+you\s+/i, "")
         .replace(/(?:please\s+)?(?:remove|delete|drop|take out|cancel|erase)\s+/i, "")
@@ -280,10 +310,42 @@ export function AiChatbot({ currentView, onNavigate }) {
       return
     }
 
-    // Check if user is requesting Boots to ADD a location to the planner
+    // Check if user is requesting Boots to ADD a location or DAY to the planner
     const isAddIntent = ["add", "put", "include", "insert", "schedule", "place"].some((kw) => lowerText.includes(kw))
 
     if (isAddIntent) {
+      // Check if user is asking to add a DAY (e.g. "add day", "add a day", "add it again", "add another day", "put it back", "add it")
+      const isDayAdd = (lowerText.includes("day") || lowerText.includes("it again") || lowerText.includes("another day") || lowerText.includes("put it back") || lowerText.includes("add it")) && !lowerText.includes("spot") && !lowerText.includes("place") && !lowerText.includes("attraction")
+      if (isDayAdd) {
+        let restored = false
+        if (tripContext.lastRemovedDayState && tripContext.restoreLastRemovedDay) {
+          restored = tripContext.restoreLastRemovedDay()
+        } else if (tripContext.addDayToItinerary) {
+          tripContext.addDayToItinerary()
+        }
+
+        const msgText = restored
+          ? `↩️ **Restored your removed Day** back to its exact original position! Live route map and budget synchronized. [ACTION:navigate:itinerary]`
+          : `➕ **Added Day ${(itinerary?.length || 0) + 1}** to your Itinerary Planner! Live route map and budget synchronized. [ACTION:navigate:itinerary]`
+
+        const actionText = restored
+          ? `↩️ Restored removed Day back to its exact original position`
+          : `➕ Added Day ${(itinerary?.length || 0) + 1} to itinerary planner`
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: msgText,
+            executedActions: [actionText],
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ])
+        setIsLoading(false)
+        return
+      }
+
       let spotName = messageText
         .replace(/can\s+you\s+/i, "")
         .replace(/(?:please\s+)?(?:add|put|include|insert|schedule|place)\s+/i, "")
@@ -359,12 +421,24 @@ export function AiChatbot({ currentView, onNavigate }) {
         body: JSON.stringify({
           messages: updatedHistory,
           userApiKey: apiKey || undefined,
+          tripState: {
+            destination: tripContext.destination,
+            startDate: tripContext.startDate,
+            endDate: tripContext.endDate,
+            days: tripContext.days,
+            travelers: tripContext.travelers,
+            stayTier: tripContext.stayTier,
+            targetBudget: tripContext.customTargetBudget || tripContext.totalBudget,
+            itinerary: tripContext.itinerary,
+            loggedExpenses: tripContext.actualExpenses,
+            activeStay: tripContext.activeStay || null
+          }
         }),
       })
 
       if (res.ok) {
         const data = await res.json()
-        const { cleanText, executedActions } = parseAndExecuteBotActions(data.text, tripContext, onNavigate)
+        const { cleanText, executedActions, planPreview } = parseAndExecuteBotActions(data.text, tripContext, onNavigate)
         setMessages((prev) => [
           ...prev,
           {
@@ -372,6 +446,7 @@ export function AiChatbot({ currentView, onNavigate }) {
             role: "assistant",
             content: cleanText,
             executedActions,
+            planPreviewCard: planPreview,
             isGemini: true,
             timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           },
@@ -379,7 +454,7 @@ export function AiChatbot({ currentView, onNavigate }) {
       } else {
         // Fallback to local intelligence engine if API fails or no key
         const fallback = generateFallbackResponse(messageText)
-        const { cleanText, executedActions } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
+        const { cleanText, executedActions, planPreview } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
         setMessages((prev) => [
           ...prev,
           {
@@ -387,6 +462,7 @@ export function AiChatbot({ currentView, onNavigate }) {
             role: "assistant",
             content: cleanText,
             executedActions,
+            planPreviewCard: planPreview,
             isFallback: true,
             destinationCard: fallback.destinationCard,
             dayPlanCard: fallback.dayPlanCard,
@@ -397,7 +473,7 @@ export function AiChatbot({ currentView, onNavigate }) {
     } catch (err) {
       // Offline fallback
       const fallback = generateFallbackResponse(messageText)
-      const { cleanText, executedActions } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
+      const { cleanText, executedActions, planPreview } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
       setMessages((prev) => [
         ...prev,
         {
@@ -405,6 +481,7 @@ export function AiChatbot({ currentView, onNavigate }) {
           role: "assistant",
           content: cleanText,
           executedActions,
+          planPreviewCard: planPreview,
           isFallback: true,
           destinationCard: fallback.destinationCard,
           dayPlanCard: fallback.dayPlanCard,
@@ -715,7 +792,38 @@ export function AiChatbot({ currentView, onNavigate }) {
                           </div>
                         )}
 
-                        {/* Special Destination Card if available */}
+                        {/* Plan Itinerary Preview Card */}
+                        {msg.planPreviewCard && (
+                          <div className="mt-3 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-background p-3.5 space-y-2.5 shadow-md">
+                            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
+                              <div>
+                                <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-500">
+                                  Trip Plan Request
+                                </span>
+                                <h4 className="font-heading font-extrabold text-sm text-foreground">
+                                  {msg.planPreviewCard.days}-Day {msg.planPreviewCard.tier} Trip to {msg.planPreviewCard.destination}
+                                </h4>
+                              </div>
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
+                                {msg.planPreviewCard.tier}
+                              </span>
+                            </div>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                generateTripItinerary(msg.planPreviewCard.destination, msg.planPreviewCard.days)
+                                if (tripContext.setStayTier) {
+                                  tripContext.setStayTier(msg.planPreviewCard.tier)
+                                }
+                                onNavigate?.("itinerary")
+                              }}
+                              className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold text-xs py-2.5 shadow-lg flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-[1.01]"
+                            >
+                              <Calendar className="h-4 w-4 stroke-[2.5]" />
+                              Plan Itinerary & Sync Map
+                            </Button>
+                          </div>
+                        )}
                         {msg.destinationCard && (
                           <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-1.5">
                             <div className="flex items-center justify-between">
