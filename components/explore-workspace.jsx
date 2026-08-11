@@ -47,38 +47,38 @@ import destinationsData from "@/destinations_105.json"
 const allDestinations = destinationsData
 
 /* ─────────────────────────────────────────────
-   FILTER CATEGORIES & OPTIONS
+   FILTER CATEGORIES & OPTIONS (PROFESSIONAL THEME, NO EMOJIS)
    ───────────────────────────────────────────── */
 const filterCategories = [
   {
-    key: "vibe", label: "Vibe", icon: "✨",
-    options: ["Relaxation", "Adventure", "Party", "Heritage", "Romantic", "Nature", "Luxury", "Budget"],
-    color: "#5A8CB2", bgTint: "rgba(90,140,178,0.06)"
+    key: "vibe", label: "Vibe",
+    options: ["Relaxation", "Adventure", "Nightlife & Party", "Cultural Heritage", "Romantic Escapes", "Nature & Wildlife", "Luxury Stays", "Budget Friendly"],
+    color: "#5B8DEF"
   },
   {
-    key: "bestTime", label: "Best Season", icon: "☀️",
-    options: ["Nov - Feb", "Oct - Mar", "Nov - Mar", "Mar - May", "Jun - Sep", "Dec - Feb", "Apr - Oct"],
-    color: "#F59E0B", bgTint: "rgba(245,158,11,0.06)"
+    key: "bestTime", label: "Best Season",
+    options: ["Nov – Feb", "Oct – Mar", "Mar – May", "Jun – Sep", "Year Round"],
+    color: "#5B8DEF"
   },
   {
-    key: "company", label: "Ideal For", icon: "👥",
-    options: ["Friends & Couples", "Families & Culture", "Youth & Couples", "Culture & Couples", "Snow & Couples", "Beach Lovers"],
-    color: "#8B5CF6", bgTint: "rgba(139,92,246,0.06)"
+    key: "company", label: "Ideal For",
+    options: ["Friends & Groups", "Couples & Honeymoon", "Family Friendly", "Solo Travelers", "Beach Lovers"],
+    color: "#5B8DEF"
   },
   {
-    key: "budget", label: "Budget Tier", icon: "💰",
-    options: ["Budget Friendly", "Mid Range", "Luxury", "Ultra Luxury"],
-    color: "#10B981", bgTint: "rgba(16,185,129,0.06)"
+    key: "budget", label: "Budget Tier",
+    options: ["Economy", "Mid Range", "Premium Luxury", "Ultra Luxury"],
+    color: "#5B8DEF"
   },
   {
-    key: "type", label: "Type", icon: "🏔️",
-    options: ["Mountains", "Beach", "Road Trips"],
-    color: "#14B8A6", bgTint: "rgba(20,184,166,0.06)"
+    key: "type", label: "Destination Type",
+    options: ["Alpine Mountains", "Coastal Beaches", "Scenic Road Trips", "Heritage Cities"],
+    color: "#5B8DEF"
   },
 ]
 
 /* ─────────────────────────────────────────────
-   PETAL INFO CONFIG (COMPACT RADIAL DISTANCE TO PREVENT CLIPPING)
+   PETAL INFO CONFIG (THEME TYPOGRAPHY & COMPACT RADIAL DISTANCE)
    ───────────────────────────────────────────── */
 const petalConfig = [
   { key: "minDays", label: "Duration", angle: -90, distance: 112 },
@@ -90,40 +90,55 @@ const petalConfig = [
 ]
 
 /* ─────────────────────────────────────────────
-   ROW DEFINITIONS
+   ROW DEFINITIONS (NO SVG ICONS)
    ───────────────────────────────────────────── */
 const rowConfig = [
-  { key: "trending", label: "Trending Picks", icon: <TrendingUp className="h-4 w-4" /> },
-  { key: "hidden", label: "Hidden Gems", icon: <Gem className="h-4 w-4" /> },
-  { key: "escapes", label: "International Escapes", icon: <Plane className="h-4 w-4" /> },
+  { key: "trending", label: "Trending Picks" },
+  { key: "hidden", label: "Hidden Gems" },
+  { key: "escapes", label: "International Escapes" },
 ]
 
 /* ─────────────────────────────────────────────
-   SCROLLABLE ROW COMPONENT
+   SCROLLABLE ROW COMPONENT (AUTO-SHIFT RIGHT-TO-LEFT & REDUCED SPACING)
    ───────────────────────────────────────────── */
-function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, onCardClick }) {
+function DestinationRow({ destinations, label, hoveredId, setHoveredId, onCardClick }) {
   const scrollRef = useRef(null)
+  const [isRowHovered, setIsRowHovered] = useState(false)
+
+  // Smooth continuous right-to-left auto-shifting (pauses on hover)
+  useEffect(() => {
+    if (isRowHovered) return
+    const interval = setInterval(() => {
+      if (!scrollRef.current) return
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
+      if (scrollLeft + clientWidth >= scrollWidth - 5) {
+        scrollRef.current.scrollTo({ left: 0, behavior: "smooth" })
+      } else {
+        scrollRef.current.scrollBy({ left: 1, behavior: "auto" })
+      }
+    }, 35)
+    return () => clearInterval(interval)
+  }, [isRowHovered])
+
   const handleScroll = (dir) => {
     if (!scrollRef.current) return
     scrollRef.current.scrollBy({ left: dir === "left" ? -380 : 380, behavior: "smooth" })
   }
 
   return (
-    <div className="mb-2">
-      <div className="flex items-center justify-between mb-2 px-2">
-        <h3 className="flex items-center gap-2 font-heading text-xl font-bold text-foreground">
-          <span className="flex items-center justify-center w-7 h-7 rounded-md bg-[#5A8CB2]/10 text-[#5A8CB2]">
-            {icon}
-          </span>
-          {label}
-          <span className="ml-2 text-xs font-normal text-muted-foreground">({destinations.length})</span>
+    <div className="mb-4">
+      {/* Clean Title Header without SVGs */}
+      <div className="flex items-center justify-between mb-1 px-2">
+        <h3 className="font-heading text-xl font-extrabold text-foreground tracking-tight flex items-center gap-2">
+          <span>{label}</span>
+          <span className="text-xs font-semibold text-muted-foreground">({destinations.length})</span>
         </h3>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => handleScroll("left")}
             aria-label="Scroll left"
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#5A8CB2] hover:text-white cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#5B8DEF] hover:text-[#0F172A] cursor-pointer"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -131,16 +146,19 @@ function DestinationRow({ destinations, label, icon, hoveredId, setHoveredId, on
             type="button"
             onClick={() => handleScroll("right")}
             aria-label="Scroll right"
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#5A8CB2] hover:text-white cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#5B8DEF] hover:text-[#0F172A] cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>
 
+      {/* Reduced Vertical Padding Container */}
       <div
         ref={scrollRef}
-        className="flex items-start gap-8 overflow-x-auto py-12 px-14 explore-scrollbar-hide"
+        onMouseEnter={() => setIsRowHovered(true)}
+        onMouseLeave={() => setIsRowHovered(false)}
+        className="flex items-start gap-6 overflow-x-auto py-6 px-6 explore-scrollbar-hide select-none"
         style={{ scrollbarWidth: "none" }}
       >
         {destinations.map((item) => (
@@ -197,12 +215,12 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-50"
             >
               <div
-                className="flex flex-col items-center justify-center rounded-md border border-neutral-200 dark:border-white/15 bg-white dark:bg-[#181613]/95 shadow-md min-w-[80px] px-2.5 py-1.5 backdrop-blur-2xl text-center"
+                className="flex flex-col items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-md min-w-[85px] px-3 py-1.5 backdrop-blur-xl text-center"
               >
-                <span className="text-[9px] font-bold text-neutral-400 dark:text-[#A9A092] uppercase tracking-widest block leading-none">
+                <span className="font-heading text-[9px] font-extrabold text-[#5B8DEF] uppercase tracking-widest block leading-none">
                   {petal.label}
                 </span>
-                <span className="text-xs font-extrabold text-[#0D2B45] dark:text-[#F1ECE2] mt-0.5 whitespace-nowrap max-w-[85px] truncate block leading-tight">
+                <span className="font-sans text-xs font-bold text-foreground mt-0.5 whitespace-nowrap max-w-[90px] truncate block leading-tight">
                   {getPetalValue(petal.key)}
                 </span>
               </div>
@@ -524,8 +542,6 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
    ───────────────────────────────────────────── */
 function CustomizeWheel({ activeFilters, setActiveFilters }) {
   const [isOpen, setIsOpen] = useState(false)
-  const [expandedCategory, setExpandedCategory] = useState(null)
-  const autoCloseTimerRef = useRef(null)
 
   const toggleFilter = (key, value) => {
     setActiveFilters(prev => {
@@ -539,126 +555,100 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
     })
   }
 
-  const handleCategoryClick = (catKey) => {
-    setExpandedCategory(expandedCategory === catKey ? null : catKey)
-  }
-
   const activeCount = Object.keys(activeFilters).length
-
-  useEffect(() => {
-    if (isOpen) {
-      if (autoCloseTimerRef.current) clearTimeout(autoCloseTimerRef.current)
-      autoCloseTimerRef.current = setTimeout(() => {
-        setIsOpen(false)
-        setExpandedCategory(null)
-      }, 4000)
-    }
-    return () => {
-      if (autoCloseTimerRef.current) clearTimeout(autoCloseTimerRef.current)
-    }
-  }, [isOpen, activeFilters, expandedCategory])
-
-  const fanAngles = [-88, -66, -44, -22, 0]
 
   return (
     <div className="fixed bottom-8 left-8 sm:bottom-10 sm:left-10 z-40">
+      {/* Professional Rectangular Filter Popover */}
       <AnimatePresence>
         {isOpen && (
-          <>
-            {filterCategories.map((cat, i) => {
-              const angleDeg = fanAngles[i]
-              const rad = (angleDeg * Math.PI) / 180
-              const distance = 150
-              const x = Math.cos(rad) * distance
-              const y = Math.sin(rad) * distance
-              const isExpanded = expandedCategory === cat.key
+          <motion.div
+            initial={{ opacity: 0, y: 15, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 15, scale: 0.95 }}
+            className="absolute bottom-14 left-0 w-80 sm:w-96 rounded-xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur-2xl text-foreground select-none max-h-[70vh] overflow-y-auto space-y-4"
+          >
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <span className="font-heading text-xs font-extrabold uppercase tracking-widest text-foreground flex items-center gap-2">
+                <SlidersHorizontal className="h-4 w-4 text-[#5B8DEF]" />
+                Customize Filters
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-1 rounded-md hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
 
-              return (
-                <motion.div
-                  key={cat.key}
-                  initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
-                  animate={{ opacity: 1, x, y, scale: 1 }}
-                  exit={{ opacity: 0, x: 0, y: 0, scale: 0 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 20, mass: 0.8, delay: i * 0.04 }}
-                  className="absolute bottom-0 left-0"
-                  style={{ zIndex: isExpanded ? 60 : 50 }}
-                >
-                  <AnimatePresence>
-                    {isExpanded && cat.options.map((opt, j) => {
-                      const offsetAngle = (j - (cat.options.length - 1) / 2) * 38
-                      const subRad = ((angleDeg + offsetAngle) * Math.PI) / 180
-                      const subDist = 72
-                      const sx = Math.cos(subRad) * subDist
-                      const sy = Math.sin(subRad) * subDist
+            {/* Filter Categories List */}
+            <div className="space-y-4">
+              {filterCategories.map((cat) => (
+                <div key={cat.key} className="space-y-2">
+                  <span className="font-heading text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
+                    {cat.label}
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {cat.options.map((opt) => {
                       const isActive = activeFilters[cat.key] === opt
-
                       return (
-                        <motion.button
+                        <button
                           key={opt}
-                          initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
-                          animate={{ opacity: 1, x: sx, y: sy, scale: 1 }}
-                          exit={{ opacity: 0, x: 0, y: 0, scale: 0 }}
-                          transition={{ type: "spring", stiffness: 220, damping: 18, mass: 0.7, delay: j * 0.05 }}
-                          onClick={(e) => { e.stopPropagation(); toggleFilter(cat.key, opt) }}
-                          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full px-3 py-1 text-xs font-extrabold border-2 whitespace-nowrap transition-all duration-200 ${
+                          type="button"
+                          onClick={() => toggleFilter(cat.key, opt)}
+                          className={cn(
+                            "rounded-full px-3 py-1 text-xs font-semibold transition-all cursor-pointer border",
                             isActive
-                              ? "text-white scale-110 shadow-xl"
-                              : "text-gray-800 bg-white/95 hover:scale-105 shadow-md"
-                          }`}
-                          style={{
-                            borderColor: isActive ? cat.color : "rgba(200,200,220,0.5)",
-                            background: isActive ? `linear-gradient(135deg, ${cat.color}, ${cat.color}dd)` : "rgba(255, 255, 255, 0.95)",
-                            boxShadow: isActive ? `0 6px 20px ${cat.color}45` : "0 4px 14px rgba(0,0,0,0.1)",
-                          }}
+                              ? "bg-[#5B8DEF] text-[#0F172A] border-[#5B8DEF] font-bold shadow-xs"
+                              : "border-border bg-background text-foreground/80 hover:border-[#5B8DEF]/60 hover:text-foreground"
+                          )}
                         >
                           {opt}
-                        </motion.button>
+                        </button>
                       )
                     })}
-                  </AnimatePresence>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-                  <button
-                    onClick={() => handleCategoryClick(cat.key)}
-                    className="flex flex-col items-center justify-center rounded-t-[999px] rounded-b-md h-[58px] w-[46px] border-2 shadow-2xl transition-all duration-300 hover:scale-110 bg-white/95"
-                    style={{
-                      borderColor: activeFilters[cat.key] ? cat.color : "rgba(200,200,220,0.6)",
-                      background: activeFilters[cat.key]
-                        ? `linear-gradient(135deg, ${cat.color}, ${cat.color}cc)`
-                        : "rgba(255, 255, 255, 0.95)",
-                      boxShadow: activeFilters[cat.key]
-                        ? `0 6px 24px ${cat.color}40`
-                        : "0 6px 20px rgba(0,0,0,0.12)",
-                      color: activeFilters[cat.key] ? "white" : "#444",
-                    }}
-                  >
-                    <span className="text-sm leading-none">{cat.icon}</span>
-                    <span className="text-[9px] font-black mt-0.5" style={{ color: activeFilters[cat.key] ? "white" : cat.color }}>{cat.label}</span>
-                  </button>
-                </motion.div>
-              )
-            })}
-          </>
+            {/* Modal Actions */}
+            <div className="flex items-center justify-between border-t border-border pt-3">
+              <button
+                type="button"
+                onClick={() => setActiveFilters({})}
+                className="text-xs font-bold text-destructive hover:underline cursor-pointer"
+              >
+                Reset All
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="rounded-md bg-[#5B8DEF] text-[#0F172A] px-4 py-1.5 text-xs font-bold uppercase tracking-wider shadow-xs hover:bg-[#487AE0] transition-colors cursor-pointer"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Rectangular Customize Button with Slightly Curved Corners */}
       <motion.button
         type="button"
-        onClick={() => { setIsOpen(!isOpen); setExpandedCategory(null) }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative flex items-center justify-center gap-2.5 rounded-t-[999px] rounded-b-2xl px-7 py-3.5 shadow-2xl border border-white/30 transition-all cursor-pointer bg-[#0D2B45] text-white hover:bg-[#0D2B45]/90"
-        style={{
-          boxShadow: "0 15px 35px rgba(13,43,69,0.5), 0 2px 10px rgba(0,0,0,0.2)",
-        }}
+        onClick={() => setIsOpen(!isOpen)}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+        className="relative flex items-center justify-center gap-2.5 rounded-lg px-5 py-3 shadow-xl border border-neutral-700 transition-all cursor-pointer bg-neutral-900 text-white hover:bg-neutral-800"
       >
-        <SlidersHorizontal className={`h-4.5 w-4.5 text-white transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
-        <span className="font-heading text-xs font-extrabold uppercase tracking-widest text-white">
-          {isOpen ? "Close" : "Customize"}
+        <SlidersHorizontal className={`h-4 w-4 text-[#5B8DEF] transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
+        <span className="font-heading text-xs font-bold uppercase tracking-wider text-white">
+          {isOpen ? "Close Filters" : "Customize"}
         </span>
 
         {activeCount > 0 && (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-white shadow-md ring-2 ring-white ml-0.5">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B8DEF] text-[10px] font-extrabold text-[#0F172A] shadow-xs">
             {activeCount}
           </span>
         )}
