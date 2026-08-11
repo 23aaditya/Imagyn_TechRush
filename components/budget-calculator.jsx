@@ -86,13 +86,6 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
               <span className="text-muted-foreground">/</span>
               <span className="font-medium text-foreground text-sm">Interactive Budget Workspace</span>
             </div>
-
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary border border-primary/20">
-                <Sparkles className="h-3.5 w-3.5" />
-                Live Synced with AI Itinerary & Expenses
-              </span>
-            </div>
           </div>
         )}
 
@@ -114,7 +107,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
             <motion.span
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="font-mono-tech text-xs sm:text-sm font-bold uppercase tracking-[0.3em] text-emerald-400 block mb-2"
+              className="font-heading text-xs sm:text-sm font-extrabold uppercase tracking-[0.25em] text-[#5B8DEF] block mb-2"
             >
               FINANCIAL TRAVEL ARCHITECT
             </motion.span>
