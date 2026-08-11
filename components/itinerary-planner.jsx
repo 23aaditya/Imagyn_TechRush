@@ -754,7 +754,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 size="sm"
                 onClick={() => setShowPreferences((prev) => !prev)}
                 className={`rounded-sm border-border text-xs font-bold px-3.5 py-2 flex items-center gap-1.5 cursor-pointer transition-all ${
-                  showPreferences ? "bg-[#5A8CB2] text-white border-[#5A8CB2]" : "bg-card text-foreground hover:bg-accent"
+                  showPreferences ? "bg-[#F5A623] text-white border-[#F5A623]" : "bg-card text-foreground hover:bg-accent"
                 }`}
               >
                 <SlidersHorizontal className="h-4 w-4" />
@@ -767,7 +767,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 setSaved(true)
                 setTimeout(() => setSaved(false), 3000)
               }}
-              className="rounded-sm bg-[#E60023] text-white hover:bg-[#C8001E] font-semibold text-xs uppercase tracking-wider px-4 py-2 flex items-center gap-2 cursor-pointer"
+              className="rounded-sm bg-[#27A84D] text-white hover:bg-[#1F8A3E] font-semibold text-xs uppercase tracking-wider px-4 py-2 flex items-center gap-2 cursor-pointer"
             >
               <Bookmark className="h-4 w-4" />
               {saved ? "Saved! Opening Report Pass..." : "Save Trip & Offline Pass"}
@@ -811,12 +811,12 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 value={searchQuery}
                 onChange={(e) => handleSearchInputChange(e.target.value)}
                 onFocus={() => searchQuery.trim() && setShowSearchDropdown(true)}
-                className="w-full rounded-full border border-border bg-card pl-11 pr-24 py-3 text-xs font-semibold text-foreground outline-none focus:border-[#E60023] focus:ring-2 focus:ring-[#E60023]/20"
+                className="w-full rounded-full border border-border bg-card pl-11 pr-24 py-3 text-xs font-semibold text-foreground outline-none focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623]/20"
               />
               <Button
                 type="submit"
                 size="sm"
-                className="absolute right-1.5 rounded-full bg-[#E60023] text-white hover:bg-[#C8001E] text-xs font-bold px-5 py-1.5"
+                className="absolute right-1.5 rounded-full bg-[#F5A623] text-white hover:bg-[#D98E19] text-xs font-bold px-5 py-1.5"
               >
                 Search
               </Button>
@@ -1082,7 +1082,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 <Button
                   onClick={() => handleGenerate()}
                   disabled={isGenerating}
-                  className="w-full rounded-xl bg-[#E60023] py-3 font-extrabold text-white hover:bg-[#C8001E] disabled:opacity-50 cursor-pointer"
+                  className="w-full rounded-xl bg-[#27A84D] py-3 font-extrabold text-white hover:bg-[#1F8A3E] disabled:opacity-50 cursor-pointer"
                 >
                   {isGenerating ? (
                     <span className="flex items-center gap-2">
@@ -1181,7 +1181,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                           onClick={() => setActiveDayIndex(idx)}
                           className={`flex items-center justify-between p-3 rounded-2xl transition-all cursor-pointer text-left ${
                             isActive
-                              ? "bg-[#E60023] text-white font-bold"
+                              ? "bg-[#27A84D] text-white font-bold"
                               : "bg-card border border-border text-muted-foreground hover:bg-accent"
                           }`}
                         >
@@ -1204,7 +1204,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     {/* Day Header */}
                     <div className="flex items-center justify-between border-b border-border/80 pb-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-[#E60023] text-white flex items-center justify-center font-black text-sm shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-[#27A84D] text-white flex items-center justify-center font-black text-sm shrink-0">
                           D{itinerary[activeDayIndex]?.day || activeDayIndex + 1}
                         </div>
                         <div>
@@ -1236,7 +1236,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                             {/* Distance Connector Pill */}
                             {idx > 0 && (
                               <div className="flex items-center justify-start ml-10 my-1">
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E60023] text-white text-[11px] font-bold px-3 py-1">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#27A84D] text-white text-[11px] font-bold px-3 py-1">
                                   <MapPin className="h-3 w-3" />
                                   <span>{act.distanceToNext || distToNext}</span>
                                 </span>
@@ -1269,7 +1269,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 {/* Spot Coin Avatar */}
                                 <div
                                   onClick={() => setActiveSpotDetail({ ...act, dayIndex: activeDayIndex, spotIndex: idx })}
-                                  className="h-11 w-11 rounded-full overflow-hidden border-2 border-[#E60023] shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                                  className="h-11 w-11 rounded-full overflow-hidden border-2 border-[#27A84D] shrink-0 cursor-pointer hover:scale-105 transition-transform"
                                   title="Click to view place photos & info"
                                 >
                                   <img src={spotImages[0]} alt={act.title} className="h-full w-full object-cover" />
@@ -1298,7 +1298,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 <button
                                   type="button"
                                   onClick={() => setActiveSpotDetail({ ...act, dayIndex: activeDayIndex, spotIndex: idx })}
-                                  className="rounded-full bg-[#E60023]/10 text-[#E60023] hover:bg-[#E60023] hover:text-white px-3 py-1 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                                  className="rounded-full bg-[#F5A623] text-white hover:bg-[#D98E19] px-3 py-1 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                                 >
                                   <Globe className="h-3 w-3" />
                                   <span>More Info</span>
@@ -1356,7 +1356,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                           })
                           setAddSpotModalOpen(true)
                         }}
-                        className="rounded-2xl bg-[#E60023] text-white hover:bg-[#C8001E] font-bold text-xs px-4 py-2.5 flex items-center gap-1.5 cursor-pointer"
+                        className="rounded-2xl bg-[#27A84D] text-white hover:bg-[#1F8A3E] font-bold text-xs px-4 py-2.5 flex items-center gap-1.5 cursor-pointer"
                       >
                         <Plus className="h-4 w-4" />
                         Add Custom Spot to Day {activeDayIndex + 1}
