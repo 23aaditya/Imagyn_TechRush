@@ -41,6 +41,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTrip } from "@/context/trip-context"
+import { DoodleBackground } from "@/components/doodle-background"
 import destinationsData from "@/destinations_105.json"
 
 /* ─────────────────────────────────────────────
@@ -899,6 +900,9 @@ export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }
 
   return (
     <div className="min-h-screen bg-background pt-24 pb-32 relative overflow-x-hidden">
+      {/* Travel Doodles Background */}
+      <DoodleBackground />
+
       {/* Filter Background Overlay */}
       <AnimatePresence>
         {hasFilters && (

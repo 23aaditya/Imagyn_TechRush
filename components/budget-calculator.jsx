@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
+import { DoodleBackground } from "@/components/doodle-background"
 
 const RADIUS = 100
 const CIRCUM = 2 * Math.PI * RADIUS
@@ -154,7 +155,9 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
   }
 
   return (
-    <section id="budget" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background dark:bg-[#0B1528] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
+    <section id="budget" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
+      {/* Travel Doodles Background */}
+      <DoodleBackground />
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Workspace Top Bar */}

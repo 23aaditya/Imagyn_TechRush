@@ -31,6 +31,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
+import { DoodleBackground } from "@/components/doodle-background"
 
 // Category Bags Configuration for Low-Resistance Quick Logging
 const CATEGORY_BAGS = [
@@ -353,6 +354,9 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
 
   return (
     <section id="tracker" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-28" : "py-20 md:py-28 bg-background"}`}>
+      {/* Travel Doodles Background */}
+      <DoodleBackground />
+
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Workspace Top Navigation Bar */}
