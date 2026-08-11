@@ -1135,6 +1135,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                       <MapPin className="h-3.5 w-3.5 text-[#5A8CB2]" />
                       <span>{(destination || "GOA").toUpperCase()}</span>
                     </div>
+                    <h2 className="font-heading text-2xl sm:text-3xl font-black text-foreground">
+                      {days}-Day {travelStyle || "Balanced"} Itinerary
+                    </h2>
+                  </div>
 
                   <div className="flex items-center gap-2.5 shrink-0">
                     <Button
