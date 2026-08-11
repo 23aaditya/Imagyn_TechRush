@@ -57,19 +57,16 @@ export function PassportProfile({ user }) {
                 {user?.name || "Hemangi Vijay Patil"}
               </h1>
               <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-0.5 text-xs font-bold text-amber-600 dark:text-amber-400 backdrop-blur-md">
-                <Award className="h-3.5 w-3.5" />
                 Level 5 Elite Wanderer
               </span>
             </div>
 
             <div className="mt-1.5 flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-muted-foreground font-medium">
-              <span className="flex items-center gap-1">
-                <Globe className="h-3.5 w-3.5 text-primary" />
+              <span>
                 Passport No: <strong className="text-foreground">TN-892401-IN</strong>
               </span>
               <span>•</span>
-              <span className="flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5 text-emerald" />
+              <span>
                 Home Port: <strong className="text-foreground">Mumbai, India</strong>
               </span>
             </div>

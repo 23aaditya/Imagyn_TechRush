@@ -41,7 +41,6 @@ export function QuickActions({ onNavigateView }) {
           onClick={() => onNavigateView("itinerary")}
           className="flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-all"
         >
-          <Sparkles className="h-3.5 w-3.5 text-[#6B4423]" />
           <span className="hidden sm:inline">Continue Planning</span>
           <span className="sm:hidden">Plan</span>
         </button>
@@ -50,7 +49,6 @@ export function QuickActions({ onNavigateView }) {
           onClick={() => onNavigateView("expenses")}
           className="flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-all"
         >
-          <Wallet className="h-3.5 w-3.5 text-emerald" />
           <span className="hidden sm:inline">Track Expenses</span>
           <span className="sm:hidden">Expenses</span>
         </button>

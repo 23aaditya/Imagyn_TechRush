@@ -58,10 +58,7 @@ export function AvailableFeatures() {
         
         {/* Section Header */}
         <div className="mx-auto max-w-3xl text-center space-y-3">
-          <span className="font-heading text-xs font-bold uppercase tracking-[0.25em] text-[#C98B55] block">
-            BUILT-IN TRIPNEST CAPABILITIES
-          </span>
-          <h2 className="font-heading text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground uppercase leading-none">
+          <h2 className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-foreground uppercase leading-none">
             Available Core Features
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
@@ -80,21 +77,20 @@ export function AvailableFeatures() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="rounded-3xl border border-border/80 bg-card text-card-foreground p-6 sm:p-8 shadow-xl flex flex-col justify-between space-y-6 relative overflow-hidden transition-all hover:border-[#C98B55]/50 hover:shadow-2xl"
+                className="rounded-xl border border-border bg-card text-card-foreground p-6 sm:p-8 shadow-xs flex flex-col justify-between space-y-6 relative overflow-hidden transition-all hover:border-[#C98B55]/50"
               >
                 <div className="space-y-4">
-                  {/* Top Badge */}
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-secondary text-muted-foreground border border-border">
-                    <ShieldCheck className="h-3.5 w-3.5" style={{ color: item.color }} />
+                  {/* Top Label */}
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#C98B55] block">
                     {item.badge}
                   </span>
 
                   {/* Icon & Title */}
                   <div className="space-y-2">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/60 border border-border">
-                      <IconComponent className="h-6 w-6" style={{ color: item.color }} />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-secondary/60 border border-border">
+                      <IconComponent className="h-5 w-5" style={{ color: item.color }} />
                     </div>
-                    <h3 className="font-heading text-2xl font-extrabold text-foreground leading-tight">
+                    <h3 className="font-heading text-xl font-bold text-foreground leading-tight">
                       {item.title}
                     </h3>
                     <p className="text-xs font-bold text-[#C98B55]">
@@ -115,7 +111,7 @@ export function AvailableFeatures() {
                     <ul className="space-y-1.5 text-xs text-foreground">
                       {item.capabilities.map((cap, i) => (
                         <li key={i} className="flex items-center gap-2">
-                          <Check className="h-3.5 w-3.5 shrink-0" style={{ color: item.color }} />
+                          <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
                           <span className="font-medium text-xs">{cap}</span>
                         </li>
                       ))}

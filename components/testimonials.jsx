@@ -118,17 +118,20 @@ export function Testimonials() {
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Header */}
-        <div className="mx-auto mb-10 max-w-2xl text-center">
-          <h2 className="text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-white">
-            Traveler Reviews & Experiences
+        <div className="mx-auto mb-12 max-w-4xl text-center space-y-4">
+          <h2 className="font-serif-editorial text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white uppercase leading-[0.95]">
+            VOICES FROM<br />
+            <span className="font-heading font-extrabold text-[#8DBFB7] italic lowercase">the</span><br />
+            ROAD.
           </h2>
-          <p className="mt-3 text-pretty text-white/70 leading-relaxed">
+
+          <p className="text-xs sm:text-sm text-white/70 max-w-xl mx-auto font-medium tracking-wide">
             Read reviews from fellow travelers or share your own journey experience with the community.
           </p>
 
           <Button
             onClick={() => setAddModalOpen(true)}
-            className="mt-6 rounded-2xl bg-[#8DBFB7] px-6 py-2.5 font-semibold text-[#0D2B45] shadow-lg shadow-[#8DBFB7]/25 hover:bg-[#8DBFB7]/90"
+            className="mt-4 rounded-sm bg-[#8DBFB7] px-6 py-2.5 font-bold text-[#0D2B45] text-xs uppercase tracking-widest shadow-sm hover:bg-[#8DBFB7]/90 cursor-pointer"
           >
             <Plus className="mr-1.5 h-4 w-4" />
             Add Your Review
@@ -146,7 +149,7 @@ export function Testimonials() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, delay: (i % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="group relative overflow-hidden rounded-3xl border border-neutral-200/80 bg-white p-6 shadow-xl transition-all duration-300 hover:border-neutral-300 hover:shadow-2xl"
+                className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 shadow-xs transition-all duration-300 hover:border-neutral-300"
               >
                 <Quote
                   className="absolute -right-2 -top-2 h-20 w-20 text-neutral-200/50"

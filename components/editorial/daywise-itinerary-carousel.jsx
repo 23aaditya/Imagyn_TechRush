@@ -102,7 +102,6 @@ export function DaywiseItineraryCarousel({ onNavigateView }) {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#6B4423]">
-              <BookOpen className="h-3.5 w-3.5" />
               Journal-Style Day Pages
             </span>
             <h2 className="font-heading text-3xl sm:text-5xl font-extrabold text-foreground mt-2 tracking-tight">

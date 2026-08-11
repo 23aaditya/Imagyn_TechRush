@@ -85,16 +85,14 @@ export function WhyTripNest() {
       <div className="mx-auto max-w-7xl">
         
         {/* Section Header */}
-        <div className="mx-auto max-w-3xl text-center mb-16 space-y-3">
-          <span className="font-heading text-xs font-bold uppercase tracking-[0.25em] text-amber-600 dark:text-amber-400 block">
-            THE TRIPNEST PHILOSOPHY
-          </span>
-
-          <h2 className="font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl leading-[1.06]">
-            Why TripNest?
+        <div className="mx-auto max-w-4xl text-center mb-16 space-y-4">
+          <h2 className="font-serif-editorial text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground uppercase leading-[0.95]">
+            QUIET PRECISION.<br />
+            <span className="font-heading font-extrabold text-[#C98B55] italic lowercase">bespoke</span><br />
+            ITINERARIES.
           </h2>
 
-          <p className="font-sans text-base sm:text-lg leading-relaxed text-muted-foreground font-normal max-w-xl mx-auto">
+          <p className="font-sans text-xs sm:text-sm leading-relaxed text-muted-foreground max-w-xl mx-auto font-medium">
             Curated for discerning travelers — replacing chaotic planning with quiet precision, bespoke routes, and effortless elegance.
           </p>
         </div>
@@ -142,8 +140,8 @@ export function WhyTripNest() {
                     if (isLeft) handlePrev()
                     if (!isCenter && !isLeft) handleNext()
                   }}
-                  className={`absolute top-0 w-[85%] sm:w-[580px] h-full rounded-3xl overflow-hidden border border-border/80 bg-card shadow-2xl transition-shadow duration-500 cursor-pointer ${
-                    isCenter ? "shadow-[0_25px_60px_rgba(0,0,0,0.35)] pointer-events-auto" : "filter brightness-[0.8] hover:brightness-[0.95]"
+                  className={`absolute top-0 w-[85%] sm:w-[580px] h-full rounded-xl overflow-hidden border border-border/80 bg-card shadow-md transition-shadow duration-500 cursor-pointer ${
+                    isCenter ? "shadow-xl pointer-events-auto" : "filter brightness-[0.8] hover:brightness-[0.95]"
                   }`}
                 >
                   {/* Card High-Impact Travel Image */}
@@ -157,9 +155,9 @@ export function WhyTripNest() {
                     {/* Gradient Dark Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
 
-                    {/* Top Pill Badge */}
+                    {/* Top Editorial Label */}
                     <div className="absolute top-5 left-6 z-10">
-                      <span className="font-heading text-xs font-bold uppercase tracking-widest text-amber-300 bg-black/60 border border-amber-400/30 px-3.5 py-1.5 rounded-full backdrop-blur-md">
+                      <span className="font-heading text-xs font-semibold uppercase tracking-widest text-amber-300 bg-black/60 border border-white/20 px-3 py-1 rounded-sm backdrop-blur-md">
                         {feat.badge}
                       </span>
                     </div>

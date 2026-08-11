@@ -5,13 +5,10 @@ import { TripProvider, useTrip } from "@/context/trip-context"
 import { Navbar } from "@/components/navbar"
 import { Hero } from "@/components/hero"
 import { TrendingDestinations } from "@/components/trending-destinations"
-import { WhyTripNest } from "@/components/why-tripnest"
-import { ExploreWorld } from "@/components/explore-world"
-import { HowItWorks } from "@/components/how-it-works"
 import { PackageComparison } from "@/components/package-comparison"
 import { BudgetCalculator } from "@/components/budget-calculator"
 import { ExpenseTracker } from "@/components/expense-tracker"
-import { AvailableFeatures } from "@/components/available-features"
+import { JourneyTimelineOverview } from "@/components/journey-timeline-overview"
 import { Testimonials } from "@/components/testimonials"
 import { FAQ } from "@/components/faq"
 import { FinalCTA } from "@/components/final-cta"
@@ -23,6 +20,8 @@ import { ProfileWorkspace } from "@/components/profile-workspace"
 import { HomeBackground } from "@/components/home-background"
 import { AiChatbot } from "@/components/ai-chatbot"
 import { SavedTripsModal } from "@/components/saved-trips-modal"
+import { JourneyLine } from "@/components/motion/journey-line"
+import { HorizonTransition } from "@/components/motion/horizon-transition"
 
 function MainApp() {
   const { destination, setDestination, days, generateTripItinerary } = useTrip()
@@ -32,6 +31,7 @@ function MainApp() {
   const [authInitialTab, setAuthInitialTab] = useState("login")
   const [pendingView, setPendingView] = useState(null)
   const [pendingDestination, setPendingDestination] = useState(null)
+  const [isNavigatingLine, setIsNavigatingLine] = useState(false)
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -47,6 +47,9 @@ function MainApp() {
 
   // Guarded View Transition: Require auth for profile/saved features, allow free exploration for planner
   const handleViewChange = (view, destName) => {
+    setIsNavigatingLine(true)
+    setTimeout(() => setIsNavigatingLine(false), 700)
+
     if (destName) {
       setDestination(destName)
       generateTripItinerary(destName, days || 3)
@@ -62,6 +65,9 @@ function MainApp() {
   }
 
   const handleSelectDestination = (destName, numDays) => {
+    setIsNavigatingLine(true)
+    setTimeout(() => setIsNavigatingLine(false), 700)
+
     const targetDest = destName || destination || "Goa (India)"
     const targetDays = numDays || days || 3
     setDestination(targetDest)
@@ -104,6 +110,9 @@ function MainApp() {
 
   return (
     <main className={`relative min-h-screen ${activeView === "home" ? "bg-background" : "bg-background dark:bg-[#11100E] text-foreground dark:text-[#F1ECE2]"}`} suppressHydrationWarning>
+      {/* Signature Journey Line Transition */}
+      <JourneyLine isNavigating={isNavigatingLine} triggerKey={activeView} />
+
       {/* Dynamic low-opacity travel background */}
       {activeView === "home" && <HomeBackground />}
 
@@ -133,10 +142,7 @@ function MainApp() {
         <div className="relative z-10 animate-in fade-in duration-300">
           <Hero onStartPlanning={(view, targetDest) => handleSelectDestination(targetDest || destination || "Goa (India)")} />
           <TrendingDestinations onNavigateView={handleViewChange} onSelectDestination={handleSelectDestination} />
-          <WhyTripNest onNavigateView={handleViewChange} />
-          <ExploreWorld onNavigateView={handleViewChange} onSelectDestination={handleSelectDestination} />
-          <HowItWorks onNavigateView={handleViewChange} />
-          <AvailableFeatures />
+          <JourneyTimelineOverview onNavigateView={handleViewChange} />
           <Testimonials />
           <FAQ />
           <FinalCTA onNavigateView={handleViewChange} />

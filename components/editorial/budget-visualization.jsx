@@ -24,7 +24,6 @@ export function BudgetVisualization({ onNavigateView }) {
           {/* Left Column: Title & Interactive Slider */}
           <div className="lg:col-span-5 space-y-6">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#6B4423]">
-              <PieChart className="h-3.5 w-3.5" />
               Smart Budget Intelligence
             </span>
 
@@ -74,8 +73,7 @@ export function BudgetVisualization({ onNavigateView }) {
           <div className="lg:col-span-7">
             <div className="rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-5">
               <div className="flex items-center justify-between border-b border-border/60 pb-3">
-                <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-                  <Wallet className="h-5 w-5 text-[#6B4423]" />
+                <h3 className="font-heading text-lg font-bold text-foreground">
                   Estimated Spend Allocation
                 </h3>
                 <span className="rounded-full bg-emerald/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
@@ -121,11 +119,8 @@ export function BudgetVisualization({ onNavigateView }) {
               </div>
 
               {/* Smart Savings Tip Banner */}
-              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed flex items-center gap-2.5">
-                <Sparkles className="h-5 w-5 text-emerald shrink-0" />
-                <span>
-                  <strong>Smart Tip:</strong> Booking midweek flights & boutique homestays saves up to <strong>18%</strong> on total stay allocation.
-                </span>
+              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed">
+                <strong>Smart Tip:</strong> Booking midweek flights & boutique homestays saves up to <strong>18%</strong> on total stay allocation.
               </div>
 
             </div>

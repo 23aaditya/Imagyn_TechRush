@@ -575,14 +575,14 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 space-y-10">
         
         {/* 1. Header Title & Subtitle */}
-        <div className="mx-auto max-w-3xl text-center space-y-3">
-          <span className="font-heading text-xs font-bold uppercase tracking-[0.25em] text-[#C98B55] block">
-            TRIPNEST DECISION ENGINE
-          </span>
-          <h2 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground uppercase leading-none drop-shadow-sm">
-            Which Trip is Better for YOU?
+        <div className="mx-auto max-w-4xl text-center space-y-4">
+          <h2 className="font-serif-editorial text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground uppercase leading-[0.95]">
+            COMPARE LESS.<br />
+            <span className="font-heading font-extrabold text-[#C98B55] italic lowercase">experience</span><br />
+            MORE.
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
+
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto font-medium tracking-wide">
             Compare packages side-by-side and easily add them directly to your personal trip itinerary or saved trips.
           </p>
         </div>
@@ -594,10 +594,9 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="rounded-3xl border-2 border-[#C98B55]/40 bg-card shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 relative"
+            className="rounded-xl border border-[#C98B55]/40 bg-card shadow-sm overflow-hidden p-6 sm:p-8 space-y-6 relative"
           >
-            <div className="absolute top-0 right-0 bg-[#C98B55] text-white text-[10px] font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-bl-2xl shadow-md flex items-center gap-1.5">
-              <Award className="h-3.5 w-3.5" />
+            <div className="absolute top-0 right-0 bg-[#C98B55] text-white text-[10px] font-semibold uppercase tracking-widest px-3 py-1 rounded-bl-md shadow-xs">
               Personalized Decision
             </div>
 
@@ -605,10 +604,9 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
               
               {/* Left Summary */}
               <div className="space-y-3 flex-1">
-                <div className="inline-flex items-center gap-2 rounded-full bg-[#C98B55]/15 px-3 py-1 text-xs font-extrabold text-[#C98B55] border border-[#C98B55]/30">
-                  <Award className="h-4 w-4" />
-                  🏆 BEST FOR YOU ({decisionData.recommendedMatch.score}% MATCH)
-                </div>
+                <span className="font-heading text-xs font-bold uppercase tracking-wider text-[#C98B55] block">
+                  BEST FOR YOU ({decisionData.recommendedMatch.score}% MATCH)
+                </span>
 
                 <h3 className="font-heading text-2xl sm:text-4xl font-extrabold text-foreground">
                   {decisionData.recommendedPkg.name}
@@ -618,19 +616,9 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                   "{decisionData.rationale}"
                 </p>
 
-                {/* Key Highlight Badges */}
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
-                    <TrendingDown className="h-3.5 w-3.5" />
-                    Est. Total Cost: ₹{decisionData.recommendedPkg.estimatedTotalCost.toLocaleString("en-IN")}
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-xl border border-amber-500/20">
-                    {decisionData.recommendedPkg.pace.icon} {decisionData.recommendedPkg.pace.label} Pace
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-xl border border-blue-500/20">
-                    <Car className="h-3.5 w-3.5" />
-                    {decisionData.recommendedPkg.convenience.transportType}
-                  </span>
+                {/* Key Highlight Metadata Line */}
+                <div className="text-xs font-semibold text-muted-foreground pt-1 tracking-wide">
+                  Est. Total Cost: <span className="text-emerald-600 dark:text-emerald-400 font-bold">₹{decisionData.recommendedPkg.estimatedTotalCost.toLocaleString("en-IN")}</span> · {decisionData.recommendedPkg.pace.label} Pace · {decisionData.recommendedPkg.convenience.transportType}
                 </div>
               </div>
 
@@ -638,7 +626,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
               <div className="flex flex-col sm:flex-row md:flex-col items-center gap-3 shrink-0 w-full md:w-auto">
                 <Button
                   onClick={() => handleAddToTrip(decisionData.recommendedPkg)}
-                  className="w-full sm:w-auto rounded-2xl bg-[#C98B55] hover:bg-[#b07847] text-white font-extrabold text-xs sm:text-sm px-6 py-3.5 shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto rounded-sm bg-[#C98B55] hover:bg-[#b07847] text-white font-semibold text-xs uppercase tracking-wider px-5 py-2.5 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Plus className="h-4 w-4" />
                   Select {decisionData.recommendedPkg.destination} Trip
@@ -646,9 +634,8 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
 
                 <button
                   onClick={() => setShowingMatchDetailPkg(decisionData.recommendedPkg)}
-                  className="text-xs font-bold text-[#C98B55] hover:underline flex items-center gap-1"
+                  className="text-xs font-bold text-[#C98B55] hover:underline cursor-pointer"
                 >
-                  <Info className="h-3.5 w-3.5" />
                   Why {decisionData.recommendedMatch.score}% Match? (View Breakdown)
                 </button>
               </div>
@@ -656,12 +643,9 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
 
             {/* Trade-Off Callout Note */}
             {decisionData.tradeOff && (
-              <div className="rounded-2xl bg-secondary/60 border border-border p-3.5 text-xs text-muted-foreground flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>
-                  <strong className="text-foreground">Honest Trade-off: </strong>
-                  {decisionData.tradeOff}
-                </span>
+              <div className="rounded-md bg-secondary/60 border border-border p-3 text-xs text-muted-foreground">
+                <strong className="text-foreground">Honest Trade-off: </strong>
+                {decisionData.tradeOff}
               </div>
             )}
           </motion.div>
@@ -670,8 +654,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
         {/* 4. SIDE-BY-SIDE PACKAGE COMPARISON CARDS */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-heading text-xs uppercase tracking-widest text-[#C98B55] font-extrabold flex items-center gap-2">
-              <Layers className="h-4 w-4" />
+            <h3 className="font-heading text-xs uppercase tracking-widest text-[#C98B55] font-extrabold">
               Comparing {comparedPackagesList.length} Packages Side-by-Side
             </h3>
 
@@ -687,7 +670,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                       setSelectedForCompare([catPkgs[0].id, catPkgs[1].id])
                     }
                   }}
-                  className={`rounded-xl px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all border ${
+                  className={`rounded-sm px-3 py-1.5 text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition-all border cursor-pointer ${
                     activeCategory === cat.id
                       ? "bg-[#C98B55] text-white border-[#C98B55]"
                       : "bg-card text-muted-foreground border-border hover:bg-secondary"
@@ -710,45 +693,44 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
               return (
                 <div
                   key={pkg.id}
-                  className={`group relative rounded-3xl border bg-card text-card-foreground p-5 sm:p-6 shadow-xl flex flex-col justify-between transition-all hover:border-[#C98B55] ${
-                    isBestForYou ? "border-2 border-[#C98B55] ring-2 ring-[#C98B55]/20" : "border-border"
+                  className={`group relative rounded-xl border bg-card text-card-foreground p-5 sm:p-6 shadow-xs flex flex-col justify-between transition-all hover:border-[#C98B55] ${
+                    isBestForYou ? "border-2 border-[#C98B55]" : "border-border"
                   }`}
                 >
                   <div className="space-y-4">
                     
-                    {/* Top Badges (Best for You / Best Value / Best Experience) */}
-                    <div className="flex items-center justify-between gap-2 flex-wrap min-h-[28px]">
+                    {/* Top Typography Badges */}
+                    <div className="flex items-center justify-between gap-2 flex-wrap min-h-[24px]">
                       {isBestForYou ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-white bg-[#C98B55] px-2.5 py-1 rounded-full shadow-sm">
-                          🏆 Best for You
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#C98B55]">
+                          BEST FOR YOU
                         </span>
                       ) : isBestValue ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-950 bg-emerald-400 px-2.5 py-1 rounded-full shadow-sm">
-                          💰 Best Value
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                          BEST VALUE
                         </span>
                       ) : isBestExp ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-purple-950 bg-purple-300 px-2.5 py-1 rounded-full shadow-sm">
-                          ✨ Best Experience
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400">
+                          BEST EXPERIENCE
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground bg-secondary px-2.5 py-1 rounded-full">
-                          <MapPin className="h-3 w-3" /> {pkg.destination}
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          {pkg.destination}
                         </span>
                       )}
 
                       {/* Clickable Personal Match Score Badge */}
                       <button
                         onClick={() => setShowingMatchDetailPkg(pkg)}
-                        className="flex items-center gap-1 bg-[#C98B55]/15 hover:bg-[#C98B55]/25 border border-[#C98B55]/30 text-[#C98B55] px-2.5 py-0.5 rounded-full text-xs font-extrabold transition-all cursor-pointer"
+                        className="text-[11px] font-bold uppercase tracking-wider text-[#C98B55] hover:underline cursor-pointer"
                         title="Click to view why this score matches you"
                       >
-                        <Sparkles className="h-3 w-3" />
-                        <span>{matchObj.score}% Match</span>
+                        {matchObj.score}% MATCH
                       </button>
                     </div>
 
                     {/* Package Image & Hero Overlay */}
-                    <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-border/80">
+                    <div className="relative h-44 w-full rounded-lg overflow-hidden border border-border/80">
                       <img
                         src={pkg.image}
                         alt={pkg.name}
@@ -757,24 +739,24 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                       
                       <div className="absolute top-3 left-3">
-                        <span className="rounded-xl bg-black/70 backdrop-blur-md text-white font-heading font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 border border-white/20">
+                        <span className="rounded-xs bg-black/70 backdrop-blur-md text-white font-heading font-semibold text-[10px] uppercase tracking-wider px-2.5 py-0.5 border border-white/20">
                           {pkg.duration}
                         </span>
                       </div>
 
                       <div className="absolute bottom-3 left-3 right-3 text-white">
-                        <h4 className="font-heading text-lg font-extrabold leading-tight drop-shadow-md truncate">
+                        <h4 className="font-heading text-lg font-bold leading-tight drop-shadow-md truncate">
                           {pkg.name}
                         </h4>
-                        <div className="flex items-center justify-between text-[11px] opacity-90 mt-0.5">
+                        <div className="flex items-center justify-between text-[11px] opacity-90 mt-0.5 font-medium">
                           <span>⭐ {pkg.rating} ({pkg.reviewsCount} reviews)</span>
-                          <span>{pkg.pace.icon} {pkg.pace.label}</span>
+                          <span>{pkg.pace.label}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Price & Estimated Actual Trip Cost */}
-                    <div className="rounded-2xl bg-secondary/50 p-3.5 border border-border/60 space-y-1">
+                    <div className="rounded-md bg-secondary/40 p-3 border border-border/50 space-y-1">
                       <div className="flex items-baseline justify-between">
                         <div>
                           <span className="text-[9.5px] uppercase tracking-widest text-muted-foreground font-bold block">Package Base Price</span>
@@ -783,48 +765,38 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                         </div>
                         <div className="text-right">
                           <span className="text-[9.5px] uppercase tracking-widest text-muted-foreground font-bold block">Est. Actual Trip Cost</span>
-                          <span className="font-extrabold text-sm text-emerald-600 dark:text-emerald-400">
+                          <span className="font-bold text-sm text-emerald-600 dark:text-emerald-400">
                             ₹{pkg.estimatedTotalCost.toLocaleString("en-IN")}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Quick Feature Highlights */}
-                    <div className="space-y-2 text-xs">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Hotel className="h-4 w-4 text-[#C98B55] shrink-0" />
-                        <span className="truncate font-semibold text-foreground">{pkg.accommodation.category}</span>
+                    {/* Quick Feature Highlights — Clean Typography */}
+                    <div className="space-y-1.5 text-xs text-muted-foreground">
+                      <div className="font-semibold text-foreground truncate">
+                        {pkg.accommodation.category}
                       </div>
 
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Compass className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                        <span className="truncate font-semibold text-foreground">
-                          {pkg.experiences.activitiesCount} Activities • {pkg.experiences.attractionsCount} Attractions
-                        </span>
+                      <div className="font-medium">
+                        {pkg.experiences.activitiesCount} Activities · {pkg.experiences.attractionsCount} Sights
                       </div>
 
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Car className="h-4 w-4 text-blue-500 shrink-0" />
-                        <span className="truncate font-semibold text-foreground">{pkg.convenience.airportTransfers}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Sun className="h-4 w-4 text-amber-500 shrink-0" />
-                        <span className="truncate font-semibold text-foreground">{pkg.weatherSuitability.title}</span>
+                      <div className="font-medium truncate">
+                        {pkg.convenience.airportTransfers}
                       </div>
                     </div>
 
                   </div>
 
                   {/* Bottom Card Actions */}
-                  <div className="mt-5 pt-3 border-t border-border space-y-2">
+                  <div className="mt-5 pt-3 border-t border-border/60 space-y-2">
                     <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setViewingModalPkg(pkg)}
-                        className="rounded-xl border-border hover:bg-secondary font-bold text-xs cursor-pointer"
+                        className="rounded-sm border-border hover:bg-secondary font-semibold text-xs cursor-pointer"
                       >
                         <Eye className="mr-1.5 h-3.5 w-3.5" />
                         Details
@@ -834,7 +806,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                         variant="outline"
                         size="sm"
                         onClick={() => toggleCompare(pkg.id)}
-                        className={`rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                        className={`rounded-sm font-semibold text-xs transition-all cursor-pointer ${
                           selectedForCompare.includes(pkg.id)
                             ? "bg-secondary border-border text-foreground"
                             : "border-border text-muted-foreground"
@@ -848,7 +820,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                     <Button
                       size="sm"
                       onClick={() => handleAddToTrip(pkg)}
-                      className={`w-full rounded-xl font-extrabold text-xs py-2.5 shadow-md flex items-center justify-center gap-1.5 cursor-pointer ${
+                      className={`w-full rounded-sm font-semibold text-xs uppercase tracking-wider py-2 flex items-center justify-center gap-1.5 cursor-pointer ${
                         isBestForYou
                           ? "bg-[#C98B55] hover:bg-[#b07847] text-white"
                           : "bg-secondary text-foreground hover:bg-secondary/80 border border-border"
@@ -869,7 +841,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
           <Button
             variant="outline"
             onClick={() => setShowFullMatrix(!showFullMatrix)}
-            className="rounded-2xl border-border bg-card hover:bg-secondary text-foreground font-bold text-xs sm:text-sm px-6 py-3 shadow-md cursor-pointer inline-flex items-center gap-2"
+            className="rounded-sm border-border bg-card hover:bg-secondary text-foreground font-bold text-xs sm:text-sm px-6 py-3 shadow-sm cursor-pointer inline-flex items-center gap-2"
           >
             <Layers className="h-4 w-4 text-[#C98B55]" />
             {showFullMatrix ? "Hide Detailed Comparison Matrix" : "View Full Detailed Category Comparison Matrix"}

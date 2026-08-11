@@ -646,10 +646,10 @@ export function AiChatbot({ currentView, onNavigate }) {
               initial={{ opacity: 0, x: 20, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 20, scale: 0.9 }}
-              className="hidden sm:flex items-center gap-2 rounded-2xl border border-primary/40 bg-card/95 px-3.5 py-2 shadow-2xl backdrop-blur-xl cursor-pointer hover:border-primary transition-colors"
+              className="hidden sm:flex items-center gap-2 rounded-md border border-primary/30 bg-card/95 px-3 py-1.5 shadow-md backdrop-blur-xl cursor-pointer hover:border-primary transition-colors"
               onClick={() => setIsOpen(true)}
             >
-              <Sparkles className="h-4 w-4 text-amber-500 animate-spin" />
+              <Sparkles className="h-3.5 w-3.5 text-amber-500 animate-spin" />
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-foreground leading-none">Ask AI Boots</span>
                 <span className="text-[10px] font-semibold text-primary">Live Travel Planning Help</span>
@@ -665,10 +665,10 @@ export function AiChatbot({ currentView, onNavigate }) {
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 1.08 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
-              className="group relative flex h-[72px] w-[72px] items-center justify-center rounded-full bg-background border-[3px] border-primary/50 shadow-2xl shadow-primary/40 transition-all hover:shadow-primary/60 focus:outline-none overflow-hidden"
+              className="group relative flex h-[64px] w-[64px] items-center justify-center rounded-full bg-background border-2 border-primary/50 shadow-xl transition-all hover:shadow-primary/40 focus:outline-none overflow-hidden cursor-pointer"
               aria-label="Open Boots AI Assistant"
             >
               {/* Outer pulsing ring */}
@@ -677,13 +677,13 @@ export function AiChatbot({ currentView, onNavigate }) {
               <img
                 src="/boots-avatar.jpg"
                 alt="Boots AI Chatbot"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
 
               {/* Status indicator dot */}
-              <span className="absolute top-1 right-1 flex h-4 w-4">
+              <span className="absolute top-1 right-1 flex h-3.5 w-3.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-background" />
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-background" />
               </span>
             </motion.button>
           )}
@@ -699,7 +699,7 @@ export function AiChatbot({ currentView, onNavigate }) {
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              "fixed z-50 flex flex-col overflow-hidden rounded-3xl border-2 border-primary/40 bg-background/95 shadow-2xl shadow-primary/20 backdrop-blur-2xl transition-all duration-300",
+              "fixed z-50 flex flex-col overflow-hidden rounded-xl border border-primary/40 bg-background/95 shadow-xl shadow-primary/20 backdrop-blur-2xl transition-all duration-300",
               isExpanded
                 ? "bottom-4 right-4 top-4 left-4 sm:left-auto sm:w-[680px] sm:h-[90vh]"
                 : "bottom-6 right-4 sm:right-6 w-[calc(100vw-32px)] sm:w-[450px] h-[620px] max-h-[88vh]"
@@ -708,7 +708,7 @@ export function AiChatbot({ currentView, onNavigate }) {
             {/* Vibrant Header Bar */}
             <div className="flex items-center justify-between border-b border-primary/30 bg-gradient-to-r from-primary/15 via-card to-emerald-500/10 px-4 py-3.5 backdrop-blur-md">
               <div className="flex items-center gap-3">
-                <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl overflow-hidden border-2 border-primary/40 shadow-lg shadow-primary/20">
+                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-md overflow-hidden border border-primary/40 shadow-sm">
                   <img
                     src="/boots-avatar.jpg"
                     alt="Boots Logo"
@@ -718,7 +718,7 @@ export function AiChatbot({ currentView, onNavigate }) {
                 <div>
                   <h3 className="font-heading text-base font-bold text-foreground flex items-center gap-2">
                     Boots
-                    <span className="text-[10px] font-normal text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-full text-primary">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-xs text-primary">
                       AI Chatbot
                     </span>
                   </h3>
@@ -736,7 +736,7 @@ export function AiChatbot({ currentView, onNavigate }) {
                   size="icon"
                   onClick={() => setIsExpanded(!isExpanded)}
                   title={isExpanded ? "Minimize Window" : "Expand Window"}
-                  className="hidden sm:inline-flex h-8 w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
+                  className="hidden sm:inline-flex h-8 w-8 rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer"
                 >
                   {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                 </Button>
@@ -746,7 +746,7 @@ export function AiChatbot({ currentView, onNavigate }) {
                   size="icon"
                   onClick={() => setIsOpen(false)}
                   title="Close Assistant"
-                  className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
+                  className="h-8 w-8 rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -760,9 +760,9 @@ export function AiChatbot({ currentView, onNavigate }) {
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
                   className={cn(
-                    "shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all",
+                    "shrink-0 rounded-sm px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider transition-all cursor-pointer",
                     activeCategory === cat.id
-                      ? "bg-primary text-primary-foreground shadow-sm"
+                      ? "bg-primary text-primary-foreground shadow-xs"
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   )}
                 >
@@ -979,7 +979,7 @@ export function AiChatbot({ currentView, onNavigate }) {
                     onNavigate?.(lk.view)
                     setIsOpen(false)
                   }}
-                  className="shrink-0 rounded-full bg-primary/10 border border-primary/20 hover:bg-amber-400 hover:text-[#0D2B45] hover:border-amber-400 px-2.5 py-1 text-primary text-[10px] font-bold transition-all cursor-pointer shadow-xs"
+                  className="shrink-0 rounded-xs bg-primary/10 border border-primary/20 hover:bg-amber-400 hover:text-[#0D2B45] hover:border-amber-400 px-2.5 py-1 text-primary text-[10px] font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
                 >
                   {lk.label}
                 </button>
@@ -1000,12 +1000,12 @@ export function AiChatbot({ currentView, onNavigate }) {
                   onChange={(e) => setInputMessage(e.target.value)}
                   placeholder="Ask about day plans, peak season, crowds..."
                   disabled={isLoading}
-                  className="h-10 rounded-xl bg-background text-xs sm:text-sm border-border/80 focus-visible:ring-primary"
+                  className="h-10 rounded-md bg-background text-xs sm:text-sm border-border/80 focus-visible:ring-primary"
                 />
                 <Button
                   type="submit"
                   disabled={!inputMessage.trim() || isLoading}
-                  className="h-10 w-10 shrink-0 rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90"
+                  className="h-10 w-10 shrink-0 rounded-sm bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 cursor-pointer"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

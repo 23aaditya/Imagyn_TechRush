@@ -40,11 +40,7 @@ export function FAQ() {
     <section id="faq" className="relative w-full py-20 md:py-28 bg-[#0D2B45] text-white">
       <div className="mx-auto max-w-3xl px-4 md:px-6">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
-            <HelpCircle className="h-3.5 w-3.5 text-[#8DBFB7]" aria-hidden />
-            Got Questions?
-          </span>
-          <h2 className="mt-4 text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-white">
+          <h2 className="mt-3 text-balance font-heading text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-white">
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-pretty text-white/70 leading-relaxed">
@@ -62,8 +58,8 @@ export function FAQ() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.4, delay: i * 0.06 }}
-                className={`overflow-hidden rounded-2xl border shadow-lg backdrop-blur-xl transition-all duration-300 ${
-                  isOpen ? "border-white bg-white ring-2 ring-white/20 shadow-2xl" : "border-white/80 bg-white"
+                className={`overflow-hidden rounded-lg border backdrop-blur-xl transition-all duration-300 ${
+                  isOpen ? "border-white bg-white shadow-sm" : "border-white/80 bg-white"
                 }`}
               >
                 <button
@@ -71,7 +67,7 @@ export function FAQ() {
                   suppressHydrationWarning
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6 sm:py-5"
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6 sm:py-5 cursor-pointer"
                 >
                   <span
                     className={`text-sm font-bold sm:text-base font-heading ${
@@ -83,7 +79,7 @@ export function FAQ() {
                   <motion.span
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${
                       isOpen ? "bg-primary/10 text-primary" : "bg-neutral-100 text-neutral-600"
                     }`}
                   >

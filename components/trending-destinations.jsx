@@ -62,15 +62,15 @@ export function TrendingDestinations() {
                       alt={card.name}
                       className="h-full w-full object-cover filter contrast-[1.05]"
                     />
-                    <div className="absolute top-0.5 right-0.5 bg-black/60 backdrop-blur-md px-1 py-0.5 rounded-full text-[7px] font-bold text-white">
+                    <div className="absolute top-0.5 right-0.5 bg-black/70 backdrop-blur-md px-1 py-0.5 rounded-xs text-[7px] font-semibold text-white">
                       {card.rating}
                     </div>
                   </div>
 
                   {/* Polaroid Caption */}
                   <div className="mt-1.5 px-0.5 text-left">
-                    <h4 className="font-heading text-[9px] sm:text-[10px] font-extrabold text-neutral-900 dark:text-white truncate flex items-center gap-0.5">
-                      <span className="text-rose-500">📍</span> {card.name}
+                    <h4 className="font-heading text-[9px] sm:text-[10px] font-bold text-neutral-900 dark:text-white truncate">
+                      {card.name}
                     </h4>
                     <p className="text-[7.5px] sm:text-[8.5px] text-neutral-500 dark:text-neutral-400 mt-0.5 truncate font-sans">
                       {card.vibe}
@@ -105,21 +105,18 @@ export function TrendingDestinations() {
               Find which place calls you, plan your itinerary, and just Pack your Bags!
             </p>
 
-            {/* Feature Highlights — No Numbering, Staggered Transitions */}
-            <div className="space-y-4 pt-2">
+            {/* Feature Highlights — Editorial Dividers & Subtle Border Cards */}
+            <div className="space-y-3 pt-2">
               {[
                 {
-                  emoji: "✦",
                   title: "Handpicked Escape Collections",
                   desc: "105+ hand-curated destinations across tropical coastlines, snowy alpine valleys, and royal palace forts."
                 },
                 {
-                  emoji: "◈",
                   title: "Transparent Realistic Trip Budgets",
                   desc: "Clear stay, dining, and transport estimates calculated upfront so you plan without price surprises."
                 },
                 {
-                  emoji: "❖",
                   title: "Dynamic Itinerary Optimization",
                   desc: "Drag, reorder, and schedule spots with live distance routes, opening hours, and travel timing."
                 }
@@ -130,19 +127,14 @@ export function TrendingDestinations() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex items-start gap-4 p-4 rounded-2xl border border-border/70 bg-card/80 shadow-sm hover:border-primary/40 transition-colors"
+                  className="p-4 rounded-lg border border-border/60 bg-card/60 hover:border-primary/40 transition-colors"
                 >
-                  <span className="font-heading text-xl text-primary shrink-0 leading-none mt-0.5">
-                    {feat.emoji}
-                  </span>
-                  <div>
-                    <h4 className="font-heading text-sm font-extrabold text-foreground uppercase tracking-wider">
-                      {feat.title}
-                    </h4>
-                    <p className="font-sans text-xs text-muted-foreground mt-1 leading-relaxed">
-                      {feat.desc}
-                    </p>
-                  </div>
+                  <h4 className="font-heading text-xs font-bold text-foreground uppercase tracking-wider">
+                    {feat.title}
+                  </h4>
+                  <p className="font-sans text-xs text-muted-foreground mt-1 leading-relaxed">
+                    {feat.desc}
+                  </p>
                 </motion.div>
               ))}
             </div>

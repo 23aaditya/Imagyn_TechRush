@@ -78,7 +78,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                 variant="outline"
                 size="sm"
                 onClick={onBack}
-                className="rounded-xl border-border bg-background hover:bg-accent text-xs sm:text-sm"
+                className="rounded-md border-border bg-background hover:bg-accent text-xs sm:text-sm cursor-pointer"
               >
                 <ArrowLeft className="mr-1.5 h-4 w-4" />
                 Back to Overview
@@ -88,9 +88,9 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary border border-primary/20">
                 <Sparkles className="h-3.5 w-3.5" />
-                ⚡ Live Synced with AI Itinerary & Expenses
+                Live Synced with AI Itinerary & Expenses
               </span>
             </div>
           </div>
@@ -105,27 +105,26 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
         {/* Selected Package Callout Banner */}
         {selectedPackage && (
-          <div className="mx-auto mb-10 max-w-4xl rounded-3xl border border-teal-500/30 bg-[#0D2B45] p-5 md:p-6 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="mx-auto mb-10 max-w-4xl rounded-xl border border-teal-500/30 bg-[#0D2B45] p-5 md:p-6 text-white shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-500/20 text-teal-300 px-3 py-0.5 text-xs font-bold border border-teal-400/30">
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Selected Package Active</span>
-              </div>
-              <h4 className="font-heading text-xl font-extrabold">{selectedPackage.name}</h4>
+              <span className="text-xs uppercase font-bold text-teal-300 tracking-wider block">
+                Selected Package Active
+              </span>
+              <h4 className="font-heading text-xl font-bold">{selectedPackage.name}</h4>
               <p className="text-xs text-slate-300">
-                Base Package Price: <strong className="text-white">₹{packageBaseCost.toLocaleString("en-IN")}</strong> • Extra Attractions: <strong className="text-amber-400">+₹{additionalExpenses.toLocaleString("en-IN")}</strong>
+                Base Package Price: <strong className="text-white">₹{packageBaseCost.toLocaleString("en-IN")}</strong> · Extra Attractions: <strong className="text-amber-400">+₹{additionalExpenses.toLocaleString("en-IN")}</strong>
               </p>
             </div>
             <div className="sm:text-right border-t sm:border-t-0 sm:border-l border-white/20 pt-3 sm:pt-0 sm:pl-6">
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Est. Cost</span>
-              <span className="font-heading text-2xl font-extrabold text-teal-300">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
+              <span className="font-heading text-2xl font-bold text-teal-300">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
             </div>
           </div>
         )}
 
         {/* Interactive Workspace Sliders Control (Only in Workspace Mode) */}
         {isWorkspace && (
-          <div className="mb-10 grid gap-6 rounded-3xl border border-border bg-card p-6 shadow-md md:grid-cols-3">
+          <div className="mb-10 grid gap-6 rounded-xl border border-border bg-card p-6 shadow-xs md:grid-cols-3">
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trip Duration</label>
@@ -167,9 +166,9 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                       setStayTier(tier)
                       setCustomTargetBudget(null)
                     }}
-                    className={`rounded-xl py-2 text-xs font-semibold transition-all ${
+                    className={`rounded-sm py-2 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                       stayTier === tier
-                        ? "bg-primary text-primary-foreground shadow-sm"
+                        ? "bg-primary text-primary-foreground shadow-xs"
                         : "border border-border text-muted-foreground hover:bg-muted"
                     }`}
                   >
@@ -182,7 +181,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
         )}
 
         {/* Donut Chart & Segments Card */}
-        <div className="grid items-center gap-10 rounded-3xl border border-border bg-card p-6 shadow-lg md:grid-cols-2 md:p-10">
+        <div className="grid items-center gap-10 rounded-xl border border-border bg-card p-6 shadow-xs md:grid-cols-2 md:p-10">
           {/* Donut Chart */}
           <div className="relative mx-auto flex h-64 w-64 items-center justify-center md:h-80 md:w-80">
             <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90">
@@ -213,7 +212,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Total Estimated</span>
               <span className="font-heading text-3xl font-bold text-foreground md:text-4xl">₹{TOTAL.toLocaleString("en-IN")}</span>
-              <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald/10 px-2.5 py-0.5 rounded-full">
+              <span className="mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                 ₹{perPerson.toLocaleString("en-IN")} / person
               </span>
             </div>
@@ -229,7 +228,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
               return (
                 <div
                   key={seg.label}
-                  className={`flex flex-col justify-between rounded-2xl border p-3.5 transition-all ${
+                  className={`flex flex-col justify-between rounded-md border p-3.5 transition-all ${
                     isOverridden
                       ? "border-primary/50 bg-primary/5"
                       : "border-border bg-background hover:border-primary/30"

@@ -46,7 +46,6 @@ export function AiPlannerPreview({ onNavigateView }) {
           {/* Left Column: Interactive Input Controls */}
           <div className="lg:col-span-5 space-y-6">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#6B4423]">
-              <Sparkles className="h-3.5 w-3.5" />
               Smart Travel Intelligence
             </span>
 
@@ -110,14 +109,9 @@ export function AiPlannerPreview({ onNavigateView }) {
             <div className="relative overflow-hidden rounded-3xl border border-border bg-[#F4F6F6] p-6 shadow-2xl">
               
               <div className="flex items-center justify-between border-b border-border/60 pb-4 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald/10 text-emerald">
-                    <CheckCircle2 className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase text-[#6B4423]">Live Generated Plan</span>
-                    <h3 className="font-heading text-lg font-bold text-foreground">{selectedDest}</h3>
-                  </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase text-[#6B4423]">Live Generated Plan</span>
+                  <h3 className="font-heading text-lg font-bold text-foreground">{selectedDest}</h3>
                 </div>
 
                 <span className="rounded-full bg-emerald/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
@@ -140,16 +134,13 @@ export function AiPlannerPreview({ onNavigateView }) {
                     </div>
 
                     <div className="grid grid-cols-3 gap-2 text-[11px] text-muted-foreground pt-1 border-t border-border/40">
-                      <span className="truncate flex items-center gap-1">
-                        <Coffee className="h-3 w-3 text-amber-500 shrink-0" />
+                      <span className="truncate font-medium">
                         {dayItem.morning}
                       </span>
-                      <span className="truncate flex items-center gap-1">
-                        <Camera className="h-3 w-3 text-[#6B4423] shrink-0" />
+                      <span className="truncate font-medium">
                         {dayItem.afternoon}
                       </span>
-                      <span className="truncate flex items-center gap-1">
-                        <Utensils className="h-3 w-3 text-emerald shrink-0" />
+                      <span className="truncate font-medium">
                         {dayItem.evening}
                       </span>
                     </div>

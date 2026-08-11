@@ -723,14 +723,14 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
          ═════════════════════════════════════════════════════════════════ */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-2.5 pointer-events-none">
 
-        {/* Left: Search Bar */}
-        <div className="relative min-w-[260px] sm:min-w-[300px] pointer-events-auto">
+        {/* Left: Search Bar & Smart Search Chips */}
+        <div className="relative min-w-[260px] sm:min-w-[340px] pointer-events-auto">
           <form
             onSubmit={(e) => {
               e.preventDefault()
               handleMapLocationSearch()
             }}
-            className="flex items-center gap-2 bg-background/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-border shadow-xl"
+            className="flex items-center gap-2 bg-background/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-border shadow-md"
           >
             <Search className="h-4 w-4 text-[#5A8CB2] shrink-0" />
             <input
@@ -748,21 +748,37 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
             <button
               type="submit"
               disabled={isSearching}
-              className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-extrabold text-[11px] px-3.5 py-1.5 shadow-xs shrink-0 cursor-pointer"
+              className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-semibold text-[11px] uppercase tracking-wider px-3.5 py-1.5 shadow-xs shrink-0 cursor-pointer"
             >
               {isSearching ? "..." : "Search"}
             </button>
           </form>
 
+          {/* Contextual Search Chips */}
+          <div className="flex items-center gap-1.5 mt-2 overflow-x-auto scrollbar-none">
+            {SMART_SEARCH_CHIPS.map((chip, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => {
+                  setMapSearchQuery(chip)
+                  handleMapLocationSearch(chip)
+                }}
+                className="px-2.5 py-1 rounded-full bg-background/90 backdrop-blur-md border border-border text-[10px] font-semibold text-foreground hover:bg-[#C8D9E6]/30 hover:border-[#5A8CB2] transition-colors shrink-0 shadow-xs cursor-pointer"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
           {/* Autocomplete Dropdown */}
           {showResultsDropdown && searchResults.length > 0 && (
-            <div className="absolute top-12 left-0 right-0 bg-background/95 backdrop-blur-md rounded-2xl border border-border shadow-2xl overflow-hidden z-50 max-h-60 overflow-y-auto p-1.5 space-y-1">
+            <div className="absolute top-12 left-0 right-0 bg-background/95 backdrop-blur-md rounded-md border border-border shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto p-1.5 space-y-1">
               {searchResults.map((res, i) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => handleSelectSearchResult(res)}
-                  className="flex items-start gap-2 w-full text-left p-2 rounded-xl hover:bg-accent text-xs font-semibold text-foreground transition-colors"
+                  className="flex items-start gap-2 w-full text-left p-2 rounded-xs hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
                 >
                   <MapPin className="h-4 w-4 text-[#5A8CB2] shrink-0 mt-0.5" />
                   <span className="line-clamp-2">{res.display_name}</span>
@@ -1133,7 +1149,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
          ═════════════════════════════════════════════════════════════════ */}
       {selectedMarkerSpot && !selectedDiscoveryPlace && (
         <div className="absolute bottom-16 left-3 z-[1000] pointer-events-auto max-w-xs w-full">
-          <div className="bg-background/95 backdrop-blur-md p-4 rounded-2xl border border-border shadow-2xl space-y-2 relative">
+          <div className="bg-background/95 backdrop-blur-md p-4 rounded-2xl border border-border shadow-xl space-y-2 relative">
             <button
               type="button"
               onClick={() => setSelectedMarkerSpot(null)}
@@ -1142,7 +1158,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               <X className="h-4 w-4" />
             </button>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-extrabold text-foreground">{selectedMarkerSpot.title}</span>
+              <span className="text-sm font-bold text-foreground">{selectedMarkerSpot.title}</span>
             </div>
             <p className="text-[11px] text-muted-foreground line-clamp-2">{selectedMarkerSpot.desc || "Popular highlight on map"}</p>
             <div className="flex items-center justify-between text-xs font-bold text-[#5A8CB2] pt-1">

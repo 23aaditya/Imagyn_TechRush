@@ -148,7 +148,7 @@ export function ProfileWorkspace({ onBack }) {
               variant="outline"
               size="sm"
               onClick={onBack}
-              className="rounded-xl border-border bg-background hover:bg-accent text-xs sm:text-sm"
+              className="rounded-md border-border bg-background hover:bg-accent text-xs sm:text-sm cursor-pointer"
             >
               <ArrowLeft className="mr-1.5 h-4 w-4" />
               Back to Overview
@@ -158,7 +158,7 @@ export function ProfileWorkspace({ onBack }) {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-500 dark:text-amber-400 border border-amber-400/20">
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-500 dark:text-amber-400 border border-amber-400/20">
               <Sparkles className="h-3.5 w-3.5" />
               Level 4 Explorer Status
             </span>
@@ -166,9 +166,9 @@ export function ProfileWorkspace({ onBack }) {
         </div>
 
         {/* ─────────────────────────────────────────────
-            PROFILE HEADER CARD (Ultra-Luxury Editorial View)
+            PROFILE HEADER CARD
            ───────────────────────────────────────────── */}
-        <div className="rounded-3xl border border-[#0D2B45]/20 bg-[#0D2B45] text-white p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div className="rounded-xl border border-[#0D2B45]/20 bg-[#0D2B45] text-white p-6 sm:p-8 shadow-lg relative overflow-hidden">
           <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
             
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
@@ -177,11 +177,11 @@ export function ProfileWorkspace({ onBack }) {
                 <img
                   src={avatarUrl}
                   alt={username}
-                  className="h-24 w-24 sm:h-28 sm:w-28 rounded-3xl object-cover border-4 border-amber-400/80 shadow-2xl transition-transform group-hover:scale-105"
+                  className="h-24 w-24 sm:h-28 sm:w-28 rounded-xl object-cover border-2 border-amber-400/80 shadow-md transition-transform group-hover:scale-105"
                 />
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="absolute bottom-0 right-0 p-2 rounded-2xl bg-amber-400 text-[#0D2B45] shadow-lg hover:scale-110 transition-transform cursor-pointer"
+                  className="absolute bottom-0 right-0 p-1.5 rounded-md bg-amber-400 text-[#0D2B45] shadow-xs hover:scale-105 transition-transform cursor-pointer"
                   title="Change Profile Photo"
                 >
                   <Camera className="h-4 w-4" />
@@ -191,24 +191,20 @@ export function ProfileWorkspace({ onBack }) {
               {/* User Details Display */}
               <div>
                 <div className="flex items-center justify-center sm:justify-start gap-2">
-                  <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-white">
+                  <h1 className="font-heading text-2xl sm:text-3xl font-bold text-white">
                     {username}
                   </h1>
-                  <span className="rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 border border-amber-400/30">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
                     Verified Traveler
                   </span>
                 </div>
 
-                <p className="text-xs text-white/80 mt-1 flex items-center justify-center sm:justify-start gap-1.5">
-                  <Mail className="h-3.5 w-3.5 text-amber-400" />
-                  {email}
-                  <span className="mx-1 opacity-40">•</span>
-                  <Phone className="h-3.5 w-3.5 text-amber-400" />
-                  {phone}
+                <p className="text-xs text-white/80 mt-1 flex items-center justify-center sm:justify-start gap-1.5 font-medium">
+                  {email} · {phone}
                 </p>
 
                 <p className="text-xs text-white/60 mt-2 font-medium">
-                  Member since 2024 • Active Itinerary: <span className="text-amber-400 font-bold">{destination || "Goa Getaway"}</span>
+                  Member since 2024 · Active Itinerary: <span className="text-amber-400 font-bold">{destination || "Goa Getaway"}</span>
                 </p>
               </div>
             </div>
@@ -216,7 +212,7 @@ export function ProfileWorkspace({ onBack }) {
             {/* Edit Profile Button */}
             <Button
               onClick={() => setIsEditing(!isEditing)}
-              className="rounded-2xl bg-amber-400 text-[#0D2B45] hover:bg-amber-300 font-bold text-xs px-5 py-2.5 shadow-lg flex items-center gap-2"
+              className="rounded-md bg-amber-400 text-[#0D2B45] hover:bg-amber-300 font-bold text-xs uppercase tracking-wider px-4 py-2 shadow-xs flex items-center gap-2 cursor-pointer"
             >
               <Edit3 className="h-4 w-4" />
               {isEditing ? "Done Editing" : "Edit Profile Settings"}
@@ -238,8 +234,8 @@ export function ProfileWorkspace({ onBack }) {
                   <button
                     key={idx}
                     onClick={() => setAvatarUrl(url)}
-                    className={`h-12 w-12 rounded-2xl overflow-hidden border-2 transition-all cursor-pointer ${
-                      avatarUrl === url ? "border-amber-400 ring-4 ring-amber-400/30 scale-110" : "border-white/20 opacity-70 hover:opacity-100"
+                    className={`h-12 w-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                      avatarUrl === url ? "border-amber-400 ring-2 ring-amber-400/30 scale-105" : "border-white/20 opacity-70 hover:opacity-100"
                     }`}
                   >
                     <img src={url} alt="Preset" className="h-full w-full object-cover" />
@@ -251,9 +247,9 @@ export function ProfileWorkspace({ onBack }) {
         </div>
 
         {/* ─────────────────────────────────────────────
-            ACCOUNT SETTINGS FORM (Name, Email, Phone with Security Dispatch)
+            ACCOUNT SETTINGS FORM
            ───────────────────────────────────────────── */}
-        <div className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-md">
+        <div className="rounded-xl border border-border bg-card p-6 sm:p-8 shadow-xs">
           <div className="flex items-center justify-between border-b border-border/60 pb-4 mb-6">
             <div>
               <h3 className="font-heading text-xl font-bold text-foreground">Account Credentials & Security</h3>
@@ -276,7 +272,7 @@ export function ProfileWorkspace({ onBack }) {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full rounded-2xl border border-border bg-background py-2.5 pl-10 pr-4 text-xs font-bold text-foreground outline-none focus:border-[#0D2B45]"
+                    className="w-full rounded-md border border-border bg-background py-2 pl-10 pr-4 text-xs font-semibold text-foreground outline-none focus:border-[#0D2B45]"
                   />
                 </div>
               </div>
@@ -293,13 +289,13 @@ export function ProfileWorkspace({ onBack }) {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-2xl border border-border bg-background py-2.5 pl-10 pr-4 text-xs font-bold text-foreground outline-none focus:border-[#0D2B45]"
+                      className="w-full rounded-md border border-border bg-background py-2 pl-10 pr-4 text-xs font-semibold text-foreground outline-none focus:border-[#0D2B45]"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={() => handleRequestContactChange("email", email)}
-                    className="rounded-xl bg-[#0D2B45] text-white text-[10px] font-bold px-3 py-2.5 hover:bg-[#12395b] shrink-0"
+                    className="rounded-md bg-[#0D2B45] text-white text-[10px] font-bold uppercase tracking-wider px-3 py-2 hover:bg-[#12395b] shrink-0 cursor-pointer"
                     title="Send verification link to previous email"
                   >
                     Verify
@@ -319,13 +315,13 @@ export function ProfileWorkspace({ onBack }) {
                       type="text"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full rounded-2xl border border-border bg-background py-2.5 pl-10 pr-4 text-xs font-bold text-foreground outline-none focus:border-[#0D2B45]"
+                      className="w-full rounded-md border border-border bg-background py-2 pl-10 pr-4 text-xs font-semibold text-foreground outline-none focus:border-[#0D2B45]"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={() => handleRequestContactChange("phone", phone)}
-                    className="rounded-xl bg-[#0D2B45] text-white text-[10px] font-bold px-3 py-2.5 hover:bg-[#12395b] shrink-0"
+                    className="rounded-md bg-[#0D2B45] text-white text-[10px] font-bold uppercase tracking-wider px-3 py-2 hover:bg-[#12395b] shrink-0 cursor-pointer"
                     title="Send SMS verification code to previous phone"
                   >
                     Verify
@@ -344,7 +340,7 @@ export function ProfileWorkspace({ onBack }) {
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-background p-2.5 text-xs font-bold text-foreground outline-none focus:border-[#0D2B45]"
+                  className="w-full rounded-md border border-border bg-background p-2 text-xs font-semibold text-foreground outline-none focus:border-[#0D2B45]"
                 >
                   <option value="INR (₹)">Indian Rupee (INR ₹)</option>
                   <option value="USD ($)">US Dollar (USD $)</option>
@@ -359,7 +355,7 @@ export function ProfileWorkspace({ onBack }) {
                 <select
                   value={travelStyle}
                   onChange={(e) => setTravelStyle(e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-background p-2.5 text-xs font-bold text-foreground outline-none focus:border-[#0D2B45]"
+                  className="w-full rounded-md border border-border bg-background p-2 text-xs font-semibold text-foreground outline-none focus:border-[#0D2B45]"
                 >
                   <option value="Balanced">Balanced Explorer</option>
                   <option value="Backpacker">Backpacker & Budget</option>
@@ -373,7 +369,7 @@ export function ProfileWorkspace({ onBack }) {
         {/* ─────────────────────────────────────────────
             GAMIFIED BADGES & TRAVEL ACHIEVEMENTS
            ───────────────────────────────────────────── */}
-        <div className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-md space-y-6">
+        <div className="rounded-xl border border-border bg-card p-6 sm:p-8 shadow-xs space-y-6">
           <div className="flex items-center justify-between border-b border-border/60 pb-4">
             <div>
               <h3 className="font-heading text-xl font-bold text-foreground flex items-center gap-2">
@@ -382,7 +378,7 @@ export function ProfileWorkspace({ onBack }) {
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">Unlocked based on your completed itineraries & expenditure milestones</p>
             </div>
-            <span className="text-xs font-extrabold text-amber-500 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 bg-amber-400/10 px-2.5 py-0.5 rounded-sm border border-amber-400/20">
               5 of 6 Unlocked
             </span>
           </div>
@@ -391,14 +387,14 @@ export function ProfileWorkspace({ onBack }) {
             {USER_BADGES.map((b) => (
               <div
                 key={b.id}
-                className={`rounded-2xl border p-4 transition-all relative overflow-hidden ${
+                className={`rounded-md border p-4 transition-all relative overflow-hidden ${
                   b.unlocked
-                    ? "border-amber-400/30 bg-amber-400/5 shadow-sm"
+                    ? "border-amber-400/30 bg-amber-400/5 shadow-xs"
                     : "border-border/60 bg-muted/40 opacity-60"
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${b.bgGradient} text-2xl shadow-md shrink-0`}>
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-br ${b.bgGradient} text-xl shadow-xs shrink-0`}>
                     {b.icon}
                   </div>
                   <div>

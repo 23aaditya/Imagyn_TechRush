@@ -738,7 +738,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               variant="outline"
               size="sm"
               onClick={onBack}
-              className="rounded-xl border-border bg-background hover:bg-accent text-xs sm:text-sm"
+              className="rounded-sm border-border bg-background hover:bg-accent text-xs sm:text-sm cursor-pointer"
             >
               <ArrowLeft className="mr-1.5 h-4 w-4" />
               Back to Overview
@@ -753,7 +753,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowPreferences((prev) => !prev)}
-                className={`rounded-xl border-border text-xs font-bold px-3.5 py-2 flex items-center gap-1.5 cursor-pointer transition-all ${
+                className={`rounded-sm border-border text-xs font-bold px-3.5 py-2 flex items-center gap-1.5 cursor-pointer transition-all ${
                   showPreferences ? "bg-[#5A8CB2] text-white border-[#5A8CB2]" : "bg-card text-foreground hover:bg-accent"
                 }`}
               >
@@ -767,7 +767,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 setSaved(true)
                 setTimeout(() => setSaved(false), 3000)
               }}
-              className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-extrabold text-xs px-4 py-2 shadow flex items-center gap-2 cursor-pointer"
+              className="rounded-sm bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-semibold text-xs uppercase tracking-wider px-4 py-2 shadow-xs flex items-center gap-2 cursor-pointer"
             >
               <Bookmark className="h-4 w-4" />
               {saved ? "Saved! Opening Report Pass..." : "Save Trip & Offline Pass"}
@@ -1135,10 +1135,6 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                       <MapPin className="h-3.5 w-3.5 text-[#5A8CB2]" />
                       <span>{(destination || "GOA").toUpperCase()}</span>
                     </div>
-                    <h2 className="font-heading text-2xl sm:text-3xl font-black text-foreground">
-                      {days}-Day {travelStyle || "Balanced"} Itinerary
-                    </h2>
-                  </div>
 
                   <div className="flex items-center gap-2.5 shrink-0">
                     <Button

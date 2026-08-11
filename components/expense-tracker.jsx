@@ -363,7 +363,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                 variant="outline"
                 size="sm"
                 onClick={onBack}
-                className="rounded-xl border-border bg-background hover:bg-accent text-xs sm:text-sm"
+                className="rounded-sm border-border bg-background hover:bg-accent text-xs sm:text-sm cursor-pointer"
               >
                 <ArrowLeft className="mr-1.5 h-4 w-4" />
                 Back to Overview
@@ -373,8 +373,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-500 dark:text-amber-400 border border-amber-400/20">
-                <Sparkles className="h-3.5 w-3.5" />
+              <span className="inline-flex items-center gap-1.5 rounded-sm bg-amber-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-500 dark:text-amber-400 border border-amber-400/20">
                 Live Synced with {destination || "Current Itinerary"}
               </span>
             </div>
@@ -391,14 +390,14 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
           </p>
         </div>
 
-        {/* View Switcher Pill (Current Trip vs Person-Wise Split vs Past Trips) */}
+        {/* View Switcher Bar (Current Trip vs Person-Wise Split vs Past Trips) */}
         <div className="mb-6 flex items-center justify-center">
-          <div className="inline-flex flex-wrap items-center justify-center gap-1 rounded-2xl bg-secondary/60 p-1.5 border border-border shadow-sm">
+          <div className="inline-flex flex-wrap items-center justify-center gap-1 rounded-md bg-secondary/50 p-1 border border-border">
             <button
               onClick={() => setActiveProfile("current")}
-              className={`rounded-xl px-4 sm:px-5 py-2 text-xs font-extrabold transition-all cursor-pointer ${
+              className={`rounded-sm px-3.5 sm:px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                 activeProfile === "current"
-                  ? "bg-[#0D2B45] text-white shadow-md"
+                  ? "bg-[#0D2B45] text-white"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -406,20 +405,19 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
             </button>
             <button
               onClick={() => setActiveProfile("person-wise")}
-              className={`rounded-xl px-4 sm:px-5 py-2 text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`rounded-sm px-3.5 sm:px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                 activeProfile === "person-wise"
-                  ? "bg-[#0D2B45] text-white shadow-md"
+                  ? "bg-[#0D2B45] text-white"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Users className="h-3.5 w-3.5 text-amber-400" />
               <span>Person-Wise Group Split</span>
             </button>
             <button
               onClick={() => setActiveProfile("past")}
-              className={`rounded-xl px-4 sm:px-5 py-2 text-xs font-extrabold transition-all cursor-pointer ${
+              className={`rounded-sm px-3.5 sm:px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                 activeProfile === "past"
-                  ? "bg-[#0D2B45] text-white shadow-md"
+                  ? "bg-[#0D2B45] text-white"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -445,36 +443,36 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
             >
               {/* Simplified 3-Stat Metric Cards */}
               <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-2">
+                <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Planned Budget</span>
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                      <Wallet className="h-4 w-4" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Planned Budget</span>
+                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary">
+                      <Wallet className="h-3.5 w-3.5" />
                     </span>
                   </div>
-                  <p className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground">₹{totalBudget.toLocaleString("en-IN")}</p>
+                  <p className="font-heading text-2xl sm:text-3xl font-bold text-foreground">₹{totalBudget.toLocaleString("en-IN")}</p>
                   <p className="text-[11px] text-muted-foreground font-medium">Derived from Itinerary Plan</p>
                 </div>
 
-                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-2">
+                <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Actual Spent</span>
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-400/15 text-amber-600 dark:text-amber-400">
-                      <TrendingUp className="h-4 w-4" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Actual Spent</span>
+                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-amber-400/15 text-amber-600 dark:text-amber-400">
+                      <TrendingUp className="h-3.5 w-3.5" />
                     </span>
                   </div>
-                  <p className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground">₹{totalSpent.toLocaleString("en-IN")}</p>
-                  <p className="text-[11px] font-extrabold text-amber-600 dark:text-amber-400">{pctSpent}% of budget logged</p>
+                  <p className="font-heading text-2xl sm:text-3xl font-bold text-foreground">₹{totalSpent.toLocaleString("en-IN")}</p>
+                  <p className="text-[11px] font-bold text-amber-600 dark:text-amber-400">{pctSpent}% of budget logged</p>
                 </div>
 
-                <div className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-2">
+                <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Remaining Balance</span>
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                      <PiggyBank className="h-4 w-4" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Remaining Balance</span>
+                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      <PiggyBank className="h-3.5 w-3.5" />
                     </span>
                   </div>
-                  <p className={`font-heading text-2xl sm:text-3xl font-extrabold ${remainingBudget >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"}`}>
+                  <p className={`font-heading text-2xl sm:text-3xl font-bold ${remainingBudget >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"}`}>
                     ₹{remainingBudget.toLocaleString("en-IN")}
                   </p>
                   <p className="text-[11px] font-semibold text-muted-foreground">
@@ -487,24 +485,24 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               <div className="grid gap-6 lg:grid-cols-12">
                 
                 {/* Graph 1: Planned vs Used Gauge & Category Breakdown */}
-                <div className="lg:col-span-6 rounded-3xl border border-border bg-card p-6 shadow-md">
+                <div className="lg:col-span-6 rounded-xl border border-border bg-card p-6 shadow-xs">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h4 className="font-heading text-lg font-bold text-foreground">Budget Planned vs. Used</h4>
                       <p className="text-xs text-muted-foreground">Overall allocation breakdown</p>
                     </div>
-                    <span className="rounded-full bg-amber-400/10 px-3 py-1 text-xs font-bold text-amber-500 dark:text-amber-400 border border-amber-400/20">
+                    <span className="rounded-md bg-amber-400/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400 border border-amber-400/20">
                       {pctSpent}% Used
                     </span>
                   </div>
 
                   {/* Visual Progress Bar */}
-                  <div className="h-4 w-full rounded-full bg-muted overflow-hidden relative p-0.5">
+                  <div className="h-3 w-full rounded-md bg-muted overflow-hidden relative">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${pctSpent}%` }}
                       transition={{ duration: 0.8, ease: "easeOut" }}
-                      className="h-full rounded-full bg-gradient-to-r from-[#0D2B45] via-amber-400 to-yellow-400 shadow-sm"
+                      className="h-full rounded-md bg-[#0D2B45]"
                     />
                   </div>
                   <div className="flex justify-between text-[11px] text-muted-foreground mt-2 font-semibold">
