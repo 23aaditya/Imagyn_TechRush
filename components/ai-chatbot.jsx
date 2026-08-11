@@ -21,6 +21,8 @@ import {
   Wallet,
   MapPin,
   CheckCircle2,
+  Mic,
+  Radio,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,6 +30,7 @@ import { cn } from "@/lib/utils"
 import { generateFallbackResponse, DESTINATION_KNOWLEDGE } from "@/lib/ai-travel-knowledge"
 import { useTrip } from "@/context/trip-context"
 import { parseAndExecuteBotActions } from "@/lib/bot-action-executor"
+import { GeminiLiveAudioModal } from "@/components/gemini-live-audio-modal"
 
 // Categorized Prompt Chips for organized browsing
 const PROMPT_CATEGORIES = [
@@ -71,15 +74,71 @@ const CATEGORIZED_PROMPTS = {
 
 export function AiChatbot({ currentView, onNavigate }) {
   const tripContext = useTrip()
-  const { itinerary, addSpotToItinerary, removeSpotByName, reorderDayActivities, generateTripItinerary, destination, setDestination } = tripContext
+  const { itinerary, addSpotToItinerary, removeSpotByName, reorderDayActivities, generateTripItinerary, destination, setDestination, setStartDate, setEndDate, setDays } = tripContext;
 
   const [isOpen, setIsOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isLiveAudioOpen, setIsLiveAudioOpen] = useState(false)
+  const [isRecordingMic, setIsRecordingMic] = useState(false)
   const [apiKey, setApiKey] = useState("")
   const [showSettings, setShowSettings] = useState(false)
   const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeCategory, setActiveCategory] = useState("all")
+  const recognitionRef = useRef(null)
+
+  const toggleMicRecording = () => {
+    if (isRecordingMic) {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop() } catch (e) {}
+      }
+      setIsRecordingMic(false)
+      return
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      setIsLiveAudioOpen(true)
+      return
+    }
+
+    try {
+      const rec = new SpeechRecognition()
+      rec.continuous = false
+      rec.interimResults = true
+      rec.lang = "en-US"
+
+      rec.onstart = () => {
+        setIsRecordingMic(true)
+      }
+
+      rec.onresult = (e) => {
+        let transcript = ""
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          transcript += e.results[i][0].transcript
+        }
+        if (transcript) {
+          setInputMessage(transcript)
+        }
+      }
+
+      rec.onerror = (e) => {
+        console.warn("Mic recording error:", e.error)
+        setIsRecordingMic(false)
+      }
+
+      rec.onend = () => {
+        setIsRecordingMic(false)
+      }
+
+      recognitionRef.current = rec
+      rec.start()
+    } catch (e) {
+      console.error("Failed to start mic recording:", e)
+      setIsRecordingMic(false)
+      setIsLiveAudioOpen(true)
+    }
+  }
   
   const [messages, setMessages] = useState([
     {
@@ -153,6 +212,35 @@ export function AiChatbot({ currentView, onNavigate }) {
         numDays = parseInt(daysMatch[1], 10)
       }
 
+      // Parse date range if present (e.g., "from 3 October to 5 October")
+      const dateRangeRegex = /(\d{1,2})\s*(january|february|march|april|may|june|july|august|september|october|november|december)\s*to\s*(\d{1,2})\s*(january|february|march|april|may|june|july|august|september|october|november|december)/i;
+      const dateMatch = lowerText.match(dateRangeRegex);
+      if (dateMatch) {
+        const monthMap = {
+          january: "01", february: "02", march: "03", april: "04", may: "05", june: "06",
+          july: "07", august: "08", september: "09", october: "10", november: "11", december: "12"
+        };
+        const startDay = dateMatch[1].padStart(2, "0");
+        const startMonth = monthMap[dateMatch[2].toLowerCase()];
+        const endDay = dateMatch[3].padStart(2, "0");
+        const endMonth = monthMap[dateMatch[4].toLowerCase()];
+        const year = new Date().getFullYear();
+        const startISO = `${year}-${startMonth}-${startDay}`;
+        const endISO = `${year}-${endMonth}-${endDay}`;
+        // Update context dates
+        setStartDate?.(startISO);
+        setEndDate?.(endISO);
+        // Compute number of days inclusive
+        const startDt = new Date(startISO);
+        const endDt = new Date(endISO);
+        const diff = (endDt - startDt) / (1000 * 60 * 60 * 24);
+        if (!isNaN(diff) && diff >= 0) {
+          const calculatedDays = Math.round(diff) + 1;
+          setDays(calculatedDays);
+          numDays = calculatedDays;
+        }
+      }
+
       // Parse destination name
       const destMatch = messageText.match(/(?:for|to|in)\s+([A-Za-z\s]+?)(?:\s+and|\s+trip|\s+for|\s+days?|$)/i)
       if (destMatch && destMatch[1] && destMatch[1].trim().length >= 2) {
@@ -176,29 +264,126 @@ export function AiChatbot({ currentView, onNavigate }) {
       return
     }
 
+    // Check if user is requesting to CHANGE TARGET TRIP BUDGET
+    const isBudgetChangeIntent = (lowerText.includes("budget") || lowerText.includes("cost limit") || lowerText.includes("target budget")) && (lowerText.includes("set") || lowerText.includes("change") || lowerText.includes("update") || lowerText.includes("make") || lowerText.includes("to") || lowerText.includes("limit"))
+    if (isBudgetChangeIntent) {
+      const amountMatch = lowerText.match(/(?:₹|rs\.?|inr)?\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)?/i)
+      if (amountMatch && amountMatch[1]) {
+        let amount = parseInt(amountMatch[1].replace(/,/g, ""), 10)
+        if (lowerText.includes("k") && amount < 1000) amount *= 1000
+        if (amount > 0 && tripContext.setCustomTargetBudget) {
+          tripContext.setCustomTargetBudget(amount)
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: (Date.now() + 1).toString(),
+              role: "assistant",
+              content: `💰 **Target Trip Budget updated to ₹${amount.toLocaleString()}!**\n\nYour category allocations and financial summaries have been synchronized. [ACTION:navigate:budget]`,
+              executedActions: [`💰 Target Budget set to ₹${amount.toLocaleString()}`],
+              timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            },
+          ])
+          setIsLoading(false)
+          return
+        }
+      }
+    }
+
+    // Check if user is requesting to LOG AN EXPENSE
+    const isExpenseLogIntent = (lowerText.includes("log") || lowerText.includes("record") || lowerText.includes("add")) && (lowerText.includes("expense") || lowerText.includes("paid") || lowerText.includes("spent"))
+    if (isExpenseLogIntent) {
+      const amountMatch = lowerText.match(/(?:₹|rs\.?|inr)?\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)?/i)
+      let amount = amountMatch && amountMatch[1] ? parseInt(amountMatch[1].replace(/,/g, ""), 10) : 500
+      if (lowerText.includes("k") && amount < 1000) amount *= 1000
+
+      let paidBy = "Rahul"
+      const paidMatch = messageText.match(/paid\s+by\s+([A-Za-z]+)/i) || messageText.match(/by\s+([A-Za-z]+)/i)
+      if (paidMatch && paidMatch[1]) paidBy = paidMatch[1].trim()
+
+      let cat = "Food & Dining"
+      if (lowerText.includes("transport") || lowerText.includes("cab") || lowerText.includes("taxi") || lowerText.includes("flight") || lowerText.includes("train")) cat = "Transport"
+      else if (lowerText.includes("hotel") || lowerText.includes("stay") || lowerText.includes("resort") || lowerText.includes("villa")) cat = "Accommodation"
+      else if (lowerText.includes("activity") || lowerText.includes("ticket") || lowerText.includes("tour") || lowerText.includes("park")) cat = "Activities"
+      else if (lowerText.includes("shopping") || lowerText.includes("souvenir") || lowerText.includes("clothes")) cat = "Shopping"
+
+      let title = "Expense"
+      const titleMatch = messageText.match(/(?:for|on)\s+([A-Za-z\s]+?)(?:\s+in|\s+paid|\s+by|\s+amount|\s+rs|\s+₹|$)/i)
+      if (titleMatch && titleMatch[1]) title = titleMatch[1].trim()
+      else if (cat) title = `${cat} Expense`
+
+      if (tripContext.addActualExpense) {
+        tripContext.addActualExpense({
+          title,
+          description: title,
+          amount,
+          category: cat,
+          paidBy,
+          date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        })
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: `🧾 **Logged Expense:** "${title}" (₹${amount.toLocaleString()}) paid by **${paidBy}** in **${cat}**!\n\nYour Expense Tracker balances have been refreshed. [ACTION:navigate:expenses]`,
+            executedActions: [`🧾 Logged ₹${amount.toLocaleString()} for ${title} paid by ${paidBy}`],
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ])
+        setIsLoading(false)
+        return
+      }
+    }
+
+    // Check if user is requesting to CHANGE STAY TIER
+    const isTierChangeIntent = lowerText.includes("tier") || lowerText.includes("luxury") || lowerText.includes("economy") || lowerText.includes("standard") || lowerText.includes("budget tier")
+    if (isTierChangeIntent && (lowerText.includes("set") || lowerText.includes("switch") || lowerText.includes("change") || lowerText.includes("to"))) {
+      let tier = "Standard"
+      if (lowerText.includes("luxury") || lowerText.includes("5 star") || lowerText.includes("premium")) tier = "Luxury"
+      else if (lowerText.includes("economy") || lowerText.includes("budget") || lowerText.includes("cheap")) tier = "Economy"
+
+      if (tripContext.setStayTier) {
+        tripContext.setStayTier(tier)
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: `🏨 **Stay Tier updated to ${tier}!**\n\nAccommodation costs and estimated trip totals have been updated. [ACTION:navigate:budget]`,
+            executedActions: [`🏨 Stay Tier changed to ${tier}`],
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ])
+        setIsLoading(false)
+        return
+      }
+    }
+
     // Check if user is requesting navigation linking
-    const isNavIntent = ["go to", "open", "show", "take me to", "navigate", "switch to", "view"].some((kw) => lowerText.includes(kw))
+    const isNavIntent = ["go to", "open", "show", "take me to", "navigate", "switch to", "view"].some((kw) => lowerText.includes(kw)) || lowerText.includes("workspace") || lowerText.includes("workplace")
     if (isNavIntent) {
       let targetView = null
       let viewName = ""
       if (lowerText.includes("budget")) {
         targetView = "budget"
-        viewName = "Budget Calculator"
+        viewName = "Budget Calculator Workspace"
       } else if (lowerText.includes("expense")) {
         targetView = "expenses"
-        viewName = "Expense Tracker"
-      } else if (lowerText.includes("planner") || lowerText.includes("itinerary")) {
-        targetView = "itinerary"
-        viewName = "Itinerary Planner Workspace"
+        viewName = "Expense Tracker Workspace"
       } else if (lowerText.includes("explore") || lowerText.includes("world")) {
         targetView = "explore"
-        viewName = "Explore World"
+        viewName = "Explore World Workspace"
       } else if (lowerText.includes("package")) {
         targetView = "packages"
-        viewName = "Package Comparison"
+        viewName = "Package Comparison Workspace"
       } else if (lowerText.includes("profile") || lowerText.includes("passport")) {
         targetView = "profile"
-        viewName = "User Profile & Passport"
+        viewName = "User Profile & Passport Workspace"
+      } else {
+        // Default "open workplace/workspace/planner/itinerary" to Itinerary Planner Workspace
+        targetView = "itinerary"
+        viewName = "Itinerary Planner Workspace"
       }
 
       if (targetView) {
@@ -208,17 +393,46 @@ export function AiChatbot({ currentView, onNavigate }) {
             id: (Date.now() + 1).toString(),
             role: "assistant",
             content: `**[Category: 🚀 Quick Action]**\n\nSure! Click below to jump directly to **${viewName}**:\n[ACTION:navigate:${targetView}]`,
+            executedActions: [`🚀 Switched view to ${targetView.toUpperCase()}`],
             timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           },
         ])
+        onNavigate?.(targetView)
         setIsLoading(false)
         return
       }
     }
 
-    // Check if user is requesting Boots to REMOVE a location from the itinerary
+    // Check if user is requesting Boots to REMOVE a location or DAY from the itinerary
     const isRemoveIntent = ["remove", "delete", "drop", "take out", "cancel", "erase"].some((kw) => lowerText.includes(kw))
     if (isRemoveIntent) {
+      // Check if user is asking to remove a DAY (e.g. "remove day 2", "delete day 3", "remove this day")
+      const isDayRemove = lowerText.includes("day") || lowerText.includes("this day")
+      if (isDayRemove && !lowerText.includes("spot") && !lowerText.includes("place") && !lowerText.includes("attraction")) {
+        const dayMatch = lowerText.match(/day\s*(\d+)/i)
+        const dayNum = dayMatch && dayMatch[1] ? parseInt(dayMatch[1], 10) : (itinerary?.length || 1)
+
+        if (tripContext.removeDayFromItinerary) {
+          const wasRemoved = tripContext.removeDayFromItinerary(dayNum)
+          const actionReply = wasRemoved
+            ? `🗑️ **Removed Day ${dayNum}** from your Itinerary Planner! Remaining days have been renumbered and live route map synchronized. [ACTION:navigate:itinerary]`
+            : `⚠️ Couldn't find **Day ${dayNum}** in your current itinerary.`
+
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: (Date.now() + 1).toString(),
+              role: "assistant",
+              content: actionReply,
+              executedActions: wasRemoved ? [`🗑️ Removed Day ${dayNum} from itinerary planner`] : [],
+              timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            },
+          ])
+          setIsLoading(false)
+          return
+        }
+      }
+
       let spotName = messageText
         .replace(/can\s+you\s+/i, "")
         .replace(/(?:please\s+)?(?:remove|delete|drop|take out|cancel|erase)\s+/i, "")
@@ -280,10 +494,42 @@ export function AiChatbot({ currentView, onNavigate }) {
       return
     }
 
-    // Check if user is requesting Boots to ADD a location to the planner
+    // Check if user is requesting Boots to ADD a location or DAY to the planner
     const isAddIntent = ["add", "put", "include", "insert", "schedule", "place"].some((kw) => lowerText.includes(kw))
 
     if (isAddIntent) {
+      // Check if user is asking to add a DAY (e.g. "add day", "add a day", "add it again", "add another day", "put it back", "add it")
+      const isDayAdd = (lowerText.includes("day") || lowerText.includes("it again") || lowerText.includes("another day") || lowerText.includes("put it back") || lowerText.includes("add it")) && !lowerText.includes("spot") && !lowerText.includes("place") && !lowerText.includes("attraction")
+      if (isDayAdd) {
+        let restored = false
+        if (tripContext.lastRemovedDayState && tripContext.restoreLastRemovedDay) {
+          restored = tripContext.restoreLastRemovedDay()
+        } else if (tripContext.addDayToItinerary) {
+          tripContext.addDayToItinerary()
+        }
+
+        const msgText = restored
+          ? `↩️ **Restored your removed Day** back to its exact original position! Live route map and budget synchronized. [ACTION:navigate:itinerary]`
+          : `➕ **Added Day ${(itinerary?.length || 0) + 1}** to your Itinerary Planner! Live route map and budget synchronized. [ACTION:navigate:itinerary]`
+
+        const actionText = restored
+          ? `↩️ Restored removed Day back to its exact original position`
+          : `➕ Added Day ${(itinerary?.length || 0) + 1} to itinerary planner`
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: msgText,
+            executedActions: [actionText],
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ])
+        setIsLoading(false)
+        return
+      }
+
       let spotName = messageText
         .replace(/can\s+you\s+/i, "")
         .replace(/(?:please\s+)?(?:add|put|include|insert|schedule|place)\s+/i, "")
@@ -359,12 +605,24 @@ export function AiChatbot({ currentView, onNavigate }) {
         body: JSON.stringify({
           messages: updatedHistory,
           userApiKey: apiKey || undefined,
+          tripState: {
+            destination: tripContext.destination,
+            startDate: tripContext.startDate,
+            endDate: tripContext.endDate,
+            days: tripContext.days,
+            travelers: tripContext.travelers,
+            stayTier: tripContext.stayTier,
+            targetBudget: tripContext.customTargetBudget || tripContext.totalBudget,
+            itinerary: tripContext.itinerary,
+            loggedExpenses: tripContext.actualExpenses,
+            activeStay: tripContext.activeStay || null
+          }
         }),
       })
 
       if (res.ok) {
         const data = await res.json()
-        const { cleanText, executedActions } = parseAndExecuteBotActions(data.text, tripContext, onNavigate)
+        const { cleanText, executedActions, planPreview } = parseAndExecuteBotActions(data.text, tripContext, onNavigate)
         setMessages((prev) => [
           ...prev,
           {
@@ -372,6 +630,7 @@ export function AiChatbot({ currentView, onNavigate }) {
             role: "assistant",
             content: cleanText,
             executedActions,
+            planPreviewCard: planPreview,
             isGemini: true,
             timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           },
@@ -379,7 +638,7 @@ export function AiChatbot({ currentView, onNavigate }) {
       } else {
         // Fallback to local intelligence engine if API fails or no key
         const fallback = generateFallbackResponse(messageText)
-        const { cleanText, executedActions } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
+        const { cleanText, executedActions, planPreview } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
         setMessages((prev) => [
           ...prev,
           {
@@ -387,6 +646,7 @@ export function AiChatbot({ currentView, onNavigate }) {
             role: "assistant",
             content: cleanText,
             executedActions,
+            planPreviewCard: planPreview,
             isFallback: true,
             destinationCard: fallback.destinationCard,
             dayPlanCard: fallback.dayPlanCard,
@@ -397,7 +657,7 @@ export function AiChatbot({ currentView, onNavigate }) {
     } catch (err) {
       // Offline fallback
       const fallback = generateFallbackResponse(messageText)
-      const { cleanText, executedActions } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
+      const { cleanText, executedActions, planPreview } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
       setMessages((prev) => [
         ...prev,
         {
@@ -405,6 +665,7 @@ export function AiChatbot({ currentView, onNavigate }) {
           role: "assistant",
           content: cleanText,
           executedActions,
+          planPreviewCard: planPreview,
           isFallback: true,
           destinationCard: fallback.destinationCard,
           dayPlanCard: fallback.dayPlanCard,
@@ -624,7 +885,19 @@ export function AiChatbot({ currentView, onNavigate }) {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsLiveAudioOpen(true)}
+                  className="rounded-xl border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 font-extrabold text-[11px] h-8 px-2.5 flex items-center gap-1 shadow-xs transition-all"
+                  title="Open Gemini 2.5 Flash Native Audio Live Mode"
+                >
+                  <Radio className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
+                  <span>Live Voice</span>
+                </Button>
+
                 <Button
                   variant="ghost"
                   size="icon"
@@ -715,7 +988,38 @@ export function AiChatbot({ currentView, onNavigate }) {
                           </div>
                         )}
 
-                        {/* Special Destination Card if available */}
+                        {/* Plan Itinerary Preview Card */}
+                        {msg.planPreviewCard && (
+                          <div className="mt-3 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-background p-3.5 space-y-2.5 shadow-md">
+                            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
+                              <div>
+                                <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-500">
+                                  Trip Plan Request
+                                </span>
+                                <h4 className="font-heading font-extrabold text-sm text-foreground">
+                                  {msg.planPreviewCard.days}-Day {msg.planPreviewCard.tier} Trip to {msg.planPreviewCard.destination}
+                                </h4>
+                              </div>
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
+                                {msg.planPreviewCard.tier}
+                              </span>
+                            </div>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                generateTripItinerary(msg.planPreviewCard.destination, msg.planPreviewCard.days)
+                                if (tripContext.setStayTier) {
+                                  tripContext.setStayTier(msg.planPreviewCard.tier)
+                                }
+                                onNavigate?.("itinerary")
+                              }}
+                              className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold text-xs py-2.5 shadow-lg flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-[1.01]"
+                            >
+                              <Calendar className="h-4 w-4 stroke-[2.5]" />
+                              Plan Itinerary & Sync Map
+                            </Button>
+                          </div>
+                        )}
                         {msg.destinationCard && (
                           <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-1.5">
                             <div className="flex items-center justify-between">
@@ -861,10 +1165,27 @@ export function AiChatbot({ currentView, onNavigate }) {
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Ask about day plans, peak season, crowds..."
+                  placeholder={isRecordingMic ? "🎙️ Listening to your voice..." : "Ask about day plans, peak season, crowds..."}
                   disabled={isLoading}
-                  className="h-10 rounded-md bg-background text-xs sm:text-sm border-border/80 focus-visible:ring-primary"
+                  className={cn(
+                    "h-10 rounded-xl bg-background text-xs sm:text-sm border-border/80 focus-visible:ring-primary transition-colors",
+                    isRecordingMic && "border-red-500 ring-2 ring-red-500/30 bg-red-500/5 text-red-600 dark:text-red-400 font-semibold"
+                  )}
                 />
+                <Button
+                  type="button"
+                  onClick={toggleMicRecording}
+                  title={isRecordingMic ? "Stop Voice Recording" : "Voice Recording (Speak Message)"}
+                  className={cn(
+                    "h-10 w-10 shrink-0 rounded-xl transition-all shadow-2xs",
+                    isRecordingMic
+                      ? "bg-red-500 text-white animate-pulse shadow-red-500/50"
+                      : "border border-amber-500/40 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+                  )}
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
+
                 <Button
                   type="submit"
                   disabled={!inputMessage.trim() || isLoading}
@@ -877,6 +1198,15 @@ export function AiChatbot({ currentView, onNavigate }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Gemini 2.5 Flash Native Audio Multimodal Live Modal */}
+      <GeminiLiveAudioModal
+        isOpen={isLiveAudioOpen}
+        onClose={() => setIsLiveAudioOpen(false)}
+        tripContext={tripContext}
+        onNavigate={onNavigate}
+        apiKey={apiKey}
+      />
     </>
   )
 }

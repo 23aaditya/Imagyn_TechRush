@@ -37,7 +37,8 @@ import {
   CheckSquare,
   FileText,
   Check,
-  GripVertical
+  GripVertical,
+  Wallet
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
@@ -303,6 +304,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
   const [budgetTier, setBudgetTier] = useState("Moderate") // Moderate | Budget | Luxury | Custom
   const [customBudgetVal, setCustomBudgetVal] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
+  const [activeSpotDetail, setActiveSpotDetail] = useState(null)
 
   // Destination Planning Option State (Plan via Explore vs Add Customized Location Directly)
   const [destPlanningMode, setDestPlanningMode] = useState("explore") // 'explore' | 'custom'
@@ -751,11 +753,9 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowPreferences((prev) => !prev)}
-                className={`rounded-sm border-border text-xs font-bold px-3.5 py-2 flex items-center gap-1.5 cursor-pointer transition-all ${
-                  showPreferences ? "bg-[#5A8CB2] text-white border-[#5A8CB2]" : "bg-card text-foreground hover:bg-accent"
-                }`}
+                className={`rounded-full border-2 border-[#5B8DEF]/50 bg-[#5B8DEF]/15 text-[#0F172A] text-xs font-bold px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all hover:bg-[#5B8DEF]/25 shadow-xs`}
               >
-                <SlidersHorizontal className="h-4 w-4" />
+                <SlidersHorizontal className="h-4 w-4 text-[#0F172A]" />
                 <span>{showPreferences ? "Hide Trip Options" : "Edit Trip Options"}</span>
               </Button>
             )}
@@ -765,9 +765,9 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 setSaved(true)
                 setTimeout(() => setSaved(false), 3000)
               }}
-              className="rounded-sm bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-semibold text-xs uppercase tracking-wider px-4 py-2 shadow-xs flex items-center gap-2 cursor-pointer"
+              className="rounded-full bg-[#5B8DEF] text-[#0F172A] hover:bg-[#487AE0] font-bold text-xs uppercase tracking-wider px-5 py-2.5 shadow-md shadow-[#5B8DEF]/25 flex items-center gap-2 cursor-pointer transition-all"
             >
-              <Bookmark className="h-4 w-4" />
+              <Bookmark className="h-4 w-4 text-[#0F172A]" />
               {saved ? "Saved! Opening Report Pass..." : "Save Trip & Offline Pass"}
             </Button>
           </div>
@@ -775,22 +775,21 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
         {/* Title Header & Single Streamlined Search Bar */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-          <div>
-            <span className="font-mono-tech text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[#5A8CB2] block mb-1">
-              03 DAYS · 15°28′N 73°49′E · {destination ? destination.toUpperCase() : "GOA, INDIA"}
-            </span>
-            <h1 className="font-serif-editorial text-3xl sm:text-5xl font-black tracking-tight text-foreground uppercase leading-[0.95]">
-              DESIGN YOUR<br />
-              <span className="font-heading font-extrabold text-[#5A8CB2] italic lowercase">personalized</span><br />
-              ITINERARY.
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-muted text-foreground font-black text-[11px] px-3.5 py-1.5 uppercase tracking-wider border border-border">
+              <Sparkles className="h-3.5 w-3.5 text-foreground" />
+              <span>TOTAL {days || 3} DAY ITINERARY TO {(destination || "GOA").toUpperCase()}</span>
+            </div>
+            <h1 className="font-heading text-4xl sm:text-5xl font-black text-foreground tracking-tight">
+              Design Your Personalized Trip
             </h1>
-            <p className="mt-2 text-xs sm:text-sm text-muted-foreground max-w-xl font-medium tracking-wide">
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-xl font-medium">
               Drag to reorder spots, sync with live map, optimize routes & add custom spots.
             </p>
           </div>
 
           {/* Single Streamlined Search Bar */}
-          <div className="relative min-w-[280px] sm:min-w-[360px]">
+          <div className="relative min-w-[300px] sm:min-w-[400px]">
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -801,21 +800,21 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 setShowSearchDropdown(false)
                 setMiniGoogleOpen(true)
               }}
-              className="relative flex items-center rounded-md border border-border bg-card shadow-xs p-1"
+              className="relative flex items-center"
             >
-              <Search className="h-4 w-4 text-muted-foreground ml-3 shrink-0" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search any location or spot live..."
                 value={searchQuery}
                 onChange={(e) => handleSearchInputChange(e.target.value)}
                 onFocus={() => searchQuery.trim() && setShowSearchDropdown(true)}
-                className="w-full bg-transparent px-3 py-2 text-xs font-medium text-foreground outline-none placeholder:text-muted-foreground"
+                className="w-full rounded-full border-2 border-[#5B8DEF]/50 bg-[#5B8DEF]/10 pl-11 pr-28 py-3 text-xs font-bold text-[#0F172A] outline-none focus:ring-2 focus:ring-[#5B8DEF]/40"
               />
               <Button
                 type="submit"
                 size="sm"
-                className="rounded-sm bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-semibold text-xs uppercase tracking-wider px-4 py-2 shadow-xs shrink-0 cursor-pointer"
+                className="absolute right-1.5 rounded-full bg-[#5B8DEF] text-[#0F172A] hover:bg-[#487AE0] text-xs font-bold px-5 py-2 shadow-sm"
               >
                 Search
               </Button>
@@ -829,7 +828,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
           {/* LEFT SIDE (4 OR 6 COLS): Interactive Map (When Globe Clicked) OR Trip Preferences Form */}
           <AnimatePresence mode="wait">
             {isMapVisible ? (
-              /* MAP APPEARS ON THE LEFT SIDE WHEN GLOBE CLICKED (User Prompt Request) */
+              /* MAP APPEARS ON THE LEFT SIDE WHEN GLOBE CLICKED */
               <motion.div
                 key="map-view"
                 initial={{ opacity: 0, x: -30 }}
@@ -838,8 +837,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 transition={{ duration: 0.35 }}
                 className="lg:col-span-6 flex flex-col space-y-3 sticky top-24"
               >
-                <div className="rounded-xl border border-border bg-card shadow-lg flex flex-col h-[680px] relative overflow-hidden">
-                  {/* Next-Gen Edge-to-Edge Leaflet Map */}
+                <div className="rounded-3xl border-2 border-border/80 bg-card shadow-2xl flex flex-col h-[680px] relative overflow-hidden">
                   <TripMap
                     spots={activeSpots}
                     nearbyPlaces={activeNearbyPlaces}
@@ -849,385 +847,253 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 </div>
               </motion.div>
             ) : (showPreferences || !itinerary || itinerary.length === 0) ? (
-              /* TRIP PREFERENCE PANEL ON THE LEFT (Collapsible when itinerary generated) */
+              /* TRIP PREFERENCES PANEL ON THE LEFT */
               <motion.div
                 key="pref-view"
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -30 }}
                 transition={{ duration: 0.35 }}
-                className="lg:col-span-4 rounded-xl border border-border bg-card p-6 shadow-xs space-y-6 sticky top-24"
+                className="lg:col-span-4 rounded-3xl border border-border bg-card p-6 shadow-xl space-y-6 sticky top-24"
               >
-                <div className="border-b border-border pb-4 space-y-3">
+                <div className="border-b border-border/80 pb-4 space-y-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-heading text-lg font-bold text-foreground">
+                    <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-[#5A8CB2]" />
                       Trip Preferences
                     </h3>
-                    {destination && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#5A8CB2] bg-[#5A8CB2]/10 px-2 py-0.5 rounded-xs border border-[#5A8CB2]/20">
-                        {destination}
-                      </span>
-                    )}
+                    <span className="text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 border border-rose-200/50 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                      📍 {destination || "Goa"}
+                    </span>
                   </div>
-                  <p className="text-xs text-muted-foreground">Customize your destination, travel dates and stay tier.</p>
-
-                  {/* DESTINATION SELECTION MODE: TWO OPTIONS (Explore Section vs Direct Custom Location) */}
-                  <div className="pt-2 space-y-2">
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Planning Option
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setDestPlanningMode("explore")}
-                        className={`flex items-center justify-center rounded-sm border p-2.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer backdrop-blur-md ${destPlanningMode === "explore"
-                            ? "border-[#5A8CB2]/80 bg-[#5A8CB2]/30 text-[#5A8CB2] dark:text-[#9BC2E6] shadow-sm"
-                            : "border-border/80 bg-background/50 text-muted-foreground hover:bg-accent/80 hover:text-foreground"
-                          }`}
-                      >
-                        <span>Plan via Explore</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDestPlanningMode("custom")}
-                        className={`flex items-center justify-center rounded-sm border p-2.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer backdrop-blur-md ${destPlanningMode === "custom"
-                            ? "border-[#5A8CB2]/80 bg-[#5A8CB2]/30 text-[#5A8CB2] dark:text-[#9BC2E6] shadow-sm"
-                            : "border-border/80 bg-background/50 text-muted-foreground hover:bg-accent/80 hover:text-foreground"
-                          }`}
-                      >
-                        <span>Direct Custom Location</span>
-                      </button>
-                    </div>
-
-                    {/* OPTION 1: PLAN THROUGH EXPLORE SECTION */}
-                    {destPlanningMode === "explore" ? (
-                      <div className="space-y-2 pt-1">
-                        <div className="relative">
-                          <select
-                            value={destination || ""}
-                            onChange={(e) => {
-                              if (e.target.value === "__EXPLORE_ALL__") {
-                                onNavigateView && onNavigateView("explore")
-                              } else {
-                                setDestination(e.target.value)
-                                setCustomDestInput(e.target.value)
-                              }
-                            }}
-                            className="w-full rounded-md border border-border bg-background px-3.5 py-2.5 text-xs font-semibold text-foreground outline-none focus:border-[#5A8CB2] cursor-pointer appearance-none"
-                          >
-                            <option value="" disabled>-- Select a Destination from Explore --</option>
-                            {destinationsData.map((d) => (
-                              <option key={d.id || d.name} value={d.name}>
-                                📍 {d.name} ({d.country}) — {d.vibe || d.type}
-                              </option>
-                            ))}
-                            <option value="__EXPLORE_ALL__">🌐 Browse Full Explore Section...</option>
-                          </select>
-                          <ChevronRight className="absolute right-3.5 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none rotate-90" />
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => onNavigateView && onNavigateView("explore")}
-                          className="w-full text-left text-[11px] font-bold text-[#5A8CB2] hover:underline flex items-center justify-between px-1"
-                        >
-                          <span>Explore all 105+ curated destinations</span>
-                          <ArrowLeft className="h-3 w-3 rotate-180" />
-                        </button>
-                      </div>
-                    ) : (
-                      /* OPTION 2: ADD CUSTOMIZED LOCATION DIRECTLY WITH AUTO-SUGGESTIONS BAR */
-                      <div className="space-y-2 pt-1 relative">
-                        <div className="relative flex items-center">
-                          <MapPin className="absolute left-3.5 h-4 w-4 text-[#5A8CB2] shrink-0" />
-                          <input
-                            type="text"
-                            placeholder="Enter any city or location (e.g. Kashmir, Paris)..."
-                            value={customDestInput}
-                            onChange={(e) => {
-                              const val = e.target.value
-                              setCustomDestInput(val)
-                              if (val.trim()) {
-                                const q = val.toLowerCase()
-                                const matches = destinationsData.filter(
-                                  (d) =>
-                                    d.name.toLowerCase().includes(q) ||
-                                    d.country?.toLowerCase().includes(q) ||
-                                    d.vibe?.toLowerCase().includes(q) ||
-                                    d.subtitle?.toLowerCase().includes(q)
-                                ).slice(0, 5)
-                                setCustomSuggestions(matches)
-                                setShowCustomSuggestions(true)
-                              } else {
-                                setCustomSuggestions([])
-                                setShowCustomSuggestions(false)
-                              }
-                            }}
-                            onFocus={() => {
-                              if (customDestInput.trim() && customSuggestions.length > 0) {
-                                setShowCustomSuggestions(true)
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && customDestInput.trim()) {
-                                setShowCustomSuggestions(false)
-                                handleGenerate(customDestInput.trim())
-                              }
-                            }}
-                            className="w-full rounded-2xl border border-border bg-background pl-9 pr-16 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2]"
-                          />
-                          {customDestInput.trim() && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowCustomSuggestions(false)
-                                handleGenerate(customDestInput.trim())
-                              }}
-                              className="absolute right-1.5 rounded-xl bg-[#5A8CB2] text-white font-extrabold text-[11px] px-2.5 py-1 shadow-xs hover:bg-[#4A7CA2] cursor-pointer"
-                            >
-                              Set
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Auto-Suggestion Dropdown Bar */}
-                        {showCustomSuggestions && customSuggestions.length > 0 && (
-                          <div className="absolute top-12 left-0 right-0 z-50 bg-background/95 backdrop-blur-md rounded-md border border-border shadow-2xl overflow-hidden max-h-48 overflow-y-auto p-1.5 space-y-1">
-                            {customSuggestions.map((item, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                onClick={() => {
-                                  setCustomDestInput(item.name)
-                                  setShowCustomSuggestions(false)
-                                }}
-                                className="flex items-center justify-between w-full text-left p-2 rounded-xs hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <MapPin className="h-3.5 w-3.5 text-[#5A8CB2] shrink-0" />
-                                  <span className="font-bold">{item.name}</span>
-                                  <span className="text-[10px] text-muted-foreground">({item.country})</span>
-                                </div>
-                                <span className="text-[10px] font-bold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2 py-0.5 rounded-xs shrink-0">
-                                  {item.vibe || item.type}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-
-                        <p className="text-[10px] text-muted-foreground px-1">
-                          Type any location. Click "Generate Itinerary" below when ready to build your trip.
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  <p className="text-xs text-muted-foreground font-medium">
+                    Customize your destination, travel dates and stay tier.
+                  </p>
                 </div>
 
-                <div className="space-y-4">
-                  {/* Single Unified Calendar Range Picker */}
-                  <div className="relative">
-                    <label className="mb-2 block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Trip Dates & Duration
-                    </label>
+                {/* PLANNING OPTION */}
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
+                    PLANNING OPTION
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-medium">
                     <button
                       type="button"
-                      onClick={() => setCalendarOpen(!calendarOpen)}
-                      className="w-full flex items-center justify-between rounded-sm border border-border bg-background px-4 py-3 text-xs font-bold text-foreground shadow-xs hover:border-primary transition-all cursor-pointer"
+                      onClick={() => setDestPlanningMode("explore")}
+                      className={`p-3 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        destPlanningMode === "explore"
+                          ? "border-[#5A8CB2] bg-[#5A8CB2]/10 text-[#5A8CB2] font-bold shadow-xs"
+                          : "border-border text-muted-foreground hover:border-border/80"
+                      }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <Calendar className="h-4 w-4 text-primary" />
-                        <span>
-                          {startDate} → {endDate} ({days} {days === 1 ? "Day" : "Days"})
-                        </span>
-                      </div>
-                      <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${calendarOpen ? "rotate-90" : ""}`} />
+                      <Compass className="h-4 w-4 text-[#5A8CB2]" />
+                      <span>Plan via Explore</span>
                     </button>
-
-                    {/* Single Unified Calendar Modal */}
-                    {calendarOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute left-0 right-0 top-16 z-50 rounded-md border border-border bg-card p-4 shadow-xl space-y-3"
-                      >
-                        <div className="flex items-center justify-between border-b border-border/80 pb-2">
-                          <span className="text-xs font-bold text-foreground">Select Travel Date Range</span>
-                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-xs">
-                            Single Calendar
-                          </span>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="grid grid-cols-7 text-center text-[10px] font-bold text-muted-foreground">
-                            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
-                              <span key={d}>{d}</span>
-                            ))}
-                          </div>
-                          <div className="grid grid-cols-7 gap-1">
-                            {Array.from({ length: 31 }, (_, i) => i + 1).map((dayNum) => {
-                              const startDayNum = parseInt(startDate.split("-")[2], 10)
-                              const endDayNum = parseInt(endDate.split("-")[2], 10)
-                              const isStart = dayNum === startDayNum
-                              const isEnd = dayNum === endDayNum
-                              const isInRange = dayNum > startDayNum && dayNum < endDayNum
-
-                              return (
-                                <button
-                                  key={dayNum}
-                                  type="button"
-                                  onClick={() => {
-                                    if (dayNum < startDayNum) {
-                                      setStartDate(`2026-08-${String(dayNum).padStart(2, "0")}`)
-                                      setDays(Math.max(1, endDayNum - dayNum + 1))
-                                    } else {
-                                      setEndDate(`2026-08-${String(dayNum).padStart(2, "0")}`)
-                                      setDays(Math.max(1, dayNum - startDayNum + 1))
-                                    }
-                                  }}
-                                  className={`py-1.5 text-xs font-bold transition-all ${isStart || isEnd
-                                      ? "bg-[#5A8CB2] text-white rounded-xs font-bold shadow-xs"
-                                      : isInRange
-                                        ? "bg-[#C8D9E6]/50 text-[#1E293B] font-bold rounded-xs border-y border-[#5A8CB2]/30"
-                                        : "hover:bg-accent text-foreground rounded-xs"
-                                    }`}
-                                >
-                                  {dayNum}
-                                </button>
-                              )
-                            })}
-                          </div>
-                        </div>
-
-                        <div className="pt-2 border-t border-border/60 flex items-center justify-between">
-                          <span className="text-[11px] font-bold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2.5 py-0.5 rounded-full">
-                            Aug {startDate.split("-")[2]} → Aug {endDate.split("-")[2]} ({days} Days Tube)
-                          </span>
-                          <Button
-                            size="sm"
-                            onClick={() => setCalendarOpen(false)}
-                            className="rounded-xl bg-[#5A8CB2] text-xs font-bold text-white px-4 py-1.5 hover:bg-[#4A7CA2]"
-                          >
-                            Set Range
-                          </Button>
-                        </div>
-                      </motion.div>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => setDestPlanningMode("custom")}
+                      className={`p-3 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        destPlanningMode === "custom"
+                          ? "border-[#5A8CB2] bg-[#5A8CB2]/10 text-[#5A8CB2] font-bold shadow-xs"
+                          : "border-border text-muted-foreground hover:border-border/80"
+                      }`}
+                    >
+                      <MapPin className="h-4 w-4 text-[#5A8CB2]" />
+                      <span>Direct Custom Location</span>
+                    </button>
                   </div>
-
-                  {/* Travel Style */}
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Pace & Style
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {["Relaxed", "Balanced", "Packed"].map((style) => (
-                        <button
-                          key={style}
-                          type="button"
-                          onClick={() => setTravelStyle(style)}
-                          className={`rounded-xl border p-2.5 text-xs font-medium transition-all ${travelStyle === style
-                              ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                              : "border-border text-muted-foreground hover:border-border/80"
-                            }`}
-                        >
-                          {style}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Budget Tier */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        Budget Tier
-                      </label>
-                      {budgetTier === "Custom" && (
-                        <span className="text-[10px] font-bold text-primary">Custom Enter Mode</span>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-4 gap-1.5">
-                      {[
-                        { label: "Backpacker", tier: "Budget" },
-                        { label: "Standard", tier: "Moderate" },
-                        { label: "Luxury", tier: "Luxury" },
-                        { label: "Custom ₹", tier: "Custom" }
-                      ].map((b) => (
-                        <button
-                          key={b.tier}
-                          type="button"
-                          onClick={() => {
-                            setBudgetTier(b.tier)
-                            if (b.tier !== "Custom") {
-                              setStayTier(b.tier)
-                              setCustomTargetBudget(null)
-                            }
-                          }}
-                          className={`rounded-xl border py-2 px-1 text-center text-xs font-medium transition-all ${budgetTier === b.tier
-                              ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                              : "border-border text-muted-foreground hover:border-border/80"
-                            }`}
-                        >
-                          {b.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Custom Budget Enter Input Box */}
-                    {budgetTier === "Custom" && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-3 rounded-2xl border border-primary bg-primary/5 p-3"
-                      >
-                        <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                          Enter Target Budget (₹)
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-primary">₹</span>
-                          <input
-                            type="number"
-                            placeholder="e.g. 25000"
-                            value={customBudgetVal}
-                            onChange={(e) => {
-                              setCustomBudgetVal(e.target.value)
-                              if (e.target.value) {
-                                setCustomTargetBudget(Number(e.target.value))
-                              }
-                            }}
-                            className="w-full rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary"
-                            autoFocus
-                          />
-                        </div>
-                        <p className="mt-1.5 text-[10px] text-muted-foreground">
-                          Budget Planner & Expense Tracker will automatically align with this limit.
-                        </p>
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* Generate Button */}
-                  <Button
-                    onClick={() => handleGenerate()}
-                    disabled={isGenerating || (destPlanningMode === "custom" ? !customDestInput.trim() : !destination)}
-                    className="w-full rounded-sm bg-[#5A8CB2] py-3 font-semibold text-xs uppercase tracking-wider text-white shadow-xs hover:bg-[#4A7CA2] disabled:opacity-50 cursor-pointer"
-                  >
-                    {isGenerating ? (
-                      <span className="flex items-center gap-2">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                        Generating Schedule...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        Generate Itinerary
-                      </span>
-                    )}
-                  </Button>
                 </div>
+
+                {/* 02 DESTINATION SELECTOR */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Select Destination
+                  </label>
+                  {destPlanningMode === "explore" ? (
+                    <div className="relative">
+                      <select
+                        value={destination || ""}
+                        onChange={(e) => {
+                          if (e.target.value === "__EXPLORE_ALL__") {
+                            onNavigateView && onNavigateView("explore")
+                          } else {
+                            setDestination(e.target.value)
+                            setCustomDestInput(e.target.value)
+                          }
+                        }}
+                        className="w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2] cursor-pointer appearance-none"
+                      >
+                        <option value="" disabled>-- Select Destination --</option>
+                        {destinationsData.map((d) => (
+                          <option key={d.id || d.name} value={d.name}>
+                            📍 {d.name} ({d.country}) — {d.vibe || d.type}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronRight className="absolute right-3.5 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none rotate-90" />
+                    </div>
+                  ) : (
+                    <div className="relative flex items-center">
+                      <MapPin className="absolute left-3.5 h-4 w-4 text-[#5A8CB2] shrink-0" />
+                      <input
+                        type="text"
+                        placeholder="Enter city or location..."
+                        value={customDestInput}
+                        onChange={(e) => {
+                          setCustomDestInput(e.target.value)
+                          if (e.target.value.trim()) {
+                            setDestination(e.target.value.trim())
+                          }
+                        }}
+                        className="w-full rounded-2xl border border-border bg-background pl-9 pr-3 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2]"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* 03 DATES & DURATION */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Travel Dates
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setCalendarOpen(!calendarOpen)}
+                    className="w-full flex items-center justify-between rounded-2xl border border-border bg-background px-4 py-3 text-xs font-bold text-foreground shadow-sm hover:border-[#5A8CB2] transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Calendar className="h-4 w-4 text-[#5A8CB2]" />
+                      <span>{startDate} → {endDate} ({days} {days === 1 ? "Day" : "Days"})</span>
+                    </div>
+                    <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${calendarOpen ? "rotate-90" : ""}`} />
+                  </button>
+
+                  {/* Calendar Modal */}
+                  {calendarOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="rounded-2xl border border-border bg-card p-4 shadow-xl space-y-3 mt-2"
+                    >
+                      <div className="flex items-center justify-between border-b border-border/80 pb-2">
+                        <span className="text-xs font-bold text-foreground">Select Travel Dates</span>
+                        <Button size="sm" onClick={() => setCalendarOpen(false)} className="rounded-xl bg-[#5A8CB2] text-xs font-bold text-white px-3 py-1">Set</Button>
+                      </div>
+                      <div className="grid grid-cols-7 text-center text-[10px] font-bold text-muted-foreground">
+                        {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+                          <span key={d}>{d}</span>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {Array.from({ length: 31 }, (_, i) => i + 1).map((dayNum) => {
+                          const startDayNum = parseInt(startDate.split("-")[2], 10) || 15
+                          const endDayNum = parseInt(endDate.split("-")[2], 10) || 17
+                          const isStart = dayNum === startDayNum
+                          const isEnd = dayNum === endDayNum
+                          const isInRange = dayNum > startDayNum && dayNum < endDayNum
+
+                          return (
+                            <button
+                              key={dayNum}
+                              type="button"
+                              onClick={() => {
+                                if (dayNum < startDayNum) {
+                                  setStartDate(`2026-08-${String(dayNum).padStart(2, "0")}`)
+                                  setDays(Math.max(1, endDayNum - dayNum + 1))
+                                } else {
+                                  setEndDate(`2026-08-${String(dayNum).padStart(2, "0")}`)
+                                  setDays(Math.max(1, dayNum - startDayNum + 1))
+                                }
+                              }}
+                              className={`py-1.5 text-xs font-bold transition-all ${
+                                isStart || isEnd
+                                  ? "bg-[#5A8CB2] text-white rounded-lg font-extrabold shadow-md scale-105"
+                                  : isInRange
+                                    ? "bg-[#C8D9E6]/50 text-[#1E293B] font-bold rounded-sm border-y border-[#5A8CB2]/30"
+                                    : "hover:bg-accent text-foreground rounded-lg"
+                              }`}
+                            >
+                              {dayNum}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* 04 PACE */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Travel Pace & Style
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["Relaxed", "Balanced", "Packed"].map((style) => (
+                      <button
+                        key={style}
+                        type="button"
+                        onClick={() => setTravelStyle(style)}
+                        className={`rounded-xl border p-2.5 text-xs font-medium transition-all cursor-pointer ${
+                          travelStyle === style
+                            ? "border-[#5A8CB2] bg-[#5A8CB2]/10 text-[#5A8CB2] font-bold shadow-sm"
+                            : "border-border text-muted-foreground hover:border-border/80"
+                        }`}
+                      >
+                        {style}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 05 BUDGET TIER */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Budget Tier
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { label: "Backpacker", tier: "Budget" },
+                      { label: "Standard", tier: "Moderate" },
+                      { label: "Luxury", tier: "Luxury" }
+                    ].map((b) => (
+                      <button
+                        key={b.tier}
+                        type="button"
+                        onClick={() => {
+                          setBudgetTier(b.tier)
+                          setStayTier(b.tier)
+                        }}
+                        className={`rounded-xl border py-2.5 px-1 text-center text-xs font-medium transition-all cursor-pointer ${
+                          budgetTier === b.tier
+                            ? "border-[#5A8CB2] bg-[#5A8CB2]/10 text-[#5A8CB2] font-bold shadow-sm"
+                            : "border-border text-muted-foreground hover:border-border/80"
+                        }`}
+                      >
+                        {b.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* GENERATE ITINERARY BUTTON */}
+                <Button
+                  onClick={() => handleGenerate()}
+                  disabled={isGenerating}
+                  className="w-full rounded-full bg-[#5B8DEF] py-3.5 font-extrabold text-[#0F172A] hover:bg-[#487AE0] shadow-md shadow-[#5B8DEF]/30 disabled:opacity-50 cursor-pointer transition-all"
+                >
+                  {isGenerating ? (
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Generating Schedule...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Generate Itinerary
+                    </span>
+                  )}
+                </Button>
               </motion.div>
             ) : null}
           </AnimatePresence>
@@ -1236,8 +1102,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
           <div className={`${isMapVisible ? "lg:col-span-6" : (showPreferences || !itinerary || itinerary.length === 0) ? "lg:col-span-8" : "lg:col-span-12"} space-y-6`}>
 
             {!itinerary || itinerary.length === 0 || !destination ? (
-              <div className="rounded-xl border border-dashed border-border bg-card/60 p-12 text-center space-y-4 flex flex-col items-center justify-center min-h-[420px]">
-                <div className="h-16 w-16 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+              <div className="rounded-3xl border border-dashed border-border bg-card/60 p-12 text-center space-y-4 flex flex-col items-center justify-center min-h-[420px]">
+                <div className="h-16 w-16 rounded-full bg-[#5A8CB2]/10 text-[#5A8CB2] flex items-center justify-center">
                   <Compass className="h-8 w-8 animate-pulse" />
                 </div>
                 <h3 className="font-heading text-xl font-bold text-foreground">
@@ -1250,475 +1116,293 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 </p>
                 {destination && (
                   <Button
-                    onClick={handleGenerate}
-                    className="rounded-sm bg-primary px-6 py-2.5 font-semibold text-xs uppercase tracking-wider text-primary-foreground shadow-xs cursor-pointer"
+                    onClick={() => handleGenerate()}
+                    className="rounded-xl bg-[#5A8CB2] px-6 py-2.5 font-semibold text-white shadow-md hover:bg-[#4A7CA2]"
                   >
                     Generate {destination} Itinerary
                   </Button>
                 )}
               </div>
             ) : (
-              <>
-                {/* Live Budget & Expense Summary Card */}
-                <div className="rounded-xl border border-border bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-[#1A2634] dark:via-[#16202C] dark:to-[#1A2634] p-5 sm:p-6 text-white shadow-xs space-y-4">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/15 pb-4">
-                    <div className="space-y-1">
-                      <div className="inline-flex items-center gap-1.5 rounded-full bg-[#5A8CB2]/25 text-[#9BC2E6] px-3 py-0.5 text-[11px] font-bold border border-[#5A8CB2]/30">
-                        <span>Live Budget & Expense Overview</span>
-                      </div>
-                      <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-white">
-                        {destination || "Trip"} Financial Summary
-                      </h3>
-                      <p className="text-xs text-slate-300">
-                        {totalSpotsCount} spots across {days} days • Updates in real-time as you add/edit places
-                      </p>
+              <div className="space-y-6">
+
+                {/* Generated Itinerary Top Card */}
+                <div className="rounded-3xl border border-border bg-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                  <div className="space-y-1">
+                    <div className="text-xs font-extrabold text-[#5A8CB2] uppercase tracking-wider flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5 text-[#5A8CB2]" />
+                      <span>{(destination || "GOA").toUpperCase()}</span>
                     </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-md border border-white/10">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">Total Est. Budget</span>
-                        <span className="font-heading text-lg sm:text-xl font-extrabold text-emerald-400">
-                          ₹{estimatedTotalTripCost.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-
-                      <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-md border border-white/10">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">Planned Spots Cost</span>
-                        <span className="font-heading text-lg sm:text-xl font-extrabold text-amber-300">
-                          ₹{totalActivitiesExpense.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-
-                      <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-md border border-white/10 col-span-2 sm:col-span-1">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">Est. Balance</span>
-                        <span className="font-heading text-lg sm:text-xl font-extrabold text-cyan-300">
-                          ₹{Math.max(0, estimatedTotalTripCost - totalActivitiesExpense).toLocaleString("en-IN")}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Spot Expenses:</span>
-                      {Object.entries(categoryExpenseBreakdown).map(([cat, amt]) => (
-                        <span key={cat} className="inline-flex items-center gap-1 rounded-xl bg-white/10 px-2.5 py-1 text-xs font-semibold text-slate-200 border border-white/10">
-                          <span>{cat}:</span>
-                          <strong className="text-amber-300">₹{amt.toLocaleString("en-IN")}</strong>
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onNavigateView("budget")}
-                        className="rounded-xl border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 cursor-pointer"
-                      >
-                        <Coins className="mr-1.5 h-3.5 w-3.5 text-amber-400" />
-                        Budget Planner
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onNavigateView("expenses")}
-                        className="rounded-xl border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 cursor-pointer"
-                      >
-                        Expense Tracker
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                {/* Imported Package Banner */}
-                {selectedPackage && (
-                  <div className="rounded-3xl border border-teal-500/30 bg-gradient-to-r from-[#0D2B45] via-[#10385C] to-[#0D2B45] p-6 text-white shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="space-y-1.5">
-                      <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-500/20 text-teal-300 px-3 py-1 text-xs font-bold border border-teal-400/30">
-                        <Sparkles className="h-3.5 w-3.5" />
-                        <span>Imported Package — Customize Your Trip</span>
-                      </div>
-                      <h3 className="font-heading text-2xl font-extrabold">{selectedPackage.name} — {selectedPackage.destination}</h3>
-                      <p className="text-xs text-slate-300 font-medium">
-                        Hotel: <strong className="text-white">{selectedPackage.hotelCategory || "4-Star Resort"}</strong> • Meals: <strong className="text-white">{selectedPackage.meals || "Included Meals"}</strong> • Transport: <strong className="text-white">{selectedPackage.transport || "Private Transport"}</strong>
-                      </p>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-5 border-t md:border-t-0 md:border-l border-white/20 pt-4 md:pt-0 md:pl-6">
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Package Base Price</span>
-                        <span className="font-heading text-xl font-extrabold text-white">₹{packageBaseCost.toLocaleString("en-IN")}</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">+ Extra Expenses</span>
-                        <span className="font-heading text-xl font-extrabold text-amber-400">+₹{additionalExpenses.toLocaleString("en-IN")}</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Estimated Total Cost</span>
-                        <span className="font-heading text-2xl font-extrabold text-teal-300">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
-                      </div>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => clearSelectedPackage()}
-                        className="rounded-xl border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5"
-                      >
-                        Clear Package
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Trip Meta Header Card */}
-                <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-border bg-card p-5 shadow-md">
-                  <div>
-                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
-                      <MapPin className="h-4 w-4" />
-                      {destination}
-                    </div>
-                    <h2 className="mt-1 text-xl sm:text-2xl font-bold font-heading text-foreground">
-                      {days}-Day {travelStyle} Itinerary
+                    <h2 className="font-heading text-2xl sm:text-3xl font-black text-foreground">
+                      {days}-Day {travelStyle || "Balanced"} Itinerary
                     </h2>
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex items-center gap-2.5 shrink-0">
                     <Button
+                      type="button"
                       variant="outline"
-                      size="sm"
-                      onClick={() => setSaved(!saved)}
-                      className={`rounded-xl ${saved ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30" : ""}`}
+                      onClick={() => {
+                        saveCurrentTrip()
+                        setSaved(true)
+                        setTimeout(() => setSaved(false), 3000)
+                      }}
+                      className="rounded-full border-2 border-[#5B8DEF]/50 bg-[#5B8DEF]/15 text-[#0F172A] hover:bg-[#5B8DEF]/25 text-xs font-bold px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all"
                     >
-                      <Bookmark className="mr-1.5 h-4 w-4" />
-                      {saved ? "Saved" : "Save Trip"}
+                      <Bookmark className="h-4 w-4 text-[#0F172A]" />
+                      <span>{saved ? "Saved!" : "Save Trip"}</span>
                     </Button>
+
                     <Button
+                      type="button"
                       variant="outline"
-                      size="sm"
                       onClick={() => onNavigateView("budget")}
-                      className="rounded-xl border-border hover:bg-accent"
+                      className="rounded-full border-2 border-[#5B8DEF]/50 bg-[#5B8DEF]/15 text-[#0F172A] hover:bg-[#5B8DEF]/25 text-xs font-bold px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all"
                     >
-                      <Coins className="mr-1.5 h-4 w-4" />
-                      Budget
+                      <Wallet className="h-4 w-4 text-[#0F172A]" />
+                      <span>Budget</span>
                     </Button>
                   </div>
                 </div>
 
-                {/* Day Navigation Tabs & Arrow Controls (Req 1, 6) */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-3">
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                      {itinerary.map((dayPlan, idx) => (
+                {/* Main Itinerary Split: Left Day Index & Right Selected Day Card */}
+                <div className="flex flex-col sm:flex-row items-start gap-5">
+
+                  {/* Left Column: Vertical Day Index */}
+                  <div className="flex sm:flex-col gap-2.5 shrink-0 w-full sm:w-32 z-10">
+                    {itinerary.map((dayPlan, idx) => {
+                      const isActive = activeDayIndex === idx
+                      return (
                         <button
                           key={idx}
                           type="button"
                           onClick={() => setActiveDayIndex(idx)}
-                          className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all shrink-0 ${activeDayIndex === idx
-                              ? "bg-primary text-primary-foreground shadow-md"
-                              : "bg-secondary text-muted-foreground hover:bg-accent"
-                            }`}
+                          className={`flex items-center justify-between p-3 rounded-full transition-all cursor-pointer text-left ${
+                            isActive
+                              ? "bg-[#5B8DEF] text-[#0F172A] font-bold shadow-md shadow-[#5B8DEF]/25"
+                              : "bg-[#5B8DEF]/10 border-2 border-[#5B8DEF]/40 text-[#0F172A] hover:bg-[#5B8DEF]/20"
+                          }`}
                         >
-                          Day {dayPlan.day}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={activeDayIndex === 0}
-                        onClick={() => setActiveDayIndex((prev) => Math.max(0, prev - 1))}
-                        className="rounded-xl h-8 w-8 p-0"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={activeDayIndex === itinerary.length - 1}
-                        onClick={() => setActiveDayIndex((prev) => Math.min(itinerary.length - 1, prev + 1))}
-                        className="rounded-xl h-8 w-8 p-0"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="text-[11px] text-center font-medium text-muted-foreground bg-accent/40 rounded-full py-1 px-3 flex items-center justify-center gap-1.5">
-                    <span>👈 Swipe card left or right on mobile/desktop to switch days 👉</span>
-                  </div>
-                </div>
-
-                {/* Side-by-Side Day Card Slider */}
-                <AnimatePresence mode="wait">
-                  {itinerary[activeDayIndex] && (
-                    <motion.div
-                      key={activeDayIndex}
-                      initial={{ opacity: 0, x: 30 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -30 }}
-                      transition={{ duration: 0.25 }}
-                      drag="x"
-                      dragConstraints={{ left: 0, right: 0 }}
-                      dragElastic={0.2}
-                      onDragEnd={(e, info) => {
-                        if (info.offset.x < -60 && activeDayIndex < itinerary.length - 1) {
-                          setActiveDayIndex(activeDayIndex + 1)
-                        } else if (info.offset.x > 60 && activeDayIndex > 0) {
-                          setActiveDayIndex(activeDayIndex - 1)
-                        }
-                      }}
-                      className="rounded-3xl border border-border bg-card p-6 shadow-md cursor-grab active:cursor-grabbing select-none"
-                    >
-                      {/* Day Header */}
-                      <div className="mb-6 flex items-center justify-between border-b border-border/60 pb-3">
-                        <div className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow">
-                            D{itinerary[activeDayIndex].day}
-                          </span>
                           <div>
-                            <h3 className="font-heading text-lg font-bold text-foreground">
-                              Day {itinerary[activeDayIndex].day}: {itinerary[activeDayIndex].title}
-                            </h3>
-                            <span className="text-xs text-muted-foreground font-medium">
-                              📅 {itinerary[activeDayIndex].date}
-                            </span>
+                            <div className="text-[9px] uppercase tracking-wider opacity-80 font-bold">INDEX</div>
+                            <div className="text-xs font-extrabold">Day {dayPlan.day}</div>
+                          </div>
+                          <span className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-black ${
+                            isActive ? "bg-amber-400 text-neutral-900 shadow-2xs" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {dayPlan.activities?.length || 0}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* Right Column: Selected Day Details Card */}
+                  <div className="flex-1 min-w-0 w-full rounded-3xl border border-border bg-card p-6 shadow-sm space-y-4">
+                    {/* Day Header */}
+                    <div className="flex items-center justify-between border-b border-border/80 pb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-[#5B8DEF] text-[#0F172A] flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+                          D{itinerary[activeDayIndex]?.day || activeDayIndex + 1}
+                        </div>
+                        <div>
+                          <h3 className="font-heading text-lg font-bold text-foreground">
+                            {itinerary[activeDayIndex]?.title || `Day ${activeDayIndex + 1}: Exploration`}
+                          </h3>
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold mt-0.5">
+                            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                            <span>{itinerary[activeDayIndex]?.date || `Sat, Aug ${15 + activeDayIndex}`}</span>
                           </div>
                         </div>
-                        <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-muted-foreground">
-                          {itinerary[activeDayIndex].activities.length} Spots
-                        </span>
                       </div>
 
-                      {/* Spot Cards List with Vertical Blue Connector Line */}
-                      <div className="space-y-6">
-                        {itinerary[activeDayIndex].activities.map((act, idx) => {
-                          const spotImages = act.images || [
-                            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
-                          ]
-                          const activeImgIdx = spotImageIndices[act.id] || 0
-                          const isHovered = hoveredSpotId === act.id
+                      <span className="rounded-full bg-muted px-3 py-1 text-xs font-extrabold text-muted-foreground">
+                        {itinerary[activeDayIndex]?.activities?.length || 0} Spots
+                      </span>
+                    </div>
 
-                          return (
+                    {/* Day Activities Stream with Distance Connectors */}
+                    <div className="space-y-3 max-h-[620px] overflow-y-auto pr-1">
+                      {itinerary[activeDayIndex]?.activities.map((act, idx) => {
+                        const spotImages = act.images || [
+                          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+                        ]
+                        const distToNext = idx === 0 ? "5.5 km • 18 mins travel" : "3.0 km • 10 mins travel"
+
+                        return (
+                          <div key={act.id || idx} className="space-y-3">
+                            {/* Distance Connector Pill */}
+                            {idx > 0 && (
+                              <div className="flex items-center justify-start ml-10 my-1">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#27A84D] text-white text-[11px] font-bold px-3 py-1">
+                                  <MapPin className="h-3 w-3" />
+                                  <span>{act.distanceToNext || distToNext}</span>
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Spot Card Row */}
                             <div
-                              key={act.id || idx}
-                              ref={(el) => (spotRefs.current[act.id] = el)}
-                              className="relative"
+                              draggable
+                              onDragStart={(e) => {
+                                e.dataTransfer.setData("text/plain", idx.toString())
+                                e.dataTransfer.effectAllowed = "move"
+                              }}
+                              onDragOver={(e) => {
+                                e.preventDefault()
+                                e.dataTransfer.dropEffect = "move"
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault()
+                                const fromIdx = parseInt(e.dataTransfer.getData("text/plain"), 10)
+                                if (!isNaN(fromIdx) && fromIdx !== idx) {
+                                  reorderDayActivities(activeDayIndex, fromIdx, idx)
+                                }
+                              }}
+                              className="group relative rounded-2xl border border-border bg-background/60 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition-all"
                             >
-                              {/* Spot Card Box (Drag & Drop Reorderable) */}
-                              <div
-                                draggable
-                                onDragStart={(e) => {
-                                  e.dataTransfer.setData("text/plain", idx.toString())
-                                  e.dataTransfer.effectAllowed = "move"
-                                }}
-                                onDragOver={(e) => {
-                                  e.preventDefault()
-                                  e.dataTransfer.dropEffect = "move"
-                                }}
-                                onDrop={(e) => {
-                                  e.preventDefault()
-                                  const fromIdx = parseInt(e.dataTransfer.getData("text/plain"), 10)
-                                  if (!isNaN(fromIdx) && fromIdx !== idx) {
-                                    reorderDayActivities(activeDayIndex, fromIdx, idx)
-                                  }
-                                }}
-                                onMouseEnter={() => handleSpotMouseEnter(act.id, spotImages.length)}
-                                onMouseLeave={() => handleSpotMouseLeave(act.id)}
-                                className={`group relative flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-2xl border p-4 transition-all cursor-grab active:cursor-grabbing ${isHovered
-                                    ? "border-primary bg-primary/5 shadow-xl scale-[1.01]"
-                                    : "border-border/70 bg-background/80 hover:border-primary/50 hover:bg-background hover:shadow-lg"
-                                  }`}
-                              >
-                                <div className="flex items-start gap-3 flex-1 min-w-0">
-                                  {/* Drag Reorder Handle & Grip Icon */}
-                                  <div className="flex flex-col items-center justify-center gap-1 text-muted-foreground shrink-0 pt-0.5">
-                                    <div className="p-1 rounded-md text-amber-500 bg-amber-400/10 cursor-grab hover:bg-amber-400/20" title="Drag with mouse to reorder spot">
-                                      <GripVertical className="h-4 w-4" />
-                                    </div>
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-primary/10 text-primary font-extrabold text-xs">
-                                      {idx + 1}
-                                    </div>
-                                    <div className="flex items-center gap-0.5">
-                                      <button
-                                        type="button"
-                                        onClick={() => moveSpot(activeDayIndex, idx, -1)}
-                                        disabled={idx === 0}
-                                        className="hover:text-primary disabled:opacity-30 p-0.5"
-                                        title="Move Up"
-                                      >
-                                        <MoveUp className="h-3 w-3" />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => moveSpot(activeDayIndex, idx, 1)}
-                                        disabled={idx === itinerary[activeDayIndex].activities.length - 1}
-                                        className="hover:text-primary disabled:opacity-30 p-0.5"
-                                        title="Move Down"
-                                      >
-                                        <MoveDown className="h-3 w-3" />
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex flex-wrap items-center justify-between gap-2">
-                                      {/* Spot Title Immediately Followed by Price */}
-                                      <h4 className="font-heading text-base font-semibold text-foreground flex items-center gap-2 flex-wrap">
-                                        <span>{act.title}</span>
-                                        <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-                                          {act.cost}
-                                        </span>
-                                        {selectedPackage && (
-                                          act.isFromPackage ? (
-                                            <span className="font-bold text-[10px] text-teal-700 dark:text-teal-400 bg-teal-500/10 px-2.5 py-0.5 rounded-full border border-teal-500/20">
-                                              Package Included
-                                            </span>
-                                          ) : (
-                                            <span className="font-bold text-[10px] text-amber-700 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
-                                              Custom Added (+₹{(act.numericCost || 0).toLocaleString("en-IN")})
-                                            </span>
-                                          )
-                                        )}
-                                      </h4>
-
-                                      <button
-                                        type="button"
-                                        onClick={() => removeSpot(activeDayIndex, idx)}
-                                        className="text-muted-foreground hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                                      >
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                      </button>
-                                    </div>
-
-                                    <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                                      {act.desc}
-                                    </p>
-
-                                    {/* Operating Hours & Timings */}
-                                    <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                                      <span className="flex items-center gap-1 font-medium text-foreground">
-                                        <Clock className="h-3.5 w-3.5 text-primary" />
-                                        {act.time}
-                                      </span>
-                                      <span>•</span>
-                                      <span className="text-[11px] font-medium text-muted-foreground">
-                                        Open: {act.openingHours || "09:00 AM - 07:00 PM"}
-                                      </span>
-                                    </div>
-                                  </div>
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <GripVertical className="h-4 w-4 text-muted-foreground/60 cursor-grab shrink-0 opacity-60 group-hover:opacity-100" />
+                                
+                                {/* Spot Coin Avatar */}
+                                <div
+                                  onClick={() => setActiveSpotDetail({ ...act, dayIndex: activeDayIndex, spotIndex: idx })}
+                                  className="h-11 w-11 rounded-full overflow-hidden border-2 border-[#27A84D] shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                                  title="Click to view place photos & info"
+                                >
+                                  <img src={spotImages[0]} alt={act.title} className="h-full w-full object-cover" />
                                 </div>
 
-                                {/* Right Side: Larger Rectangular Hover Gallery */}
-                                <div className="shrink-0 self-center">
-                                  <div className="relative h-28 w-44 rounded-xl overflow-hidden border border-border shadow-sm group-hover:scale-105 transition-transform">
-                                    <img
-                                      src={spotImages[activeImgIdx]}
-                                      alt={act.title}
-                                      className="h-full w-full object-cover transition-all duration-500"
-                                    />
-                                    {spotImages.length > 1 && (
-                                      <div className="absolute bottom-1 right-1 flex gap-1 bg-black/60 px-1.5 py-0.5 rounded-full">
-                                        {spotImages.map((_, imgI) => (
-                                          <div
-                                            key={imgI}
-                                            className={`h-1.5 w-1.5 rounded-full ${activeImgIdx === imgI ? "bg-white" : "bg-white/40"
-                                              }`}
-                                          />
-                                        ))}
-                                      </div>
-                                    )}
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <h4 className="font-heading text-sm font-bold text-foreground truncate">
+                                      {act.title}
+                                    </h4>
+                                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-extrabold text-[11px] px-2.5 py-0.5 shrink-0">
+                                      {act.cost}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-semibold mt-0.5">
+                                    <Clock className="h-3 w-3 text-muted-foreground shrink-0" />
+                                    <span>{act.time}</span>
+                                    <span>•</span>
+                                    <span>Open: {act.openingHours || "10:00 AM - 07:00 PM"}</span>
                                   </div>
                                 </div>
-
                               </div>
 
-                              {/* VERTICAL BLUE BAR CONNECTING CONSECUTIVE SPOT CARDS ON LEFT EDGE (Matching Drawing) */}
-                              {idx < itinerary[activeDayIndex].activities.length - 1 && (
-                                <div className="relative my-2.5 ml-5 flex items-center gap-3 pl-1">
-                                  {/* Vertical Blue Line on Left */}
-                                  <div className="w-1.5 h-10 bg-blue-600 rounded-full shadow-sm shrink-0" />
+                              <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-border">
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveSpotDetail({ ...act, dayIndex: activeDayIndex, spotIndex: idx })}
+                                  className="rounded-full border-2 border-[#5B8DEF]/50 bg-[#5B8DEF]/15 text-[#0F172A] hover:bg-[#5B8DEF] hover:text-[#0F172A] px-3.5 py-1 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-xs"
+                                >
+                                  <Globe className="h-3 w-3" />
+                                  <span>More Info</span>
+                                </button>
 
-                                  {/* Travel Distance & Time Badge */}
-                                  <div className="rounded-full bg-blue-600 text-white px-3 py-1 text-[11px] font-bold shadow-md border-2 border-background flex items-center gap-1.5">
-                                    <span>📍</span>
-                                    <span>{act.distanceToNext || "3.0 km • 10 mins travel"}</span>
-                                  </div>
-                                </div>
-                              )}
+                                <button
+                                  type="button"
+                                  disabled={idx === 0}
+                                  onClick={() => idx > 0 && reorderDayActivities(activeDayIndex, idx, idx - 1)}
+                                  className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer"
+                                  title="Move Up"
+                                >
+                                  <MoveUp className="h-3.5 w-3.5" />
+                                </button>
 
+                                <button
+                                  type="button"
+                                  disabled={idx === (itinerary[activeDayIndex]?.activities?.length || 1) - 1}
+                                  onClick={() => idx < (itinerary[activeDayIndex]?.activities?.length || 1) - 1 && reorderDayActivities(activeDayIndex, idx, idx + 1)}
+                                  className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer"
+                                  title="Move Down"
+                                >
+                                  <MoveDown className="h-3.5 w-3.5" />
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => removeSpot(activeDayIndex, idx)}
+                                  className="p-1 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                                  title="Remove Spot"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
                             </div>
-                          )
-                        })}
-                      </div>
+                          </div>
+                        )
+                      })}
+                    </div>
 
-                      {/* Manual Add Custom Spot & Add Extra Day Action Bar */}
-                      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border/60">
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            setTargetDayForCustomSpot(activeDayIndex)
-                            setCustomSpotForm({
-                              title: "",
-                              type: "Sightseeing",
-                              category: "Activities",
-                              time: "02:30 PM",
-                              cost: "500",
-                              desc: "",
-                              img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
-                            })
-                            setAddSpotModalOpen(true)
-                          }}
-                          className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs px-4 py-2.5 shadow-md flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <Plus className="h-4 w-4" />
-                          Add Custom Spot to Day {activeDayIndex + 1}
-                        </Button>
+                    {/* Add Custom Spot & Add Day Actions */}
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setTargetDayForCustomSpot(activeDayIndex)
+                          setCustomSpotForm({
+                            title: "",
+                            type: "Sightseeing",
+                            category: "Activities",
+                            time: "02:30 PM",
+                            cost: "500",
+                            desc: "",
+                            img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+                          })
+                          setAddSpotModalOpen(true)
+                        }}
+                        className="rounded-full bg-[#5B8DEF] text-[#0F172A] hover:bg-[#487AE0] font-bold text-xs px-5 py-2.5 shadow-md shadow-[#5B8DEF]/25 flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add Custom Spot to Day {activeDayIndex + 1}
+                      </Button>
 
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            const nextDayNum = (itinerary?.length || days || 3) + 1
-                            setDays(nextDayNum)
-                            setItinerary((prev) => [
-                              ...(prev || []),
-                              {
-                                day: nextDayNum,
-                                title: `Day ${nextDayNum} Local Explorations`,
-                                date: `Aug ${15 + nextDayNum - 1}`,
-                                activities: [
-                                  {
-                                    id: `spot-extra-d${nextDayNum}-s1-${Date.now()}`,
-                                    time: "10:00 AM",
-                                    openingHours: "09:00 AM - 06:00 PM",
-                                    type: "Sightseeing",
-                                    category: "Activities",
-                                    title: `${destination || "Trip"} Day ${nextDayNum} Highlight`,
-                                    desc: `Curated local attraction for Day ${nextDayNum}.`,
-                                    cost: "₹650",
-                                    numericCost: 650,
-                                    lat: 15.55 + nextDayNum * 0.01,
-                                    lng: 73.75 + nextDayNum * 0.01,
-                                    images: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"]
-                                  }
-                                ]
-                              }
-                            ])
-                            setActiveDayIndex(nextDayNum - 1)
-                          }}
-                          className="rounded-xl border border-border text-foreground hover:bg-accent font-bold text-xs px-4 py-2.5 flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <Plus className="h-4 w-4 text-[#5A8CB2]" />
-                          Add Extra Day (Day {(itinerary?.length || days || 3) + 1})
-                        </Button>
-                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          const nextDayNum = (itinerary?.length || days || 3) + 1
+                          setDays(nextDayNum)
+                          setItinerary((prev) => [
+                            ...(prev || []),
+                            {
+                              day: nextDayNum,
+                              title: `Day ${nextDayNum} Local Explorations`,
+                              date: `Aug ${15 + nextDayNum - 1}`,
+                              activities: [
+                                {
+                                  id: `spot-extra-d${nextDayNum}-s1-${Date.now()}`,
+                                  time: "10:00 AM",
+                                  openingHours: "09:00 AM - 06:00 PM",
+                                  type: "Sightseeing",
+                                  category: "Activities",
+                                  title: `${destination || "Trip"} Day ${nextDayNum} Highlight`,
+                                  desc: `Curated local attraction for Day ${nextDayNum}.`,
+                                  cost: "₹650",
+                                  numericCost: 650,
+                                  lat: 15.55 + nextDayNum * 0.01,
+                                  lng: 73.75 + nextDayNum * 0.01,
+                                  images: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"]
+                                }
+                              ]
+                            }
+                          ])
+                          setActiveDayIndex(nextDayNum - 1)
+                        }}
+                        className="rounded-2xl border border-border text-foreground hover:bg-accent font-bold text-xs px-4 py-2.5 flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Plus className="h-4 w-4 text-[#5A8CB2]" />
+                        Add Extra Day (Day {(itinerary?.length || days || 3) + 1})
+                      </Button>
+                    </div>
+                  </div>
 
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </>
+                </div>
+
+              </div>
             )}
 
           </div>
@@ -1741,43 +1425,56 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               <span className="text-xs text-muted-foreground">Showing top places in {destination}</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {currentAttractions.map((spot, idx) => (
                 <div
                   key={idx}
-                  className="group flex flex-col rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/50 hover:shadow-md transition-all text-left"
+                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/50 hover:shadow-md transition-all text-left"
                 >
-                  <div className="relative h-32 w-full rounded-xl overflow-hidden mb-2">
-                    <img
-                      src={spot.img}
-                      alt={spot.name || spot.title}
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-1.5 right-1.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-semibold text-white flex items-center gap-0.5">
-                      <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
-                      {spot.rating || "4.8 ⭐"}
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    {/* Coin-Shaped Circular Image Avatar */}
+                    <div className="relative h-14 w-14 shrink-0 rounded-full border-2 border-[#5A8CB2] shadow-md overflow-hidden group-hover:scale-105 transition-transform bg-muted">
+                      <img
+                        src={spot.img}
+                        alt={spot.name || spot.title}
+                        className="h-full w-full object-cover"
+                      />
+                      <span className="absolute top-0 right-0 h-5 w-5 rounded-full bg-amber-500 text-white text-[9px] font-black flex items-center justify-center border border-white shadow-xs">
+                        ★
+                      </span>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <h4 className="font-heading text-xs font-bold text-foreground truncate">
+                          {spot.name || spot.title}
+                        </h4>
+                        <span className="text-xs font-bold text-emerald-600 shrink-0">
+                          {spot.cost}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[10px] text-amber-500 font-bold mt-0.5">
+                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                        <span>{spot.rating || "4.8 ⭐"}</span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
+                        {spot.desc}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-2 mt-1">
-                    <h4 className="font-heading text-xs font-bold text-foreground truncate">
-                      {spot.name || spot.title}
-                    </h4>
-                    <span className="text-xs font-bold text-emerald-600 shrink-0">
-                      {spot.cost}
-                    </span>
-                  </div>
-
-                  <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">
-                    {spot.desc}
-                  </p>
-
                   <Button
                     size="sm"
-                    onClick={() => addSearchedPlaceToItinerary(spot.name || spot.title)}
-                    className="mt-3 w-full rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground text-[11px] font-semibold py-1 transition-colors"
+                    onClick={() => addSpotToItinerary(activeDayIndex, {
+                      title: spot.name || spot.title,
+                      cost: spot.cost,
+                      numericCost: parseInt(String(spot.cost).replace(/[^\d]/g, "")) || 500,
+                      desc: spot.desc,
+                      img: spot.img
+                    })}
+                    className="rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground text-[11px] font-bold py-1.5 px-3 shrink-0 transition-colors cursor-pointer"
                   >
-                    + Add to Itinerary
+                    + Add
                   </Button>
                 </div>
               ))}
@@ -1787,43 +1484,34 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
       </div>
 
-      {/* FLOATING CORNER CONTROLS: MAP TOGGLE, CHECKLIST & PERSONAL NOTES (Req 4) */}
-      <div className="fixed bottom-6 left-6 z-50 flex items-center gap-3">
-        {!isMapVisible ? (
-          <Button
-            onClick={() => setIsMapVisible(true)}
-            className="rounded-full h-14 w-14 bg-[#0D2B45] text-white shadow-2xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-background"
-            title="Open Interactive Map"
-          >
-            <Globe className="h-6 w-6 text-amber-400" />
-          </Button>
-        ) : (
-          <Button
-            onClick={() => setIsMapVisible(false)}
-            className="rounded-full bg-card border border-border text-foreground text-xs font-bold px-5 py-3 shadow-2xl hover:bg-accent flex items-center gap-2"
-          >
-            <SlidersHorizontal className="h-4 w-4 text-primary" />
-            Plan Itinerary Mode
-          </Button>
-        )}
+      {/* Floating Tools Dock */}
+      <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2.5">
+        <button
+          type="button"
+          onClick={() => setIsMapVisible(!isMapVisible)}
+          className="rounded-full bg-[#0D2B45] text-white font-bold text-xs px-4 py-2.5 shadow-xl hover:bg-[#12395b] transition-all flex items-center gap-2 cursor-pointer"
+        >
+          <Globe className="h-4 w-4 text-amber-400" />
+          <span>{!isMapVisible ? "Interactive Map" : "Show Planner"}</span>
+        </button>
 
-        {/* Checklist Button */}
-        <Button
+        <button
+          type="button"
           onClick={() => setChecklistOpen(true)}
-          className="rounded-full h-14 w-14 bg-white text-[#0D2B45] border-2 border-amber-400/40 shadow-2xl hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
-          title="Itinerary Checklist & Packing List"
+          className="rounded-full bg-amber-100 dark:bg-amber-950/50 text-amber-900 dark:text-amber-200 font-bold text-xs px-4 py-2.5 shadow-md hover:bg-amber-200 transition-all flex items-center gap-2 cursor-pointer"
         >
-          <CheckSquare className="h-6 w-6 text-amber-500" />
-        </Button>
+          <CheckSquare className="h-4 w-4 text-amber-600" />
+          <span>Packing Checklist</span>
+        </button>
 
-        {/* Personal Notes Button */}
-        <Button
+        <button
+          type="button"
           onClick={() => setNotesOpen(true)}
-          className="rounded-full h-14 w-14 bg-white text-[#0D2B45] border-2 border-blue-400/40 shadow-2xl hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
-          title="Personal Travel Reference Notes"
+          className="rounded-full bg-blue-100 dark:bg-blue-950/50 text-blue-900 dark:text-blue-200 font-bold text-xs px-4 py-2.5 shadow-md hover:bg-blue-200 transition-all flex items-center gap-2 cursor-pointer"
         >
-          <FileText className="h-6 w-6 text-blue-600" />
-        </Button>
+          <FileText className="h-4 w-4 text-blue-600" />
+          <span>Travel Notes</span>
+        </button>
       </div>
 
       {/* ─────────────────────────────────────────────
@@ -2338,6 +2026,160 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         )}
       </AnimatePresence>
 
+      {/* Google Maps Style Place Information & Photo Modal */}
+      <AnimatePresence>
+        {activeSpotDetail && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl space-y-0"
+            >
+              {/* Google Maps Style Header Bar */}
+              <div className="flex items-center justify-between bg-[#1E293B] text-white px-5 py-3 border-b border-slate-700">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-emerald-400" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Google Maps Place Information
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveSpotDetail(null)}
+                  className="rounded-full bg-white/10 p-1 text-slate-300 hover:bg-white/20 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Cover Image & Rating Header */}
+              <div className="relative h-56 w-full overflow-hidden bg-slate-900">
+                <img
+                  src={activeSpotDetail.images?.[0] || activeSpotDetail.img || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"}
+                  alt={activeSpotDetail.title}
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+
+                <div className="absolute bottom-3 left-5 right-5 text-white">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="rounded-full bg-emerald-500 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+                      {activeSpotDetail.category || "Sightseeing"}
+                    </span>
+                    <div className="flex items-center gap-1 text-xs font-bold text-amber-400 bg-black/60 px-2 py-0.5 rounded-full border border-white/10">
+                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                      <span>4.8 (1,280 reviews)</span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-heading text-2xl font-extrabold leading-tight text-white">
+                    {activeSpotDetail.title}
+                  </h3>
+                </div>
+              </div>
+
+              {/* Google Maps Style Quick Actions Bar */}
+              <div className="bg-muted/40 border-b border-border px-5 py-2.5 flex items-center justify-between gap-2 overflow-x-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const query = encodeURIComponent(`${activeSpotDetail.title} ${destination || ""}`)
+                    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank")
+                  }}
+                  className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs px-3.5 py-1.5 shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  <Compass className="h-3.5 w-3.5" />
+                  <span>Open Directions</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const query = encodeURIComponent(`photos of ${activeSpotDetail.title} ${destination || ""}`)
+                    window.open(`https://www.google.com/search?tbm=isch&q=${query}`, "_blank")
+                  }}
+                  className="rounded-xl border border-border bg-background hover:bg-accent text-foreground font-bold text-xs px-3.5 py-1.5 shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  <Camera className="h-3.5 w-3.5 text-primary" />
+                  <span>Google Photos</span>
+                </button>
+
+                <span className="font-extrabold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 shrink-0">
+                  Est. {activeSpotDetail.cost}
+                </span>
+              </div>
+
+              {/* Spot Details Body */}
+              <div className="p-5 space-y-4">
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="rounded-xl border border-border/70 bg-background p-3 space-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                      Scheduled & Hours
+                    </span>
+                    <p className="font-bold text-foreground flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5 text-primary" />
+                      {activeSpotDetail.time}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground font-medium">
+                      Open: {activeSpotDetail.openingHours || "08:00 AM - 08:00 PM"}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-border/70 bg-background p-3 space-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                      Location & Vibe
+                    </span>
+                    <p className="font-bold text-foreground flex items-center gap-1 truncate">
+                      <MapPin className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                      {destination || "Goa"}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground font-medium">
+                      Verified Place Highlight
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
+                    About Place / Overview
+                  </span>
+                  <p className="text-xs leading-relaxed text-card-foreground font-medium">
+                    {activeSpotDetail.desc || `Popular destination landmark and curated experience for your trip in ${destination || "Goa"}.`}
+                  </p>
+                </div>
+
+                {/* Actions Footer */}
+                <div className="flex items-center justify-between pt-3 border-t border-border">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      removeSpot(activeSpotDetail.dayIndex, activeSpotDetail.spotIndex)
+                      setActiveSpotDetail(null)
+                    }}
+                    className="rounded-xl border-rose-500/30 text-rose-500 hover:bg-rose-500/10 text-xs font-bold px-3.5 py-1.5 cursor-pointer"
+                  >
+                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                    Remove from Day
+                  </Button>
+
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => setActiveSpotDetail(null)}
+                    className="rounded-xl bg-secondary text-secondary-foreground hover:bg-accent font-bold text-xs px-5 py-1.5 cursor-pointer"
+                  >
+                    Close Card
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
+

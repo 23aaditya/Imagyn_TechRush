@@ -74,43 +74,35 @@
   --night-border: rgba(235, 226, 208, 0.12);
   --night-text: #F1ECE2;
   --night-muted: #A9A092;
-  --night-accent: #C98B55;
-  --night-olive: #73775B;
+  --night-accent: #5B8DEF;
+  --night-olive: #5B8DEF;
 
-  --background: #f5f1ea;
-  --foreground: #0F172A;
+  --background: #FFFFFF;
+  --foreground: #1E293B;
   --card: #FFFFFF;
-  --card-foreground: #0F172A;
+  --card-foreground: #1E293B;
   --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
-  --primary: #5A8CB2;
-  --primary-foreground: #ffffff;
-  --secondary: #E2E8F0;
+  --popover-foreground: #1E293B;
+  --primary: #5B8DEF;
+  --primary-foreground: #0F172A;
+  --secondary: rgba(91, 141, 239, 0.12);
   --secondary-foreground: #0F172A;
-  --muted: #F1F5F9;
+  --muted: rgba(91, 141, 239, 0.08);
   --muted-foreground: #64748B;
-  --accent: #C98B55;
-  --accent-foreground: #ffffff;
-  --emerald: #73775B;
-  --emerald-foreground: #ffffff;
+  --accent: #5B8DEF;
+  --accent-foreground: #0F172A;
+  --emerald: #5B8DEF;
+  --emerald-foreground: #0F172A;
   --destructive: #EF4444;
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #5A8CB2;
-  --chart-1: #C8D9E6;
-  --chart-2: #5A8CB2;
-  --chart-3: #FFFFFF;
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #5B8DEF;
+  --chart-1: #FFFFFF;
+  --chart-2: #5B8DEF;
+  --chart-3: rgba(91, 141, 239, 0.15);
   --chart-4: #334155;
-  --chart-5: #0F172A;
+  --chart-5: #1E293B;
   --radius: 0.75rem;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #0F172A;
-  --sidebar-primary: #5A8CB2;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #C8D9E6;
-  --sidebar-accent-foreground: #1E293B;
-  --sidebar-border: #E2E8F0;
-  --sidebar-ring: #5A8CB2;
 }
 
 .dark {
@@ -121,33 +113,33 @@
   --card-foreground: #F1ECE2;
   --popover: #181613;
   --popover-foreground: #F1ECE2;
-  --primary: #C98B55;
-  --primary-foreground: #11100E;
+  --primary: #5B8DEF;
+  --primary-foreground: #0F172A;
   --secondary: #211E19;
   --secondary-foreground: #F1ECE2;
   --muted: #211E19;
   --muted-foreground: #A9A092;
-  --accent: #C98B55;
-  --accent-foreground: #11100E;
-  --emerald: #73775B;
-  --emerald-foreground: #11100E;
+  --accent: #5B8DEF;
+  --accent-foreground: #0F172A;
+  --emerald: #5B8DEF;
+  --emerald-foreground: #0F172A;
   --destructive: #EF4444;
   --border: rgba(235, 226, 208, 0.12);
   --input: rgba(235, 226, 208, 0.12);
-  --ring: #C98B55;
-  --chart-1: #C98B55;
-  --chart-2: #73775B;
+  --ring: #5B8DEF;
+  --chart-1: #5B8DEF;
+  --chart-2: #5B8DEF;
   --chart-3: #211E19;
   --chart-4: #A9A092;
   --chart-5: #F1ECE2;
   --sidebar: #181613;
   --sidebar-foreground: #F1ECE2;
-  --sidebar-primary: #C98B55;
-  --sidebar-primary-foreground: #11100E;
+  --sidebar-primary: #5B8DEF;
+  --sidebar-primary-foreground: #0F172A;
   --sidebar-accent: #211E19;
   --sidebar-accent-foreground: #F1ECE2;
   --sidebar-border: rgba(235, 226, 208, 0.12);
-  --sidebar-ring: #C98B55;
+  --sidebar-ring: #5B8DEF;
 }
 
 /* Night Journey Transition & Cartographic Pattern */
@@ -159,7 +151,7 @@ html {
   background-color: #11100E;
   color: #F1ECE2;
   background-image: 
-    radial-gradient(circle at 50% 15%, rgba(201, 139, 85, 0.05) 0%, transparent 65%),
+    radial-gradient(circle at 50% 15%, rgba(139, 155, 228, 0.05) 0%, transparent 65%),
     linear-gradient(to right, rgba(235, 226, 208, 0.025) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(235, 226, 208, 0.025) 1px, transparent 1px);
   background-size: 100% 100%, 90px 90px, 90px 90px;
@@ -168,7 +160,7 @@ html {
 .night-cartography-bg {
   background-color: #11100E;
   background-image: 
-    radial-gradient(circle at 50% 20%, rgba(201, 139, 85, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 50% 20%, rgba(139, 155, 228, 0.06) 0%, transparent 60%),
     linear-gradient(to right, rgba(235, 226, 208, 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(235, 226, 208, 0.03) 1px, transparent 1px);
   background-size: 100% 100%, 80px 80px, 80px 80px;

@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, useMemo } from "react"
+import { getDestinationSpots } from "@/lib/destination-spots-data"
 
 // Initial default preset spots for Goa / Bali fallback
 const defaultTemplates = [
@@ -134,8 +135,79 @@ export function TripProvider({ children }) {
   // Centralized Itinerary State
   const [itinerary, setItinerary] = useState([])
 
-  // BASE STAY / BASE HOTEL STATE
-  const [baseStay, setBaseStay] = useState(null)
+  // ═══════════════════════════════════════════════════════════════════════
+  // GEOGRAPHIC INTELLIGENCE — STAY-CENTRIC ANCHOR & DISCOVERY STATE
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // Active Stay / Hotel — the geographic anchor for all proximity discovery
+  // Schema: { name, lat, lng, address, placeId, rating, priceRange }
+  const [activeStay, setActiveStayRaw] = useState(null)
+
+  // Map display mode: "discovery" (explore nearby) or "itinerary" (route view)
+  const [mapMode, setMapMode] = useState("discovery")
+
+  // Discovered places from Overpass API, organized by category
+  // Schema: { cafes: [], restaurants: [], attractions: [], hotels: [], activities: [], fuel: [], medical: [] }
+  const [discoveredPlaces, setDiscoveredPlacesRaw] = useState({
+    cafes: [], restaurants: [], attractions: [], hotels: [], activities: [], fuel: [], medical: []
+  })
+
+  // Discovery search radius in meters (default 5km)
+  const [discoveryRadius, setDiscoveryRadius] = useState(5000)
+
+  // Currently active discovery category on the map
+  const [activeDiscoveryCategory, setActiveDiscoveryCategory] = useState("cafes")
+
+  // Enhanced setActiveStay that also triggers map mode switch
+  const setActiveStay = (stayObj) => {
+    setActiveStayRaw(stayObj)
+    if (stayObj && stayObj.lat && stayObj.lng) {
+      setMapMode("discovery")
+    }
+  }
+
+  // Backwards compatibility alias for baseStay
+  const baseStay = activeStay
+  const setBaseStay = setActiveStay
+
+  // Update discovered places for a specific category
+  const setDiscoveredPlaces = (category, places) => {
+    setDiscoveredPlacesRaw((prev) => ({
+      ...prev,
+      [category]: places || []
+    }))
+  }
+
+  // Replace all discovered places at once (bulk update)
+  const setAllDiscoveredPlaces = (allPlaces) => {
+    setDiscoveredPlacesRaw(allPlaces)
+  }
+
+  // Add a discovered place from the map directly to the itinerary
+  const addDiscoveredPlaceToItinerary = (place, dayIndex = 0) => {
+    if (!place) return
+    const categoryMap = {
+      cafes: "Food & Dining",
+      restaurants: "Food & Dining",
+      attractions: "Activities",
+      hotels: "Accommodation",
+      activities: "Activities",
+      fuel: "Transport",
+      medical: "Emergency Reserve"
+    }
+    const numCost = place.estimatedCabCost ? place.estimatedCabCost + 300 : 500
+    addSpotToItinerary(dayIndex, {
+      title: place.name,
+      desc: place.address || `${place.categoryLabel || place.category} • ${place.distanceKm?.toFixed(1) || '?'} km from stay`,
+      cost: `₹${numCost.toLocaleString("en-IN")}`,
+      numericCost: numCost,
+      category: categoryMap[place.category] || "Activities",
+      type: place.categoryLabel || place.category,
+      lat: place.lat,
+      lng: place.lng,
+      openingHours: place.openingHours || "08:00 AM - 08:00 PM"
+    })
+  }
 
   // SAVED TRIPS & OFFLINE REPORT STATE
   const [savedTrips, setSavedTrips] = useState([])
@@ -445,6 +517,181 @@ export function TripProvider({ children }) {
     return removed
   }
 
+  // Last removed day tracking for exact position restoration
+  const [lastRemovedDayState, setLastRemovedDayState] = useState(null)
+
+  // Remove an entire day from itinerary and record exact index
+  const removeDayFromItinerary = (dayNumber) => {
+    const targetDay = Number(dayNumber)
+    let removed = false
+
+    setItinerary((prev) => {
+      if (!prev || prev.length === 0) return prev
+      const targetIndex = prev.findIndex((d) => d.day === targetDay)
+      if (targetIndex === -1) return prev
+
+      const removedDayObj = prev[targetIndex]
+      setLastRemovedDayState({
+        originalIndex: targetIndex,
+        dayNumber: targetDay,
+        dayData: JSON.parse(JSON.stringify(removedDayObj))
+      })
+
+      const filtered = prev.filter((_, idx) => idx !== targetIndex)
+      removed = true
+
+      // Re-number remaining days 1, 2, 3...
+      const renumbered = filtered.map((d, idx) => ({
+        ...d,
+        day: idx + 1,
+        date: `Day ${idx + 1}`
+      }))
+      setDays(renumbered.length)
+      return renumbered
+    })
+    return removed
+  }
+
+  // Restore last removed day at its exact original position
+  const restoreLastRemovedDay = () => {
+    if (!lastRemovedDayState) return false
+    const { originalIndex, dayData } = lastRemovedDayState
+
+    setItinerary((prev) => {
+      const updated = [...(prev || [])]
+      const insertIdx = Math.min(originalIndex, updated.length)
+      updated.splice(insertIdx, 0, dayData)
+
+      const renumbered = updated.map((d, idx) => ({
+        ...d,
+        day: idx + 1,
+        date: `Day ${idx + 1}`
+      }))
+      setDays(renumbered.length)
+      return renumbered
+    })
+
+    setLastRemovedDayState(null)
+    return true
+  }
+
+  // Add a new day to itinerary
+  const addDayToItinerary = () => {
+    setItinerary((prev) => {
+      const nextDayNum = (prev ? prev.length : 0) + 1
+      const spotData = getDestinationSpots(destination, nextDayNum)
+      const newDay = {
+        day: nextDayNum,
+        date: `Day ${nextDayNum}`,
+        title: `Day ${nextDayNum}: ${spotData.dayTitle}`,
+        activities: spotData.activities
+      }
+      const updated = [...(prev || []), newDay]
+      setDays(updated.length)
+      return updated
+    })
+  }
+
+  // Swap entire days (e.g. Swap Day 1 and Day 2)
+  const swapDays = (day1Num, day2Num) => {
+    const idx1 = Number(day1Num) - 1
+    const idx2 = Number(day2Num) - 1
+    setItinerary((prev) => {
+      if (!prev || !prev[idx1] || !prev[idx2]) return prev
+      const updated = [...prev]
+      const temp = updated[idx1]
+      updated[idx1] = { ...updated[idx2], day: idx1 + 1, date: `Day ${idx1 + 1}` }
+      updated[idx2] = { ...temp, day: idx2 + 1, date: `Day ${idx2 + 1}` }
+      return updated
+    })
+  }
+
+  // Undo history stack
+  const [historyStack, setHistoryStack] = useState([])
+
+  const pushHistorySnapshot = () => {
+    setHistoryStack((prev) => [
+      ...prev.slice(-10),
+      {
+        itinerary: JSON.parse(JSON.stringify(itinerary || [])),
+        customTargetBudget,
+        days
+      }
+    ])
+  }
+
+  const undoLastAction = () => {
+    if (!historyStack || historyStack.length === 0) return false
+    const lastSnap = historyStack[historyStack.length - 1]
+    setHistoryStack((prev) => prev.slice(0, -1))
+
+    if (lastSnap.itinerary) setItinerary(lastSnap.itinerary)
+    if (lastSnap.customTargetBudget !== undefined) setCustomTargetBudget(lastSnap.customTargetBudget)
+    if (lastSnap.days) setDays(lastSnap.days)
+    return true
+  }
+
+  // Move a spot to a specific target day
+  const moveSpotToDay = (spotTitle, targetDayNumber) => {
+    pushHistorySnapshot()
+    const targetDayIdx = Number(targetDayNumber) - 1
+    let foundSpot = null
+
+    setItinerary((prev) => {
+      if (!prev || !prev[targetDayIdx]) return prev
+      const queryLower = spotTitle.toLowerCase().trim()
+
+      const updated = prev.map((dayPlan) => {
+        const remaining = (dayPlan.activities || []).filter((act) => {
+          const match = (act.title || "").toLowerCase().includes(queryLower) || queryLower.includes((act.title || "").toLowerCase())
+          if (match && !foundSpot) {
+            foundSpot = { ...act }
+          }
+          return !match
+        })
+        return { ...dayPlan, activities: remaining }
+      })
+
+      if (foundSpot) {
+        updated[targetDayIdx] = {
+          ...updated[targetDayIdx],
+          activities: [...updated[targetDayIdx].activities, foundSpot]
+        }
+      }
+      return updated
+    })
+    return !!foundSpot
+  }
+
+  // Replace a spot with a new alternative spot
+  const replaceSpot = (oldSpotTitle, newSpotObj) => {
+    pushHistorySnapshot()
+    let replaced = false
+
+    setItinerary((prev) => {
+      if (!prev) return prev
+      const queryLower = oldSpotTitle.toLowerCase().trim()
+
+      return prev.map((dayPlan) => {
+        const updatedActs = (dayPlan.activities || []).map((act) => {
+          const match = (act.title || "").toLowerCase().includes(queryLower) || queryLower.includes((act.title || "").toLowerCase())
+          if (match) {
+            replaced = true
+            return {
+              ...act,
+              ...newSpotObj,
+              id: act.id || `spot-${Date.now()}`
+            }
+          }
+          return act
+        })
+        return { ...dayPlan, activities: updatedActs }
+      })
+    })
+
+    return replaced
+  }
+
   // Reorder spots in a specific day's itinerary
   const reorderDayActivities = (dayIndex, fromIndex, toIndex) => {
     setItinerary((prev) => {
@@ -464,17 +711,33 @@ export function TripProvider({ children }) {
     })
   }
 
-  // Generate Full Multi-Day Itinerary and Populate State Globally
+  // Swap spots between days or positions
+  const swapSpots = (day1Index, fromIndex, day2Index, toIndex) => {
+    setItinerary((prev) => {
+      if (!prev || !prev[day1Index] || !prev[day2Index]) return prev
+      const updated = [...prev]
+      const day1Acts = [...updated[day1Index].activities]
+      const day2Acts = [...updated[day2Index].activities]
+
+      if (!day1Acts[fromIndex] || !day2Acts[toIndex]) return prev
+
+      const temp = day1Acts[fromIndex]
+      day1Acts[fromIndex] = day2Acts[toIndex]
+      day2Acts[toIndex] = temp
+
+      updated[day1Index] = { ...updated[day1Index], activities: day1Acts }
+      updated[day2Index] = { ...updated[day2Index], activities: day2Acts }
+      return updated
+    })
+  }
+
+  // Generate Full Multi-Day Itinerary with 100% Unique Spots per Day
   const generateTripItinerary = (cityName, totalDays = 3, startStr = "2026-08-15") => {
     const destName = cityName || destination || "Goa (India)"
     const numDays = Number(totalDays) || 3
 
     setDestination(destName)
     setDays(numDays)
-
-    const baseLat = 15.55
-    const baseLng = 73.75
-    const img = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
 
     const generated = []
     for (let d = 1; d <= numDays; d++) {
@@ -486,54 +749,13 @@ export function TripProvider({ children }) {
         day: "numeric"
       })
 
+      const spotData = getDestinationSpots(destName, d)
+
       generated.push({
         day: d,
-        title: d === 1 ? `Arrival & Historic Highlights of ${destName}` : d === 2 ? `Cultural Exploration & Local Cuisines` : d === 3 ? `Scenic Panoramas & Sunset Relaxation` : `Day ${d} Local Discoveries`,
+        title: `Day ${d}: ${spotData.dayTitle}`,
         date: dateFormatted,
-        activities: [
-          {
-            id: `spot-${destName.toLowerCase()}-d${d}-s1-${Date.now()}`,
-            time: "09:30 AM",
-            openingHours: "08:30 AM - 06:00 PM",
-            type: "Sightseeing",
-            category: "Activities",
-            title: `${destName} Heritage & Landmark Tour - Day ${d}`,
-            desc: `Explore top iconic landmarks, culture, and architecture in ${destName}.`,
-            cost: "₹750",
-            numericCost: 750,
-            lat: baseLat + (d * 0.015) + 0.005,
-            lng: baseLng + (d * 0.01) + 0.005,
-            images: [img]
-          },
-          {
-            id: `spot-${destName.toLowerCase()}-d${d}-s2-${Date.now()}`,
-            time: "01:30 PM",
-            openingHours: "11:30 AM - 11:00 PM",
-            type: "Food",
-            category: "Food & Dining",
-            title: `Authentic ${destName} Culinary & Tasting Trail`,
-            desc: `Savor regional delicacies, street food markets, and top rated eateries.`,
-            cost: "₹950",
-            numericCost: 950,
-            lat: baseLat - (d * 0.01) + 0.01,
-            lng: baseLng + (d * 0.015) - 0.005,
-            images: ["https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=80"]
-          },
-          {
-            id: `spot-${destName.toLowerCase()}-d${d}-s3-${Date.now()}`,
-            time: "06:00 PM",
-            openingHours: "04:30 PM - 09:30 PM",
-            type: "Sunset",
-            category: "Activities",
-            title: `${destName} Golden Hour Promenade & Sunset Viewpoint`,
-            desc: `Scenic evening views and relaxing stroll at ${destName}.`,
-            cost: "₹450",
-            numericCost: 450,
-            lat: baseLat + (d * 0.005) - 0.015,
-            lng: baseLng - (d * 0.01) + 0.02,
-            images: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80"]
-          }
-        ]
+        activities: spotData.activities
       })
     }
 
@@ -923,11 +1145,32 @@ export function TripProvider({ children }) {
     addSpotToItinerary,
     removeSpotFromItinerary,
     removeSpotByName,
-    reorderDayActivities,
+    removeDayFromItinerary,
+    restoreLastRemovedDay,
+    lastRemovedDayState,
+    addDayToItinerary,
+    swapSpots,
+    swapDays,
+    moveSpotToDay,
+    replaceSpot,
+    undoLastAction,
     updateSpotCostInItinerary,
 
+    // Geographic Intelligence — Stay-Centric Anchor & Discovery
+    activeStay,
+    setActiveStay,
     baseStay,
     setBaseStay,
+    mapMode,
+    setMapMode,
+    discoveredPlaces,
+    setDiscoveredPlaces,
+    setAllDiscoveredPlaces,
+    discoveryRadius,
+    setDiscoveryRadius,
+    activeDiscoveryCategory,
+    setActiveDiscoveryCategory,
+    addDiscoveredPlaceToItinerary,
 
     savedTrips,
     setSavedTrips,
