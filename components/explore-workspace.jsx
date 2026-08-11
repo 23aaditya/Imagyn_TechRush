@@ -543,6 +543,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
    ───────────────────────────────────────────── */
 function CustomizeWheel({ activeFilters, setActiveFilters }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [selectedCategoryKey, setSelectedCategoryKey] = useState(null)
 
   const toggleFilter = (key, value) => {
     setActiveFilters(prev => {
@@ -557,78 +558,132 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
   }
 
   const activeCount = Object.keys(activeFilters).length
+  const selectedCatObj = filterCategories.find(c => c.key === selectedCategoryKey)
 
   return (
     <div className="fixed bottom-8 left-8 sm:bottom-10 sm:left-10 z-40">
-      {/* Professional Rectangular Filter Popover */}
+      {/* Professional Rectangular Filter Popover with Interactive Button-by-Button Flow */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 15, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 15, scale: 0.95 }}
-            className="absolute bottom-14 left-0 w-80 sm:w-96 rounded-xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur-2xl text-foreground select-none max-h-[70vh] overflow-y-auto space-y-4"
+            className="absolute bottom-14 left-0 w-80 sm:w-96 rounded-xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur-2xl text-foreground select-none max-h-[75vh] overflow-y-auto space-y-4"
           >
+            {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <span className="font-heading text-xs font-extrabold uppercase tracking-widest text-foreground flex items-center gap-2">
-                <SlidersHorizontal className="h-4 w-4 text-[#5B8DEF]" />
-                Customize Filters
-              </span>
+              {selectedCategoryKey ? (
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategoryKey(null)}
+                  className="font-heading text-xs font-bold uppercase tracking-wider text-[#5B8DEF] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  Categories
+                </button>
+              ) : (
+                <span className="font-heading text-xs font-extrabold uppercase tracking-widest text-foreground flex items-center gap-2">
+                  <SlidersHorizontal className="h-4 w-4 text-[#5B8DEF]" />
+                  Customize Itinerary
+                </span>
+              )}
+
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false)
+                  setSelectedCategoryKey(null)
+                }}
                 className="p-1 rounded-md hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Filter Categories List */}
-            <div className="space-y-4">
-              {filterCategories.map((cat) => (
-                <div key={cat.key} className="space-y-2">
-                  <span className="font-heading text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
-                    {cat.label}
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {cat.options.map((opt) => {
-                      const isActive = activeFilters[cat.key] === opt
-                      return (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => toggleFilter(cat.key, opt)}
-                          className={cn(
-                            "rounded-full px-3 py-1 text-xs font-semibold transition-all cursor-pointer border",
-                            isActive
-                              ? "bg-[#5B8DEF] text-[#0F172A] border-[#5B8DEF] font-bold shadow-xs"
-                              : "border-border bg-background text-foreground/80 hover:border-[#5B8DEF]/60 hover:text-foreground"
-                          )}
-                        >
-                          {opt}
-                        </button>
-                      )
-                    })}
-                  </div>
+            {/* LEVEL 1: 5 CATEGORY BUTTONS */}
+            {!selectedCategoryKey ? (
+              <div className="space-y-2.5">
+                <p className="text-xs text-muted-foreground font-medium">Select a category button to customize:</p>
+                <div className="space-y-2">
+                  {filterCategories.map((cat) => {
+                    const activeVal = activeFilters[cat.key]
+                    return (
+                      <button
+                        key={cat.key}
+                        type="button"
+                        onClick={() => setSelectedCategoryKey(cat.key)}
+                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-background hover:border-[#5B8DEF] hover:bg-accent/60 transition-all text-left group cursor-pointer shadow-2xs"
+                      >
+                        <div>
+                          <span className="font-heading text-xs font-bold uppercase tracking-wider text-foreground block group-hover:text-[#5B8DEF]">
+                            {cat.label}
+                          </span>
+                          <span className="text-[11px] font-medium text-muted-foreground block mt-0.5">
+                            {activeVal ? `Selected: ${activeVal}` : "Tap to choose options →"}
+                          </span>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-[#5B8DEF] group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    )
+                  })}
                 </div>
-              ))}
-            </div>
+              </div>
+            ) : (
+              /* LEVEL 2: DETAIL OPTION BUTTONS FOR SELECTED CATEGORY */
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-heading text-xs font-extrabold uppercase tracking-wider text-[#5B8DEF]">
+                    {selectedCatObj?.label} Options
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">Select option:</span>
+                </div>
 
-            {/* Modal Actions */}
+                <div className="space-y-2">
+                  {selectedCatObj?.options.map((opt) => {
+                    const isActive = activeFilters[selectedCatObj.key] === opt
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => toggleFilter(selectedCatObj.key, opt)}
+                        className={cn(
+                          "w-full flex items-center justify-between p-3 rounded-lg border text-left text-xs font-bold transition-all cursor-pointer shadow-2xs",
+                          isActive
+                            ? "bg-[#5B8DEF] text-[#0F172A] border-[#5B8DEF] font-extrabold shadow-xs"
+                            : "bg-background border-border text-foreground hover:border-[#5B8DEF]/60 hover:bg-accent/50"
+                        )}
+                      >
+                        <span>{opt}</span>
+                        {isActive && <CheckCircle2 className="h-4 w-4 text-[#0F172A]" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Modal Actions Footer */}
             <div className="flex items-center justify-between border-t border-border pt-3">
               <button
                 type="button"
-                onClick={() => setActiveFilters({})}
+                onClick={() => {
+                  setActiveFilters({})
+                  setSelectedCategoryKey(null)
+                }}
                 className="text-xs font-bold text-destructive hover:underline cursor-pointer"
               >
                 Reset All
               </button>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false)
+                  setSelectedCategoryKey(null)
+                }}
                 className="rounded-md bg-[#5B8DEF] text-[#0F172A] px-4 py-1.5 text-xs font-bold uppercase tracking-wider shadow-xs hover:bg-[#487AE0] transition-colors cursor-pointer"
               >
-                Apply Filters
+                Done
               </button>
             </div>
           </motion.div>
