@@ -38,6 +38,7 @@ import {
   ArrowRightLeft
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { useTrip } from "@/context/trip-context"
 import destinationsData from "@/destinations_105.json"
 
