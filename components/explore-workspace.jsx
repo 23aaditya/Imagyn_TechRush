@@ -130,9 +130,8 @@ function DestinationRow({ destinations, label, hoveredId, setHoveredId, onCardCl
     <div className="mb-4">
       {/* Clean Title Header without SVGs */}
       <div className="flex items-center justify-between mb-1 px-2">
-        <h3 className="font-heading text-xl font-extrabold text-foreground tracking-tight flex items-center gap-2">
-          <span>{label}</span>
-          <span className="text-xs font-semibold text-muted-foreground">({destinations.length})</span>
+        <h3 className="font-heading text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">
+          {label}
         </h3>
         <div className="flex items-center gap-2">
           <button
@@ -869,10 +868,6 @@ export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }
             <span className="text-muted-foreground">/</span>
             <span className="font-medium text-foreground text-sm">Interactive Destination Explorer</span>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-            <Globe className="h-3.5 w-3.5" />
-            {filteredDestinations.length} Destinations
-          </span>
         </div>
 
         {/* 100% EDGE-TO-EDGE FULL-BLEED CULTURAL BACKGROUND HERO */}
