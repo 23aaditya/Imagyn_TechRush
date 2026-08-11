@@ -560,147 +560,149 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
   const activeCount = Object.keys(activeFilters).length
   const selectedCatObj = filterCategories.find(c => c.key === selectedCategoryKey)
 
+  // Radial Arc Angles for 5 Category Petals (Blooming outward from trigger)
+  const categoryAngles = [-86, -64, -42, -20, 2]
+  const categoryDistance = 145
+
   return (
     <div className="fixed bottom-8 left-8 sm:bottom-10 sm:left-10 z-40">
-      {/* Professional Rectangular Filter Popover with Interactive Button-by-Button Flow */}
+      {/* RADIAL PETAL FORMAT MENU */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 15, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 15, scale: 0.95 }}
-            className="absolute bottom-14 left-0 w-80 sm:w-96 rounded-xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur-2xl text-foreground select-none max-h-[75vh] overflow-y-auto space-y-4"
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              {selectedCategoryKey ? (
-                <button
-                  type="button"
-                  onClick={() => setSelectedCategoryKey(null)}
-                  className="font-heading text-xs font-bold uppercase tracking-wider text-[#5B8DEF] hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <ArrowLeft className="h-3.5 w-3.5" />
-                  Categories
-                </button>
-              ) : (
-                <span className="font-heading text-xs font-extrabold uppercase tracking-widest text-foreground flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-[#5B8DEF]" />
-                  Customize Itinerary
-                </span>
-              )}
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsOpen(false)
-                  setSelectedCategoryKey(null)
-                }}
-                className="p-1 rounded-md hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* LEVEL 1: 5 CATEGORY BUTTONS */}
+          <>
+            {/* LEVEL 1: 5 CATEGORY PETALS BLOOMING OUT IN RADIAL ARC */}
             {!selectedCategoryKey ? (
-              <div className="space-y-2.5">
-                <p className="text-xs text-muted-foreground font-medium">Select a category button to customize:</p>
-                <div className="space-y-2">
-                  {filterCategories.map((cat) => {
-                    const activeVal = activeFilters[cat.key]
-                    return (
-                      <button
-                        key={cat.key}
-                        type="button"
-                        onClick={() => setSelectedCategoryKey(cat.key)}
-                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-background hover:border-[#5B8DEF] hover:bg-accent/60 transition-all text-left group cursor-pointer shadow-2xs"
-                      >
-                        <div>
-                          <span className="font-heading text-xs font-bold uppercase tracking-wider text-foreground block group-hover:text-[#5B8DEF]">
-                            {cat.label}
-                          </span>
-                          <span className="text-[11px] font-medium text-muted-foreground block mt-0.5">
-                            {activeVal ? `Selected: ${activeVal}` : "Tap to choose options →"}
-                          </span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-[#5B8DEF] group-hover:translate-x-1 transition-transform" />
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ) : (
-              /* LEVEL 2: DETAIL OPTION BUTTONS FOR SELECTED CATEGORY */
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-heading text-xs font-extrabold uppercase tracking-wider text-[#5B8DEF]">
-                    {selectedCatObj?.label} Options
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">Select option:</span>
-                </div>
+              filterCategories.map((cat, i) => {
+                const angleDeg = categoryAngles[i]
+                const rad = (angleDeg * Math.PI) / 180
+                const x = Math.cos(rad) * categoryDistance
+                const y = Math.sin(rad) * categoryDistance
+                const activeVal = activeFilters[cat.key]
 
-                <div className="space-y-2">
-                  {selectedCatObj?.options.map((opt) => {
-                    const isActive = activeFilters[selectedCatObj.key] === opt
-                    return (
+                return (
+                  <motion.div
+                    key={cat.key}
+                    initial={{ opacity: 0, x: 0, y: 0, scale: 0.2 }}
+                    animate={{ opacity: 1, x, y, scale: 1 }}
+                    exit={{ opacity: 0, x: 0, y: 0, scale: 0.2 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 220,
+                      damping: 19,
+                      mass: 0.75,
+                      delay: i * 0.04,
+                    }}
+                    className="absolute bottom-2 left-2"
+                    style={{ zIndex: 50 }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCategoryKey(cat.key)}
+                      className={cn(
+                        "rounded-t-2xl rounded-b-md px-3.5 py-2.5 border shadow-2xl backdrop-blur-2xl flex flex-col items-center justify-center transition-all cursor-pointer min-w-[80px] max-w-[110px] text-center group",
+                        activeVal
+                          ? "bg-[#5B8DEF] text-[#0F172A] border-[#5B8DEF] font-extrabold shadow-[#5B8DEF]/30"
+                          : "bg-[#0F172A]/95 text-white border-neutral-700 hover:border-[#5B8DEF] hover:scale-108"
+                      )}
+                    >
+                      <span className={cn(
+                        "font-heading text-[9px] font-extrabold uppercase tracking-widest block leading-none",
+                        activeVal ? "text-[#0F172A]" : "text-[#5B8DEF]"
+                      )}>
+                        {cat.label}
+                      </span>
+                      <span className="text-[11px] font-bold mt-1 truncate max-w-[95px] block leading-tight">
+                        {activeVal ? activeVal : "Tap to choose"}
+                      </span>
+                    </button>
+                  </motion.div>
+                )
+              })
+            ) : (
+              /* LEVEL 2: DETAIL OPTIONS SUB-PETALS BLOOMING IN FAN ARC */
+              <>
+                {/* Central Back Petal Button */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.5 }}
+                  className="absolute bottom-16 left-0"
+                  style={{ zIndex: 60 }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategoryKey(null)}
+                    className="rounded-full px-3.5 py-1.5 border border-[#5B8DEF] bg-[#5B8DEF] text-[#0F172A] text-xs font-black uppercase tracking-wider shadow-xl hover:scale-105 transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Back to Petals
+                  </button>
+                </motion.div>
+
+                {/* Sub-Petal Options Blooming Out */}
+                {selectedCatObj?.options.map((opt, j) => {
+                  const totalOpts = selectedCatObj.options.length
+                  const stepAngle = totalOpts > 5 ? 24 : 32
+                  const startAngle = -90 - ((totalOpts - 1) * stepAngle) / 2
+                  const angleDeg = startAngle + j * stepAngle
+                  const rad = (angleDeg * Math.PI) / 180
+                  const subDist = 155
+                  const x = Math.cos(rad) * subDist
+                  const y = Math.sin(rad) * subDist
+                  const isActive = activeFilters[selectedCatObj.key] === opt
+
+                  return (
+                    <motion.div
+                      key={opt}
+                      initial={{ opacity: 0, x: 0, y: 0, scale: 0.2 }}
+                      animate={{ opacity: 1, x, y, scale: 1 }}
+                      exit={{ opacity: 0, x: 0, y: 0, scale: 0.2 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 230,
+                        damping: 18,
+                        mass: 0.7,
+                        delay: j * 0.04,
+                      }}
+                      className="absolute bottom-2 left-2"
+                      style={{ zIndex: 55 }}
+                    >
                       <button
-                        key={opt}
                         type="button"
                         onClick={() => toggleFilter(selectedCatObj.key, opt)}
                         className={cn(
-                          "w-full flex items-center justify-between p-3 rounded-lg border text-left text-xs font-bold transition-all cursor-pointer shadow-2xs",
+                          "rounded-full px-3.5 py-1.5 border text-xs font-bold whitespace-nowrap shadow-2xl backdrop-blur-2xl transition-all cursor-pointer flex items-center gap-1.5",
                           isActive
-                            ? "bg-[#5B8DEF] text-[#0F172A] border-[#5B8DEF] font-extrabold shadow-xs"
-                            : "bg-background border-border text-foreground hover:border-[#5B8DEF]/60 hover:bg-accent/50"
+                            ? "bg-[#5B8DEF] text-[#0F172A] border-[#5B8DEF] font-extrabold scale-110 shadow-[#5B8DEF]/30"
+                            : "bg-[#0F172A]/95 text-white border-neutral-700 hover:border-[#5B8DEF] hover:scale-108"
                         )}
                       >
                         <span>{opt}</span>
-                        {isActive && <CheckCircle2 className="h-4 w-4 text-[#0F172A]" />}
+                        {isActive && <CheckCircle2 className="h-3.5 w-3.5 text-[#0F172A]" />}
                       </button>
-                    )
-                  })}
-                </div>
-              </div>
+                    </motion.div>
+                  )
+                })}
+              </>
             )}
-
-            {/* Modal Actions Footer */}
-            <div className="flex items-center justify-between border-t border-border pt-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveFilters({})
-                  setSelectedCategoryKey(null)
-                }}
-                className="text-xs font-bold text-destructive hover:underline cursor-pointer"
-              >
-                Reset All
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsOpen(false)
-                  setSelectedCategoryKey(null)
-                }}
-                className="rounded-md bg-[#5B8DEF] text-[#0F172A] px-4 py-1.5 text-xs font-bold uppercase tracking-wider shadow-xs hover:bg-[#487AE0] transition-colors cursor-pointer"
-              >
-                Done
-              </button>
-            </div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
 
-      {/* Rectangular Customize Button with Slightly Curved Corners */}
+      {/* Rectangular Customize Trigger Button with Slightly Curved Corners */}
       <motion.button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
+        onClick={() => {
+          setIsOpen(!isOpen)
+          if (isOpen) setSelectedCategoryKey(null)
+        }}
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.96 }}
         className="relative flex items-center justify-center gap-2.5 rounded-lg px-5 py-3 shadow-xl border border-neutral-700 transition-all cursor-pointer bg-neutral-900 text-white hover:bg-neutral-800"
       >
         <SlidersHorizontal className={`h-4 w-4 text-[#5B8DEF] transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
         <span className="font-heading text-xs font-bold uppercase tracking-wider text-white">
-          {isOpen ? "Close Filters" : "Customize"}
+          {isOpen ? "Close Petals" : "Customize"}
         </span>
 
         {activeCount > 0 && (
