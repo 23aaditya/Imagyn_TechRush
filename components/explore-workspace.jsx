@@ -720,6 +720,66 @@ function FilterPills({ activeFilters, setActiveFilters }) {
 }
 
 /* ─────────────────────────────────────────────
+   DYNAMIC CULTURAL BACKGROUND DIRECTORY
+   ───────────────────────────────────────────── */
+const CULTURAL_BACKGROUNDS = {
+  india: {
+    image: "/images/cultural/culture-indian-mosaic.jpg",
+    title: "Indian Folk Mosaic & Rajasthani Heritage",
+    subtitle: "Sacred Palaces, Truck Art & Architectural Spectrum",
+    coordinates: "26°55′N 75°49′E · JAIPUR · INDIA"
+  },
+  goa: {
+    image: "/images/cultural/culture-warli.jpg",
+    title: "Warli Tribal & Coastal Heritage",
+    subtitle: "Traditional Folk Motifs, Palms & Sun-Drenched Culture",
+    coordinates: "15°29′N 73°49′E · GOA · INDIA"
+  },
+  indonesia: {
+    image: "/images/cultural/culture-balinese.jpg",
+    title: "Wayang Balinese Mythological Art",
+    subtitle: "Mossy Temples, Terraces & Island Mysticism",
+    coordinates: "8°20′S 115°09′E · BALI · INDONESIA"
+  },
+  japan: {
+    image: "/images/cultural/culture-balinese.jpg",
+    title: "Traditional Japanese Zen Sanctuary",
+    subtitle: "Pagodas, Cherry Gardens & Ancient Temples",
+    coordinates: "35°01′N 135°46′E · KYOTO · JAPAN"
+  },
+  france: {
+    image: "/images/cultural/culture-indian-mosaic.jpg",
+    title: "Parisian Urban Elegance",
+    subtitle: "Boulevards, Cafés & French Architectural Heritage",
+    coordinates: "48°51′N 2°21′E · PARIS · FRANCE"
+  },
+  italy: {
+    image: "/images/cultural/culture-indian-mosaic.jpg",
+    title: "Roman Classical Heritage",
+    subtitle: "Historic Cobblestone Streets & Renaissance Identity",
+    coordinates: "41°54′N 12°29′E · ROME · ITALY"
+  },
+  greece: {
+    image: "/images/cultural/culture-warli.jpg",
+    title: "Cycladic Aegean Architecture",
+    subtitle: "White-and-Blue Mediterranean Atmosphere",
+    coordinates: "36°23′N 25°26′E · SANTORINI · GREECE"
+  },
+  egypt: {
+    image: "/images/cultural/culture-warli.jpg",
+    title: "Ancient Nile & Nubian Heritage",
+    subtitle: "Pyramids, Monuments & Warm Desert Culture",
+    coordinates: "29°58′N 31°07′E · CAIRO · EGYPT"
+  },
+  default: {
+    image: "/images/cultural/culture-indian-mosaic.jpg",
+    title: "Global Cultural Gateway",
+    subtitle: "Immersive Architectural Spectrum Across 42 Countries",
+    coordinates: "WORLD ATLAS · DISCOVER CULTURES"
+  }
+}
+
+/* ─────────────────────────────────────────────
    MAIN EXPLORE WORKSPACE COMPONENT
    ───────────────────────────────────────────── */
 export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }) {
@@ -731,6 +791,43 @@ export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }
   const filteredDestinations = allDestinations.filter(dest => {
     return Object.entries(activeFilters).every(([key, value]) => dest[key] === value)
   })
+
+  // Auto-Changing Cultural Background Reel across uploaded photos
+  const UPLOADED_CULTURAL_IMAGES = [
+    "/images/cultural/culture-indian-mosaic.jpg",
+    "/images/cultural/culture-warli.jpg",
+    "/images/cultural/culture-balinese.jpg"
+  ]
+  const [autoImageIdx, setAutoImageIdx] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setAutoImageIdx((prev) => (prev + 1) % UPLOADED_CULTURAL_IMAGES.length)
+    }, 3800)
+    return () => clearInterval(timer)
+  }, [])
+
+  // Determine active culture background dynamically using uploaded photos
+  const activeDest = selectedDest || allDestinations.find(d => d.id === hoveredId)
+  const getCultureBackground = () => {
+    if (!activeDest) return CULTURAL_BACKGROUNDS.default
+    const country = (activeDest.country || "").toLowerCase()
+    const name = (activeDest.name || "").toLowerCase()
+
+    if (name.includes("goa") || country.includes("goa")) return CULTURAL_BACKGROUNDS.goa
+    if (name.includes("jaipur") || country.includes("jaipur") || country.includes("india")) return CULTURAL_BACKGROUNDS.india
+    if (country.includes("italy") || name.includes("rome") || name.includes("venice")) return CULTURAL_BACKGROUNDS.italy
+    if (country.includes("japan") || name.includes("kyoto") || name.includes("tokyo")) return CULTURAL_BACKGROUNDS.japan
+    if (country.includes("france") || name.includes("paris")) return CULTURAL_BACKGROUNDS.france
+    if (country.includes("greece") || name.includes("santorini")) return CULTURAL_BACKGROUNDS.greece
+    if (country.includes("egypt") || name.includes("cairo")) return CULTURAL_BACKGROUNDS.egypt
+    if (country.includes("indonesia") || name.includes("bali")) return CULTURAL_BACKGROUNDS.indonesia
+
+    return CULTURAL_BACKGROUNDS.default
+  }
+
+  const activeBg = getCultureBackground()
+  const activeDisplayImage = activeDest ? activeBg.image : UPLOADED_CULTURAL_IMAGES[autoImageIdx]
 
   const getOverlayTint = () => {
     const keys = Object.keys(activeFilters)
@@ -753,7 +850,7 @@ export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }
   const escapeDests = filteredDestinations.filter(d => d.row === "escapes")
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-32 relative">
+    <div className="min-h-screen bg-background pt-24 pb-32 relative overflow-x-hidden">
       {/* Filter Background Overlay */}
       <AnimatePresence>
         {hasFilters && (
@@ -771,7 +868,7 @@ export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Navigation Bar */}
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-5">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-5">
           <div className="flex items-center gap-3">
             <Button variant="outline" size="sm" onClick={onBack}
               className="rounded-xl border-border bg-background hover:bg-accent text-xs sm:text-sm font-semibold">
@@ -787,14 +884,40 @@ export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }
           </span>
         </div>
 
-        {/* Section Heading */}
-        <div className="mb-8 text-center md:text-left">
-          <h1 className="font-heading text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-            Explore the World Your Way
-          </h1>
-          <p className="mt-2 text-base text-muted-foreground max-w-2xl font-medium">
-            Hover to discover quick info petals • Click to see full details • Filter using Customize below
-          </p>
+        {/* 100% EDGE-TO-EDGE FULL-BLEED CULTURAL BACKGROUND HERO */}
+        <div className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mb-8 overflow-hidden min-h-[220px] sm:min-h-[260px] flex items-center justify-center border-y border-border/40 select-none">
+          {/* Dynamic Auto-Changing Cultural Background Image with 800ms Crossfade */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeDisplayImage}
+              initial={{ opacity: 0, scale: 1.04 }}
+              animate={{ opacity: 0.52, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+              className="absolute inset-0 z-0"
+            >
+              <img
+                src={activeDisplayImage}
+                alt="TripNest Cultural Explorer"
+                className="h-full w-full object-cover filter brightness-[0.98] contrast-[1.05]"
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Light Atmospheric Gradient Overlays for Clear Visibility & Readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/45 to-background/80 z-10 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30 z-10 pointer-events-none" />
+
+          {/* Integrated Heading Content */}
+          <div className="relative z-20 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 text-center md:text-left space-y-2">
+            <h1 className="font-heading text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl uppercase leading-[0.95] drop-shadow-xs">
+              Explore the World Your Way
+            </h1>
+
+            <p className="text-xs sm:text-sm text-foreground/80 max-w-2xl font-semibold tracking-wide drop-shadow-xs">
+              Hover to discover quick info petals • Click to see full details • Filter using Customize below
+            </p>
+          </div>
         </div>
 
         {/* Active Filter Pills */}
