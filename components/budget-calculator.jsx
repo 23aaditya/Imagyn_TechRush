@@ -19,9 +19,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
 
-const RADIUS = 110
+const RADIUS = 100
 const CIRCUM = 2 * Math.PI * RADIUS
-const SVG_SIZE = 380
+const SVG_SIZE = 350
 const CENTER = SVG_SIZE / 2
 
 export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace }) {
@@ -51,53 +51,52 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
   const TOTAL = totalBudget || 35500
   const perPerson = Math.round(TOTAL / Math.max(1, travelers))
 
-  // Exact 6 categories matching the reference chart order and colors 1-to-1
+  // Curated Premium Pastel Color Palette matching user's design aesthetic
   const segments = [
     {
       id: "Accommodation",
       label: "Accommodation",
       value: categoryBudgets["Accommodation"] || Math.round(TOTAL * 0.30),
-      color: "#14B8A6", // Cyan Teal
+      color: "#9066D6", // Soft Pastel Purple
       icon: Bed
     },
     {
       id: "Food & Dining",
       label: "Food & Dining",
       value: categoryBudgets["Food & Dining"] || Math.round(TOTAL * 0.20),
-      color: "#8B5CF6", // Deep Purple
+      color: "#9FE165", // Soft Pastel Lime
       icon: UtensilsCrossed
     },
     {
       id: "Activities",
       label: "Activities",
       value: categoryBudgets["Activities"] || Math.round(TOTAL * 0.17),
-      color: "#84CC16", // Lime Green
+      color: "#F46593", // Soft Pastel Rose Pink
       icon: Ticket
     },
     {
       id: "Shopping",
       label: "Shopping",
       value: categoryBudgets["Shopping"] || Math.round(TOTAL * 0.11),
-      color: "#10B981", // Mint Emerald
+      color: "#F7A361", // Soft Pastel Peach Orange
       icon: ShoppingBag
     },
     {
       id: "Emergency Reserve",
       label: "Emergency",
       value: categoryBudgets["Emergency Reserve"] || Math.round(TOTAL * 0.10),
-      color: "#EC4899", // Hot Pink
+      color: "#66D5B4", // Soft Pastel Mint Teal
       icon: ShieldAlert
     },
     {
       id: "Transport",
       label: "Transport",
       value: categoryBudgets["Transport"] || Math.round(TOTAL * 0.12),
-      color: "#F97316", // Warm Amber Orange
+      color: "#38B2B0", // Soft Pastel Cyan Teal
       icon: Bus
     },
   ]
 
-  // Calculate mathematically exact stroke offsets and mid-angle positions in screen coordinates
   let offsetAccum = 0
 
   const processedSegments = segments.map((seg) => {
@@ -108,18 +107,27 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
     offsetAccum += dash
 
     // Mid-angle calculation in standard unrotated screen space (where -90° is 12 o'clock)
-    const startFraction = (currentOffset) / CIRCUM
+    const startFraction = currentOffset / CIRCUM
     const midFraction = startFraction + fraction / 2
     const midAngleRotatedDeg = midFraction * 360 - 90
     const midAngleRad = (midAngleRotatedDeg * Math.PI) / 180
 
-    // Inner Ring Percentage Coordinates (Radius = 110, dead-center in stroke)
+    // Inner Ring Percentage Coordinates (Radius = 100, dead-center in stroke)
     const innerX = CENTER + RADIUS * Math.cos(midAngleRad)
     const innerY = CENTER + RADIUS * Math.sin(midAngleRad)
 
-    // Outer Perimeter Category Label Coordinates (Radius = 154)
-    const outerX = CENTER + 154 * Math.cos(midAngleRad)
-    const outerY = CENTER + 154 * Math.sin(midAngleRad)
+    // Outer Perimeter Category Label Coordinates (Radius = 132 for perfect 10px spacing from ring)
+    const outerX = CENTER + 132 * Math.cos(midAngleRad)
+    const outerY = CENTER + 132 * Math.sin(midAngleRad)
+
+    // Precise quadrant-aware text alignment parameters for tight, readable spacing
+    let textAnchor = "middle"
+    if (outerX > CENTER + 15) textAnchor = "start"
+    else if (outerX < CENTER - 15) textAnchor = "end"
+
+    let dy = "0.35em"
+    if (outerY < CENTER - 30) dy = "-0.3em"
+    else if (outerY > CENTER + 30) dy = "0.85em"
 
     return {
       ...seg,
@@ -131,7 +139,9 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
       innerX,
       innerY,
       outerX,
-      outerY
+      outerY,
+      textAnchor,
+      dy
     }
   })
 
@@ -262,7 +272,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
           
           {/* Main Donut Chart Container (Col-span 6) */}
           <div className="md:col-span-6 flex flex-col items-center justify-center relative py-4">
-            <div className="relative flex h-[360px] w-[360px] items-center justify-center">
+            <div className="relative flex h-[340px] w-[340px] items-center justify-center">
               
               {/* SVG Donut Ring */}
               <svg viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`} className="h-full w-full overflow-visible">
@@ -275,8 +285,8 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                     r={RADIUS}
                     fill="none"
                     stroke="currentColor"
-                    className="text-muted/20"
-                    strokeWidth="48"
+                    className="text-muted/15"
+                    strokeWidth="44"
                   />
 
                   {/* Donut Slices */}
@@ -290,7 +300,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                         r={RADIUS}
                         fill="none"
                         stroke={seg.color}
-                        strokeWidth={isHovered ? 54 : 48}
+                        strokeWidth={isHovered ? 50 : 44}
                         strokeDasharray={`${Math.max(0, seg.dash - 2.5)} ${CIRCUM - Math.max(0, seg.dash - 2.5)}`}
                         initial={{ strokeDashoffset: CIRCUM }}
                         animate={{ strokeDashoffset: -seg.currentOffset }}
@@ -303,7 +313,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                   })}
                 </g>
 
-                {/* Inner Ring Percentage Typography (Dead-center in stroke, 100% matched) */}
+                {/* Inner Ring Percentage Typography */}
                 {processedSegments.map((seg) => {
                   if (seg.pct < 3) return null
                   return (
@@ -315,9 +325,9 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                       dominantBaseline="central"
                       className="fill-white font-extrabold font-sans pointer-events-none"
                       style={{
-                        fontSize: "15px",
+                        fontSize: "14px",
                         fontWeight: 800,
-                        filter: "drop-shadow(0px 1px 2px rgba(0,0,0,0.6))"
+                        filter: "drop-shadow(0px 1px 2px rgba(0,0,0,0.5))"
                       }}
                     >
                       {seg.pct}%
@@ -325,20 +335,22 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                   )
                 })}
 
-                {/* Outer Perimeter Category Label Badges (100% aligned with exact slice center) */}
+                {/* Outer Perimeter Category Label Typography (Optimized 10px spacing for perfect readability) */}
                 {processedSegments.map((seg) => {
+                  const isHovered = hoveredCategory === seg.id
                   return (
                     <text
                       key={`outer-${seg.id}`}
                       x={seg.outerX}
                       y={seg.outerY}
-                      textAnchor="middle"
-                      dominantBaseline="central"
-                      className="fill-foreground font-extrabold text-[12px] tracking-tight font-sans pointer-events-none"
+                      dy={seg.dy}
+                      textAnchor={seg.textAnchor}
+                      className={`font-bold text-[11.5px] font-sans transition-all duration-200 pointer-events-none ${
+                        isHovered ? "fill-primary font-extrabold scale-105" : "fill-foreground"
+                      }`}
                       style={{
-                        fontSize: "12px",
-                        fontWeight: 800,
-                        filter: "drop-shadow(0px 1px 1px rgba(255,255,255,0.8))"
+                        fontSize: isHovered ? "12px" : "11px",
+                        fontWeight: isHovered ? 900 : 700,
                       }}
                     >
                       {seg.label}
@@ -349,7 +361,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
               {/* Central Elevated White Badge (Exact Match to User's Design) */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="flex h-36 w-36 sm:h-40 sm:w-40 flex-col items-center justify-center rounded-full bg-slate-50 dark:bg-slate-900 border-4 border-white dark:border-slate-800 shadow-2xl shadow-slate-900/10 p-2 text-center pointer-events-auto transition-transform hover:scale-105">
+                <div className="flex h-36 w-36 sm:h-38 sm:w-38 flex-col items-center justify-center rounded-full bg-slate-50 dark:bg-slate-900 border-4 border-white dark:border-slate-800 shadow-xl shadow-slate-900/10 p-2 text-center pointer-events-auto transition-transform hover:scale-105">
                   
                   {/* Circular Rupee Coin Badge */}
                   <div className="mb-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 shadow-2xs">
@@ -399,7 +411,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                     <div className="flex items-center gap-2.5">
                       <span
                         className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-2xs"
-                        style={{ backgroundColor: `${seg.color}25`, color: seg.color }}
+                        style={{ backgroundColor: `${seg.color}20`, color: seg.color }}
                       >
                         <Icon className="h-4 w-4 stroke-[2.5]" aria-hidden />
                       </span>
