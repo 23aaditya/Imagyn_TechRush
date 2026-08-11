@@ -199,55 +199,138 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             </div>
           )}
 
-          {/* Mobile hamburger menu toggle */}
+          {/* Menu Drawer Toggle Button (Visible on all viewports) */}
           <Button
             variant="ghost"
             size="icon"
             aria-label="Toggle menu"
             onClick={() => setMobileOpen((o) => !o)}
-            className="text-foreground xl:hidden rounded-sm"
+            className="text-foreground rounded-sm hover:bg-white/20 transition-colors cursor-pointer"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
       </nav>
 
-      {/* Mobile drawer */}
-      {mobileOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mx-auto mt-2 max-w-7xl rounded-md border border-border/60 bg-background/95 p-3 shadow-lg backdrop-blur-xl xl:hidden"
-        >
-          <ul className="flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <li key={link.view}>
-                <button
-                  onClick={() => handleNavClick(link.view)}
-                  className={cn(
-                    "block w-full rounded-sm px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider transition-colors",
-                    activeView === link.view
-                      ? "bg-primary/10 font-bold text-primary"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
+      {/* Right Slide-Out Navigation Drawer */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            {/* Dark Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileOpen(false)}
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs cursor-pointer"
+            />
+
+            {/* Right Side Drawer Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 220 }}
+              className="fixed top-0 right-0 bottom-0 z-50 w-80 sm:w-96 bg-white dark:bg-neutral-900 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto select-none border-l border-neutral-200 dark:border-neutral-800"
+            >
+              {/* Drawer Top Header: User Info / Avatar & Close Button */}
+              <div>
+                <div className="flex items-center justify-between pb-6 border-b border-neutral-200/80 dark:border-neutral-800">
+                  {user ? (
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-700 text-white font-black text-sm shadow-sm">
+                        {user.initials || "AA"}
+                      </div>
+                      <div className="text-left">
+                        <span className="font-heading font-extrabold text-sm text-neutral-900 dark:text-white block">
+                          {user.name}
+                        </span>
+                        <span className="font-sans text-[11px] text-neutral-500 dark:text-neutral-400 block">
+                          Logged In
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-700 text-white font-black text-sm shadow-sm">
+                        AA
+                      </div>
+                      <div className="text-left">
+                        <span className="font-heading font-extrabold text-sm text-neutral-900 dark:text-white block">
+                          Aaditya
+                        </span>
+                        <span className="font-sans text-[11px] text-neutral-500 dark:text-neutral-400 block">
+                          TripNest Explorer
+                        </span>
+                      </div>
+                    </div>
                   )}
+
+                  <button
+                    type="button"
+                    onClick={() => setMobileOpen(false)}
+                    className="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {/* Menu Options List (NO ICONS for each menu option as requested) */}
+                <div className="mt-8 space-y-2">
+                  {navLinks.map((link) => {
+                    const isActive = activeView === link.view
+                    return (
+                      <button
+                        key={link.view}
+                        type="button"
+                        onClick={() => handleNavClick(link.view)}
+                        className={cn(
+                          "w-full text-left py-3.5 px-5 rounded-2xl font-heading font-extrabold text-xs uppercase tracking-widest transition-all cursor-pointer",
+                          isActive
+                            ? "bg-stone-100 dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs border-l-4 border-[#5B8DEF]"
+                            : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-neutral-900 dark:hover:text-white hover:pl-6"
+                        )}
+                      >
+                        {link.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Bottom Decorative Mountain Train Illustration (Matching User's Reference Photo) */}
+              <div className="pt-6 border-t border-neutral-200/60 dark:border-neutral-800 mt-auto">
+                <svg
+                  viewBox="0 0 400 180"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-full h-auto text-neutral-300 dark:text-neutral-700 stroke-current opacity-80"
+                  strokeWidth="1.2"
                 >
-                  {link.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-          {!user && (
-            <div className="mt-2 border-t border-border/60 pt-3">
-              <Button
-                onClick={() => { setMobileOpen(false); onOpenAuth("signup"); }}
-                className="w-full rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 text-xs uppercase tracking-wider py-2 font-semibold"
-              >
-                Get Started
-              </Button>
-            </div>
-          )}
-        </motion.div>
-      )}
+                  {/* Background Mountains */}
+                  <path d="M10 160 L90 70 L140 120 L210 30 L290 140 L390 80 L400 160 Z" fill="none" strokeDasharray="3 3" />
+                  <path d="M60 160 L150 50 L230 130 L310 40 L380 160 Z" fill="none" />
+                  {/* Pines & Trees */}
+                  <path d="M30 160 L45 130 L60 160 Z M40 140 L45 125 L50 140 Z" fill="none" />
+                  <path d="M70 160 L85 120 L100 160 Z" fill="none" />
+                  <path d="M330 160 L345 125 L360 160 Z" fill="none" />
+                  {/* Scenic Rail Line & Train */}
+                  <path d="M0 165 C 100 160, 200 150, 400 140" strokeWidth="1.8" />
+                  <rect x="120" y="125" width="160" height="25" rx="4" fill="none" strokeWidth="1.5" />
+                  <line x1="150" y1="125" x2="150" y2="150" />
+                  <line x1="190" y1="125" x2="190" y2="150" />
+                  <line x1="230" y1="125" x2="230" y2="150" />
+                  <circle cx="140" cy="153" r="4" fill="currentColor" />
+                  <circle cx="160" cy="153" r="4" fill="currentColor" />
+                  <circle cx="210" cy="153" r="4" fill="currentColor" />
+                  <circle cx="230" cy="153" r="4" fill="currentColor" />
+                  <circle cx="260" cy="153" r="4" fill="currentColor" />
+                </svg>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </motion.header>
   )
 }
