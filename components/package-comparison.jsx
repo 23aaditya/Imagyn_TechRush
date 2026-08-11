@@ -36,6 +36,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
+import { DoodleBackground } from "@/components/doodle-background"
 
 /* ─────────────────────────────────────────────
    VACATION CATEGORIES CONFIG
@@ -546,6 +547,8 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
 
   return (
     <section id="packages" className="relative w-full min-h-screen py-12 sm:py-16 md:py-20 bg-background text-foreground select-none font-sans transition-colors duration-300">
+      {/* Travel Doodles Background */}
+      <DoodleBackground />
       
       {/* Background Cartographic Radial Pattern */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/5 via-background to-background pointer-events-none" />
