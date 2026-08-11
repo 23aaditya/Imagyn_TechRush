@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Wallet,
@@ -24,7 +24,10 @@ import {
   Calendar,
   X,
   Layers,
-  Info
+  Info,
+  Users,
+  UserPlus,
+  ArrowRightLeft
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
@@ -174,10 +177,13 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
     allItinerarySpots,
     categoryBudgets,
     days: tripDaysCount,
-    travelers
+    travelers,
+    groupMembers,
+    setGroupMembers,
+    updateExpensePayer
   } = useTrip()
 
-  // Profile Selector: 'current' | 'past'
+  // Profile Selector: 'current' | 'person-wise' | 'past'
   const [activeProfile, setActiveProfile] = useState("current")
 
   // Log Feed Tab: 'actual' | 'planned'
@@ -192,6 +198,11 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
   const [quickAmount, setQuickAmount] = useState("")
   const [quickComment, setQuickComment] = useState("")
   const [quickDay, setQuickDay] = useState(null)
+
+  // Person-Wise State
+  const members = groupMembers && groupMembers.length > 0 ? groupMembers : ["Aaditya", "Rohan", "Priya"]
+  const [newMemberName, setNewMemberName] = useState("")
+  const [quickPayer, setQuickPayer] = useState(members[0] || "Aaditya")
 
   // Dynamically fetched days directly from current itinerary
   const availableDays = (itinerary && itinerary.length > 0)
@@ -210,13 +221,78 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
 
   // Initial fallback actual logs (linked directly to initial Goa itinerary spots if actualExpenses is empty)
   const displayActualExpenses = actualExpenses.length > 0 ? actualExpenses : [
-    { id: 101, title: "Artjuna Cafe Breakfast & Smoothies", category: "Food & Dining", amount: 950, isPaid: true, day: "Day 1", date: "Aug 15" },
-    { id: 102, title: "Fort Aguada Entrance & Museum", category: "Tickets & Entry", amount: 400, isPaid: true, day: "Day 1", date: "Aug 15" },
-    { id: 103, title: "Thalassa Cliffside Greek Dinner", category: "Food & Dining", amount: 3250, isPaid: true, day: "Day 1", date: "Aug 15" },
-    { id: 104, title: "Baga & Calangute Water Sports", category: "Activities", amount: 3600, isPaid: true, day: "Day 2", date: "Aug 16" },
-    { id: 105, title: "Fisherman's Wharf Seafood", category: "Food & Dining", amount: 1900, isPaid: true, day: "Day 2", date: "Aug 16" },
-    { id: 106, title: "Anjuna Flea Market Souvenirs", category: "Shopping", amount: 3000, isPaid: true, day: "Day 3", date: "Aug 17" }
+    { id: 101, title: "Artjuna Cafe Breakfast & Smoothies", category: "Food & Dining", amount: 950, isPaid: true, day: "Day 1", date: "Aug 15", paidBy: "Aaditya" },
+    { id: 102, title: "Fort Aguada Entrance & Museum", category: "Tickets & Entry", amount: 400, isPaid: true, day: "Day 1", date: "Aug 15", paidBy: "Rohan" },
+    { id: 103, title: "Thalassa Cliffside Greek Dinner", category: "Food & Dining", amount: 3250, isPaid: true, day: "Day 1", date: "Aug 15", paidBy: "Rohan" },
+    { id: 104, title: "Baga & Calangute Water Sports", category: "Activities", amount: 3600, isPaid: true, day: "Day 2", date: "Aug 16", paidBy: "Priya" },
+    { id: 105, title: "Fisherman's Wharf Seafood", category: "Food & Dining", amount: 1900, isPaid: true, day: "Day 2", date: "Aug 16", paidBy: "Aaditya" },
+    { id: 106, title: "Anjuna Flea Market Souvenirs", category: "Shopping", amount: 3000, isPaid: true, day: "Day 3", date: "Aug 17", paidBy: "Rohan" }
   ]
+
+  // Person-Wise Calculations
+  const memberPaidTotals = useMemo(() => {
+    const res = {}
+    members.forEach((m) => (res[m] = 0))
+    displayActualExpenses.forEach((exp) => {
+      const payer = exp.paidBy && members.includes(exp.paidBy) ? exp.paidBy : members[0]
+      res[payer] = (res[payer] || 0) + exp.amount
+    })
+    return res
+  }, [members, displayActualExpenses])
+
+  const totalGroupSpent = useMemo(() => {
+    return Object.values(memberPaidTotals).reduce((a, b) => a + b, 0)
+  }, [memberPaidTotals])
+
+  const fairSharePerPerson = useMemo(() => {
+    return members.length > 0 ? Math.round(totalGroupSpent / members.length) : 0
+  }, [totalGroupSpent, members])
+
+  const memberNetBalances = useMemo(() => {
+    const res = {}
+    members.forEach((m) => {
+      res[m] = (memberPaidTotals[m] || 0) - fairSharePerPerson
+    })
+    return res
+  }, [members, memberPaidTotals, fairSharePerPerson])
+
+  // Calculated Pairwise Settlement Transactions ("Who Owes Whom")
+  const settlements = useMemo(() => {
+    const creditors = []
+    const debtors = []
+
+    Object.entries(memberNetBalances).forEach(([name, bal]) => {
+      if (bal > 10) creditors.push({ name, amount: bal })
+      else if (bal < -10) debtors.push({ name, amount: -bal })
+    })
+
+    const list = []
+    let cIdx = 0
+    let dIdx = 0
+
+    while (cIdx < creditors.length && dIdx < debtors.length) {
+      const creditor = creditors[cIdx]
+      const debtor = debtors[dIdx]
+      const payAmt = Math.min(creditor.amount, debtor.amount)
+
+      if (payAmt > 0) {
+        list.push({
+          id: `settle-${debtor.name}-${creditor.name}-${Math.round(payAmt)}`,
+          from: debtor.name,
+          to: creditor.name,
+          amount: Math.round(payAmt)
+        })
+      }
+
+      creditor.amount -= payAmt
+      debtor.amount -= payAmt
+
+      if (creditor.amount <= 5) cIdx++
+      if (debtor.amount <= 5) dIdx++
+    }
+
+    return list
+  }, [memberNetBalances])
 
   // Actual Total Spent calculation
   const calculatedActualSpent = displayActualExpenses.reduce((s, e) => s + e.amount, 0)
@@ -264,7 +340,8 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
       amount: Number(quickAmount),
       isPaid: true,
       day: quickDay,
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      paidBy: quickPayer || members[0] || "Aaditya"
     })
 
     setQuickModalOpen(false)
@@ -314,12 +391,12 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
           </p>
         </div>
 
-        {/* View Switcher Pill (Current Trip vs Past Trips) */}
+        {/* View Switcher Pill (Current Trip vs Person-Wise Split vs Past Trips) */}
         <div className="mb-6 flex items-center justify-center">
-          <div className="inline-flex items-center gap-1 rounded-2xl bg-secondary/60 p-1.5 border border-border shadow-sm">
+          <div className="inline-flex flex-wrap items-center justify-center gap-1 rounded-2xl bg-secondary/60 p-1.5 border border-border shadow-sm">
             <button
               onClick={() => setActiveProfile("current")}
-              className={`rounded-xl px-5 py-2 text-xs font-extrabold transition-all cursor-pointer ${
+              className={`rounded-xl px-4 sm:px-5 py-2 text-xs font-extrabold transition-all cursor-pointer ${
                 activeProfile === "current"
                   ? "bg-[#0D2B45] text-white shadow-md"
                   : "text-muted-foreground hover:text-foreground"
@@ -328,8 +405,19 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               Current Trip Tracker
             </button>
             <button
+              onClick={() => setActiveProfile("person-wise")}
+              className={`rounded-xl px-4 sm:px-5 py-2 text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeProfile === "person-wise"
+                  ? "bg-[#0D2B45] text-white shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Users className="h-3.5 w-3.5 text-amber-400" />
+              <span>Person-Wise Group Split</span>
+            </button>
+            <button
               onClick={() => setActiveProfile("past")}
-              className={`rounded-xl px-5 py-2 text-xs font-extrabold transition-all cursor-pointer ${
+              className={`rounded-xl px-4 sm:px-5 py-2 text-xs font-extrabold transition-all cursor-pointer ${
                 activeProfile === "past"
                   ? "bg-[#0D2B45] text-white shadow-md"
                   : "text-muted-foreground hover:text-foreground"
@@ -634,7 +722,21 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-4 flex-wrap justify-between sm:justify-end">
+                            <div className="flex items-center gap-1.5 text-xs">
+                              <span className="text-muted-foreground font-medium text-[11px]">Paid by:</span>
+                              <select
+                                value={log.paidBy && members.includes(log.paidBy) ? log.paidBy : members[0]}
+                                onChange={(e) => updateExpensePayer(log.id, e.target.value)}
+                                className="rounded-xl border border-border bg-card px-2 py-1 text-xs font-bold text-foreground outline-none focus:border-primary cursor-pointer shadow-xs"
+                              >
+                                {members.map((m) => (
+                                  <option key={m} value={m}>
+                                    👤 {m}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
                             <span className="font-extrabold text-base text-foreground">₹{log.amount.toLocaleString("en-IN")}</span>
                             <button
                               type="button"
@@ -674,6 +776,288 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
 
               </div>
 
+            </motion.div>
+          ) : activeProfile === "person-wise" ? (
+            
+            /* PROFILE: PERSON-WISE GROUP SPLIT & DEBT SETTLEMENT */
+            <motion.div
+              key="profile-person-wise"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-8"
+            >
+              {/* Person-Wise Top Financial Overview Banner */}
+              <div className="rounded-3xl border border-[#0D2B45]/20 bg-[#0D2B45] text-white p-6 shadow-xl relative overflow-hidden">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                      Group Expense Splitting & Debt Settlement
+                    </span>
+                    <h3 className="font-heading text-2xl sm:text-3xl font-extrabold">
+                      Person-Wise Expense Breakdown
+                    </h3>
+                    <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+                      Document who paid for what across your trip. Automatically computes net balances and minimal debt settlement payments among travelers.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 border-t md:border-t-0 md:border-l border-white/20 pt-4 md:pt-0 md:pl-6 shrink-0">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Group Expenses</span>
+                      <span className="font-heading text-2xl font-extrabold text-white">₹{totalGroupSpent.toLocaleString("en-IN")}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Fair Share / Person</span>
+                      <span className="font-heading text-2xl font-extrabold text-amber-300">₹{fairSharePerPerson.toLocaleString("en-IN")}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Group Members Manager & Individual Balances */}
+              <div className="rounded-3xl border border-border bg-card p-6 shadow-md space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-4">
+                  <div>
+                    <h4 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      Travelers & Group Balances ({members.length} People)
+                    </h4>
+                    <p className="text-xs text-muted-foreground">Individual paid amounts vs. fair share</p>
+                  </div>
+
+                  {/* Add Group Member Form */}
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      if (!newMemberName.trim()) return
+                      const clean = newMemberName.trim()
+                      if (!members.includes(clean)) {
+                        setGroupMembers([...members, clean])
+                      }
+                      setNewMemberName("")
+                    }}
+                    className="flex gap-2"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Add traveler name..."
+                      value={newMemberName}
+                      onChange={(e) => setNewMemberName(e.target.value)}
+                      className="rounded-xl border border-border bg-background px-3.5 py-1.5 text-xs text-foreground outline-none focus:border-primary w-44"
+                    />
+                    <Button type="submit" size="sm" className="rounded-xl bg-primary text-white text-xs font-bold px-3">
+                      <UserPlus className="h-3.5 w-3.5 mr-1" />
+                      Add
+                    </Button>
+                  </form>
+                </div>
+
+                {/* Group Member Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {members.map((member, idx) => {
+                    const paid = memberPaidTotals[member] || 0
+                    const net = memberNetBalances[member] || 0
+                    const colors = ["bg-blue-500", "bg-purple-500", "bg-emerald-500", "bg-amber-500", "bg-rose-500"]
+                    const colorBg = colors[idx % colors.length]
+
+                    return (
+                      <div key={member} className="rounded-2xl border border-border bg-background p-4 shadow-sm space-y-3 relative group">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <div className={`h-9 w-9 rounded-xl ${colorBg} text-white font-extrabold text-xs flex items-center justify-center shadow`}>
+                              {member.slice(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                              <h5 className="font-bold text-sm text-foreground">{member}</h5>
+                              <span className="text-[10px] text-muted-foreground font-medium">Traveler #{idx + 1}</span>
+                            </div>
+                          </div>
+
+                          {members.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => setGroupMembers(members.filter((m) => m !== member))}
+                              className="text-muted-foreground hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                              title="Remove member"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="space-y-1.5 text-xs pt-1">
+                          <div className="flex justify-between font-medium">
+                            <span className="text-muted-foreground">Total Paid:</span>
+                            <strong className="text-foreground font-extrabold">₹{paid.toLocaleString("en-IN")}</strong>
+                          </div>
+                          <div className="flex justify-between font-medium">
+                            <span className="text-muted-foreground">Fair Share:</span>
+                            <span className="text-muted-foreground">₹{fairSharePerPerson.toLocaleString("en-IN")}</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Net Balance</span>
+                          {net > 5 ? (
+                            <span className="rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs px-2.5 py-0.5 border border-emerald-500/20">
+                              +₹{net.toLocaleString("en-IN")} (Gets Back)
+                            </span>
+                          ) : net < -5 ? (
+                            <span className="rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 font-extrabold text-xs px-2.5 py-0.5 border border-rose-500/20">
+                              -₹{Math.abs(net).toLocaleString("en-IN")} (Owes Group)
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-slate-500/10 text-slate-600 dark:text-slate-400 font-bold text-xs px-2.5 py-0.5">
+                              Settled Up ✨
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Debt Settlement Matrix ("Who Owes Whom") */}
+              <div className="rounded-3xl border border-border bg-card p-6 shadow-md space-y-4">
+                <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                  <div>
+                    <h4 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
+                      <ArrowRightLeft className="h-5 w-5 text-amber-500" />
+                      Settlement Summary ("Who Owes Whom")
+                    </h4>
+                    <p className="text-xs text-muted-foreground">Optimal minimum transactions to settle all group debts</p>
+                  </div>
+                  <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                    {settlements.length} Pending Transfers
+                  </span>
+                </div>
+
+                {settlements.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-border p-8 text-center space-y-2">
+                    <div className="h-10 w-10 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
+                      <CheckCircle2 className="h-6 w-6" />
+                    </div>
+                    <h5 className="font-bold text-sm text-foreground">Everyone is Settled Up!</h5>
+                    <p className="text-xs text-muted-foreground">All travelers have contributed their exact fair share. No debts pending.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {settlements.map((settle) => (
+                      <div key={settle.id} className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-2xl bg-amber-500 text-white font-extrabold text-sm flex items-center justify-center shadow">
+                            💳
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                              <span className="text-rose-600 dark:text-rose-400 font-extrabold">{settle.from}</span>
+                              <span>→ pays →</span>
+                              <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{settle.to}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground font-medium">To equalize trip expenses</span>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="font-heading text-lg font-extrabold text-amber-600 dark:text-amber-400 block">
+                            ₹{settle.amount.toLocaleString("en-IN")}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              addActualExpense({
+                                title: `Settlement: ${settle.from} paid ${settle.to}`,
+                                category: "Other",
+                                amount: settle.amount,
+                                isPaid: true,
+                                day: "Settlement",
+                                date: "Just now",
+                                paidBy: settle.from
+                              })
+                            }}
+                            className="text-[10px] font-bold text-primary hover:underline cursor-pointer"
+                          >
+                            Mark Paid & Settle
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Person-Wise Expense Entries List with Inline Payer Change */}
+              <div className="rounded-3xl border border-border bg-card p-6 shadow-md space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
+                  <div>
+                    <h4 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
+                      <Receipt className="h-5 w-5 text-primary" />
+                      Person-Wise Expense Log ({displayActualExpenses.length} Entries)
+                    </h4>
+                    <p className="text-xs text-muted-foreground">Assigned payers & split breakdown for each expense</p>
+                  </div>
+
+                  <Button
+                    onClick={() => setQuickModalOpen(true)}
+                    className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs px-4 py-2 shadow cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Plus className="h-4 w-4" />
+                    + Log Person Expense
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  {displayActualExpenses.map((exp) => {
+                    const currentPayer = exp.paidBy && members.includes(exp.paidBy) ? exp.paidBy : members[0]
+                    const perPersonSplit = Math.round(exp.amount / (members.length || 1))
+
+                    return (
+                      <div key={exp.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-border/80 bg-background p-4 shadow-sm hover:shadow-md transition-all">
+                        <div className="flex items-center gap-3">
+                          <div className="h-9 w-9 rounded-xl bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">
+                            <Receipt className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h5 className="font-bold text-sm text-foreground">{exp.title}</h5>
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                              <span className="font-semibold text-foreground">{exp.category}</span>
+                              <span>• {exp.day}</span>
+                              <span className="text-[10px] font-bold bg-secondary px-2 py-0.5 rounded-full text-muted-foreground">
+                                Split {members.length} ways (₹{perPersonSplit.toLocaleString("en-IN")}/person)
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 flex-wrap justify-between sm:justify-end">
+                          {/* Payer Dropdown */}
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-muted-foreground font-medium text-[11px]">Paid by:</span>
+                            <select
+                              value={currentPayer}
+                              onChange={(e) => updateExpensePayer(exp.id, e.target.value)}
+                              className="rounded-xl border border-border bg-card px-2.5 py-1 text-xs font-bold text-foreground outline-none focus:border-primary cursor-pointer shadow-xs"
+                            >
+                              {members.map((m) => (
+                                <option key={m} value={m}>
+                                  👤 {m}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <span className="font-extrabold text-base text-foreground shrink-0">
+                            ₹{exp.amount.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
             </motion.div>
           ) : (
             
@@ -967,22 +1351,41 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                     </div>
                   </div>
 
-                  {/* Amount Input */}
-                  <div>
-                    <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-neutral-600">
-                      Amount Spent (₹) *
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-neutral-400">₹</span>
-                      <input
-                        type="number"
-                        required
-                        autoFocus
-                        placeholder="e.g. 450"
-                        value={quickAmount}
-                        onChange={(e) => setQuickAmount(e.target.value)}
-                        className="w-full rounded-2xl border-2 border-neutral-200 bg-neutral-50 py-3 pl-10 pr-4 text-xl font-extrabold text-[#0D2B45] outline-none focus:border-[#0D2B45] focus:bg-white focus:ring-4 focus:ring-[#0D2B45]/10"
-                      />
+                  {/* Paid By Selection & Amount Input Grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-neutral-600">
+                        Paid By Traveler *
+                      </label>
+                      <select
+                        value={quickPayer || members[0] || "Aaditya"}
+                        onChange={(e) => setQuickPayer(e.target.value)}
+                        className="w-full rounded-2xl border-2 border-neutral-200 bg-neutral-50 px-3 py-3 text-xs font-bold text-[#0D2B45] outline-none focus:border-[#0D2B45] focus:bg-white cursor-pointer"
+                      >
+                        {members.map((m) => (
+                          <option key={m} value={m}>
+                            👤 Paid by {m}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-neutral-600">
+                        Amount Spent (₹) *
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-lg font-bold text-neutral-400">₹</span>
+                        <input
+                          type="number"
+                          required
+                          autoFocus
+                          placeholder="e.g. 450"
+                          value={quickAmount}
+                          onChange={(e) => setQuickAmount(e.target.value)}
+                          className="w-full rounded-2xl border-2 border-neutral-200 bg-neutral-50 py-3 pl-8 pr-3 text-lg font-extrabold text-[#0D2B45] outline-none focus:border-[#0D2B45] focus:bg-white focus:ring-4 focus:ring-[#0D2B45]/10"
+                        />
+                      </div>
                     </div>
                   </div>
 

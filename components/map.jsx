@@ -117,6 +117,9 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
   const [wishlist, setWishlist] = useState([])
   const [selectedMarkerSpot, setSelectedMarkerSpot] = useState(null)
   const [optimizationAlertDismissed, setOptimizationAlertDismissed] = useState(false)
+  const [routePathCoords, setRoutePathCoords] = useState([])
+  const [realRouteLegs, setRealRouteLegs] = useState([])
+  const [isRoutingLoading, setIsRoutingLoading] = useState(false)
 
   // Filter spots by Day
   const visibleSpots = useMemo(() => {
@@ -126,41 +129,92 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
     return dayData ? (dayData.activities || []) : spots
   }, [spots, itinerary, activeDayFilter])
 
-  // Route calculations
-  const routeLegs = useMemo(() => {
+  // Fetch real road route geometry & accurate leg stats from OSRM
+  useEffect(() => {
     const validSpots = visibleSpots.filter((s) => s.lat && s.lng)
-    const legs = []
+    if (validSpots.length < 2) {
+      setRoutePathCoords([])
+      setRealRouteLegs([])
+      return
+    }
+
     const modeConfig = TRANSIT_MODES.find((m) => m.id === selectedTransit) || TRANSIT_MODES[0]
 
+    // Immediate fallback straight-line calculations while fetching
+    const fallbackLegs = []
     for (let i = 0; i < validSpots.length - 1; i++) {
       const from = validSpots[i]
       const to = validSpots[i + 1]
       const dist = calculateDistanceKm(from.lat, from.lng, to.lat, to.lng)
       const durationMins = Math.max(2, Math.round((dist / modeConfig.speedKmh) * 60))
-      const traffic = dist > 5 ? "🔴 Heavy" : dist > 2 ? "🟡 Moderate" : "🟢 Low"
-
-      legs.push({
+      fallbackLegs.push({
         from: from.title,
         to: to.title,
         distanceKm: dist,
         durationMins,
-        traffic,
+        traffic: dist > 5 ? "🔴 Heavy" : dist > 2 ? "🟡 Moderate" : "🟢 Low",
         mode: modeConfig.label
       })
     }
-    return legs
+    setRoutePathCoords(validSpots.map((s) => [s.lat, s.lng]))
+    setRealRouteLegs(fallbackLegs)
+
+    let isCancelled = false
+    setIsRoutingLoading(true)
+
+    const profile = selectedTransit === "bike" ? "biking" : selectedTransit === "walk" ? "foot" : "driving"
+    const coordsStr = validSpots.map((s) => `${s.lng},${s.lat}`).join(";")
+    const osrmUrl = `https://router.project-osrm.org/route/v1/${profile}/${coordsStr}?overview=full&geometries=geojson`
+
+    fetch(osrmUrl)
+      .then((res) => res.json())
+      .then((data) => {
+        if (isCancelled) return
+        if (data.code === "Ok" && data.routes && data.routes[0]) {
+          const route = data.routes[0]
+          // OSRM returns coordinates as [lng, lat], Leaflet needs [lat, lng]
+          const roadCoords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng])
+          setRoutePathCoords(roadCoords)
+
+          if (route.legs && route.legs.length === validSpots.length - 1) {
+            const realLegs = route.legs.map((leg, i) => {
+              const distKm = Number((leg.distance / 1000).toFixed(1))
+              const durationMins = Math.max(1, Math.round(leg.duration / 60))
+              return {
+                from: validSpots[i].title,
+                to: validSpots[i + 1].title,
+                distanceKm: distKm,
+                durationMins,
+                traffic: durationMins > 30 ? "🔴 Heavy" : durationMins > 15 ? "🟡 Moderate" : "🟢 Low",
+                mode: modeConfig.label
+              }
+            })
+            setRealRouteLegs(realLegs)
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn("OSRM routing fetch failed, falling back to straight-line:", err)
+      })
+      .finally(() => {
+        if (!isCancelled) setIsRoutingLoading(false)
+      })
+
+    return () => {
+      isCancelled = true
+    }
   }, [visibleSpots, selectedTransit])
 
   const totalStats = useMemo(() => {
-    const totalKm = routeLegs.reduce((sum, leg) => sum + leg.distanceKm, 0)
-    const totalMins = routeLegs.reduce((sum, leg) => sum + leg.durationMins, 0)
+    const totalKm = realRouteLegs.reduce((sum, leg) => sum + leg.distanceKm, 0)
+    const totalMins = realRouteLegs.reduce((sum, leg) => sum + leg.durationMins, 0)
     const hrs = Math.floor(totalMins / 60)
     const mins = totalMins % 60
     return {
       distanceKm: Number(totalKm.toFixed(1)),
       durationText: hrs > 0 ? `${hrs}h ${mins}m` : `${mins} mins`
     }
-  }, [routeLegs])
+  }, [realRouteLegs])
 
   // Initialize Leaflet Map
   useEffect(() => {
@@ -440,18 +494,27 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       poiMarkersRef.current.push(marker)
     })
 
-    const latLngs = validSpots.map((s) => [s.lat, s.lng])
-    if (latLngs.length > 1) {
-      const polyline = L.polyline(latLngs, {
+    if (routePathCoords.length > 1) {
+      const glowLine = L.polyline(routePathCoords, {
         color: "#5A8CB2",
-        weight: 4,
-        dashArray: "6, 8",
-        opacity: 0.85
-      }).addTo(map)
+        weight: 8,
+        opacity: 0.3,
+        lineCap: "round",
+        lineJoin: "round"
+      })
 
-      polylineRef.current = polyline
+      const mainLine = L.polyline(routePathCoords, {
+        color: "#2563EB",
+        weight: 4,
+        opacity: 0.9,
+        lineCap: "round",
+        lineJoin: "round"
+      })
+
+      const group = L.layerGroup([glowLine, mainLine]).addTo(map)
+      polylineRef.current = group
     }
-  }, [visibleSpots, nearbyPlaces, hoveredSpotId, selectedCategory, baseStay])
+  }, [visibleSpots, nearbyPlaces, hoveredSpotId, selectedCategory, baseStay, routePathCoords])
 
   const handleZoomIntoPlaces = () => {
     const map = mapInstanceRef.current
@@ -726,9 +789,15 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
 
           {totalStats.distanceKm > 0 && (
             <div className="ml-2 pl-3 border-l border-border flex items-center gap-2 text-xs font-extrabold text-[#5A8CB2] shrink-0">
-              <span>📍 {totalStats.distanceKm} km</span>
-              <span>•</span>
-              <span>⏱️ {totalStats.durationText}</span>
+              {isRoutingLoading ? (
+                <span className="animate-pulse text-amber-500 font-bold text-[11px]">⚡ Calculating road route...</span>
+              ) : (
+                <>
+                  <span>📍 {totalStats.distanceKm} km</span>
+                  <span>•</span>
+                  <span>⏱️ {totalStats.durationText}</span>
+                </>
+              )}
             </div>
           )}
         </div>

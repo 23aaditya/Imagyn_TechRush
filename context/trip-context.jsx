@@ -275,7 +275,7 @@ export function TripProvider({ children }) {
   // Auto-imported Planned Expenses derived from Itinerary activities & baseline costs
   const plannedExpenses = useMemo(() => {
     const list = []
-    
+
     // Add Hotel Stay
     list.push({
       id: "plan-hotel",
@@ -784,6 +784,9 @@ export function TripProvider({ children }) {
     }
   }
 
+  // Group Members & Person-Wise Expense Splitting State
+  const [groupMembers, setGroupMembers] = useState(["Aaditya", "Rohan", "Priya"])
+
   const addActualExpense = (expense) => {
     const newEntry = {
       id: Date.now(),
@@ -792,9 +795,17 @@ export function TripProvider({ children }) {
       amount: Number(expense.amount),
       isPaid: expense.isPaid ?? true,
       day: expense.day || "Today",
-      date: expense.date || "Just now"
+      date: expense.date || "Just now",
+      paidBy: expense.paidBy || groupMembers[0] || "Aaditya",
+      splitWith: expense.splitWith || groupMembers
     }
     setActualExpenses((prev) => [newEntry, ...prev])
+  }
+
+  const updateExpensePayer = (expenseId, paidBy) => {
+    setActualExpenses((prev) =>
+      prev.map((item) => (item.id === expenseId ? { ...item, paidBy } : item))
+    )
   }
 
   const toggleExpensePaid = (id) => {
@@ -942,7 +953,10 @@ export function TripProvider({ children }) {
     addActualExpense,
     toggleExpensePaid,
     updateExpenseAmount,
-    deleteActualExpense
+    deleteActualExpense,
+    groupMembers,
+    setGroupMembers,
+    updateExpensePayer
   }
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>

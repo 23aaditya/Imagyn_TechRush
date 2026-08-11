@@ -27,10 +27,12 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { generateFallbackResponse, DESTINATION_KNOWLEDGE } from "@/lib/ai-travel-knowledge"
 import { useTrip } from "@/context/trip-context"
+import { parseAndExecuteBotActions } from "@/lib/bot-action-executor"
 
 // Categorized Prompt Chips for organized browsing
 const PROMPT_CATEGORIES = [
   { id: "all", label: "🌟 All" },
+  { id: "websitecontrol", label: "⚡ Website Control" },
   { id: "dayplans", label: "🗓️ Day Plans" },
   { id: "peakseason", label: "☀️ Peak Season" },
   { id: "crowds", label: "👥 Crowd Control" },
@@ -38,6 +40,13 @@ const PROMPT_CATEGORIES = [
 ]
 
 const CATEGORIZED_PROMPTS = {
+  websitecontrol: [
+    { label: "💰 Set Budget to ₹50,000", prompt: "Set my target trip budget to ₹50,000" },
+    { label: "🏨 Switch to Luxury Tier", prompt: "Switch my stay tier to Luxury" },
+    { label: "👥 4 Travelers, 5 Days", prompt: "Set travelers to 4 and trip duration to 5 days" },
+    { label: "🧾 Log ₹1,200 Dinner Expense", prompt: "Log ₹1,200 paid by Rahul for Dinner in Food & Dining" },
+    { label: "💾 Save Trip to Passport", prompt: "Save my current trip to passport and open saved trips" },
+  ],
   dayplans: [
     { label: "🗓️ Kyoto 3-Day Plan", prompt: "Suggest a detailed 3-day itinerary for Kyoto with morning, afternoon, and evening timing." },
     { label: "📍 Paris Day 1 Highlights", prompt: "Suggest a day 1 itinerary for Paris covering major landmarks, Seine river, and sunset spots." },
@@ -61,7 +70,8 @@ const CATEGORIZED_PROMPTS = {
 }
 
 export function AiChatbot({ currentView, onNavigate }) {
-  const { itinerary, addSpotToItinerary, removeSpotByName, reorderDayActivities, generateTripItinerary, destination, setDestination } = useTrip()
+  const tripContext = useTrip()
+  const { itinerary, addSpotToItinerary, removeSpotByName, reorderDayActivities, generateTripItinerary, destination, setDestination } = tripContext
 
   const [isOpen, setIsOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -354,12 +364,14 @@ export function AiChatbot({ currentView, onNavigate }) {
 
       if (res.ok) {
         const data = await res.json()
+        const { cleanText, executedActions } = parseAndExecuteBotActions(data.text, tripContext, onNavigate)
         setMessages((prev) => [
           ...prev,
           {
             id: (Date.now() + 1).toString(),
             role: "assistant",
-            content: data.text,
+            content: cleanText,
+            executedActions,
             isGemini: true,
             timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           },
@@ -367,12 +379,14 @@ export function AiChatbot({ currentView, onNavigate }) {
       } else {
         // Fallback to local intelligence engine if API fails or no key
         const fallback = generateFallbackResponse(messageText)
+        const { cleanText, executedActions } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
         setMessages((prev) => [
           ...prev,
           {
             id: (Date.now() + 1).toString(),
             role: "assistant",
-            content: fallback.text,
+            content: cleanText,
+            executedActions,
             isFallback: true,
             destinationCard: fallback.destinationCard,
             dayPlanCard: fallback.dayPlanCard,
@@ -383,12 +397,14 @@ export function AiChatbot({ currentView, onNavigate }) {
     } catch (err) {
       // Offline fallback
       const fallback = generateFallbackResponse(messageText)
+      const { cleanText, executedActions } = parseAndExecuteBotActions(fallback.text, tripContext, onNavigate)
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: fallback.text,
+          content: cleanText,
+          executedActions,
           isFallback: true,
           destinationCard: fallback.destinationCard,
           dayPlanCard: fallback.dayPlanCard,
@@ -683,6 +699,21 @@ export function AiChatbot({ currentView, onNavigate }) {
                         )}
                       >
                         {renderFormattedText(msg.content)}
+
+                        {/* Live Action Badges */}
+                        {msg.executedActions && msg.executedActions.length > 0 && (
+                          <div className="mt-2.5 p-2.5 rounded-xl bg-emerald-950/20 dark:bg-emerald-950/50 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs space-y-1 shadow-2xs">
+                            <div className="font-extrabold flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 border-b border-emerald-500/20 pb-1">
+                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                              Executed Website Action
+                            </div>
+                            {msg.executedActions.map((act, aIdx) => (
+                              <div key={aIdx} className="text-[11px] leading-snug font-medium">
+                                {act}
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
                         {/* Special Destination Card if available */}
                         {msg.destinationCard && (

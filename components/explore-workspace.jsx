@@ -428,18 +428,10 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
 
               <div className="flex flex-col gap-2.5">
                 <Button
-                  onClick={() => setShowPackagesView(true)}
+                  onClick={() => onExplore(destination.name)}
                   className="w-full rounded-xl py-3 font-bold text-white shadow-xl transition hover:opacity-95 bg-[#5A8CB2] hover:bg-[#4A7CA2] cursor-pointer"
                 >
-                  Explore Company Packages for {destination.name}
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => onExplore(destination.name)}
-                  className="w-full rounded-xl py-2.5 font-bold border-border text-foreground hover:bg-accent cursor-pointer"
-                >
-                  <Sparkles className="mr-1.5 h-4 w-4 text-[#5A8CB2]" />
+                  <Sparkles className="mr-1.5 h-4 w-4 text-amber-300" />
                   Customize Itinerary directly in Planner
                 </Button>
               </div>

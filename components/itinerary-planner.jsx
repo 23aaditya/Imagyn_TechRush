@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import dynamic from "next/dynamic"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -150,8 +150,8 @@ const cityCoords = {
 
 // Build Itinerary Helper (Guarantees NO repeating places across days)
 const buildItineraryData = (cityName, totalDays, startStr) => {
-  const matchedDest = destinationsData.find(d => 
-    d.name.toLowerCase() === cityName.toLowerCase() || 
+  const matchedDest = destinationsData.find(d =>
+    d.name.toLowerCase() === cityName.toLowerCase() ||
     cityName.toLowerCase().includes(d.name.toLowerCase()) ||
     d.name.toLowerCase().includes(cityName.toLowerCase())
   )
@@ -304,8 +304,94 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
   const [customBudgetVal, setCustomBudgetVal] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
 
+  // Destination Planning Option State (Plan via Explore vs Add Customized Location Directly)
+  const [destPlanningMode, setDestPlanningMode] = useState("explore") // 'explore' | 'custom'
+  const [customDestInput, setCustomDestInput] = useState(destination || "")
+  const [customSuggestions, setCustomSuggestions] = useState([])
+  const [showCustomSuggestions, setShowCustomSuggestions] = useState(false)
+
+  useEffect(() => {
+    if (destination) {
+      setCustomDestInput(destination)
+    }
+  }, [destination])
+
   const [activeDayIndex, setActiveDayIndex] = useState(0)
   const [saved, setSaved] = useState(false)
+
+  // Option Bar (Preferences Panel) Visibility State: Default to hidden when itinerary exists
+  const [showPreferences, setShowPreferences] = useState(!itinerary || itinerary.length === 0)
+
+  // Derived Itinerary Financial Calculations for Live Budget & Expense Display
+  const totalActivitiesExpense = useMemo(() => {
+    if (!itinerary || !Array.isArray(itinerary)) return 0
+    return itinerary.reduce((sum, day) => {
+      if (!day.activities) return sum
+      return sum + day.activities.reduce((dSum, act) => {
+        const costNum = act.numericCost || parseInt(String(act.cost || "0").replace(/[^\d]/g, "")) || 0
+        return dSum + costNum
+      }, 0)
+    }, 0)
+  }, [itinerary])
+
+  const categoryExpenseBreakdown = useMemo(() => {
+    if (!itinerary || !Array.isArray(itinerary)) return {}
+    const res = {}
+    itinerary.forEach((day) => {
+      (day.activities || []).forEach((act) => {
+        const cat = act.category || (act.type === "Food" ? "Food & Dining" : act.type === "Shopping" ? "Shopping" : "Activities")
+        const costNum = act.numericCost || parseInt(String(act.cost || "0").replace(/[^\d]/g, "")) || 0
+        res[cat] = (res[cat] || 0) + costNum
+      })
+    })
+    return res
+  }, [itinerary])
+
+  const totalSpotsCount = useMemo(() => {
+    if (!itinerary || !Array.isArray(itinerary)) return 0
+    return itinerary.reduce((sum, day) => sum + (day.activities?.length || 0), 0)
+  }, [itinerary])
+
+  // Sleek Add Custom Spot Modal State
+  const [addSpotModalOpen, setAddSpotModalOpen] = useState(false)
+  const [targetDayForCustomSpot, setTargetDayForCustomSpot] = useState(0)
+  const [customSpotForm, setCustomSpotForm] = useState({
+    title: "",
+    type: "Sightseeing",
+    category: "Activities",
+    time: "02:30 PM",
+    cost: "500",
+    desc: "",
+    img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+  })
+
+  const handleAddCustomSpotSubmit = (e) => {
+    e.preventDefault()
+    if (!customSpotForm.title.trim()) return
+
+    const numCost = parseInt(String(customSpotForm.cost).replace(/[^\d]/g, "")) || 500
+    addSpotToItinerary(targetDayForCustomSpot, {
+      title: customSpotForm.title.trim(),
+      type: customSpotForm.type,
+      category: customSpotForm.category || (customSpotForm.type === "Food" ? "Food & Dining" : "Activities"),
+      time: customSpotForm.time || "02:30 PM",
+      desc: customSpotForm.desc.trim() || `Custom added spot in ${destination || "your trip"}.`,
+      cost: `₹${numCost.toLocaleString("en-IN")}`,
+      numericCost: numCost,
+      img: customSpotForm.img
+    })
+
+    setAddSpotModalOpen(false)
+    setCustomSpotForm({
+      title: "",
+      type: "Sightseeing",
+      category: "Activities",
+      time: "02:30 PM",
+      cost: "500",
+      desc: "",
+      img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+    })
+  }
 
   // Bi-directional hover/click state
   const [hoveredSpotId, setHoveredSpotId] = useState(null)
@@ -361,8 +447,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
   // Synchronize itinerary & load destination-aware checklist presets
   useEffect(() => {
     if (destination) {
-      const isAlreadyMatching = itinerary && itinerary.length > 0 && itinerary[0]?.title?.toLowerCase().includes(destination.toLowerCase())
-      if (!isAlreadyMatching) {
+      if (!itinerary || itinerary.length === 0) {
         const newPlan = buildItineraryData(destination, days, startDate)
         setItinerary(newPlan)
         setActiveDayIndex(0)
@@ -438,6 +523,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
       const newPlan = buildItineraryData(dest.name, days, startDate)
       setItinerary(newPlan)
       setActiveDayIndex(0)
+      setShowPreferences(false)
     }, 500)
   }
 
@@ -470,14 +556,18 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
   }
 
   // Generate Itinerary Action
-  const handleGenerate = () => {
-    if (!destination) return
+  const handleGenerate = (destOverride) => {
+    const targetDest = destOverride || (destPlanningMode === "custom" ? customDestInput.trim() : destination) || destination || "Goa"
+    if (!targetDest) return
+
+    setDestination(targetDest)
     setIsGenerating(true)
     setTimeout(() => {
       setIsGenerating(false)
-      const newPlan = buildItineraryData(destination, days, startDate)
+      const newPlan = buildItineraryData(targetDest, days, startDate)
       setItinerary(newPlan)
       setActiveDayIndex(0)
+      setShowPreferences(false)
     }, 600)
   }
 
@@ -526,6 +616,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
       const newPlan = buildItineraryData(targetDestinationName, days, startDate)
       setItinerary(newPlan)
       setActiveDayIndex(0)
+      setShowPreferences(false)
     }, 500)
   }
 
@@ -655,6 +746,19 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
           </div>
 
           <div className="flex items-center gap-2">
+            {itinerary && itinerary.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPreferences((prev) => !prev)}
+                className={`rounded-xl border-border text-xs font-bold px-3.5 py-2 flex items-center gap-1.5 cursor-pointer transition-all ${
+                  showPreferences ? "bg-[#5A8CB2] text-white border-[#5A8CB2]" : "bg-card text-foreground hover:bg-accent"
+                }`}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                <span>{showPreferences ? "Hide Trip Options" : "Edit Trip Options"}</span>
+              </Button>
+            )}
             <Button
               onClick={() => {
                 saveCurrentTrip()
@@ -743,8 +847,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   />
                 </div>
               </motion.div>
-            ) : (
-              /* TRIP PREFERENCE PANEL ON THE LEFT (Default State) */
+            ) : (showPreferences || !itinerary || itinerary.length === 0) ? (
+              /* TRIP PREFERENCE PANEL ON THE LEFT (Collapsible when itinerary generated) */
               <motion.div
                 key="pref-view"
                 initial={{ opacity: 0, x: -30 }}
@@ -753,12 +857,173 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 transition={{ duration: 0.35 }}
                 className="lg:col-span-4 rounded-3xl border border-border bg-card p-6 shadow-xl space-y-6 sticky top-24"
               >
-                <div className="border-b border-border pb-4">
-                  <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Trip Preferences
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">Customize your travel dates and stay tier.</p>
+                <div className="border-b border-border pb-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-[#5A8CB2]" />
+                      Trip Preferences
+                    </h3>
+                    {destination && (
+                      <span className="text-[11px] font-extrabold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2.5 py-0.5 rounded-full">
+                        📍 {destination}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Customize your destination, travel dates and stay tier.</p>
+
+                  {/* DESTINATION SELECTION MODE: TWO OPTIONS (Explore Section vs Direct Custom Location) */}
+                  <div className="pt-2 space-y-2">
+                    <label className="block text-[11px] font-extrabold text-muted-foreground uppercase tracking-wider">
+                      Planning Option
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setDestPlanningMode("explore")}
+                        className={`flex items-center justify-center gap-1.5 rounded-2xl border p-2.5 text-xs font-bold transition-all cursor-pointer ${destPlanningMode === "explore"
+                            ? "border-[#5A8CB2] bg-[#5A8CB2]/15 text-[#5A8CB2] shadow-xs"
+                            : "border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+                          }`}
+                      >
+                        <Compass className="h-4 w-4" />
+                        <span>Plan via Explore</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDestPlanningMode("custom")}
+                        className={`flex items-center justify-center gap-1.5 rounded-2xl border p-2.5 text-xs font-bold transition-all cursor-pointer ${destPlanningMode === "custom"
+                            ? "border-[#5A8CB2] bg-[#5A8CB2]/15 text-[#5A8CB2] shadow-xs"
+                            : "border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+                          }`}
+                      >
+                        <MapPin className="h-4 w-4" />
+                        <span>Direct Custom Location</span>
+                      </button>
+                    </div>
+
+                    {/* OPTION 1: PLAN THROUGH EXPLORE SECTION */}
+                    {destPlanningMode === "explore" ? (
+                      <div className="space-y-2 pt-1">
+                        <div className="relative">
+                          <select
+                            value={destination || ""}
+                            onChange={(e) => {
+                              if (e.target.value === "__EXPLORE_ALL__") {
+                                onNavigateView && onNavigateView("explore")
+                              } else {
+                                setDestination(e.target.value)
+                                setCustomDestInput(e.target.value)
+                              }
+                            }}
+                            className="w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2] cursor-pointer appearance-none"
+                          >
+                            <option value="" disabled>-- Select a Destination from Explore --</option>
+                            {destinationsData.map((d) => (
+                              <option key={d.id || d.name} value={d.name}>
+                                📍 {d.name} ({d.country}) — {d.vibe || d.type}
+                              </option>
+                            ))}
+                            <option value="__EXPLORE_ALL__">🌐 Browse Full Explore Section...</option>
+                          </select>
+                          <ChevronRight className="absolute right-3.5 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none rotate-90" />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => onNavigateView && onNavigateView("explore")}
+                          className="w-full text-left text-[11px] font-bold text-[#5A8CB2] hover:underline flex items-center justify-between px-1"
+                        >
+                          <span>Explore all 105+ curated destinations</span>
+                          <ArrowLeft className="h-3 w-3 rotate-180" />
+                        </button>
+                      </div>
+                    ) : (
+                      /* OPTION 2: ADD CUSTOMIZED LOCATION DIRECTLY WITH AUTO-SUGGESTIONS BAR */
+                      <div className="space-y-2 pt-1 relative">
+                        <div className="relative flex items-center">
+                          <MapPin className="absolute left-3.5 h-4 w-4 text-[#5A8CB2] shrink-0" />
+                          <input
+                            type="text"
+                            placeholder="Enter any city or location (e.g. Kashmir, Paris)..."
+                            value={customDestInput}
+                            onChange={(e) => {
+                              const val = e.target.value
+                              setCustomDestInput(val)
+                              if (val.trim()) {
+                                const q = val.toLowerCase()
+                                const matches = destinationsData.filter(
+                                  (d) =>
+                                    d.name.toLowerCase().includes(q) ||
+                                    d.country?.toLowerCase().includes(q) ||
+                                    d.vibe?.toLowerCase().includes(q) ||
+                                    d.subtitle?.toLowerCase().includes(q)
+                                ).slice(0, 5)
+                                setCustomSuggestions(matches)
+                                setShowCustomSuggestions(true)
+                              } else {
+                                setCustomSuggestions([])
+                                setShowCustomSuggestions(false)
+                              }
+                            }}
+                            onFocus={() => {
+                              if (customDestInput.trim() && customSuggestions.length > 0) {
+                                setShowCustomSuggestions(true)
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && customDestInput.trim()) {
+                                setShowCustomSuggestions(false)
+                                handleGenerate(customDestInput.trim())
+                              }
+                            }}
+                            className="w-full rounded-2xl border border-border bg-background pl-9 pr-16 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2]"
+                          />
+                          {customDestInput.trim() && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowCustomSuggestions(false)
+                                handleGenerate(customDestInput.trim())
+                              }}
+                              className="absolute right-1.5 rounded-xl bg-[#5A8CB2] text-white font-extrabold text-[11px] px-2.5 py-1 shadow-xs hover:bg-[#4A7CA2] cursor-pointer"
+                            >
+                              Set
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Auto-Suggestion Dropdown Bar */}
+                        {showCustomSuggestions && customSuggestions.length > 0 && (
+                          <div className="absolute top-12 left-0 right-0 z-50 bg-background/95 backdrop-blur-md rounded-2xl border border-border shadow-2xl overflow-hidden max-h-48 overflow-y-auto p-1.5 space-y-1">
+                            {customSuggestions.map((item, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => {
+                                  setCustomDestInput(item.name)
+                                  setShowCustomSuggestions(false)
+                                }}
+                                className="flex items-center justify-between w-full text-left p-2 rounded-xl hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="h-3.5 w-3.5 text-[#5A8CB2] shrink-0" />
+                                  <span className="font-bold">{item.name}</span>
+                                  <span className="text-[10px] text-muted-foreground">({item.country})</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2 py-0.5 rounded-full shrink-0">
+                                  {item.vibe || item.type}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        <p className="text-[10px] text-muted-foreground px-1">
+                          Type any location. Click "Generate Itinerary" below when ready to build your trip.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-4">
@@ -823,13 +1088,12 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                       setDays(Math.max(1, dayNum - startDayNum + 1))
                                     }
                                   }}
-                                  className={`py-1.5 text-xs font-bold transition-all ${
-                                    isStart || isEnd
+                                  className={`py-1.5 text-xs font-bold transition-all ${isStart || isEnd
                                       ? "bg-[#5A8CB2] text-white rounded-lg font-extrabold shadow-md scale-105"
                                       : isInRange
-                                      ? "bg-[#C8D9E6]/50 text-[#1E293B] font-bold rounded-sm border-y border-[#5A8CB2]/30"
-                                      : "hover:bg-accent text-foreground rounded-lg"
-                                  }`}
+                                        ? "bg-[#C8D9E6]/50 text-[#1E293B] font-bold rounded-sm border-y border-[#5A8CB2]/30"
+                                        : "hover:bg-accent text-foreground rounded-lg"
+                                    }`}
                                 >
                                   {dayNum}
                                 </button>
@@ -865,11 +1129,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                           key={style}
                           type="button"
                           onClick={() => setTravelStyle(style)}
-                          className={`rounded-xl border p-2.5 text-xs font-medium transition-all ${
-                            travelStyle === style
+                          className={`rounded-xl border p-2.5 text-xs font-medium transition-all ${travelStyle === style
                               ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
                               : "border-border text-muted-foreground hover:border-border/80"
-                          }`}
+                            }`}
                         >
                           {style}
                         </button>
@@ -905,11 +1168,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                               setCustomTargetBudget(null)
                             }
                           }}
-                          className={`rounded-xl border py-2 px-1 text-center text-xs font-medium transition-all ${
-                            budgetTier === b.tier
+                          className={`rounded-xl border py-2 px-1 text-center text-xs font-medium transition-all ${budgetTier === b.tier
                               ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
                               : "border-border text-muted-foreground hover:border-border/80"
-                          }`}
+                            }`}
                         >
                           {b.label}
                         </button>
@@ -951,9 +1213,9 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
                   {/* Generate Button */}
                   <Button
-                    onClick={handleGenerate}
-                    disabled={isGenerating || !destination}
-                    className="w-full rounded-xl bg-primary py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90 disabled:opacity-50"
+                    onClick={() => handleGenerate()}
+                    disabled={isGenerating || (destPlanningMode === "custom" ? !customDestInput.trim() : !destination)}
+                    className="w-full rounded-xl bg-[#5A8CB2] py-3 font-extrabold text-white shadow-lg shadow-[#5A8CB2]/25 hover:bg-[#4A7CA2] disabled:opacity-50 cursor-pointer"
                   >
                     {isGenerating ? (
                       <span className="flex items-center gap-2">
@@ -969,11 +1231,11 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   </Button>
                 </div>
               </motion.div>
-            )}
+            ) : null}
           </AnimatePresence>
 
-          {/* RIGHT SIDE (6 OR 8 COLS): Itinerary Cards Timeline */}
-          <div className={`${isMapVisible ? "lg:col-span-6" : "lg:col-span-8"} space-y-6`}>
+          {/* RIGHT SIDE / MAIN TIMELINE: Itinerary Cards & Live Budget Overview */}
+          <div className={`${isMapVisible ? "lg:col-span-6" : (showPreferences || !itinerary || itinerary.length === 0) ? "lg:col-span-8" : "lg:col-span-12"} space-y-6`}>
 
             {!itinerary || itinerary.length === 0 || !destination ? (
               <div className="rounded-3xl border border-dashed border-border bg-card/60 p-12 text-center space-y-4 flex flex-col items-center justify-center min-h-[420px]">
@@ -999,6 +1261,78 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               </div>
             ) : (
               <>
+                {/* Live Budget & Expense Summary Card */}
+                <div className="rounded-3xl border border-border bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-[#1A2634] dark:via-[#16202C] dark:to-[#1A2634] p-5 sm:p-6 text-white shadow-xl space-y-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/15 pb-4">
+                    <div className="space-y-1">
+                      <div className="inline-flex items-center gap-1.5 rounded-full bg-[#5A8CB2]/25 text-[#9BC2E6] px-3 py-0.5 text-[11px] font-bold border border-[#5A8CB2]/30">
+                        <Coins className="h-3.5 w-3.5 text-amber-400" />
+                        <span>Live Budget & Expense Overview</span>
+                      </div>
+                      <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-white">
+                        {destination || "Trip"} Financial Summary
+                      </h3>
+                      <p className="text-xs text-slate-300">
+                        {totalSpotsCount} spots across {days} days • Updates in real-time as you add/edit places
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-md border border-white/10">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">Total Est. Budget</span>
+                        <span className="font-heading text-lg sm:text-xl font-extrabold text-emerald-400">
+                          ₹{estimatedTotalTripCost.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+
+                      <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-md border border-white/10">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">Planned Spots Cost</span>
+                        <span className="font-heading text-lg sm:text-xl font-extrabold text-amber-300">
+                          ₹{totalActivitiesExpense.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+
+                      <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-md border border-white/10 col-span-2 sm:col-span-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">Est. Balance</span>
+                        <span className="font-heading text-lg sm:text-xl font-extrabold text-cyan-300">
+                          ₹{Math.max(0, estimatedTotalTripCost - totalActivitiesExpense).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Spot Expenses:</span>
+                      {Object.entries(categoryExpenseBreakdown).map(([cat, amt]) => (
+                        <span key={cat} className="inline-flex items-center gap-1 rounded-xl bg-white/10 px-2.5 py-1 text-xs font-semibold text-slate-200 border border-white/10">
+                          <span>{cat}:</span>
+                          <strong className="text-amber-300">₹{amt.toLocaleString("en-IN")}</strong>
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onNavigateView("budget")}
+                        className="rounded-xl border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 cursor-pointer"
+                      >
+                        <Coins className="mr-1.5 h-3.5 w-3.5 text-amber-400" />
+                        Budget Planner
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onNavigateView("expenses")}
+                        className="rounded-xl border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 cursor-pointer"
+                      >
+                        Expense Tracker
+                      </Button>
+                    </div>
+                  </div>
+                </div>
                 {/* Imported Package Banner */}
                 {selectedPackage && (
                   <div className="rounded-3xl border border-teal-500/30 bg-gradient-to-r from-[#0D2B45] via-[#10385C] to-[#0D2B45] p-6 text-white shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -1082,11 +1416,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                           key={idx}
                           type="button"
                           onClick={() => setActiveDayIndex(idx)}
-                          className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all shrink-0 ${
-                            activeDayIndex === idx
+                          className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all shrink-0 ${activeDayIndex === idx
                               ? "bg-primary text-primary-foreground shadow-md"
                               : "bg-secondary text-muted-foreground hover:bg-accent"
-                          }`}
+                            }`}
                         >
                           Day {dayPlan.day}
                         </button>
@@ -1196,11 +1529,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 }}
                                 onMouseEnter={() => handleSpotMouseEnter(act.id, spotImages.length)}
                                 onMouseLeave={() => handleSpotMouseLeave(act.id)}
-                                className={`group relative flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-2xl border p-4 transition-all cursor-grab active:cursor-grabbing ${
-                                  isHovered
+                                className={`group relative flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-2xl border p-4 transition-all cursor-grab active:cursor-grabbing ${isHovered
                                     ? "border-primary bg-primary/5 shadow-xl scale-[1.01]"
                                     : "border-border/70 bg-background/80 hover:border-primary/50 hover:bg-background hover:shadow-lg"
-                                }`}
+                                  }`}
                               >
                                 <div className="flex items-start gap-3 flex-1 min-w-0">
                                   {/* Drag Reorder Handle & Grip Icon */}
@@ -1294,9 +1626,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                         {spotImages.map((_, imgI) => (
                                           <div
                                             key={imgI}
-                                            className={`h-1.5 w-1.5 rounded-full ${
-                                              activeImgIdx === imgI ? "bg-white" : "bg-white/40"
-                                            }`}
+                                            className={`h-1.5 w-1.5 rounded-full ${activeImgIdx === imgI ? "bg-white" : "bg-white/40"
+                                              }`}
                                           />
                                         ))}
                                       </div>
@@ -1311,7 +1642,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 <div className="relative my-2.5 ml-5 flex items-center gap-3 pl-1">
                                   {/* Vertical Blue Line on Left */}
                                   <div className="w-1.5 h-10 bg-blue-600 rounded-full shadow-sm shrink-0" />
-                                  
+
                                   {/* Travel Distance & Time Badge */}
                                   <div className="rounded-full bg-blue-600 text-white px-3 py-1 text-[11px] font-bold shadow-md border-2 border-background flex items-center gap-1.5">
                                     <span>📍</span>
@@ -1330,16 +1661,17 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                         <Button
                           type="button"
                           onClick={() => {
-                            const spotTitle = prompt(`Enter custom place name to add to Day ${activeDayIndex + 1}:`)
-                            if (spotTitle && spotTitle.trim()) {
-                              addSpotToItinerary(activeDayIndex, {
-                                title: spotTitle.trim(),
-                                time: "02:30 PM",
-                                desc: `Custom added spot in ${destination || "your trip"}.`,
-                                cost: "₹500",
-                                numericCost: 500
-                              })
-                            }
+                            setTargetDayForCustomSpot(activeDayIndex)
+                            setCustomSpotForm({
+                              title: "",
+                              type: "Sightseeing",
+                              category: "Activities",
+                              time: "02:30 PM",
+                              cost: "500",
+                              desc: "",
+                              img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+                            })
+                            setAddSpotModalOpen(true)
                           }}
                           className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs px-4 py-2.5 shadow-md flex items-center gap-1.5 cursor-pointer"
                         >
@@ -1563,16 +1895,14 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                         checklistItems.map((i) => (i.id === item.id ? { ...i, checked: !i.checked } : i))
                       )
                     }}
-                    className={`flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer ${
-                      item.checked
+                    className={`flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer ${item.checked
                         ? "bg-emerald-50 border-emerald-200 text-emerald-900 opacity-75"
                         : "bg-neutral-50/80 border-neutral-200 text-neutral-900 hover:bg-white hover:shadow-md"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`h-5 w-5 rounded-lg border flex items-center justify-center transition-colors ${
-                        item.checked ? "bg-emerald-500 border-emerald-500 text-white" : "border-neutral-300 bg-white"
-                      }`}>
+                      <div className={`h-5 w-5 rounded-lg border flex items-center justify-center transition-colors ${item.checked ? "bg-emerald-500 border-emerald-500 text-white" : "border-neutral-300 bg-white"
+                        }`}>
                         {item.checked && <Check className="h-3.5 w-3.5" />}
                       </div>
                       <div>
@@ -1819,11 +2149,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
             {botMessages.map((m, idx) => (
               <div
                 key={idx}
-                className={`p-2.5 rounded-2xl ${
-                  m.sender === "user"
+                className={`p-2.5 rounded-2xl ${m.sender === "user"
                     ? "bg-primary text-primary-foreground ml-auto max-w-[85%]"
                     : "bg-secondary text-foreground mr-auto max-w-[85%]"
-                }`}
+                  }`}
               >
                 {m.text}
               </div>
@@ -1844,6 +2173,173 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
           </form>
         </motion.div>
       )}
+
+      {/* Sleek Modern Add Custom Spot Modal */}
+      <AnimatePresence>
+        {addSpotModalOpen && (
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-5 relative overflow-hidden"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-border pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-10 w-10 rounded-2xl bg-[#5A8CB2]/15 text-[#5A8CB2] flex items-center justify-center font-bold">
+                    <Plus className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading text-lg font-bold text-foreground">Add Custom Attraction</h3>
+                    <p className="text-xs text-muted-foreground">Add a custom spot to Day {targetDayForCustomSpot + 1}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAddSpotModalOpen(false)}
+                  className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleAddCustomSpotSubmit} className="space-y-4">
+                {/* Spot Title */}
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                    Spot / Place Name *
+                  </label>
+                  <div className="relative flex items-center">
+                    <MapPin className="absolute left-3.5 h-4 w-4 text-[#5A8CB2]" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Cafe Chocolatti, Aguada Fort View..."
+                      value={customSpotForm.title}
+                      onChange={(e) => setCustomSpotForm({ ...customSpotForm, title: e.target.value })}
+                      className="w-full rounded-2xl border border-border bg-background pl-10 pr-4 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2]"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+
+                {/* Type & Time Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                      Category / Type
+                    </label>
+                    <select
+                      value={customSpotForm.type}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        const cat = val === "Food" ? "Food & Dining" : val === "Shopping" ? "Shopping" : "Activities"
+                        setCustomSpotForm({ ...customSpotForm, type: val, category: cat })
+                      }}
+                      className="w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2] cursor-pointer"
+                    >
+                      <option value="Sightseeing">🏛️ Sightseeing</option>
+                      <option value="Food">🍽️ Food & Dining</option>
+                      <option value="Relaxation">🏖️ Relaxation & Beach</option>
+                      <option value="Sunset">🌅 Sunset Spot</option>
+                      <option value="Shopping">🛍️ Shopping & Bazaar</option>
+                      <option value="Culture">🎭 Culture & Heritage</option>
+                      <option value="Show">🎪 Show & Event</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                      Scheduled Time
+                    </label>
+                    <select
+                      value={customSpotForm.time}
+                      onChange={(e) => setCustomSpotForm({ ...customSpotForm, time: e.target.value })}
+                      className="w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2] cursor-pointer"
+                    >
+                      <option value="09:00 AM">🌅 09:00 AM (Morning)</option>
+                      <option value="11:30 AM">☀️ 11:30 AM (Late Morning)</option>
+                      <option value="01:30 PM">🍽️ 01:30 PM (Afternoon)</option>
+                      <option value="04:30 PM">🌇 04:30 PM (Late Afternoon)</option>
+                      <option value="06:00 PM">🌅 06:00 PM (Sunset)</option>
+                      <option value="08:30 PM">🌙 08:30 PM (Night)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Cost & Image Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                      Estimated Cost (₹)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 500"
+                      value={customSpotForm.cost}
+                      onChange={(e) => setCustomSpotForm({ ...customSpotForm, cost: e.target.value })}
+                      className="w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                      Cover Photo Vibe
+                    </label>
+                    <select
+                      value={customSpotForm.img}
+                      onChange={(e) => setCustomSpotForm({ ...customSpotForm, img: e.target.value })}
+                      className="w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-xs font-bold text-foreground outline-none focus:border-[#5A8CB2] cursor-pointer"
+                    >
+                      <option value="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80">🏖️ Beach & Ocean</option>
+                      <option value="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=80">☕ Cafe & Dining</option>
+                      <option value="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&auto=format&fit=crop&q=80">🏰 Heritage & Fort</option>
+                      <option value="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80">🌅 Sunset & Views</option>
+                      <option value="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&auto=format&fit=crop&q=80">🛍️ Market & Bazaar</option>
+                      <option value="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&auto=format&fit=crop&q=80">🌿 Waterfall & Nature</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                    Description / Special Notes
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="e.g. Try wood-fired pizza and watch sunset from cliffside."
+                    value={customSpotForm.desc}
+                    onChange={(e) => setCustomSpotForm({ ...customSpotForm, desc: e.target.value })}
+                    className="w-full rounded-2xl border border-border bg-background px-3.5 py-2 text-xs font-medium text-foreground outline-none focus:border-[#5A8CB2] resize-none"
+                  />
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setAddSpotModalOpen(false)}
+                    className="rounded-xl border-border hover:bg-accent text-xs font-bold px-4 py-2 cursor-pointer"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-extrabold text-xs px-5 py-2 shadow-md cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add to Itinerary
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   )
