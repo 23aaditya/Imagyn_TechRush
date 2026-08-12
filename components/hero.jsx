@@ -701,9 +701,9 @@ export function Hero({ onStartPlanning }) {
                 const targetDest = query.trim()
                 onStartPlanning?.("itinerary", targetDest)
               }}
-              className="mt-5 h-11 w-full rounded-sm bg-white text-neutral-900 text-xs font-bold uppercase tracking-wider shadow-sm hover:bg-white/90 transition-all cursor-pointer"
+              className="mt-5 h-11 w-full rounded-sm bg-[#8D5BB3] hover:bg-[#7b4d9e] text-white text-xs font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer"
             >
-              <Search className="mr-1.5 h-4 w-4 text-primary" />
+              <Search className="mr-1.5 h-4 w-4 text-white" />
               Plan Itinerary
             </Button>
           </motion.div>

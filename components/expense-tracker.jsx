@@ -785,28 +785,28 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               className="space-y-8"
             >
               {/* Person-Wise Top Financial Overview Banner */}
-              <div className="rounded-sm border border-[#E2DDCB] dark:border-[#38332A] bg-[#F4F1E2] dark:bg-[#25221C] text-black dark:text-white p-6 shadow-sm relative overflow-hidden select-none">
+              <div className="rounded-sm border border-[#f0c8c8] bg-[#fff0f0] text-black p-6 shadow-sm relative overflow-hidden select-none">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="space-y-1.5">
-                    <span className="text-[11px] font-black uppercase tracking-widest text-[#475569] dark:text-[#A9A092] block">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-[#7a3a3a] block">
                       Group Expense Splitting & Debt Settlement
                     </span>
-                    <h3 className="font-heading text-2xl sm:text-3xl font-black text-black dark:text-white">
+                    <h3 className="font-heading text-2xl sm:text-3xl font-black text-black">
                       Person-Wise Expense Breakdown
                     </h3>
-                    <p className="text-xs text-[#475569] dark:text-[#A9A092] max-w-xl leading-relaxed font-medium">
+                    <p className="text-xs text-[#7a3a3a] max-w-xl leading-relaxed font-medium">
                       Document who paid for what across your trip. Automatically computes net balances and minimal debt settlement payments among travelers.
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-6 border-t md:border-t-0 md:border-l border-[#D4CEB8] dark:border-[#38332A] pt-4 md:pt-0 md:pl-6 shrink-0">
+                  <div className="flex flex-wrap items-center gap-6 border-t md:border-t-0 md:border-l border-[#f0c8c8] pt-4 md:pt-0 md:pl-6 shrink-0">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-[#64748B] dark:text-[#A9A092] block tracking-wider">Total Group Expenses</span>
-                      <span className="font-heading text-2xl sm:text-3xl font-black text-black dark:text-white">₹{totalGroupSpent.toLocaleString("en-IN")}</span>
+                      <span className="text-[10px] uppercase font-bold text-[#7a3a3a] block tracking-wider">Total Group Expenses</span>
+                      <span className="font-heading text-2xl sm:text-3xl font-black text-black">₹{totalGroupSpent.toLocaleString("en-IN")}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-[#64748B] dark:text-[#A9A092] block tracking-wider">Fair Share / Person</span>
-                      <span className="font-heading text-2xl sm:text-3xl font-black text-black dark:text-white">₹{fairSharePerPerson.toLocaleString("en-IN")}</span>
+                      <span className="text-[10px] uppercase font-bold text-[#7a3a3a] block tracking-wider">Fair Share / Person</span>
+                      <span className="font-heading text-2xl sm:text-3xl font-black text-black">₹{fairSharePerPerson.toLocaleString("en-IN")}</span>
                     </div>
                   </div>
                 </div>
@@ -1067,14 +1067,14 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               className="space-y-8"
             >
               {/* Profile 2 Header Comparison Summary */}
-              <div className="rounded-3xl border border-[#0D2B45]/20 bg-[#0D2B45] text-white p-6 shadow-xl relative overflow-hidden">
+              <div className="rounded-3xl border border-[#f0c8c8] bg-[#fff0f0] text-black p-6 shadow-xl relative overflow-hidden">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-[#f0c8c8] text-[#7a3a3a] border border-[#f0b8b8]">
                       Multi-Trip Comparison
                     </span>
-                    <h3 className="font-heading text-2xl font-bold mt-2">Historical Expenditure Benchmarks</h3>
-                    <p className="text-xs text-white/80 mt-1 max-w-xl">
+                    <h3 className="font-heading text-2xl font-bold mt-2 text-black">Historical Expenditure Benchmarks</h3>
+                    <p className="text-xs text-[#7a3a3a] mt-1 max-w-xl">
                       Comparing total budget and category expenditure across your current {destination || "trip"} and past journeys.
                     </p>
                   </div>

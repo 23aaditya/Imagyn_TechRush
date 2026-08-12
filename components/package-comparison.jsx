@@ -1303,7 +1303,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
         <div className="mx-auto max-w-4xl text-center space-y-4">
           <h2 className="font-serif-editorial text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground uppercase leading-[0.95]">
             COMPARE LESS.<br />
-            <span className="font-heading font-extrabold text-[#C98B55] italic lowercase">experience</span><br />
+            <span className="font-heading font-extrabold text-foreground italic lowercase">experience</span><br />
             MORE.
           </h2>
 
@@ -1321,7 +1321,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
             transition={{ duration: 0.4 }}
             className="rounded-sm border border-border bg-card shadow-sm overflow-hidden p-6 sm:p-8 space-y-6 relative"
           >
-            <div className="absolute top-0 right-0 bg-[#D8EBF9] text-[#0F172A] border-b border-l border-[#B5D9F3] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-sm shadow-xs">
+            <div className="absolute top-0 right-0 bg-[#8D5BB3] text-white border-b border-l border-[#8D5BB3] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-sm shadow-xs">
               Personalized Decision
             </div>
 
@@ -1329,7 +1329,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
               
               {/* Left Summary */}
               <div className="space-y-3 flex-1">
-                <span className="font-heading text-xs font-black uppercase tracking-wider text-[#0F172A] dark:text-white block">
+                <span className="font-heading text-xs font-black uppercase tracking-wider text-[#8D5BB3] dark:text-white block">
                   BEST FOR YOU ({decisionData.recommendedMatch.score}% MATCH)
                 </span>
 
@@ -1337,7 +1337,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                   {decisionData.recommendedPkg.name}
                 </h3>
 
-                <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed max-w-2xl font-medium border-l-2 border-[#5A8CB2] pl-3 py-0.5">
+                <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed max-w-2xl font-medium border-l-2 border-[#8D5BB3] pl-3 py-0.5">
                   "{decisionData.rationale}"
                 </p>
 
@@ -1351,7 +1351,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
               <div className="flex flex-col sm:flex-row md:flex-col items-center gap-3 shrink-0 w-full md:w-auto">
                 <Button
                   onClick={() => handleAddToTrip(decisionData.recommendedPkg)}
-                  className="w-full sm:w-auto rounded-sm bg-[#D8EBF9] hover:bg-[#C5E2F6] text-[#0F172A] border border-[#B5D9F3] font-bold text-xs uppercase tracking-wider px-5 py-2.5 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto rounded-sm bg-[#8D5BB3] hover:bg-[#7b4d9e] text-white border border-[#8D5BB3] font-bold text-xs uppercase tracking-wider px-5 py-2.5 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Plus className="h-4 w-4" />
                   Select {decisionData.recommendedPkg.destination} Trip
@@ -1364,7 +1364,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
         {/* 4. SIDE-BY-SIDE PACKAGE COMPARISON CARDS */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-heading text-xs uppercase tracking-widest text-[#C98B55] font-extrabold">
+            <h3 className="font-heading text-xs uppercase tracking-widest text-foreground font-extrabold">
               Comparing {comparedPackagesList.length} Packages Side-by-Side
             </h3>
 
@@ -1382,8 +1382,8 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                   }}
                   className={`rounded-sm px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border cursor-pointer ${
                     activeCategory === cat.id
-                      ? "bg-[#D8EBF9] text-[#0F172A] border-[#B5D9F3] shadow-xs"
-                      : "bg-card text-muted-foreground border-border hover:bg-[#D8EBF9]/40 hover:text-[#0F172A]"
+                      ? "bg-[#8D5BB3] text-white border-[#8D5BB3] shadow-xs"
+                      : "bg-[#FFEEEE] text-[#4A154B] border-transparent hover:bg-[#fcdede]"
                   }`}
                 >
                   {cat.name}
@@ -1506,7 +1506,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                         variant="outline"
                         size="sm"
                         onClick={() => setViewingModalPkg(pkg)}
-                        className="rounded-sm border-[#B5D9F3] bg-[#D8EBF9] hover:bg-[#C5E2F6] text-[#0F172A] font-bold text-xs cursor-pointer shadow-xs"
+                        className="rounded-sm border-[#FFEEEE] bg-[#FFEEEE] hover:bg-[#fcdede] text-[#4A154B] font-bold text-xs cursor-pointer shadow-xs"
                       >
                         Details
                       </Button>
@@ -1517,7 +1517,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                         onClick={() => toggleCompare(pkg.id)}
                         className={`rounded-sm font-bold text-xs transition-all cursor-pointer ${
                           selectedForCompare.includes(pkg.id)
-                            ? "bg-secondary border-border text-foreground"
+                            ? "bg-[#FFEEEE] text-[#4A154B] border-[#FFEEEE]"
                             : "border-border text-muted-foreground"
                         }`}
                       >
@@ -1528,7 +1528,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                     <Button
                       size="sm"
                       onClick={() => handleAddToTrip(pkg)}
-                      className="w-full rounded-sm font-bold text-xs uppercase tracking-wider py-2.5 flex items-center justify-center gap-1.5 cursor-pointer bg-[#D8EBF9] hover:bg-[#C5E2F6] text-[#0F172A] border border-[#B5D9F3] shadow-xs"
+                      className="w-full rounded-sm font-bold text-xs uppercase tracking-wider py-2.5 flex items-center justify-center gap-1.5 cursor-pointer bg-[#8D5BB3] hover:bg-[#7b4d9e] text-white shadow-xs"
                     >
                       <Plus className="h-4 w-4" />
                       <span>Add to My Trip</span>
@@ -1545,7 +1545,7 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
           <Button
             variant="outline"
             onClick={() => setShowFullMatrix(!showFullMatrix)}
-            className="rounded-sm border-[#B5D9F3] bg-[#D8EBF9] hover:bg-[#C5E2F6] text-[#0F172A] font-bold text-xs sm:text-sm px-6 py-3 shadow-xs cursor-pointer inline-flex items-center justify-center gap-2"
+            className="rounded-sm border-[#8D5BB3] bg-[#8D5BB3] hover:bg-[#7b4d9e] text-white font-bold text-xs sm:text-sm px-6 py-3 shadow-xs cursor-pointer inline-flex items-center justify-center gap-2"
           >
             {showFullMatrix ? "Hide Detailed Comparison Matrix" : "View Full Detailed Category Comparison Matrix"}
           </Button>

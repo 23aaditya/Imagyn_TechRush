@@ -74,32 +74,32 @@
   --night-border: rgba(235, 226, 208, 0.12);
   --night-text: #F1ECE2;
   --night-muted: #A9A092;
-  --night-accent: #5B8DEF;
-  --night-olive: #5B8DEF;
+  --night-accent: #8D5BB3;
+  --night-olive: #8D5BB3;
 
-  --background: #FFFFFF;
+  --background: #FCFAFF;
   --foreground: #1E293B;
   --card: #FFFFFF;
   --card-foreground: #1E293B;
   --popover: #FFFFFF;
   --popover-foreground: #1E293B;
-  --primary: #5B8DEF;
-  --primary-foreground: #0F172A;
-  --secondary: rgba(91, 141, 239, 0.12);
-  --secondary-foreground: #0F172A;
-  --muted: rgba(91, 141, 239, 0.08);
+  --primary: #8D5BB3;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFEEEE;
+  --secondary-foreground: #4A154B;
+  --muted: rgba(141, 91, 179, 0.08);
   --muted-foreground: #64748B;
-  --accent: #5B8DEF;
-  --accent-foreground: #0F172A;
-  --emerald: #5B8DEF;
-  --emerald-foreground: #0F172A;
+  --accent: #8D5BB3;
+  --accent-foreground: #FFFFFF;
+  --emerald: #8D5BB3;
+  --emerald-foreground: #FFFFFF;
   --destructive: #EF4444;
   --border: #E5E7EB;
   --input: #E5E7EB;
-  --ring: #5B8DEF;
-  --chart-1: #FFFFFF;
-  --chart-2: #5B8DEF;
-  --chart-3: rgba(91, 141, 239, 0.15);
+  --ring: #8D5BB3;
+  --chart-1: #8D5BB3;
+  --chart-2: #8D5BB3;
+  --chart-3: rgba(141, 91, 179, 0.15);
   --chart-4: #334155;
   --chart-5: #1E293B;
   --radius: 0.75rem;
@@ -113,33 +113,33 @@
   --card-foreground: #F1ECE2;
   --popover: #181613;
   --popover-foreground: #F1ECE2;
-  --primary: #5B8DEF;
-  --primary-foreground: #0F172A;
+  --primary: #8D5BB3;
+  --primary-foreground: #FFFFFF;
   --secondary: #211E19;
   --secondary-foreground: #F1ECE2;
   --muted: #211E19;
   --muted-foreground: #A9A092;
-  --accent: #5B8DEF;
-  --accent-foreground: #0F172A;
-  --emerald: #5B8DEF;
-  --emerald-foreground: #0F172A;
+  --accent: #8D5BB3;
+  --accent-foreground: #FFFFFF;
+  --emerald: #8D5BB3;
+  --emerald-foreground: #FFFFFF;
   --destructive: #EF4444;
   --border: rgba(235, 226, 208, 0.12);
   --input: rgba(235, 226, 208, 0.12);
-  --ring: #5B8DEF;
-  --chart-1: #5B8DEF;
-  --chart-2: #5B8DEF;
+  --ring: #8D5BB3;
+  --chart-1: #8D5BB3;
+  --chart-2: #8D5BB3;
   --chart-3: #211E19;
   --chart-4: #A9A092;
   --chart-5: #F1ECE2;
   --sidebar: #181613;
   --sidebar-foreground: #F1ECE2;
-  --sidebar-primary: #5B8DEF;
-  --sidebar-primary-foreground: #0F172A;
+  --sidebar-primary: #8D5BB3;
+  --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: #211E19;
   --sidebar-accent-foreground: #F1ECE2;
   --sidebar-border: rgba(235, 226, 208, 0.12);
-  --sidebar-ring: #5B8DEF;
+  --sidebar-ring: #8D5BB3;
 }
 
 /* Night Journey Transition & Cartographic Pattern */
@@ -151,7 +151,7 @@ html {
   background-color: #11100E;
   color: #F1ECE2;
   background-image: 
-    radial-gradient(circle at 50% 15%, rgba(139, 155, 228, 0.05) 0%, transparent 65%),
+    radial-gradient(circle at 50% 15%, rgba(141, 91, 179, 0.05) 0%, transparent 65%),
     linear-gradient(to right, rgba(235, 226, 208, 0.025) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(235, 226, 208, 0.025) 1px, transparent 1px);
   background-size: 100% 100%, 90px 90px, 90px 90px;
@@ -160,7 +160,7 @@ html {
 .night-cartography-bg {
   background-color: #11100E;
   background-image: 
-    radial-gradient(circle at 50% 20%, rgba(139, 155, 228, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 50% 20%, rgba(141, 91, 179, 0.06) 0%, transparent 60%),
     linear-gradient(to right, rgba(235, 226, 208, 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(235, 226, 208, 0.03) 1px, transparent 1px);
   background-size: 100% 100%, 80px 80px, 80px 80px;
@@ -171,17 +171,19 @@ html {
     @apply border-border outline-ring/50;
   }
   ::selection {
-    background-color: rgba(37, 99, 235, 0.2);
-    color: #2563eb;
+    background-color: rgba(141, 91, 179, 0.2);
+    color: #8D5BB3;
   }
   html {
     scroll-behavior: smooth;
+    background-color: #FCFAFF;
   }
   section[id] {
     scroll-margin-top: 5rem;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: #FCFAFF;
+    @apply text-foreground;
   }
   button:active, .btn-tactile:active {
     transform: scale(0.98);

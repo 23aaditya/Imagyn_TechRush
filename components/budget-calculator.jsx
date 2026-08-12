@@ -172,9 +172,9 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                 variant="outline"
                 size="sm"
                 onClick={onBack}
-                className="rounded-sm border border-[#B5D9F3] bg-[#D8EBF9] hover:bg-[#C5E2F6] text-[#0F172A] text-xs sm:text-sm font-bold cursor-pointer transition-all shadow-xs"
+                className="rounded-sm border border-[#FFEEEE] bg-[#FFEEEE] hover:bg-[#fcdede] text-[#4A154B] text-xs sm:text-sm font-bold cursor-pointer transition-all shadow-xs"
               >
-                <ArrowLeft className="mr-1.5 h-4 w-4 text-[#0F172A]" />
+                <ArrowLeft className="mr-1.5 h-4 w-4 text-[#4A154B]" />
                 Back to Overview
               </Button>
               <span className="text-muted-foreground">/</span>
@@ -219,20 +219,20 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
         {/* Selected Package Callout Banner */}
         {selectedPackage && (
-          <div className="mb-10 w-full rounded-sm border border-[#E2DDCB] dark:border-[#38332A] bg-[#F4F1E2] dark:bg-[#25221C] p-5 sm:p-6 text-[#1E293B] dark:text-[#F1ECE2] shadow-sm select-none">
+          <div className="mb-10 w-full rounded-sm border border-[#f0c8c8] bg-[#fff0f0] p-5 sm:p-6 text-black shadow-sm select-none">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="space-y-1.5">
-                <span className="inline-block text-[11px] uppercase font-black text-[#0F172A] bg-[#D8EBF9] border border-[#B5D9F3] px-3 py-1 rounded-sm tracking-wider">
+                <span className="inline-block text-[11px] uppercase font-black text-white bg-[#8D5BB3] border border-[#8D5BB3] px-3 py-1 rounded-sm tracking-wider">
                   Selected Package Active
                 </span>
-                <h4 className="font-heading text-xl sm:text-2xl font-black text-black dark:text-white">{selectedPackage.name}</h4>
-                <p className="text-xs text-[#475569] dark:text-[#A9A092] font-medium">
-                  Base Package Price: <strong className="text-black dark:text-white">₹{packageBaseCost.toLocaleString("en-IN")}</strong> · Extra Attractions: <strong className="text-[#B45309] dark:text-amber-400">+₹{additionalExpenses.toLocaleString("en-IN")}</strong>
+                <h4 className="font-heading text-xl sm:text-2xl font-black text-black">{selectedPackage.name}</h4>
+                <p className="text-xs text-[#7a3a3a] font-medium">
+                  Base Package Price: <strong className="text-black">₹{packageBaseCost.toLocaleString("en-IN")}</strong> · Extra Attractions: <strong className="text-[#B45309]">+₹{additionalExpenses.toLocaleString("en-IN")}</strong>
                 </p>
               </div>
-              <div className="sm:text-right border-t sm:border-t-0 sm:border-l border-[#D4CEB8] dark:border-[#38332A] pt-3 sm:pt-0 sm:pl-8">
-                <span className="text-[10px] uppercase font-bold text-[#64748B] dark:text-[#A9A092] block tracking-wider">Total Est. Cost</span>
-                <span className="font-heading text-2xl sm:text-3xl font-black text-black dark:text-white">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
+              <div className="sm:text-right border-t sm:border-t-0 sm:border-l border-[#f0c8c8] pt-3 sm:pt-0 sm:pl-8">
+                <span className="text-[10px] uppercase font-bold text-[#7a3a3a] block tracking-wider">Total Est. Cost</span>
+                <span className="font-heading text-2xl sm:text-3xl font-black text-black">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
               </div>
             </div>
           </div>
@@ -284,8 +284,8 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                     }}
                     className={`rounded-sm py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                       stayTier === tier
-                        ? "bg-[#D8EBF9] text-[#0F172A] border border-[#B5D9F3] shadow-sm scale-[1.02]"
-                        : "border border-border text-muted-foreground hover:bg-[#D8EBF9]/30 hover:text-foreground"
+                        ? "bg-[#8D5BB3] text-white border border-[#8D5BB3] shadow-sm scale-[1.02]"
+                        : "bg-[#FFEEEE] text-[#4A154B] hover:bg-[#fcdede]"
                     }`}
                   >
                     {tier}
@@ -416,7 +416,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                       <Button
                         size="sm"
                         onClick={() => handleSaveOverride(seg.label)}
-                        className="rounded-sm text-[10px] font-bold px-2.5 py-1 bg-[#D8EBF9] text-[#0F172A] hover:bg-[#C5E2F6] border border-[#B5D9F3] cursor-pointer"
+                        className="rounded-sm text-[10px] font-bold px-2.5 py-1 bg-[#8D5BB3] text-white hover:bg-[#7b4d9e] border border-[#8D5BB3] cursor-pointer"
                       >
                         Save
                       </Button>
