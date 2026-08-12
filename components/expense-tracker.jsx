@@ -353,11 +353,11 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
   }
 
   return (
-    <section id="tracker" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-28" : "py-20 md:py-28 bg-background"}`}>
+    <section id="tracker" className={`relative w-full overflow-hidden ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-28" : "py-20 md:py-28 bg-background"}`}>
       {/* Travel Doodles Background */}
       <DoodleBackground />
 
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Workspace Top Navigation Bar */}
         {isWorkspace && (
@@ -374,12 +374,6 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               </Button>
               <span className="text-muted-foreground">/</span>
               <span className="font-semibold text-foreground text-sm">Trip Expense Tracker</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-sm bg-amber-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-500 dark:text-amber-400 border border-amber-400/20">
-                Live Synced with {destination || "Current Itinerary"}
-              </span>
             </div>
           </div>
         )}
@@ -791,35 +785,35 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               className="space-y-8"
             >
               {/* Person-Wise Top Financial Overview Banner */}
-              <div className="rounded-3xl border border-[#0D2B45]/20 bg-[#0D2B45] text-white p-6 shadow-xl relative overflow-hidden">
+              <div className="rounded-sm border border-[#f0c8c8] bg-[#fff0f0] text-black p-6 shadow-sm relative overflow-hidden select-none">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-[#7a3a3a] block">
                       Group Expense Splitting & Debt Settlement
                     </span>
-                    <h3 className="font-heading text-2xl sm:text-3xl font-extrabold">
+                    <h3 className="font-heading text-2xl sm:text-3xl font-black text-black">
                       Person-Wise Expense Breakdown
                     </h3>
-                    <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+                    <p className="text-xs text-[#7a3a3a] max-w-xl leading-relaxed font-medium">
                       Document who paid for what across your trip. Automatically computes net balances and minimal debt settlement payments among travelers.
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-4 border-t md:border-t-0 md:border-l border-white/20 pt-4 md:pt-0 md:pl-6 shrink-0">
+                  <div className="flex flex-wrap items-center gap-6 border-t md:border-t-0 md:border-l border-[#f0c8c8] pt-4 md:pt-0 md:pl-6 shrink-0">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Group Expenses</span>
-                      <span className="font-heading text-2xl font-extrabold text-white">₹{totalGroupSpent.toLocaleString("en-IN")}</span>
+                      <span className="text-[10px] uppercase font-bold text-[#7a3a3a] block tracking-wider">Total Group Expenses</span>
+                      <span className="font-heading text-2xl sm:text-3xl font-black text-black">₹{totalGroupSpent.toLocaleString("en-IN")}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Fair Share / Person</span>
-                      <span className="font-heading text-2xl font-extrabold text-amber-300">₹{fairSharePerPerson.toLocaleString("en-IN")}</span>
+                      <span className="text-[10px] uppercase font-bold text-[#7a3a3a] block tracking-wider">Fair Share / Person</span>
+                      <span className="font-heading text-2xl sm:text-3xl font-black text-black">₹{fairSharePerPerson.toLocaleString("en-IN")}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Group Members Manager & Individual Balances */}
-              <div className="rounded-3xl border border-border bg-card p-6 shadow-md space-y-6">
+              <div className="rounded-sm border border-border bg-card p-6 shadow-md space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-4">
                   <div>
                     <h4 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
@@ -847,9 +841,9 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                       placeholder="Add traveler name..."
                       value={newMemberName}
                       onChange={(e) => setNewMemberName(e.target.value)}
-                      className="rounded-xl border border-border bg-background px-3.5 py-1.5 text-xs text-foreground outline-none focus:border-primary w-44"
+                      className="rounded-sm border border-border bg-background px-3.5 py-1.5 text-xs text-foreground outline-none focus:border-primary w-44"
                     />
-                    <Button type="submit" size="sm" className="rounded-xl bg-primary text-white text-xs font-bold px-3">
+                    <Button type="submit" size="sm" className="rounded-sm bg-primary text-white text-xs font-bold px-3">
                       <UserPlus className="h-3.5 w-3.5 mr-1" />
                       Add
                     </Button>
@@ -865,10 +859,10 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                     const colorBg = colors[idx % colors.length]
 
                     return (
-                      <div key={member} className="rounded-2xl border border-border bg-background p-4 shadow-sm space-y-3 relative group">
+                      <div key={member} className="rounded-sm border border-border bg-background p-4 shadow-sm space-y-3 relative group">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2.5">
-                            <div className={`h-9 w-9 rounded-xl ${colorBg} text-white font-extrabold text-xs flex items-center justify-center shadow`}>
+                            <div className={`h-9 w-9 rounded-sm ${colorBg} text-white font-extrabold text-xs flex items-center justify-center shadow`}>
                               {member.slice(0, 2).toUpperCase()}
                             </div>
                             <div>
@@ -903,15 +897,15 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                         <div className="pt-2 border-t border-border/60 flex items-center justify-between">
                           <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Net Balance</span>
                           {net > 5 ? (
-                            <span className="rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs px-2.5 py-0.5 border border-emerald-500/20">
+                            <span className="rounded-sm bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs px-2.5 py-0.5 border border-emerald-500/20">
                               +₹{net.toLocaleString("en-IN")} (Gets Back)
                             </span>
                           ) : net < -5 ? (
-                            <span className="rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 font-extrabold text-xs px-2.5 py-0.5 border border-rose-500/20">
+                            <span className="rounded-sm bg-rose-500/10 text-rose-600 dark:text-rose-400 font-extrabold text-xs px-2.5 py-0.5 border border-rose-500/20">
                               -₹{Math.abs(net).toLocaleString("en-IN")} (Owes Group)
                             </span>
                           ) : (
-                            <span className="rounded-full bg-slate-500/10 text-slate-600 dark:text-slate-400 font-bold text-xs px-2.5 py-0.5">
+                            <span className="rounded-sm bg-slate-500/10 text-slate-600 dark:text-slate-400 font-bold text-xs px-2.5 py-0.5">
                               Settled Up ✨
                             </span>
                           )}
@@ -923,7 +917,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               </div>
 
               {/* Debt Settlement Matrix ("Who Owes Whom") */}
-              <div className="rounded-3xl border border-border bg-card p-6 shadow-md space-y-4">
+              <div className="rounded-sm border border-border bg-card p-6 shadow-md space-y-4">
                 <div className="flex items-center justify-between border-b border-border/60 pb-3">
                   <div>
                     <h4 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
@@ -932,14 +926,14 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                     </h4>
                     <p className="text-xs text-muted-foreground">Optimal minimum transactions to settle all group debts</p>
                   </div>
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                  <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-3 py-1 rounded-sm border border-emerald-500/20">
                     {settlements.length} Pending Transfers
                   </span>
                 </div>
 
                 {settlements.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-border p-8 text-center space-y-2">
-                    <div className="h-10 w-10 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
+                  <div className="rounded-sm border border-dashed border-border p-8 text-center space-y-2">
+                    <div className="h-10 w-10 rounded-sm bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
                       <CheckCircle2 className="h-6 w-6" />
                     </div>
                     <h5 className="font-bold text-sm text-foreground">Everyone is Settled Up!</h5>
@@ -948,9 +942,9 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {settlements.map((settle) => (
-                      <div key={settle.id} className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 flex items-center justify-between gap-3">
+                      <div key={settle.id} className="rounded-sm border border-border bg-background p-4 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-2xl bg-amber-500 text-white font-extrabold text-sm flex items-center justify-center shadow">
+                          <div className="h-9 w-9 rounded-sm bg-primary/10 text-primary font-extrabold text-sm flex items-center justify-center shrink-0">
                             💳
                           </div>
                           <div>
@@ -964,7 +958,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                         </div>
 
                         <div className="text-right">
-                          <span className="font-heading text-lg font-extrabold text-amber-600 dark:text-amber-400 block">
+                          <span className="font-heading text-lg font-extrabold text-foreground block">
                             ₹{settle.amount.toLocaleString("en-IN")}
                           </span>
                           <button
@@ -992,7 +986,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               </div>
 
               {/* Person-Wise Expense Entries List with Inline Payer Change */}
-              <div className="rounded-3xl border border-border bg-card p-6 shadow-md space-y-4">
+              <div className="rounded-sm border border-border bg-card p-6 shadow-md space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
                   <div>
                     <h4 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
@@ -1004,10 +998,10 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
 
                   <Button
                     onClick={() => setQuickModalOpen(true)}
-                    className="rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs px-4 py-2 shadow cursor-pointer flex items-center gap-1.5"
+                    className="rounded-sm bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-xs px-4 py-2 shadow cursor-pointer flex items-center gap-1.5"
                   >
                     <Plus className="h-4 w-4" />
-                    + Log Person Expense
+                    Log Person Expense
                   </Button>
                 </div>
 
@@ -1017,9 +1011,9 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                     const perPersonSplit = Math.round(exp.amount / (members.length || 1))
 
                     return (
-                      <div key={exp.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-border/80 bg-background p-4 shadow-sm hover:shadow-md transition-all">
+                      <div key={exp.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-sm border border-border/80 bg-background p-4 shadow-sm hover:shadow-md transition-all">
                         <div className="flex items-center gap-3">
-                          <div className="h-9 w-9 rounded-xl bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">
+                          <div className="h-9 w-9 rounded-sm bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">
                             <Receipt className="h-4 w-4" />
                           </div>
                           <div>
@@ -1027,7 +1021,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-0.5">
                               <span className="font-semibold text-foreground">{exp.category}</span>
                               <span>• {exp.day}</span>
-                              <span className="text-[10px] font-bold bg-secondary px-2 py-0.5 rounded-full text-muted-foreground">
+                              <span className="text-[10px] font-bold bg-secondary px-2 py-0.5 rounded-sm text-muted-foreground">
                                 Split {members.length} ways (₹{perPersonSplit.toLocaleString("en-IN")}/person)
                               </span>
                             </div>
@@ -1041,7 +1035,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                             <select
                               value={currentPayer}
                               onChange={(e) => updateExpensePayer(exp.id, e.target.value)}
-                              className="rounded-xl border border-border bg-card px-2.5 py-1 text-xs font-bold text-foreground outline-none focus:border-primary cursor-pointer shadow-xs"
+                              className="rounded-sm border border-border bg-card px-2.5 py-1 text-xs font-bold text-foreground outline-none focus:border-primary cursor-pointer shadow-xs"
                             >
                               {members.map((m) => (
                                 <option key={m} value={m}>
@@ -1073,14 +1067,14 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
               className="space-y-8"
             >
               {/* Profile 2 Header Comparison Summary */}
-              <div className="rounded-3xl border border-[#0D2B45]/20 bg-[#0D2B45] text-white p-6 shadow-xl relative overflow-hidden">
+              <div className="rounded-3xl border border-[#f0c8c8] bg-[#fff0f0] text-black p-6 shadow-xl relative overflow-hidden">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-[#f0c8c8] text-[#7a3a3a] border border-[#f0b8b8]">
                       Multi-Trip Comparison
                     </span>
-                    <h3 className="font-heading text-2xl font-bold mt-2">Historical Expenditure Benchmarks</h3>
-                    <p className="text-xs text-white/80 mt-1 max-w-xl">
+                    <h3 className="font-heading text-2xl font-bold mt-2 text-black">Historical Expenditure Benchmarks</h3>
+                    <p className="text-xs text-[#7a3a3a] mt-1 max-w-xl">
                       Comparing total budget and category expenditure across your current {destination || "trip"} and past journeys.
                     </p>
                   </div>

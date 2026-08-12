@@ -36,6 +36,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
+import { DoodleBackground } from "@/components/doodle-background"
 
 // Visited Places Dataset featuring Explore destination photos & full itineraries
 const VISITED_PLACES_BADGES = [
@@ -407,8 +408,10 @@ export function ProfileWorkspace({ onBack, user, onUserUpdate }) {
   const pendingSavedTrips = savedTrips ? savedTrips.filter((t) => t.status !== "completed") : []
 
   return (
-    <section className="min-h-screen bg-background dark:bg-[#11100E] text-foreground dark:text-[#F1ECE2] pt-20 pb-28">
-      <div className="mx-auto max-w-6xl px-4 md:px-6 space-y-6">
+    <section className="relative w-full overflow-hidden min-h-screen bg-background dark:bg-[#11100E] text-foreground dark:text-[#F1ECE2] pt-24 pb-28">
+      {/* Travel Doodles Background */}
+      <DoodleBackground />
+      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6 space-y-8">
         
         {/* Navigation Top Bar */}
         <div className="flex items-center justify-between border-b border-border/40 pb-3">

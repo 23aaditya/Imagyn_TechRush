@@ -13,14 +13,21 @@ import {
   ArrowLeft,
   Edit3,
   RotateCcw,
-  Sparkles
+  Sparkles,
+  IndianRupee,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
 import { DoodleBackground } from "@/components/doodle-background"
+import { PieChart } from "@/components/charts/pie-chart"
+import { PieSlice } from "@/components/charts/pie-slice"
+import { PieCenter } from "@/components/charts/pie-center"
+import { PieLabels } from "@/components/charts/pie-labels"
 
-const RADIUS = 80
+const RADIUS = 100
 const CIRCUM = 2 * Math.PI * RADIUS
+const SVG_SIZE = 350
+const CENTER = SVG_SIZE / 2
 
 export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace }) {
   const {
@@ -44,20 +51,104 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
   const [editingCategory, setEditingCategory] = useState(null)
   const [editValue, setEditValue] = useState("")
+  const [hoveredCategory, setHoveredCategory] = useState(null)
 
-  const TOTAL = totalBudget || 1
-  const perPerson = Math.round(TOTAL / travelers)
+  const TOTAL = totalBudget || 35500
+  const perPerson = Math.round(TOTAL / Math.max(1, travelers))
 
+  // Curated Soft Pastel Color Palette
   const segments = [
-    { label: "Accommodation", value: categoryBudgets["Accommodation"] || 0, color: "var(--color-primary)", icon: Bed },
-    { label: "Food & Dining", value: categoryBudgets["Food & Dining"] || 0, color: "var(--color-emerald)", icon: UtensilsCrossed },
-    { label: "Transport", value: categoryBudgets["Transport"] || 0, color: "oklch(0.7 0.15 230)", icon: Bus },
-    { label: "Activities", value: categoryBudgets["Activities"] || 0, color: "oklch(0.75 0.15 85)", icon: Ticket },
-    { label: "Shopping", value: categoryBudgets["Shopping"] || 0, color: "oklch(0.68 0.16 300)", icon: ShoppingBag },
-    { label: "Emergency Reserve", value: categoryBudgets["Emergency Reserve"] || 0, color: "oklch(0.62 0.02 257)", icon: ShieldAlert },
+    {
+      id: "Accommodation",
+      label: "Accommodation",
+      value: categoryBudgets["Accommodation"] || Math.round(TOTAL * 0.30),
+      color: "#B39DDB", // Soft Pastel Lavender
+      icon: Bed
+    },
+    {
+      id: "Food & Dining",
+      label: "Food & Dining",
+      value: categoryBudgets["Food & Dining"] || Math.round(TOTAL * 0.20),
+      color: "#C5E1A5", // Soft Pastel Sage Green
+      icon: UtensilsCrossed
+    },
+    {
+      id: "Activities",
+      label: "Activities",
+      value: categoryBudgets["Activities"] || Math.round(TOTAL * 0.17),
+      color: "#F48FB1", // Soft Pastel Rose Pink
+      icon: Ticket
+    },
+    {
+      id: "Shopping",
+      label: "Shopping",
+      value: categoryBudgets["Shopping"] || Math.round(TOTAL * 0.11),
+      color: "#FFCC80", // Soft Pastel Warm Apricot
+      icon: ShoppingBag
+    },
+    {
+      id: "Emergency Reserve",
+      label: "Emergency",
+      value: categoryBudgets["Emergency Reserve"] || Math.round(TOTAL * 0.10),
+      color: "#80CBC4", // Soft Pastel Mint Teal
+      icon: ShieldAlert
+    },
+    {
+      id: "Transport",
+      label: "Transport",
+      value: categoryBudgets["Transport"] || Math.round(TOTAL * 0.12),
+      color: "#90CAF9", // Soft Pastel Sky Blue
+      icon: Bus
+    },
   ]
 
   let offsetAccum = 0
+
+  const processedSegments = segments.map((seg) => {
+    const fraction = TOTAL > 0 ? seg.value / TOTAL : 0
+    const pct = Math.round(fraction * 100)
+    const dash = fraction * CIRCUM
+    const currentOffset = offsetAccum
+    offsetAccum += dash
+
+    // Mid-angle calculation starting from 12 o'clock (-90° / -PI/2) moving clockwise
+    const startFraction = currentOffset / CIRCUM
+    const midFraction = startFraction + fraction / 2
+    const midAngleRotatedDeg = midFraction * 360 - 90
+    const midAngleRad = (midAngleRotatedDeg * Math.PI) / 180
+
+    // Inner Ring Percentage Coordinates (Radius = 100)
+    const innerX = CENTER + RADIUS * Math.cos(midAngleRad)
+    const innerY = CENTER + RADIUS * Math.sin(midAngleRad)
+
+    // Outer Perimeter Category Label Coordinates (Radius = 142 for perfect 15px clearance around the donut slices)
+    const outerX = CENTER + 142 * Math.cos(midAngleRad)
+    const outerY = CENTER + 142 * Math.sin(midAngleRad)
+
+    // Precise quadrant-aware text alignment parameters for tight, readable spacing next to its slice
+    let textAnchor = "middle"
+    if (outerX > CENTER + 20) textAnchor = "start"
+    else if (outerX < CENTER - 20) textAnchor = "end"
+
+    let dy = "0.35em"
+    if (outerY < CENTER - 40) dy = "-0.2em"
+    else if (outerY > CENTER + 40) dy = "0.75em"
+
+    return {
+      ...seg,
+      pct,
+      fraction,
+      dash,
+      currentOffset,
+      midAngleRotatedDeg,
+      innerX,
+      innerY,
+      outerX,
+      outerY,
+      textAnchor,
+      dy
+    }
+  })
 
   const handleSaveOverride = (catLabel) => {
     if (editValue && !isNaN(Number(editValue))) {
@@ -68,11 +159,10 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
   }
 
   return (
-    <section id="budget" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
+    <section id="budget" className={`relative w-full overflow-hidden ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
       {/* Travel Doodles Background */}
       <DoodleBackground />
-
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Workspace Top Bar */}
         {isWorkspace && (
@@ -82,9 +172,9 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                 variant="outline"
                 size="sm"
                 onClick={onBack}
-                className="rounded-md border-border bg-background hover:bg-accent text-xs sm:text-sm cursor-pointer"
+                className="rounded-sm border border-[#FFEEEE] bg-[#FFEEEE] hover:bg-[#fcdede] text-[#4A154B] text-xs sm:text-sm font-bold cursor-pointer transition-all shadow-xs"
               >
-                <ArrowLeft className="mr-1.5 h-4 w-4" />
+                <ArrowLeft className="mr-1.5 h-4 w-4 text-[#4A154B]" />
                 Back to Overview
               </Button>
               <span className="text-muted-foreground">/</span>
@@ -108,13 +198,6 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
           {/* White Font BUDGET Title & Subtitle Overlay */}
           <div className="relative z-10 text-center px-4 max-w-3xl">
-            <motion.span
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="font-heading text-xs sm:text-sm font-extrabold uppercase tracking-[0.25em] text-[#5B8DEF] block mb-2"
-            >
-              FINANCIAL TRAVEL ARCHITECT
-            </motion.span>
             <motion.h1
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -136,29 +219,31 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
         {/* Selected Package Callout Banner */}
         {selectedPackage && (
-          <div className="mx-auto mb-10 max-w-4xl rounded-xl border border-teal-500/30 bg-[#0D2B45] p-5 md:p-6 text-white shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <span className="text-xs uppercase font-bold text-teal-300 tracking-wider block">
-                Selected Package Active
-              </span>
-              <h4 className="font-heading text-xl font-bold">{selectedPackage.name}</h4>
-              <p className="text-xs text-slate-300">
-                Base Package Price: <strong className="text-white">₹{packageBaseCost.toLocaleString("en-IN")}</strong> · Extra Attractions: <strong className="text-amber-400">+₹{additionalExpenses.toLocaleString("en-IN")}</strong>
-              </p>
-            </div>
-            <div className="sm:text-right border-t sm:border-t-0 sm:border-l border-white/20 pt-3 sm:pt-0 sm:pl-6">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Est. Cost</span>
-              <span className="font-heading text-2xl font-bold text-teal-300">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
+          <div className="mb-10 w-full rounded-sm border border-[#f0c8c8] bg-[#fff0f0] p-5 sm:p-6 text-black shadow-sm select-none">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="space-y-1.5">
+                <span className="inline-block text-[11px] uppercase font-black text-white bg-[#8D5BB3] border border-[#8D5BB3] px-3 py-1 rounded-sm tracking-wider">
+                  Selected Package Active
+                </span>
+                <h4 className="font-heading text-xl sm:text-2xl font-black text-black">{selectedPackage.name}</h4>
+                <p className="text-xs text-[#7a3a3a] font-medium">
+                  Base Package Price: <strong className="text-black">₹{packageBaseCost.toLocaleString("en-IN")}</strong> · Extra Attractions: <strong className="text-[#B45309]">+₹{additionalExpenses.toLocaleString("en-IN")}</strong>
+                </p>
+              </div>
+              <div className="sm:text-right border-t sm:border-t-0 sm:border-l border-[#f0c8c8] pt-3 sm:pt-0 sm:pl-8">
+                <span className="text-[10px] uppercase font-bold text-[#7a3a3a] block tracking-wider">Total Est. Cost</span>
+                <span className="font-heading text-2xl sm:text-3xl font-black text-black">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Interactive Workspace Sliders Control (Only in Workspace Mode) */}
+        {/* Interactive Sliders Control */}
         {isWorkspace && (
-          <div className="mb-10 grid gap-6 rounded-xl border border-border bg-card p-6 shadow-xs md:grid-cols-3">
+          <div className="mb-10 grid gap-6 rounded-sm border border-border bg-card p-6 shadow-sm md:grid-cols-3">
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trip Duration</label>
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Trip Duration</label>
                 <span className="text-sm font-bold text-primary">{days} Days</span>
               </div>
               <input
@@ -167,13 +252,13 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                 max="14"
                 value={days}
                 onChange={(e) => setDays(Number(e.target.value))}
-                className="w-full accent-primary cursor-pointer"
+                className="w-full accent-[#5B8DEF] cursor-pointer h-2 bg-muted rounded-none"
               />
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Travelers</label>
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Travelers</label>
                 <span className="text-sm font-bold text-primary">{travelers} People</span>
               </div>
               <input
@@ -182,13 +267,13 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                 max="8"
                 value={travelers}
                 onChange={(e) => setTravelers(Number(e.target.value))}
-                className="w-full accent-primary cursor-pointer"
+                className="w-full accent-[#5B8DEF] cursor-pointer h-2 bg-muted rounded-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Stay Comfort</label>
-              <div className="grid grid-cols-3 gap-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Stay Comfort</label>
+              <div className="grid grid-cols-3 gap-2">
                 {["Economy", "Standard", "Luxury"].map((tier) => (
                   <button
                     key={tier}
@@ -197,10 +282,10 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                       setStayTier(tier)
                       setCustomTargetBudget(null)
                     }}
-                    className={`rounded-sm py-2 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                    className={`rounded-sm py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                       stayTier === tier
-                        ? "bg-primary text-primary-foreground shadow-xs"
-                        : "border border-border text-muted-foreground hover:bg-muted"
+                        ? "bg-[#8D5BB3] text-white border border-[#8D5BB3] shadow-sm scale-[1.02]"
+                        : "bg-[#FFEEEE] text-[#4A154B] hover:bg-[#fcdede]"
                     }`}
                   >
                     {tier}
@@ -211,97 +296,137 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
           </div>
         )}
 
-        {/* Donut Chart & Segments Card */}
-        <div className="grid items-center gap-10 rounded-xl border border-border bg-card p-6 shadow-xs md:grid-cols-2 md:p-10">
-          {/* Donut Chart */}
-          <div className="relative mx-auto flex h-64 w-64 items-center justify-center md:h-80 md:w-80">
-            <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90">
-              <circle cx="100" cy="100" r={RADIUS} fill="none" stroke="var(--color-muted)" strokeWidth="18" />
-              {segments.map((seg) => {
-                const fraction = TOTAL > 0 ? seg.value / TOTAL : 0
-                const dash = fraction * CIRCUM
-                const circle = (
-                  <motion.circle
-                    key={seg.label}
-                    cx="100"
-                    cy="100"
-                    r={RADIUS}
-                    fill="none"
-                    stroke={seg.color}
-                    strokeWidth="18"
-                    strokeLinecap="round"
-                    strokeDasharray={`${dash} ${CIRCUM - dash}`}
-                    initial={{ strokeDashoffset: CIRCUM }}
-                    animate={{ strokeDashoffset: -offsetAccum }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                  />
-                )
-                offsetAccum += dash
-                return circle
-              })}
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Total Estimated</span>
-              <span className="font-heading text-3xl font-bold text-foreground md:text-4xl">₹{TOTAL.toLocaleString("en-IN")}</span>
-              <span className="mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                ₹{perPerson.toLocaleString("en-IN")} / person
-              </span>
+        {/* Dynamic Elevated Donut Chart & Breakdown Grid Container */}
+        <div className="grid items-center gap-10 rounded-sm border border-border/80 bg-card p-6 shadow-lg md:grid-cols-12 md:p-10">
+          
+          {/* Main Donut Chart Container (Col-span 6) */}
+          <div className="md:col-span-6 flex flex-col items-center justify-center relative py-2">
+            <div className="relative flex h-[400px] w-full max-w-[400px] items-center justify-center overflow-visible">
+              
+              {/* @bklit/pie-chart Component */}
+              <PieChart
+                data={processedSegments.map((seg) => ({
+                  id: seg.id,
+                  label: seg.label,
+                  value: seg.value,
+                  color: seg.color,
+                }))}
+                innerRadius={68}
+                hoverOffset={55}
+                padAngle={0.03}
+                cornerRadius={4}
+                hoveredIndex={
+                  hoveredCategory
+                    ? processedSegments.findIndex((s) => s.id === hoveredCategory)
+                    : null
+                }
+                onHoverChange={(index) => {
+                  if (index !== null && index >= 0 && processedSegments[index]) {
+                    setHoveredCategory(processedSegments[index].id)
+                  } else {
+                    setHoveredCategory(null)
+                  }
+                }}
+                className="w-full h-full"
+              >
+                {processedSegments.map((seg, idx) => (
+                  <PieSlice key={seg.id} index={idx} color={seg.color} />
+                ))}
+
+                {/* Exact Outer Category Labels Aligned to Slices */}
+                <PieLabels
+                  hoverColor="#513229"
+                  labelRadiusOffset={20}
+                  onHoverChange={(index) => {
+                    if (index !== null && index >= 0 && processedSegments[index]) {
+                      setHoveredCategory(processedSegments[index].id)
+                    } else {
+                      setHoveredCategory(null)
+                    }
+                  }}
+                />
+
+                <PieCenter>
+                  {() => (
+                    <div className="flex flex-col items-center justify-center text-center p-2">
+                      <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        TOTAL ESTIMATED
+                      </span>
+                      <span className="font-heading text-xl sm:text-2xl font-extrabold text-[#0D2B45] dark:text-white leading-tight my-0.5">
+                        ₹{TOTAL.toLocaleString("en-IN")}
+                      </span>
+                      <span className="mt-1 text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 block">
+                        ₹{perPerson.toLocaleString("en-IN")} / person
+                      </span>
+                    </div>
+                  )}
+                </PieCenter>
+              </PieChart>
+
             </div>
           </div>
 
-          {/* Breakdown Items with Manual Override Triggers */}
-          <div className="grid gap-3 sm:grid-cols-2">
-            {segments.map((seg) => {
+          {/* Interactive Category Breakdown Cards (Col-span 6) */}
+          <div className="md:col-span-6 grid gap-3 sm:grid-cols-2">
+            {processedSegments.map((seg) => {
               const Icon = seg.icon
-              const pct = TOTAL > 0 ? Math.round((seg.value / TOTAL) * 100) : 0
               const isOverridden = budgetOverrides[seg.label] !== undefined
+              const isHovered = hoveredCategory === seg.id
 
               return (
                 <div
                   key={seg.label}
-                  className={`flex flex-col justify-between rounded-md border p-3.5 transition-all ${
-                    isOverridden
+                  onMouseEnter={() => setHoveredCategory(seg.id)}
+                  onMouseLeave={() => setHoveredCategory(null)}
+                  className={`flex flex-col justify-between rounded-sm border p-4 transition-all duration-200 cursor-pointer ${
+                    isHovered
+                      ? "border-[#D4CEB8] shadow-md scale-[1.02] bg-[#F4F1E2] text-[#513229] dark:bg-[#2B2822] dark:text-[#F1ECE2] dark:border-[#423D33]"
+                      : isOverridden
                       ? "border-primary/50 bg-primary/5"
-                      : "border-border bg-background hover:border-primary/30"
+                      : "border-border/80 bg-background hover:bg-[#F4F1E2] hover:border-[#D4CEB8] dark:hover:bg-[#2B2822] dark:hover:border-[#423D33]"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <span
-                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                        style={{ backgroundColor: `color-mix(in oklch, ${seg.color} 18%, transparent)`, color: seg.color }}
+                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-sm shadow-2xs"
+                        style={{ backgroundColor: `${seg.color}20`, color: seg.color }}
                       >
-                        <Icon className="h-4 w-4" aria-hidden />
+                        <Icon className="h-4 w-4 stroke-[2.5]" aria-hidden />
                       </span>
-                      <span className="truncate text-xs font-semibold text-foreground">{seg.label}</span>
+                      <div>
+                        <h4 className={`truncate text-sm sm:text-base font-extrabold transition-colors leading-snug ${isHovered ? "text-[#513229]" : "text-foreground"}`}>{seg.label}</h4>
+                        <span className="text-[10px] font-extrabold" style={{ color: seg.color }}>
+                          {seg.pct}% Allocation
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-[11px] font-bold text-muted-foreground">{pct}%</span>
                   </div>
 
                   {editingCategory === seg.label ? (
-                    <div className="flex items-center gap-1.5 mt-1">
+                    <div className="flex items-center gap-1.5 mt-2">
                       <input
                         type="number"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
                         placeholder={`₹${seg.value}`}
-                        className="w-full rounded-xl border border-primary bg-background px-2.5 py-1 text-xs font-bold text-foreground focus:outline-none"
+                        className="w-full rounded-sm border border-primary bg-background px-2.5 py-1 text-xs font-bold text-foreground focus:outline-none"
                         autoFocus
                       />
                       <Button
-                        size="xs"
+                        size="sm"
                         onClick={() => handleSaveOverride(seg.label)}
-                        className="rounded-lg text-[10px] font-bold px-2 py-1 bg-primary text-primary-foreground"
+                        className="rounded-sm text-[10px] font-bold px-2.5 py-1 bg-[#8D5BB3] text-white hover:bg-[#7b4d9e] border border-[#8D5BB3] cursor-pointer"
                       >
                         Save
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/40">
-                      <span className="font-heading text-sm font-bold text-foreground">
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/40 mt-1">
+                      <span className="font-heading text-base font-extrabold text-foreground">
                         ₹{seg.value.toLocaleString("en-IN")}
                       </span>
-                      
+
                       <div className="flex items-center gap-1">
                         {isOverridden && (
                           <button
@@ -309,7 +434,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                             title="Reset to auto-calculated budget"
                             className="text-muted-foreground hover:text-foreground p-1"
                           >
-                            <RotateCcw className="h-3 w-3" />
+                            <RotateCcw className="h-3.5 w-3.5" />
                           </button>
                         )}
                         <button
@@ -320,14 +445,14 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                           title="Override budget manually"
                           className="text-muted-foreground hover:text-primary p-1"
                         >
-                          <Edit3 className="h-3 w-3" />
+                          <Edit3 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
                   )}
 
                   {isOverridden && (
-                    <span className="mt-1 text-[9px] font-semibold text-primary uppercase tracking-wider">
+                    <span className="mt-1 text-[9px] font-bold text-primary uppercase tracking-wider">
                       Manual Override Active
                     </span>
                   )}
@@ -335,6 +460,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
               )
             })}
           </div>
+
         </div>
 
       </div>

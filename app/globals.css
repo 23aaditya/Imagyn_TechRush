@@ -83,7 +83,7 @@
   --night-accent: #00356B;
   --night-olive: #00356B;
 
-  --background: #FFFFFF;
+  --background: #FCFAFF;
   --foreground: #1E293B;
   --card: #FFFFFF;
   --card-foreground: #1E293B;
@@ -157,7 +157,7 @@ html {
   background-color: #11100E;
   color: #F1ECE2;
   background-image: 
-    radial-gradient(circle at 50% 15%, rgba(139, 155, 228, 0.05) 0%, transparent 65%),
+    radial-gradient(circle at 50% 15%, rgba(141, 91, 179, 0.05) 0%, transparent 65%),
     linear-gradient(to right, rgba(235, 226, 208, 0.025) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(235, 226, 208, 0.025) 1px, transparent 1px);
   background-size: 100% 100%, 90px 90px, 90px 90px;
@@ -166,7 +166,7 @@ html {
 .night-cartography-bg {
   background-color: #11100E;
   background-image: 
-    radial-gradient(circle at 50% 20%, rgba(139, 155, 228, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 50% 20%, rgba(141, 91, 179, 0.06) 0%, transparent 60%),
     linear-gradient(to right, rgba(235, 226, 208, 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(235, 226, 208, 0.03) 1px, transparent 1px);
   background-size: 100% 100%, 80px 80px, 80px 80px;
@@ -177,17 +177,19 @@ html {
     @apply border-border outline-ring/50;
   }
   ::selection {
-    background-color: rgba(37, 99, 235, 0.2);
-    color: #2563eb;
+    background-color: rgba(141, 91, 179, 0.2);
+    color: #8D5BB3;
   }
   html {
     scroll-behavior: smooth;
+    background-color: #FCFAFF;
   }
   section[id] {
     scroll-margin-top: 5rem;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: #FCFAFF;
+    @apply text-foreground;
   }
   button, .font-button, [role="button"] {
     font-family: var(--font-button), 'Instrument Sans', sans-serif !important;
