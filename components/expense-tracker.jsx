@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Wallet,
@@ -32,6 +32,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
 import { DoodleBackground } from "@/components/doodle-background"
+import { ExpenseEntranceLoader } from "@/components/expense-entrance-loader"
 
 // Category Bags Configuration for Low-Resistance Quick Logging
 const CATEGORY_BAGS = [
@@ -184,6 +185,24 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
     updateExpensePayer
   } = useTrip()
 
+  // Subtle changing background photos (low opacity)
+  const UPLOADED_TRAVEL_BACKGROUNDS = [
+    "/images/cultural/culture-indian-mosaic.jpg",
+    "/images/cultural/culture-warli.jpg",
+    "/images/cultural/culture-balinese.jpg"
+  ]
+  const [bgImgIdx, setBgImgIdx] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBgImgIdx((prev) => (prev + 1) % UPLOADED_TRAVEL_BACKGROUNDS.length)
+    }, 4200)
+    return () => clearInterval(timer)
+  }, [])
+
+  // Entrance Loader state (Only triggers once on workspace mount)
+  const [showEntranceLoader, setShowEntranceLoader] = useState(isWorkspace)
+
   // Profile Selector: 'current' | 'person-wise' | 'past'
   const [activeProfile, setActiveProfile] = useState("current")
 
@@ -203,6 +222,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
   // Person-Wise State
   const members = groupMembers && groupMembers.length > 0 ? groupMembers : ["Aaditya", "Rohan", "Priya"]
   const [newMemberName, setNewMemberName] = useState("")
+  const [showAddMemberInput, setShowAddMemberInput] = useState(false)
   const [quickPayer, setQuickPayer] = useState(members[0] || "Aaditya")
 
   // Dynamically fetched days directly from current itinerary
@@ -354,8 +374,32 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
 
   return (
     <section id="tracker" className={`relative w-full overflow-hidden ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-28" : "py-20 md:py-28 bg-background"}`}>
+      {/* Expense Tracker Entrance Animation Overlay ("Every Expense Has a Place") */}
+      <AnimatePresence>
+        {isWorkspace && showEntranceLoader && (
+          <ExpenseEntranceLoader onComplete={() => setShowEntranceLoader(false)} />
+        )}
+      </AnimatePresence>
+
       {/* Travel Doodles Background */}
       <DoodleBackground />
+
+      {/* Subtle Auto-Changing Low-Opacity Photo Background Reel */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={UPLOADED_TRAVEL_BACKGROUNDS[bgImgIdx]}
+            src={UPLOADED_TRAVEL_BACKGROUNDS[bgImgIdx]}
+            alt="Subtle travel background"
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 0.16, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="h-full w-full object-cover filter brightness-95"
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-background/70 backdrop-blur-xs" />
+      </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
         
@@ -943,17 +987,14 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {settlements.map((settle) => (
                       <div key={settle.id} className="rounded-sm border border-border bg-background p-4 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="h-9 w-9 rounded-sm bg-primary/10 text-primary font-extrabold text-sm flex items-center justify-center shrink-0">
-                            💳
-                          </div>
+                        <div className="flex items-center gap-3 font-button">
                           <div>
-                            <div className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                              <span className="text-rose-600 dark:text-rose-400 font-extrabold">{settle.from}</span>
+                            <div className="text-xs font-normal text-foreground flex items-center gap-1.5 font-button">
+                              <span className="text-rose-600 dark:text-rose-400 font-normal">{settle.from}</span>
                               <span>→ pays →</span>
-                              <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{settle.to}</span>
+                              <span className="text-emerald-600 dark:text-emerald-400 font-normal">{settle.to}</span>
                             </div>
-                            <span className="text-xs text-muted-foreground font-medium">To equalize trip expenses</span>
+                            <span className="text-xs text-muted-foreground font-normal">To equalize trip expenses</span>
                           </div>
                         </div>
 
@@ -1030,16 +1071,16 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
 
                         <div className="flex items-center gap-4 flex-wrap justify-between sm:justify-end">
                           {/* Payer Dropdown */}
-                          <div className="flex items-center gap-1.5 text-xs">
-                            <span className="text-muted-foreground font-medium text-[11px]">Paid by:</span>
+                          <div className="flex items-center gap-1.5 text-xs font-button">
+                            <span className="text-muted-foreground font-normal text-[11px]">Paid by:</span>
                             <select
                               value={currentPayer}
                               onChange={(e) => updateExpensePayer(exp.id, e.target.value)}
-                              className="rounded-sm border border-border bg-card px-2.5 py-1 text-xs font-bold text-foreground outline-none focus:border-primary cursor-pointer shadow-xs"
+                              className="rounded-xl border border-[#B9A6C9]/40 bg-card px-2.5 py-1 text-xs font-normal text-foreground outline-none focus:border-[#8E5AB5] cursor-pointer font-button shadow-xs"
                             >
                               {members.map((m) => (
                                 <option key={m} value={m}>
-                                  👤 {m}
+                                  Paid by {m}
                                 </option>
                               ))}
                             </select>
@@ -1144,39 +1185,39 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
       {/* ─────────────────────────────────────────────
           FLOATING QUICK ADD [ + ] BUTTON (Bottom-Left Corner)
          ───────────────────────────────────────────── */}
-      {/* FLOATING QUICK ADD [ + ] BUTTON (Only in Expense Tracker Page Workspace) */}
+      {/* FLOATING QUICK ADD [ + ] BUTTON (White with Lavender Border & Purple +) */}
       {isWorkspace && (
         <motion.button
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setQuickModalOpen(true)}
-          className="fixed bottom-6 left-6 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#5A8CB2] text-white shadow-2xl border-2 border-white/40 hover:bg-[#4A7CA2] transition-all cursor-pointer"
+          className="fixed bottom-6 left-6 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-[#8E5AB5] shadow-2xl border-2 border-[#B9A6C9] hover:bg-[#FAF8FC] hover:border-[#8E5AB5] transition-all cursor-pointer font-button"
           aria-label="Add New Expense"
           title="Quick Add Expense"
         >
-          <Plus className="h-7 w-7 text-white" />
+          <span className="text-3xl font-normal leading-none text-[#8E5AB5]">+</span>
         </motion.button>
       )}
 
       {/* ─────────────────────────────────────────────
-          DYNAMIC STEP EXPENSE MODAL
+          DYNAMIC STEP EXPENSE MODAL (WHITE & LAVENDER THEME, NO SVGS, INSTRUMENT SANS)
          ───────────────────────────────────────────── */}
       <AnimatePresence>
         {quickModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-20 pb-6 bg-black/60 backdrop-blur-md overflow-y-auto">
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              initial={{ opacity: 0, scale: 0.94, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
-              className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-neutral-200 bg-white text-neutral-900 shadow-2xl p-6 sm:p-8"
+              exit={{ opacity: 0, scale: 0.94, y: 15 }}
+              className="relative w-full max-w-xl max-h-[82vh] overflow-y-auto rounded-2xl border border-[#B9A6C9]/40 bg-white text-[#100B12] shadow-2xl p-5 sm:p-6 text-left select-none font-button"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between border-b border-neutral-200 pb-4 mb-5">
+              <div className="flex items-center justify-between border-b border-[#B9A6C9]/30 pb-3 mb-4">
                 <div>
-                  <h3 className="font-heading text-xl font-extrabold text-[#0D2B45]">
+                  <h3 className="font-heading text-lg font-normal text-[#100B12]">
                     Add New Expense
                   </h3>
-                  <p className="text-xs text-neutral-500 mt-0.5 font-medium">
+                  <p className="text-xs text-[#8E5AB5] mt-0.5 font-normal">
                     {!quickDay ? "Step 1: Select Day from Itinerary" : !selectedBag ? `${quickDay} • Step 2: Select Category` : `${quickDay} • ${selectedBag.shortLabel} • Step 3: Enter Amount`}
                   </p>
                 </div>
@@ -1187,59 +1228,56 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                     setSelectedBag(null)
                   }}
                   aria-label="Close modal"
-                  className="rounded-full p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+                  className="rounded-lg p-1.5 text-[#100B12]/60 hover:bg-[#DDD0EA]/50 hover:text-[#100B12] transition-colors cursor-pointer"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              {/* Progress Steps Header Pills */}
-              <div className="flex items-center gap-1.5 mb-5 text-[11px] font-bold">
-                <span className={`px-2.5 py-1 rounded-full transition-colors ${!quickDay ? "bg-[#0D2B45] text-white" : "bg-amber-400/20 text-amber-600 dark:text-amber-400"}`}>
+              {/* Progress Steps Header Pills (Lavender & White Theme) */}
+              <div className="flex items-center gap-1.5 mb-4 text-[11px] font-normal">
+                <span className={`px-2.5 py-1 rounded-lg transition-colors ${!quickDay ? "bg-[#8E5AB5] text-white" : "bg-[#DDD0EA] text-[#100B12]"}`}>
                   1. {quickDay || "Select Day"}
                 </span>
-                <span className="text-neutral-300">•</span>
-                <span className={`px-2.5 py-1 rounded-full transition-colors ${quickDay && !selectedBag ? "bg-[#0D2B45] text-white" : selectedBag ? "bg-amber-400/20 text-amber-600 dark:text-amber-400" : "bg-neutral-100 text-neutral-400"}`}>
+                <span className="text-[#B9A6C9]">•</span>
+                <span className={`px-2.5 py-1 rounded-lg transition-colors ${quickDay && !selectedBag ? "bg-[#8E5AB5] text-white" : selectedBag ? "bg-[#DDD0EA] text-[#100B12]" : "bg-neutral-100 text-neutral-400"}`}>
                   2. {selectedBag?.shortLabel || "Select Type"}
                 </span>
-                <span className="text-neutral-300">•</span>
-                <span className={`px-2.5 py-1 rounded-full transition-colors ${selectedBag ? "bg-[#0D2B45] text-white" : "bg-neutral-100 text-neutral-400"}`}>
+                <span className="text-[#B9A6C9]">•</span>
+                <span className={`px-2.5 py-1 rounded-lg transition-colors ${selectedBag ? "bg-[#8E5AB5] text-white" : "bg-neutral-100 text-neutral-400"}`}>
                   3. Amount
                 </span>
               </div>
 
               {/* Modal Content - STEP 1: SELECT DAY FROM ITINERARY */}
               {!quickDay ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+                    <p className="text-xs font-normal uppercase tracking-wider text-[#8E5AB5]">
                       Select Itinerary Day ({availableDays.length} Days Planned)
                     </p>
-                    <span className="text-[10px] text-amber-500 bg-amber-400/10 px-2 py-0.5 rounded-full font-bold">
+                    <span className="text-[10px] text-[#8E5AB5] bg-[#DDD0EA]/50 px-2 py-0.5 rounded-lg font-normal border border-[#B9A6C9]/40">
                       Synced from Itinerary
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                     {availableDays.map((dObj) => (
                       <button
                         key={dObj.dayLabel}
                         onClick={() => setQuickDay(dObj.dayLabel)}
-                        className="group flex flex-col items-start justify-between rounded-2xl border-2 border-neutral-100 bg-neutral-50/90 p-4 transition-all hover:border-[#0D2B45] hover:bg-white hover:shadow-xl active:scale-95 text-left cursor-pointer"
+                        className="group flex flex-col items-start justify-between rounded-xl border border-[#B9A6C9]/40 bg-[#DDD0EA]/30 p-3.5 transition-all hover:bg-[#DDD0EA] hover:border-[#8E5AB5] active:scale-98 text-left cursor-pointer font-button"
                       >
                         <div className="flex items-center justify-between w-full">
-                          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#0D2B45] text-white text-xs font-bold transition-transform group-hover:scale-110">
-                            <Calendar className="h-4 w-4" />
+                          <span className="text-xs font-normal text-[#8E5AB5] uppercase tracking-wider">
+                            {dObj.dayLabel}
                           </span>
-                          <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider">
+                          <span className="text-[10px] font-normal text-[#100B12]/60 uppercase tracking-wider">
                             {dObj.dateStr}
                           </span>
                         </div>
-                        <div className="mt-3">
-                          <span className="text-sm font-extrabold text-[#0D2B45] block">
-                            {dObj.dayLabel}
-                          </span>
-                          <span className="text-[10px] font-semibold text-neutral-500 mt-0.5 block">
+                        <div className="mt-2.5">
+                          <span className="text-xs font-normal text-[#100B12] block">
                             {dObj.activities.length > 0 ? `${dObj.activities.length} Itinerary Spots` : "Planned Day"}
                           </span>
                         </div>
@@ -1249,83 +1287,66 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                 </div>
               ) : !selectedBag ? (
                 /* STEP 2: SELECT CATEGORY BAG / TYPE */
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between bg-neutral-100 p-2.5 rounded-xl">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-[#0D2B45]" />
-                      <span className="text-xs font-bold text-[#0D2B45]">Selected: {quickDay}</span>
-                    </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between bg-[#DDD0EA]/40 border border-[#B9A6C9]/30 p-2 rounded-xl">
+                    <span className="text-xs font-normal text-[#100B12]">Selected: {quickDay}</span>
                     <button
                       onClick={() => setQuickDay(null)}
-                      className="text-xs font-bold text-primary hover:underline"
+                      className="text-xs font-normal text-[#8E5AB5] hover:underline cursor-pointer"
                     >
                       Change Day
                     </button>
                   </div>
 
-                  <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
-                    Select Category Bag / Type
+                  <p className="text-xs font-normal uppercase tracking-wider text-[#8E5AB5]">
+                    Select Category Type
                   </p>
 
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {CATEGORY_BAGS.map((bag) => {
-                      const IconComp = bag.icon
-                      return (
-                        <button
-                          key={bag.id}
-                          onClick={() => setSelectedBag(bag)}
-                          className="group flex flex-col items-center justify-center rounded-2xl border-2 border-neutral-100 bg-neutral-50/80 p-4 transition-all hover:border-[#0D2B45] hover:bg-white hover:shadow-xl active:scale-95 text-center cursor-pointer"
-                        >
-                          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${bag.bgGradient} text-white shadow-md transition-transform group-hover:scale-110`}>
-                            <IconComp className="h-6 w-6" />
-                          </div>
-                          <span className="mt-2.5 text-xs font-bold text-[#0D2B45] leading-tight">
-                            {bag.shortLabel}
-                          </span>
-                          <span className="text-[10px] text-neutral-400 mt-0.5">
-                            Tap to select
-                          </span>
-                        </button>
-                      )
-                    })}
+                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                    {CATEGORY_BAGS.map((bag) => (
+                      <button
+                        key={bag.id}
+                        onClick={() => setSelectedBag(bag)}
+                        className="group flex flex-col items-center justify-center rounded-xl border border-[#B9A6C9]/40 bg-[#DDD0EA]/30 py-3.5 px-3 transition-all hover:bg-[#DDD0EA] hover:border-[#8E5AB5] active:scale-98 text-center cursor-pointer font-button"
+                      >
+                        <span className="text-xs font-normal text-[#100B12] leading-tight">
+                          {bag.shortLabel}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               ) : (
                 /* STEP 3: ENTER AMOUNT & OPTIONAL COMMENTS */
-                <form onSubmit={handleQuickAddSubmit} className="space-y-4">
+                <form onSubmit={handleQuickAddSubmit} className="space-y-3">
                   
-                  {/* Category Fast Switcher Grid with White Outlines */}
-                  <div className="space-y-2">
+                  {/* Category Fast Switcher Grid */}
+                  <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold uppercase tracking-wider text-neutral-500">
-                        Category Type (Tap to Switch On The Spot)
+                      <label className="text-xs font-normal uppercase tracking-wider text-[#8E5AB5]">
+                        Category Type (Tap to Switch)
                       </label>
-                      <span className="text-[11px] font-extrabold text-[#0D2B45] bg-neutral-100 px-2.5 py-0.5 rounded-full">
+                      <span className="text-[11px] font-normal text-[#100B12] bg-[#DDD0EA]/50 px-2 py-0.5 rounded-lg border border-[#B9A6C9]/30">
                         {quickDay}
                       </span>
                     </div>
 
-                    {/* Small Category Boxes */}
-                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
                       {CATEGORY_BAGS.map((bag) => {
                         const isSelected = selectedBag.id === bag.id
-                        const IconComp = bag.icon
                         return (
                           <button
                             key={bag.id}
                             type="button"
                             onClick={() => setSelectedBag(bag)}
                             title={bag.label}
-                            className={`flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all cursor-pointer text-center ${
+                            className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all cursor-pointer text-center font-button ${
                               isSelected
-                                ? "border-[#0D2B45] bg-white ring-4 ring-white shadow-xl scale-105 z-10"
-                                : "border-neutral-200/80 bg-neutral-50/70 hover:border-neutral-400 hover:bg-white"
+                                ? "border-[#8E5AB5] bg-[#8E5AB5] text-white shadow-sm"
+                                : "border-[#B9A6C9]/40 bg-[#DDD0EA]/30 hover:bg-[#DDD0EA] text-[#100B12]"
                             }`}
                           >
-                            <div className={`flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br ${bag.bgGradient} text-white shadow-sm`}>
-                              <IconComp className="h-3.5 w-3.5" />
-                            </div>
-                            <span className={`text-[9px] mt-1 truncate w-full block font-bold ${isSelected ? "text-[#0D2B45]" : "text-neutral-500"}`}>
+                            <span className="text-[10px] truncate w-full block font-normal">
                               {bag.shortLabel}
                             </span>
                           </button>
@@ -1335,43 +1356,78 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                   </div>
 
                   {/* Highlighted Selected Category Bar */}
-                  <div className="flex items-center justify-between rounded-2xl bg-[#0D2B45]/5 border border-[#0D2B45]/15 p-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${selectedBag.bgGradient} text-white shadow-sm ring-2 ring-white`}>
-                        <selectedBag.icon className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-[#0D2B45] block">{selectedBag.label}</span>
-                        <span className="text-[10px] font-semibold text-amber-500">Active Category Selected</span>
-                      </div>
+                  <div className="flex items-center justify-between rounded-xl bg-[#DDD0EA]/40 border border-[#B9A6C9]/40 p-2.5">
+                    <div>
+                      <span className="text-xs font-normal text-[#100B12] block">{selectedBag.label}</span>
+                      <span className="text-[10px] font-normal text-[#8E5AB5]">Active Category Selected</span>
                     </div>
                   </div>
 
                   {/* Paid By Selection & Amount Input Grid */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2.5">
                     <div>
-                      <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-neutral-600">
-                        Paid By Traveler *
-                      </label>
-                      <select
-                        value={quickPayer || members[0] || "Aaditya"}
-                        onChange={(e) => setQuickPayer(e.target.value)}
-                        className="w-full rounded-2xl border-2 border-neutral-200 bg-neutral-50 px-3 py-3 text-xs font-bold text-[#0D2B45] outline-none focus:border-[#0D2B45] focus:bg-white cursor-pointer"
-                      >
-                        {members.map((m) => (
-                          <option key={m} value={m}>
-                            👤 Paid by {m}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-normal uppercase tracking-wider text-[#8E5AB5]">
+                          Paid By Traveler *
+                        </label>
+                        {!showAddMemberInput && (
+                          <button
+                            type="button"
+                            onClick={() => setShowAddMemberInput(true)}
+                            className="text-[11px] font-normal text-[#8E5AB5] hover:underline cursor-pointer font-button"
+                          >
+                            + Add Person
+                          </button>
+                        )}
+                      </div>
+
+                      {showAddMemberInput ? (
+                        <div className="flex gap-1.5">
+                          <input
+                            type="text"
+                            placeholder="Person name..."
+                            value={newMemberName}
+                            onChange={(e) => setNewMemberName(e.target.value)}
+                            className="w-full rounded-xl border border-[#B9A6C9]/50 bg-white px-3 py-1.5 text-xs font-normal text-[#100B12] outline-none focus:border-[#8E5AB5] font-button"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!newMemberName.trim()) return
+                              const clean = newMemberName.trim()
+                              if (!members.includes(clean)) {
+                                setGroupMembers([...members, clean])
+                              }
+                              setQuickPayer(clean)
+                              setNewMemberName("")
+                              setShowAddMemberInput(false)
+                            }}
+                            className="rounded-xl bg-[#8E5AB5] text-white px-3 py-1.5 text-xs font-normal hover:bg-[#7A4A9E] cursor-pointer font-button shrink-0"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      ) : (
+                        <select
+                          value={quickPayer || members[0] || "Aaditya"}
+                          onChange={(e) => setQuickPayer(e.target.value)}
+                          className="w-full rounded-xl border border-[#B9A6C9]/50 bg-white px-3 py-2 text-xs font-normal text-[#100B12] outline-none focus:border-[#8E5AB5] cursor-pointer font-button"
+                        >
+                          {members.map((m) => (
+                            <option key={m} value={m}>
+                              Paid by {m}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                     </div>
 
                     <div>
-                      <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-neutral-600">
+                      <label className="mb-1 block text-xs font-normal uppercase tracking-wider text-[#8E5AB5]">
                         Amount Spent (₹) *
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-lg font-bold text-neutral-400">₹</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-normal text-[#100B12]/60">₹</span>
                         <input
                           type="number"
                           required
@@ -1379,7 +1435,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                           placeholder="e.g. 450"
                           value={quickAmount}
                           onChange={(e) => setQuickAmount(e.target.value)}
-                          className="w-full rounded-2xl border-2 border-neutral-200 bg-neutral-50 py-3 pl-8 pr-3 text-lg font-extrabold text-[#0D2B45] outline-none focus:border-[#0D2B45] focus:bg-white focus:ring-4 focus:ring-[#0D2B45]/10"
+                          className="w-full rounded-xl border border-[#B9A6C9]/50 bg-white py-2 pl-7 pr-3 text-sm font-normal text-[#100B12] outline-none focus:border-[#8E5AB5]"
                         />
                       </div>
                     </div>
@@ -1387,7 +1443,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
 
                   {/* Optional Comment / Note Box */}
                   <div>
-                    <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-neutral-600">
+                    <label className="mb-1 block text-xs font-normal uppercase tracking-wider text-[#8E5AB5]">
                       Comments / Item Note (Optional)
                     </label>
                     <input
@@ -1395,24 +1451,23 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                       placeholder="e.g. Dinner at Martin's Corner"
                       value={quickComment}
                       onChange={(e) => setQuickComment(e.target.value)}
-                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-800 outline-none focus:border-[#0D2B45] focus:bg-white"
+                      className="w-full rounded-xl border border-[#B9A6C9]/50 bg-white p-2.5 text-xs text-[#100B12] outline-none focus:border-[#8E5AB5]"
                     />
                   </div>
 
                   {/* Submit Action */}
-                  <div className="pt-2 flex gap-3">
+                  <div className="pt-1 flex gap-2.5">
                     <button
                       type="button"
                       onClick={() => setSelectedBag(null)}
-                      className="w-1/3 rounded-xl border border-neutral-200 py-3 text-xs font-bold text-neutral-600 hover:bg-neutral-100"
+                      className="w-1/3 rounded-xl border border-[#B9A6C9]/50 bg-[#DDD0EA]/40 hover:bg-[#DDD0EA] py-2.5 text-xs font-normal text-[#100B12] cursor-pointer font-button"
                     >
                       Back
                     </button>
                     <button
                       type="submit"
-                      className="w-2/3 rounded-xl bg-[#0D2B45] py-3 text-xs font-bold text-white shadow-lg hover:bg-[#12395b] transition-all flex items-center justify-center gap-2"
+                      className="w-2/3 rounded-xl bg-[#8E5AB5] hover:bg-[#7A4A9E] py-2.5 text-xs font-normal text-white shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer font-button"
                     >
-                      <CheckCircle2 className="h-4 w-4 text-amber-400" />
                       Save Expense
                     </button>
                   </div>

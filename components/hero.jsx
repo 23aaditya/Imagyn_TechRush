@@ -18,7 +18,10 @@ import {
   AlertCircle,
   Play,
   Pause,
-  Film
+  Film,
+  Check,
+  Coins,
+  Edit3
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -125,6 +128,13 @@ export function Hero({ onStartPlanning }) {
   // Budget state
   const [selectedBudget, setSelectedBudget] = useState("Any budget")
   const [customBudgetInput, setCustomBudgetInput] = useState("")
+  const [isBudgetDropdownOpen, setIsBudgetDropdownOpen] = useState(false)
+  const budgetRef = useRef(null)
+
+  // Travel Type state
+  const [selectedTravelType, setSelectedTravelType] = useState("Any Type")
+  const [isTravelTypeDropdownOpen, setIsTravelTypeDropdownOpen] = useState(false)
+  const travelTypeRef = useRef(null)
 
   // Load recent searches on mount
   useEffect(() => {
@@ -144,7 +154,7 @@ export function Hero({ onStartPlanning }) {
     return () => clearInterval(timer)
   }, [])
 
-  // Handle outside click for search dropdown and range calendar
+  // Handle outside click for search dropdown, range calendar, and custom dropdowns
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -152,6 +162,12 @@ export function Hero({ onStartPlanning }) {
       }
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
         setIsCalendarOpen(false)
+      }
+      if (budgetRef.current && !budgetRef.current.contains(e.target)) {
+        setIsBudgetDropdownOpen(false)
+      }
+      if (travelTypeRef.current && !travelTypeRef.current.contains(e.target)) {
+        setIsTravelTypeDropdownOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -199,7 +215,8 @@ export function Hero({ onStartPlanning }) {
   const handleScrollDownToSearch = () => {
     const searchSection = document.getElementById("search-video-hero")
     if (searchSection) {
-      searchSection.scrollIntoView({ behavior: "smooth" })
+      const topPos = searchSection.getBoundingClientRect().top + window.pageYOffset
+      window.scrollTo({ top: topPos, behavior: "smooth" })
     } else {
       window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
     }
@@ -287,14 +304,11 @@ export function Hero({ onStartPlanning }) {
             </button>
           </motion.div>
         </div>
-
-        {/* 1cm White Line at the very bottom of Landing Page */}
-        <div className="absolute bottom-0 inset-x-0 h-3 sm:h-3.5 bg-white shadow-xs z-20" />
       </section>
 
       {/* 2. FULL SCREEN VIDEO SEARCH HERO SECTION (Appears smoothly on scroll down) */}
-      <section id="search-video-hero" className="relative min-h-screen w-full overflow-hidden select-none flex flex-col items-center justify-center py-12 px-4 sm:px-6 space-y-6">
-        
+      <section id="search-video-hero" className="relative min-h-screen w-full overflow-hidden select-none flex flex-col items-center justify-center pt-24 pb-12 px-4 sm:px-6 space-y-6">
+
         {/* Fullscreen Video Background Playlist (Zero-Gap Instant Switch) */}
         <div className="absolute inset-0 z-0 overflow-hidden bg-black">
           {HERO_TRAVEL_VIDEOS.map((vid, idx) => {
@@ -616,19 +630,27 @@ export function Hero({ onStartPlanning }) {
                 </AnimatePresence>
               </div>
 
-              {/* 3. Budget Picker in INR */}
-              <div className="md:col-span-2">
-                <label className="flex cursor-pointer flex-col justify-center rounded-md border border-white/30 bg-white/15 backdrop-blur-xl px-3.5 py-2.5 transition-all focus-within:border-white hover:bg-white/20 shadow-sm">
-                  <span className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-white/80">
+              {/* 3. Luxury Custom Budget Picker */}
+              <div className="md:col-span-2 relative" ref={budgetRef}>
+                <div
+                  onClick={() => {
+                    setIsBudgetDropdownOpen(!isBudgetDropdownOpen)
+                    setIsTravelTypeDropdownOpen(false)
+                    setIsCalendarOpen(false)
+                    setIsDropdownOpen(false)
+                  }}
+                  className="flex cursor-pointer flex-col justify-center rounded-xl border border-white/30 bg-white/15 backdrop-blur-xl px-3.5 py-2.5 transition-all hover:bg-white/25 shadow-sm font-button select-none"
+                >
+                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-white/80">
                     <span>Budget (₹)</span>
                     {selectedBudget === "Custom" && (
-                      <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">Custom</span>
+                      <span className="text-[9px] font-bold text-[#C8A985] uppercase tracking-wider">Custom</span>
                     )}
-                  </span>
+                  </div>
 
                   {selectedBudget === "Custom" ? (
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <span className="text-xs font-bold text-amber-400">₹</span>
+                    <div className="flex items-center gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
+                      <span className="text-xs font-bold text-[#C8A985]">₹</span>
                       <input
                         type="number"
                         placeholder="e.g. 25000"
@@ -639,71 +661,163 @@ export function Hero({ onStartPlanning }) {
                       />
                       <button
                         type="button"
-                        onClick={() => setSelectedBudget("Any budget")}
-                        className="text-[10px] text-white/60 hover:text-white underline cursor-pointer"
+                        onClick={() => {
+                          setSelectedBudget("Any budget")
+                          setCustomBudgetInput("")
+                        }}
+                        className="text-[10px] text-white/70 hover:text-white underline cursor-pointer"
                       >
                         Reset
                       </button>
                     </div>
                   ) : (
-                    <select
-                      value={selectedBudget}
-                      onChange={(e) => setSelectedBudget(e.target.value)}
-                      className="w-full cursor-pointer bg-transparent text-xs font-semibold text-white focus:outline-none"
-                    >
-                      <option value="Any budget" className="bg-neutral-900 text-white">Any Budget</option>
-                      <option value="Under ₹5,000" className="bg-neutral-900 text-white">Under ₹5,000</option>
-                      <option value="₹5,000 – ₹15,000" className="bg-neutral-900 text-white">₹5,000 – ₹15,000</option>
-                      <option value="₹15,000 – ₹35,000" className="bg-neutral-900 text-white">₹15,000 – ₹35,000</option>
-                      <option value="₹35,000+" className="bg-neutral-900 text-white">₹35,000+</option>
-                      <option value="Custom" className="bg-neutral-900 font-bold text-amber-400">Enter Custom Budget (₹)...</option>
-                    </select>
+                    <div className="flex items-center justify-between mt-0.5">
+                      <span className="text-xs font-semibold text-white truncate">
+                        {selectedBudget}
+                      </span>
+                      <ChevronDown className={`h-3.5 w-3.5 text-white/80 transition-transform duration-200 ${isBudgetDropdownOpen ? "rotate-180" : ""}`} />
+                    </div>
                   )}
-                </label>
+                </div>
+
+                {/* Custom Luxury Budget Options Panel */}
+                <AnimatePresence>
+                  {isBudgetDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute left-0 w-full top-full z-50 mt-1.5 max-h-56 overflow-y-auto rounded-xl border border-white/20 bg-[#18131B]/95 p-1.5 shadow-2xl backdrop-blur-2xl text-white select-none"
+                    >
+                      {[
+                        { label: "Any budget", desc: "No budget constraints" },
+                        { label: "Under ₹5,000", desc: "Budget friendly trip" },
+                        { label: "₹5,000 – ₹15,000", desc: "Standard comfortable stay" },
+                        { label: "₹15,000 – ₹35,000", desc: "Moderate premium experiences" },
+                        { label: "₹35,000+", desc: "Luxury 5-star travel" },
+                        { label: "Custom", desc: "Enter exact custom amount" },
+                      ].map((opt) => {
+                        const isSelected = selectedBudget === opt.label
+                        return (
+                          <button
+                            key={opt.label}
+                            type="button"
+                            onClick={() => {
+                              setSelectedBudget(opt.label)
+                              setIsBudgetDropdownOpen(false)
+                            }}
+                            className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-all cursor-pointer font-button mb-1 last:mb-0 ${
+                              isSelected
+                                ? "bg-[#8E5AB5] text-white font-semibold shadow-sm"
+                                : "hover:bg-white/15 text-white/90"
+                            }`}
+                          >
+                            <div>
+                              <div className="font-semibold text-xs">{opt.label}</div>
+                              <div className={`text-[10px] ${isSelected ? "text-white/80" : "text-white/60"}`}>{opt.desc}</div>
+                            </div>
+                            {isSelected && <Check className="h-4 w-4 text-white shrink-0 ml-2" />}
+                          </button>
+                        )
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              {/* 4. Travel Type */}
-              <div className="md:col-span-2">
-                <label className="flex cursor-pointer flex-col justify-center rounded-md border border-white/20 bg-white/10 px-3.5 py-2.5 transition-colors focus-within:border-white hover:bg-white/15">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/70">
+              {/* 4. Luxury Custom Travel Type / Companion Picker */}
+              <div className="md:col-span-2 relative" ref={travelTypeRef}>
+                <div
+                  onClick={() => {
+                    setIsTravelTypeDropdownOpen(!isTravelTypeDropdownOpen)
+                    setIsBudgetDropdownOpen(false)
+                    setIsCalendarOpen(false)
+                    setIsDropdownOpen(false)
+                  }}
+                  className="flex cursor-pointer flex-col justify-center rounded-xl border border-white/30 bg-white/15 backdrop-blur-xl px-3.5 py-2.5 transition-all hover:bg-white/25 shadow-sm font-button select-none"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">
                     Travel Type
                   </span>
-                  <select className="w-full cursor-pointer bg-transparent text-xs font-semibold text-white focus:outline-none">
-                    <option className="bg-neutral-900 text-white">Any Type</option>
-                    <option className="bg-neutral-900 text-white">Solo</option>
-                    <option className="bg-neutral-900 text-white">Couple</option>
-                    <option className="bg-neutral-900 text-white">Family</option>
-                    <option className="bg-neutral-900 text-white">Friends</option>
-                  </select>
-                </label>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <span className="text-xs font-semibold text-white truncate">
+                      {selectedTravelType}
+                    </span>
+                    <ChevronDown className={`h-3.5 w-3.5 text-white/80 transition-transform duration-200 ${isTravelTypeDropdownOpen ? "rotate-180" : ""}`} />
+                  </div>
+                </div>
+
+                {/* Custom Luxury Travel Type Options Panel */}
+                <AnimatePresence>
+                  {isTravelTypeDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute left-0 w-full top-full z-50 mt-1.5 max-h-56 overflow-y-auto rounded-xl border border-white/20 bg-[#18131B]/95 p-1.5 shadow-2xl backdrop-blur-2xl text-white select-none"
+                    >
+                      {[
+                        { label: "Any Type", desc: "Flexible travel companion" },
+                        { label: "Solo", desc: "Independent exploration" },
+                        { label: "Couple", desc: "Romantic & quiet getaway" },
+                        { label: "Family", desc: "Kid-friendly & relaxed" },
+                        { label: "Friends", desc: "High-energy social trip" },
+                      ].map((opt) => {
+                        const isSelected = selectedTravelType === opt.label
+                        return (
+                          <button
+                            key={opt.label}
+                            type="button"
+                            onClick={() => {
+                              setSelectedTravelType(opt.label)
+                              setIsTravelTypeDropdownOpen(false)
+                            }}
+                            className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-all cursor-pointer font-button mb-1 last:mb-0 ${
+                              isSelected
+                                ? "bg-[#8E5AB5] text-white font-semibold shadow-sm"
+                                : "hover:bg-white/15 text-white/90"
+                            }`}
+                          >
+                            <div>
+                              <div className="font-semibold text-xs">{opt.label}</div>
+                              <div className={`text-[10px] ${isSelected ? "text-white/80" : "text-white/60"}`}>{opt.desc}</div>
+                            </div>
+                            {isSelected && <Check className="h-4 w-4 text-white shrink-0 ml-2" />}
+                          </button>
+                        )
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
             </div>
 
             {/* Validation & Duration Display */}
             {dateError && (
-              <div className="mt-3 flex items-center gap-2 rounded-sm bg-rose-500/20 border border-rose-500/30 p-2.5 text-xs text-rose-200">
+              <div className="mt-3 flex items-center gap-2 rounded-xl bg-rose-500/20 border border-rose-500/30 p-2.5 text-xs text-rose-200">
                 <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
                 <span>{dateError}</span>
               </div>
             )}
 
             {tripDuration && !dateError && (
-              <div className="mt-3 flex items-center gap-2 rounded-sm bg-emerald-500/20 border border-emerald-500/30 p-2.5 text-xs font-semibold text-emerald-300">
+              <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-500/20 border border-emerald-500/30 p-2.5 text-xs font-semibold text-emerald-300">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
                 <span>Trip Duration Calculated: {tripDuration} {tripDuration === 1 ? "Day" : "Days"}</span>
               </div>
             )}
 
-            {/* Submit CTA */}
+            {/* Submit CTA - Rectangular with slightly curved ends */}
             <Button
               onClick={() => {
                 const targetDest = query.trim()
                 onStartPlanning?.("itinerary", targetDest)
               }}
-              className="mt-5 h-11 w-full rounded-xl bg-white text-neutral-900 text-xs font-semibold uppercase tracking-wider shadow-sm hover:bg-white/90 transition-all cursor-pointer font-button"
+              className="mt-5 h-11 w-full rounded-xl bg-white text-neutral-900 text-xs font-bold uppercase tracking-wider shadow-sm hover:bg-white/90 transition-all cursor-pointer font-button"
             >
-              <Search className="mr-1.5 h-4 w-4 text-[#00356B]" />
               Plan Itinerary
             </Button>
           </motion.div>

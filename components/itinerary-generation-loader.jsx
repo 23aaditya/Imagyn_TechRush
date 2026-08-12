@@ -30,7 +30,7 @@ export function ItineraryGenerationLoader({ destination = "Goa", days = 3 }) {
   ]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-xl overflow-hidden select-none">
+    <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-xl overflow-hidden select-none">
       <motion.div
         initial={{ opacity: 0, scale: 0.94, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}

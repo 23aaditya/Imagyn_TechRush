@@ -43,6 +43,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTrip } from "@/context/trip-context"
+import { PlannerTransitionLoader } from "@/components/planner-transition-loader"
 import { DoodleBackground } from "@/components/doodle-background"
 import destinationsData from "@/destinations_105.json"
 import { ItineraryGenerationLoader } from "./itinerary-generation-loader"
@@ -271,6 +272,7 @@ const buildItineraryData = (cityName, totalDays, startStr) => {
 }
 
 export function ItineraryPlanner({ onBack, onNavigateView }) {
+  const [showTransitionLoader, setShowTransitionLoader] = useState(true)
   // Centralized Trip Context
   const {
     destination,
@@ -833,6 +835,13 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
   return (
     <div className="min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20 relative overflow-hidden">
+      {/* Overview Search -> Planner Transition Overlay */}
+      <AnimatePresence>
+        {showTransitionLoader && (
+          <PlannerTransitionLoader onComplete={() => setShowTransitionLoader(false)} />
+        )}
+      </AnimatePresence>
+
       {/* Travel Doodles Background */}
       <DoodleBackground />
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -858,7 +867,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               <Button
                 size="sm"
                 onClick={() => setShowPreferences((prev) => !prev)}
-                className="rounded-xl bg-[#00356B] text-white hover:bg-[#002852] text-xs font-medium px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all shadow-md font-button"
+                className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] text-xs font-medium px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all shadow-md font-button"
               >
                 <SlidersHorizontal className="h-4 w-4 text-white" />
                 <span>{showPreferences ? "Hide Trip Options" : "Edit Trip Options"}</span>
@@ -870,7 +879,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 setSaved(true)
                 setTimeout(() => setSaved(false), 3000)
               }}
-              className="rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-xs uppercase tracking-wider px-5 py-2.5 shadow-md shadow-[#00356B]/30 flex items-center gap-2 cursor-pointer transition-all font-button"
+              className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] font-medium text-xs uppercase tracking-wider px-5 py-2.5 shadow-md shadow-[#8E5AB5]/30 flex items-center gap-2 cursor-pointer transition-all font-button"
             >
               <Bookmark className="h-4 w-4 text-white" />
               {saved ? "Saved! Opening Report Pass..." : "Save Trip & Offline Pass"}
@@ -914,12 +923,12 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 value={searchQuery}
                 onChange={(e) => handleSearchInputChange(e.target.value)}
                 onFocus={() => searchQuery.trim() && setShowSearchDropdown(true)}
-                className="w-full rounded-xl border-2 border-[#00356B]/40 bg-[#00356B]/10 pl-11 pr-28 py-3 text-xs font-medium text-foreground outline-none focus:ring-2 focus:ring-[#00356B]/40 font-button"
+                className="w-full rounded-xl border-none bg-[#DDD0EA] pl-11 pr-28 py-3 text-xs font-medium text-[#100B12] placeholder-[#100B12]/60 outline-none font-button"
               />
               <Button
                 type="submit"
                 size="sm"
-                className="absolute right-1.5 rounded-xl bg-[#00356B] text-white hover:bg-[#002852] text-xs font-medium px-5 py-2 shadow-sm font-button"
+                className="absolute right-1.5 rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] text-xs font-medium px-5 py-2 shadow-sm font-button"
               >
                 Search
               </Button>
@@ -949,8 +958,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               >
                 {/* Minimal Left Page Atlas Header */}
                 <div className="flex items-center justify-between px-4 py-2 border-b border-border/60 bg-card/90 text-xs font-semibold text-muted-foreground shrink-0 font-button">
-                  <span className="flex items-center gap-1.5 text-[#00356B] dark:text-[#86B3E6] font-heading">
-                    <Compass className="h-3.5 w-3.5 text-[#00356B] dark:text-[#86B3E6]" />
+                  <span className="flex items-center gap-1.5 text-[#8E5AB5] dark:text-[#86B3E6] font-heading">
+                    <Compass className="h-3.5 w-3.5 text-[#8E5AB5] dark:text-[#86B3E6]" />
                     Atlas Map Page
                   </span>
                   <span className="text-[10px] text-muted-foreground uppercase tracking-wider hidden sm:inline">
@@ -983,7 +992,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 <div className="border-b border-border/80 pb-4 space-y-1">
                   <div className="flex items-center justify-between">
                     <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-[#00356B] dark:text-[#86B3E6]" />
+                      <Sparkles className="h-4 w-4 text-[#8E5AB5] dark:text-[#86B3E6]" />
                       Trip Preferences
                     </h3>
                     <span className="text-xs font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/40 border border-rose-200/50 px-2.5 py-0.5 rounded-xl flex items-center gap-1">
@@ -1004,25 +1013,25 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     <button
                       type="button"
                       onClick={() => setDestPlanningMode("explore")}
-                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 font-button ${
+                      className={`p-3 rounded-xl text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 font-button ${
                         destPlanningMode === "explore"
-                          ? "border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] font-medium shadow-xs"
-                          : "border-border text-muted-foreground hover:border-border/80"
+                          ? "bg-[#DDD0EA] text-[#100B12] font-medium shadow-xs"
+                          : "bg-neutral-100 dark:bg-neutral-800 text-muted-foreground hover:bg-[#DDD0EA]/60 hover:text-[#100B12]"
                       }`}
                     >
-                      <Compass className="h-4 w-4 text-[#00356B] dark:text-[#86B3E6]" />
+                      <Compass className="h-4 w-4 text-[#100B12]" />
                       <span>Plan via Explore</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setDestPlanningMode("custom")}
-                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 font-button ${
+                      className={`p-3 rounded-xl text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 font-button ${
                         destPlanningMode === "custom"
-                          ? "border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] font-medium shadow-xs"
-                          : "border-border text-muted-foreground hover:border-border/80"
+                          ? "bg-[#DDD0EA] text-[#100B12] font-medium shadow-xs"
+                          : "bg-neutral-100 dark:bg-neutral-800 text-muted-foreground hover:bg-[#DDD0EA]/60 hover:text-[#100B12]"
                       }`}
                     >
-                      <MapPin className="h-4 w-4 text-[#00356B] dark:text-[#86B3E6]" />
+                      <MapPin className="h-4 w-4 text-[#100B12]" />
                       <span>Direct Custom Location</span>
                     </button>
                   </div>
@@ -1045,7 +1054,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                             setCustomDestInput(e.target.value)
                           }
                         }}
-                        className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#00356B] cursor-pointer appearance-none font-button"
+                        className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#8E5AB5] cursor-pointer appearance-none font-button"
                       >
                         <option value="" disabled>-- Select Destination --</option>
                         {destinationsData.map((d) => (
@@ -1058,7 +1067,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     </div>
                   ) : (
                     <div className="relative flex items-center">
-                      <MapPin className="absolute left-3.5 h-4 w-4 text-[#00356B] shrink-0" />
+                      <MapPin className="absolute left-3.5 h-4 w-4 text-[#8E5AB5] shrink-0" />
                       <input
                         type="text"
                         placeholder="Enter city or location..."
@@ -1069,7 +1078,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                             setDestination(e.target.value.trim())
                           }
                         }}
-                        className="w-full rounded-xl border border-border bg-background pl-9 pr-3 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#00356B] font-button"
+                        className="w-full rounded-xl border border-border bg-background pl-9 pr-3 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#8E5AB5] font-button"
                       />
                     </div>
                   )}
@@ -1083,10 +1092,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   <button
                     type="button"
                     onClick={() => setCalendarOpen(!calendarOpen)}
-                    className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-xs font-medium text-foreground shadow-sm hover:border-[#00356B] transition-all cursor-pointer font-button"
+                    className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-xs font-medium text-foreground shadow-sm hover:border-[#8E5AB5] transition-all cursor-pointer font-button"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Calendar className="h-4 w-4 text-[#00356B] dark:text-[#86B3E6]" />
+                      <Calendar className="h-4 w-4 text-[#8E5AB5] dark:text-[#86B3E6]" />
                       <span>{startDate} → {endDate} ({days} {days === 1 ? "Day" : "Days"})</span>
                     </div>
                     <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${calendarOpen ? "rotate-90" : ""}`} />
@@ -1102,7 +1111,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     >
                       <div className="flex items-center justify-between border-b border-border/80 pb-2">
                         <span className="text-xs font-semibold text-foreground">Select Travel Dates</span>
-                        <Button size="sm" onClick={() => setCalendarOpen(false)} className="rounded-xl bg-[#00356B] text-xs font-medium text-white px-3 py-1 font-button">Set</Button>
+                        <Button size="sm" onClick={() => setCalendarOpen(false)} className="rounded-xl bg-[#8E5AB5] text-xs font-medium text-white px-3 py-1 font-button">Set</Button>
                       </div>
                       <div className="grid grid-cols-7 text-center text-[10px] font-semibold text-muted-foreground">
                         {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
@@ -1132,9 +1141,9 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                               }}
                               className={`py-1.5 text-xs font-medium transition-all font-button ${
                                 isStart || isEnd
-                                  ? "bg-[#00356B] text-white rounded-lg font-medium shadow-md scale-105"
+                                  ? "bg-[#8E5AB5] text-white rounded-lg font-medium shadow-md scale-105"
                                   : isInRange
-                                    ? "bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] font-medium rounded-sm border-y border-[#00356B]/30"
+                                    ? "bg-[#8E5AB5]/15 text-[#8E5AB5] dark:text-[#86B3E6] font-medium rounded-sm border-y border-[#8E5AB5]/30"
                                     : "hover:bg-accent text-foreground rounded-lg"
                               }`}
                             >
@@ -1160,7 +1169,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                         onClick={() => setTravelStyle(style)}
                         className={`rounded-xl border p-2.5 text-xs font-medium transition-all cursor-pointer font-button ${
                           travelStyle === style
-                            ? "border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] font-medium shadow-sm"
+                            ? "border-[#8E5AB5] bg-[#8E5AB5]/15 text-[#8E5AB5] dark:text-[#86B3E6] font-medium shadow-sm"
                             : "border-border text-muted-foreground hover:border-border/80"
                         }`}
                       >
@@ -1190,7 +1199,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                         }}
                         className={`rounded-xl border py-2.5 px-1 text-center text-xs font-medium transition-all cursor-pointer font-button ${
                           budgetTier === b.tier
-                            ? "border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] font-medium shadow-sm"
+                            ? "border-[#8E5AB5] bg-[#8E5AB5]/15 text-[#8E5AB5] dark:text-[#86B3E6] font-medium shadow-sm"
                             : "border-border text-muted-foreground hover:border-border/80"
                         }`}
                       >
@@ -1204,7 +1213,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 <Button
                   onClick={() => handleGenerate()}
                   disabled={isGenerating}
-                  className="w-full rounded-xl bg-[#00356B] py-3.5 font-medium text-white hover:bg-[#002852] shadow-md shadow-[#00356B]/30 disabled:opacity-50 cursor-pointer transition-all font-button"
+                  className="w-full rounded-xl bg-[#8E5AB5] py-3.5 font-medium text-white hover:bg-[#7B4A9E] shadow-md shadow-[#8E5AB5]/30 disabled:opacity-50 cursor-pointer transition-all font-button"
                 >
                   {isGenerating ? (
                     <span className="flex items-center gap-2">
@@ -1229,10 +1238,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               const touch = e.touches[0]
               handleMouseDownResize({ preventDefault: () => {}, clientX: touch.clientX })
             }}
-            className="hidden lg:flex w-2.5 bg-muted/60 hover:bg-[#00356B]/30 border-x border-border/60 cursor-col-resize items-center justify-center transition-colors group shrink-0 select-none z-20"
+            className="hidden lg:flex w-2.5 bg-muted/60 hover:bg-[#8E5AB5]/30 border-x border-border/60 cursor-col-resize items-center justify-center transition-colors group shrink-0 select-none z-20"
             title="Drag left/right to resize split width"
           >
-              <div className="h-8 w-1 rounded-full bg-muted-foreground/40 group-hover:bg-[#00356B] transition-colors flex items-center justify-center">
+              <div className="h-8 w-1 rounded-full bg-muted-foreground/40 group-hover:bg-[#8E5AB5] transition-colors flex items-center justify-center">
                 <GripVertical className="h-3 w-3 text-muted-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </div>
@@ -1253,7 +1262,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
             {!itinerary || itinerary.length === 0 || !destination ? (
               <div className="rounded-3xl border border-dashed border-border bg-card/60 p-12 text-center space-y-4 flex flex-col items-center justify-center min-h-[420px]">
-                <div className="h-16 w-16 rounded-full bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] flex items-center justify-center">
+                <div className="h-16 w-16 rounded-full bg-[#8E5AB5]/15 text-[#8E5AB5] dark:text-[#86B3E6] flex items-center justify-center">
                   <Compass className="h-8 w-8 animate-pulse" />
                 </div>
                 <h3 className="font-heading text-xl font-bold text-foreground">
@@ -1267,7 +1276,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 {destination && (
                   <Button
                     onClick={() => handleGenerate()}
-                    className="rounded-xl bg-[#00356B] px-6 py-2.5 font-medium text-white shadow-md hover:bg-[#002852] font-button"
+                    className="rounded-xl bg-[#8E5AB5] px-6 py-2.5 font-medium text-white shadow-md hover:bg-[#7B4A9E] font-button"
                   >
                     Generate {destination} Itinerary
                   </Button>
@@ -1279,8 +1288,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 {/* Generated Itinerary Top Card */}
                 <div className="rounded-3xl border border-border bg-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
                   <div className="space-y-1">
-                    <div className="text-xs font-semibold text-[#00356B] dark:text-[#86B3E6] uppercase tracking-wider flex items-center gap-1.5 font-button">
-                      <MapPin className="h-3.5 w-3.5 text-[#00356B] dark:text-[#86B3E6]" />
+                    <div className="text-xs font-semibold text-[#8E5AB5] dark:text-[#86B3E6] uppercase tracking-wider flex items-center gap-1.5 font-button">
+                      <MapPin className="h-3.5 w-3.5 text-[#8E5AB5] dark:text-[#86B3E6]" />
                       <span>{(destination || "GOA").toUpperCase()}</span>
                     </div>
                     <h2 className="font-heading text-2xl sm:text-3xl font-bold text-foreground">
@@ -1297,9 +1306,9 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                         setSaved(true)
                         setTimeout(() => setSaved(false), 3000)
                       }}
-                      className="rounded-xl border border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] hover:bg-[#00356B]/25 text-xs font-medium px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all font-button"
+                      className="rounded-xl border-none bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] text-xs font-medium px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all font-button"
                     >
-                      <Bookmark className="h-4 w-4 text-[#00356B] dark:text-[#86B3E6]" />
+                      <Bookmark className="h-4 w-4 text-[#100B12]" />
                       <span>{saved ? "Saved!" : "Save Trip"}</span>
                     </Button>
 
@@ -1307,9 +1316,9 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                       type="button"
                       variant="outline"
                       onClick={() => onNavigateView("budget")}
-                      className="rounded-xl border border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] hover:bg-[#00356B]/25 text-xs font-medium px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all font-button"
+                      className="rounded-xl border-none bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] text-xs font-medium px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all font-button"
                     >
-                      <Wallet className="h-4 w-4 text-[#00356B] dark:text-[#86B3E6]" />
+                      <Wallet className="h-4 w-4 text-[#100B12]" />
                       <span>Budget</span>
                     </Button>
                   </div>
@@ -1327,10 +1336,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                           key={idx}
                           type="button"
                           onClick={() => setActiveDayIndex(idx)}
-                          className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all cursor-pointer text-left font-button shrink-0 ${
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all cursor-pointer text-left font-button shrink-0 border-none ${
                             isActive
-                              ? "bg-[#00356B] text-white font-medium shadow-md shadow-[#00356B]/25"
-                              : "bg-[#00356B]/10 border border-[#00356B]/30 text-[#00356B] dark:text-[#86B3E6] hover:bg-[#00356B]/20"
+                              ? "bg-[#8E5AB5] text-white font-medium shadow-md"
+                              : "bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD]"
                           }`}
                         >
                           <div>
@@ -1352,7 +1361,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     {/* Day Header */}
                     <div className="flex items-center justify-between border-b border-border/80 pb-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-[#00356B] text-white flex items-center justify-center font-medium text-sm shrink-0 shadow-sm">
+                        <div className="h-10 w-10 rounded-full bg-[#8E5AB5] text-white flex items-center justify-center font-medium text-sm shrink-0 shadow-sm">
                           D{itinerary[activeDayIndex]?.day || activeDayIndex + 1}
                         </div>
                         <div>
@@ -1422,9 +1431,9 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                               }}
                               className={`group relative rounded-2xl border p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all cursor-grab active:cursor-grabbing ${
                                 draggedSpotIdx === idx
-                                  ? "opacity-30 border-dashed border-[#00356B] bg-[#00356B]/5 scale-[0.98]"
+                                  ? "opacity-30 border-dashed border-[#8E5AB5] bg-[#8E5AB5]/5 scale-[0.98]"
                                   : dragOverSpotIdx === idx
-                                  ? "border-2 border-[#00356B] bg-[#00356B]/10 shadow-lg scale-[1.01]"
+                                  ? "border-2 border-[#8E5AB5] bg-[#8E5AB5]/10 shadow-lg scale-[1.01]"
                                   : "border-border bg-background/60 hover:shadow-sm"
                               }`}
                             >
@@ -1520,7 +1529,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 <button
                                   type="button"
                                   onClick={() => setActiveSpotDetail({ ...act, dayIndex: activeDayIndex, spotIndex: idx })}
-                                  className="rounded-xl border border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] hover:bg-[#00356B] hover:text-white px-3.5 py-1 text-xs font-medium transition-all flex items-center gap-1 cursor-pointer shadow-xs font-button"
+                                  className="rounded-xl border border-[#8E5AB5] bg-[#8E5AB5]/15 text-[#8E5AB5] dark:text-[#86B3E6] hover:bg-[#8E5AB5] hover:text-white px-3.5 py-1 text-xs font-medium transition-all flex items-center gap-1 cursor-pointer shadow-xs font-button"
                                 >
                                   <Globe className="h-3 w-3" />
                                   <span>More Info</span>
@@ -1578,7 +1587,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                           })
                           setAddSpotModalOpen(true)
                         }}
-                        className="rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-xs px-5 py-2.5 shadow-md shadow-[#00356B]/25 flex items-center gap-1.5 cursor-pointer font-button"
+                        className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] font-medium text-xs px-5 py-2.5 shadow-md shadow-[#8E5AB5]/25 flex items-center gap-1.5 cursor-pointer font-button"
                       >
                         <Plus className="h-4 w-4" />
                         Add Custom Spot to Day {activeDayIndex + 1}
@@ -1711,7 +1720,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         <button
           type="button"
           onClick={() => setIsMapVisible(!isMapVisible)}
-          className="rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-xs px-4 py-2.5 shadow-md hover:shadow-lg transition-all flex items-center cursor-pointer font-button"
+          className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] font-medium text-xs px-4 py-2.5 shadow-md hover:shadow-lg transition-all flex items-center cursor-pointer font-button"
         >
           <span>{!isMapVisible ? "Interactive Map" : "Show Planner"}</span>
         </button>
@@ -1719,7 +1728,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         <button
           type="button"
           onClick={() => setChecklistOpen(true)}
-          className="rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-xs px-4 py-2.5 shadow-md hover:shadow-lg transition-all flex items-center cursor-pointer font-button"
+          className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] font-medium text-xs px-4 py-2.5 shadow-md hover:shadow-lg transition-all flex items-center cursor-pointer font-button"
         >
           <span>Packing Checklist</span>
         </button>
@@ -1727,7 +1736,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         <button
           type="button"
           onClick={() => { setNotesOpen(true); setNotesView("list") }}
-          className="rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-xs px-4 py-2.5 shadow-md hover:shadow-lg transition-all flex items-center cursor-pointer font-button"
+          className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] font-medium text-xs px-4 py-2.5 shadow-md hover:shadow-lg transition-all flex items-center cursor-pointer font-button"
         >
           <span>Travel Notes</span>
         </button>
@@ -1788,7 +1797,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   onChange={(e) => setNewChecklistItem(e.target.value)}
                   className="flex-1 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-xs text-neutral-900 outline-none focus:border-[#0D2B45] focus:bg-white"
                 />
-                <Button type="submit" className="rounded-xl bg-[#00356B] text-white px-4 py-2.5 text-xs font-medium hover:bg-[#002852] font-button">
+                <Button type="submit" className="rounded-xl bg-[#8E5AB5] text-white px-4 py-2.5 text-xs font-medium hover:bg-[#7B4A9E] font-button">
                   <Plus className="h-4 w-4" />
                 </Button>
               </form>
@@ -1891,7 +1900,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   <button
                     type="button"
                     onClick={() => setNotesView("add")}
-                    className="w-full rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-xs py-3 transition-all cursor-pointer font-button flex items-center justify-center gap-2 shadow-md"
+                    className="w-full rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] font-medium text-xs py-3 transition-all cursor-pointer font-button flex items-center justify-center gap-2 shadow-md"
                   >
                     <Plus className="h-4 w-4" />
                     Add New Note
@@ -1952,14 +1961,14 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     placeholder="Note Title (e.g. Driver Phone Number...)"
                     value={newNoteTitle}
                     onChange={(e) => setNewNoteTitle(e.target.value)}
-                    className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs font-medium text-neutral-900 outline-none focus:border-[#00356B] focus:bg-white transition-colors"
+                    className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs font-medium text-neutral-900 outline-none focus:border-[#8E5AB5] focus:bg-white transition-colors"
                   />
                   <textarea
                     placeholder="Note Details / References..."
                     value={newNoteText}
                     onChange={(e) => setNewNoteText(e.target.value)}
                     rows={4}
-                    className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-800 outline-none focus:border-[#00356B] focus:bg-white transition-colors resize-none"
+                    className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-800 outline-none focus:border-[#8E5AB5] focus:bg-white transition-colors resize-none"
                   />
                   <div className="flex gap-3">
                     <button
@@ -1969,7 +1978,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     >
                       Cancel
                     </button>
-                    <Button type="submit" className="flex-1 rounded-xl bg-[#00356B] text-white py-2.5 text-xs font-medium hover:bg-[#002852] shadow-sm font-button">
+                    <Button type="submit" className="flex-1 rounded-xl bg-[#8E5AB5] text-white py-2.5 text-xs font-medium hover:bg-[#7B4A9E] shadow-sm font-button">
                       Save Note
                     </Button>
                   </div>
@@ -1994,7 +2003,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               className="w-full h-full rounded-xl border-2 border-[#0D2B45]/20 bg-white text-neutral-900 shadow-2xl overflow-hidden flex flex-col"
             >
               {/* Web Search Tab Bar Header */}
-              <div className="flex items-center justify-between bg-[#00356B] text-white px-5 py-3 border-b border-[#002852]">
+              <div className="flex items-center justify-between bg-[#8E5AB5] text-white px-5 py-3 border-b border-[#7B4A9E]">
                 <div className="flex items-center gap-2">
                   <span className="font-heading font-medium text-sm text-white">
                     Web Search
@@ -2029,7 +2038,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                       className="w-full rounded-xl border border-neutral-300 bg-white pl-9 pr-3 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-[#0D2B45] focus:ring-2 focus:ring-[#0D2B45]/10"
                     />
                   </div>
-                  <Button type="submit" size="sm" className="rounded-xl bg-[#00356B] text-white text-xs font-medium px-4 py-2 hover:bg-[#002852] font-button shadow-xs">
+                  <Button type="submit" size="sm" className="rounded-xl bg-[#8E5AB5] text-white text-xs font-medium px-4 py-2 hover:bg-[#7B4A9E] font-button shadow-xs">
                     Search
                   </Button>
                 </form>
@@ -2139,7 +2148,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
               {/* Header */}
               <div className="flex items-center justify-between border-b border-border pb-4">
                 <div className="flex items-center gap-2.5">
-                  <div className="h-10 w-10 rounded-xl bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] flex items-center justify-center font-medium">
+                  <div className="h-10 w-10 rounded-xl bg-[#8E5AB5]/15 text-[#8E5AB5] dark:text-[#86B3E6] flex items-center justify-center font-medium">
                     <Plus className="h-5 w-5" />
                   </div>
                   <div>
@@ -2164,14 +2173,14 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     Spot / Place Name *
                   </label>
                   <div className="relative flex items-center">
-                    <MapPin className="absolute left-3.5 h-4 w-4 text-[#00356B] dark:text-[#86B3E6]" />
+                    <MapPin className="absolute left-3.5 h-4 w-4 text-[#8E5AB5] dark:text-[#86B3E6]" />
                     <input
                       type="text"
                       required
                       placeholder="e.g. Cafe Chocolatti, Aguada Fort View..."
                       value={customSpotForm.title}
                       onChange={(e) => setCustomSpotForm({ ...customSpotForm, title: e.target.value })}
-                      className="w-full rounded-xl border border-border bg-background pl-10 pr-4 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#00356B] font-button"
+                      className="w-full rounded-xl border border-border bg-background pl-10 pr-4 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#8E5AB5] font-button"
                       autoFocus
                     />
                   </div>
@@ -2190,7 +2199,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                         const cat = val === "Food" ? "Food & Dining" : val === "Shopping" ? "Shopping" : "Activities"
                         setCustomSpotForm({ ...customSpotForm, type: val, category: cat })
                       }}
-                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#00356B] cursor-pointer font-button"
+                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#8E5AB5] cursor-pointer font-button"
                     >
                       <option value="Sightseeing">🏛️ Sightseeing</option>
                       <option value="Food">🍽️ Food & Dining</option>
@@ -2209,7 +2218,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     <select
                       value={customSpotForm.time}
                       onChange={(e) => setCustomSpotForm({ ...customSpotForm, time: e.target.value })}
-                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#00356B] cursor-pointer font-button"
+                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#8E5AB5] cursor-pointer font-button"
                     >
                       <option value="09:00 AM">🌅 09:00 AM (Morning)</option>
                       <option value="11:30 AM">☀️ 11:30 AM (Late Morning)</option>
@@ -2232,7 +2241,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                       placeholder="e.g. 500"
                       value={customSpotForm.cost}
                       onChange={(e) => setCustomSpotForm({ ...customSpotForm, cost: e.target.value })}
-                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#00356B]"
+                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#8E5AB5]"
                     />
                   </div>
 
@@ -2243,7 +2252,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     <select
                       value={customSpotForm.img}
                       onChange={(e) => setCustomSpotForm({ ...customSpotForm, img: e.target.value })}
-                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#00356B] cursor-pointer"
+                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs font-medium text-foreground outline-none focus:border-[#8E5AB5] cursor-pointer"
                     >
                       <option value="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80">🏖️ Beach & Ocean</option>
                       <option value="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=80">☕ Cafe & Dining</option>
@@ -2265,7 +2274,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     placeholder="e.g. Try wood-fired pizza and watch sunset from cliffside."
                     value={customSpotForm.desc}
                     onChange={(e) => setCustomSpotForm({ ...customSpotForm, desc: e.target.value })}
-                    className="w-full rounded-2xl border border-border bg-background px-3.5 py-2 text-xs font-medium text-foreground outline-none focus:border-[#00356B] resize-none"
+                    className="w-full rounded-2xl border border-border bg-background px-3.5 py-2 text-xs font-medium text-foreground outline-none focus:border-[#8E5AB5] resize-none"
                   />
                 </div>
 
@@ -2281,7 +2290,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   </Button>
                   <Button
                     type="submit"
-                    className="rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-xs px-5 py-2 shadow-md cursor-pointer flex items-center gap-1.5 font-button"
+                    className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] font-medium text-xs px-5 py-2 shadow-md cursor-pointer flex items-center gap-1.5 font-button"
                   >
                     <Plus className="h-4 w-4" />
                     Add to Itinerary
@@ -2354,7 +2363,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     const query = encodeURIComponent(`${activeSpotDetail.title} ${destination || ""}`)
                     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank")
                   }}
-                  className="rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-xs px-3.5 py-1.5 shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0 font-button"
+                  className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] font-medium text-xs px-3.5 py-1.5 shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0 font-button"
                 >
                   <Compass className="h-3.5 w-3.5" />
                   <span>Open Directions</span>

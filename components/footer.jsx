@@ -7,6 +7,7 @@ export function Footer({ onNavigateView }) {
         
         {/* Official TripNest Imagyn Logo */}
         <button
+          suppressHydrationWarning
           onClick={() => {
             onNavigateView?.("home")
             window.scrollTo({ top: 0, behavior: "smooth" })
@@ -22,27 +23,27 @@ export function Footer({ onNavigateView }) {
 
         {/* Essential Navigation Links */}
         <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-muted-foreground">
-          <button onClick={() => onNavigateView?.("home")} className="hover:text-primary transition-colors">
+          <button suppressHydrationWarning onClick={() => onNavigateView?.("home")} className="hover:text-primary transition-colors">
             Home
           </button>
           <span>•</span>
-          <button onClick={() => onNavigateView?.("itinerary")} className="hover:text-primary transition-colors">
+          <button suppressHydrationWarning onClick={() => onNavigateView?.("itinerary")} className="hover:text-primary transition-colors">
             Itinerary Planner
           </button>
           <span>•</span>
-          <button onClick={() => onNavigateView?.("explore")} className="hover:text-primary transition-colors">
+          <button suppressHydrationWarning onClick={() => onNavigateView?.("explore")} className="hover:text-primary transition-colors">
             Explore Maps
           </button>
           <span>•</span>
-          <button onClick={() => onNavigateView?.("budget")} className="hover:text-primary transition-colors">
+          <button suppressHydrationWarning onClick={() => onNavigateView?.("budget")} className="hover:text-primary transition-colors">
             Budget Planner
           </button>
           <span>•</span>
-          <button onClick={() => onNavigateView?.("expenses")} className="hover:text-primary transition-colors">
+          <button suppressHydrationWarning onClick={() => onNavigateView?.("expenses")} className="hover:text-primary transition-colors">
             Expense Tracker
           </button>
           <span>•</span>
-          <button onClick={() => onNavigateView?.("packages")} className="hover:text-primary transition-colors">
+          <button suppressHydrationWarning onClick={() => onNavigateView?.("packages")} className="hover:text-primary transition-colors">
             Packages
           </button>
         </div>

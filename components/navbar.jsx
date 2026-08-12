@@ -184,7 +184,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                     : "border-white/30 bg-white/15 text-white hover:bg-white/25"
                 )}
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#00356B] text-[10px] font-semibold text-white">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#8E5AB5] text-[10px] font-semibold text-white">
                   {user.initials || "U"}
                 </span>
                 <span className="hidden text-xs font-semibold sm:inline-block max-w-[90px] truncate">
@@ -212,7 +212,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                       }}
                       className="flex w-full items-center gap-2 rounded-xs px-3 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-colors cursor-pointer font-button"
                     >
-                      <User className="h-3.5 w-3.5 text-[#00356B] dark:text-[#86B3E6]" />
+                      <User className="h-3.5 w-3.5 text-[#8E5AB5] dark:text-[#B9A6C9]" />
                       Profile & Passport
                     </button>
 
@@ -257,7 +257,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
 
               <Button
                 onClick={() => onOpenAuth("signup")}
-                className="rounded-xl bg-[#00356B] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#002852] shadow-md shadow-[#00356B]/25 sm:text-xs px-4 sm:px-5 py-2 transition-all cursor-pointer font-button"
+                className="rounded-xl bg-[#8E5AB5] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#7B4A9E] shadow-md shadow-[#8E5AB5]/25 sm:text-xs px-4 sm:px-5 py-2 transition-all cursor-pointer font-button"
               >
                 Get Started
               </Button>

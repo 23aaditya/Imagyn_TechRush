@@ -7,7 +7,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-serif: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
@@ -28,7 +28,7 @@
 }
 
 @theme inline {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -74,78 +74,78 @@
 
 :root {
   color-scheme: light;
-  --night-bg: #11100E;
-  --night-surface: #181613;
-  --night-surface-2: #211E19;
-  --night-border: rgba(235, 226, 208, 0.12);
-  --night-text: #F1ECE2;
-  --night-muted: #A9A092;
-  --night-accent: #00356B;
-  --night-olive: #00356B;
+  --night-bg: #0D0A0F;
+  --night-surface: #18131B;
+  --night-surface-2: #241C29;
+  --night-border: rgba(221, 208, 234, 0.15);
+  --night-text: #F5F2F7;
+  --night-muted: #B9A6C9;
+  --night-accent: #C8A985;
+  --night-olive: #8E5AB5;
 
-  --background: #FCFAFF;
-  --foreground: #1E293B;
-  --card: #FFFFFF;
-  --card-foreground: #1E293B;
-  --popover: #FFFFFF;
-  --popover-foreground: #1E293B;
-  --primary: #00356B;
+  --background: #FAF8FC;
+  --foreground: #100B12;
+  --card: #F1EEF4;
+  --card-foreground: #100B12;
+  --popover: #F1EEF4;
+  --popover-foreground: #100B12;
+  --primary: #8E5AB5;
   --primary-foreground: #FFFFFF;
-  --secondary: rgba(0, 53, 107, 0.15);
-  --secondary-foreground: #00356B;
-  --muted: rgba(0, 53, 107, 0.08);
-  --muted-foreground: #64748B;
-  --accent: #00356B;
-  --accent-foreground: #FFFFFF;
-  --emerald: #00356B;
+  --secondary: #DDD0EA;
+  --secondary-foreground: #100B12;
+  --muted: #F1EEF4;
+  --muted-foreground: #5C5264;
+  --accent: #C8A985;
+  --accent-foreground: #100B12;
+  --emerald: #8E5AB5;
   --emerald-foreground: #FFFFFF;
-  --destructive: #EF4444;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #00356B;
-  --chart-1: #FFFFFF;
-  --chart-2: #00356B;
-  --chart-3: rgba(0, 53, 107, 0.15);
-  --chart-4: #334155;
-  --chart-5: #1E293B;
+  --destructive: #8E5AB5;
+  --border: #E4DFEA;
+  --input: #E4DFEA;
+  --ring: #8E5AB5;
+  --chart-1: #8E5AB5;
+  --chart-2: #DDD0EA;
+  --chart-3: #C8A985;
+  --chart-4: #F1EEF4;
+  --chart-5: #100B12;
   --radius: 0.75rem;
 }
 
 .dark {
   color-scheme: dark;
-  --background: #11100E;
-  --foreground: #F1ECE2;
-  --card: #181613;
-  --card-foreground: #F1ECE2;
-  --popover: #181613;
-  --popover-foreground: #F1ECE2;
-  --primary: #00356B;
+  --background: #0D0A0F;
+  --foreground: #F5F2F7;
+  --card: #18131B;
+  --card-foreground: #F5F2F7;
+  --popover: #18131B;
+  --popover-foreground: #F5F2F7;
+  --primary: #9560BC;
   --primary-foreground: #FFFFFF;
-  --secondary: rgba(0, 53, 107, 0.2);
-  --secondary-foreground: #F1ECE2;
-  --muted: #211E19;
-  --muted-foreground: #A9A092;
-  --accent: #00356B;
-  --accent-foreground: #FFFFFF;
-  --emerald: #00356B;
+  --secondary: #B9A6C9;
+  --secondary-foreground: #0D0A0F;
+  --muted: #18131B;
+  --muted-foreground: #B9A6C9;
+  --accent: #C8A985;
+  --accent-foreground: #0D0A0F;
+  --emerald: #9560BC;
   --emerald-foreground: #FFFFFF;
-  --destructive: #EF4444;
-  --border: rgba(235, 226, 208, 0.12);
-  --input: rgba(235, 226, 208, 0.12);
-  --ring: #00356B;
-  --chart-1: #00356B;
-  --chart-2: #00356B;
-  --chart-3: #211E19;
-  --chart-4: #A9A092;
-  --chart-5: #F1ECE2;
-  --sidebar: #181613;
-  --sidebar-foreground: #F1ECE2;
-  --sidebar-primary: #00356B;
+  --destructive: #9560BC;
+  --border: rgba(245, 242, 247, 0.15);
+  --input: rgba(245, 242, 247, 0.15);
+  --ring: #9560BC;
+  --chart-1: #9560BC;
+  --chart-2: #B9A6C9;
+  --chart-3: #C8A985;
+  --chart-4: #18131B;
+  --chart-5: #F5F2F7;
+  --sidebar: #18131B;
+  --sidebar-foreground: #F5F2F7;
+  --sidebar-primary: #9560BC;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #211E19;
-  --sidebar-accent-foreground: #F1ECE2;
-  --sidebar-border: rgba(235, 226, 208, 0.12);
-  --sidebar-ring: #00356B;
+  --sidebar-accent: #B9A6C9;
+  --sidebar-accent-foreground: #0D0A0F;
+  --sidebar-border: rgba(245, 242, 247, 0.15);
+  --sidebar-ring: #9560BC;
 }
 
 /* Night Journey Transition & Cartographic Pattern */

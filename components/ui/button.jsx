@@ -8,16 +8,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-[#00356B] text-white hover:bg-[#002852] [a]:hover:bg-[#002852]',
+        default: 'bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] [a]:hover:bg-[#7B4A9E]',
         outline:
-          'border border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] hover:bg-[#00356B]/25 aria-expanded:bg-[#00356B]/25',
+          'border-none bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] aria-expanded:bg-[#C8B8DD]',
         secondary:
-          'border border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] hover:bg-[#00356B]/25 aria-expanded:bg-[#00356B]/25',
+          'border-none bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] aria-expanded:bg-[#C8B8DD]',
         ghost:
-          'hover:bg-[#00356B]/10 hover:text-[#00356B] dark:hover:text-[#86B3E6] aria-expanded:bg-[#00356B]/10 aria-expanded:text-[#00356B]',
+          'hover:bg-[#DDD0EA]/60 hover:text-[#100B12] aria-expanded:bg-[#DDD0EA]/60 aria-expanded:text-[#100B12]',
         destructive:
           'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',
-        link: 'text-[#00356B] dark:text-[#86B3E6] underline-offset-4 hover:underline',
+        link: 'text-[#8E5AB5] dark:text-[#B9A6C9] underline-offset-4 hover:underline',
       },
       size: {
         default:
@@ -49,6 +49,7 @@ function Button({
   return (
     <ButtonPrimitive
       data-slot="button"
+      suppressHydrationWarning
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

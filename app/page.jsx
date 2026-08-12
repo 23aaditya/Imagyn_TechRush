@@ -33,8 +33,14 @@ function MainApp() {
   const [pendingDestination, setPendingDestination] = useState(null)
   const [isNavigatingLine, setIsNavigatingLine] = useState(false)
 
-  // Load user from localStorage on mount
+  // Load user from localStorage on mount & reset scroll position on page reload
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual"
+      }
+      window.scrollTo(0, 0)
+    }
     try {
       const savedUser = localStorage.getItem("tripnest_user")
       if (savedUser) {

@@ -70,18 +70,14 @@ export function FAQ() {
                   className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6 sm:py-5 cursor-pointer"
                 >
                   <span
-                    className={`text-sm font-bold sm:text-base font-heading ${
-                      isOpen ? "text-primary" : "text-neutral-900"
-                    }`}
+                    className="text-sm font-bold sm:text-base font-heading text-neutral-900"
                   >
                     {faq.question}
                   </span>
                   <motion.span
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${
-                      isOpen ? "bg-primary/10 text-primary" : "bg-neutral-100 text-neutral-600"
-                    }`}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-neutral-100 text-neutral-900"
                   >
                     <ChevronDown className="h-4 w-4" aria-hidden />
                   </motion.span>

@@ -54,29 +54,29 @@ const allDestinations = destinationsData
    ───────────────────────────────────────────── */
 const filterCategories = [
   {
-    key: "vibe", label: "Vibe",
-    options: ["Relaxation", "Adventure", "Nightlife & Party", "Cultural Heritage", "Romantic Escapes", "Nature & Wildlife", "Luxury Stays", "Budget Friendly"],
-    color: "#5B8DEF"
+    key: "mood", label: "Mood",
+    options: ["Relax", "Adventure", "Party", "Road Trips"],
+    color: "#8E5AB5"
   },
   {
     key: "bestTime", label: "Best Season",
-    options: ["Nov – Feb", "Oct – Mar", "Mar – May", "Jun – Sep", "Year Round"],
-    color: "#5B8DEF"
+    options: ["Nov – Feb", "Oct – Mar", "Mar – Jun", "Jun – Sep", "Year round"],
+    color: "#8E5AB5"
   },
   {
     key: "company", label: "Ideal For",
-    options: ["Friends & Groups", "Couples & Honeymoon", "Family Friendly", "Solo Travelers", "Beach Lovers"],
-    color: "#5B8DEF"
+    options: ["Friends", "Family", "Solo"],
+    color: "#8E5AB5"
   },
   {
     key: "budget", label: "Budget Tier",
-    options: ["Economy", "Mid Range", "Premium Luxury", "Ultra Luxury"],
-    color: "#5B8DEF"
+    options: ["Economy", "Luxury"],
+    color: "#8E5AB5"
   },
   {
     key: "type", label: "Destination Type",
-    options: ["Alpine Mountains", "Coastal Beaches", "Scenic Road Trips", "Heritage Cities"],
-    color: "#5B8DEF"
+    options: ["Mountains", "Beach", "Road Trips"],
+    color: "#8E5AB5"
   },
 ]
 
@@ -107,10 +107,12 @@ const rowConfig = [
 function DestinationRow({ destinations, label, hoveredId, setHoveredId, onCardClick }) {
   const scrollRef = useRef(null)
   const [isRowHovered, setIsRowHovered] = useState(false)
+  const [isManualScrolling, setIsManualScrolling] = useState(false)
+  const manualScrollTimer = useRef(null)
 
-  // Smooth continuous right-to-left auto-shifting (pauses on hover)
+  // Smooth continuous right-to-left auto-shifting (pauses on hover or manual scroll)
   useEffect(() => {
-    if (isRowHovered) return
+    if (isRowHovered || isManualScrolling) return
     const interval = setInterval(() => {
       if (!scrollRef.current) return
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
@@ -121,18 +123,22 @@ function DestinationRow({ destinations, label, hoveredId, setHoveredId, onCardCl
       }
     }, 35)
     return () => clearInterval(interval)
-  }, [isRowHovered])
+  }, [isRowHovered, isManualScrolling])
 
   const handleScroll = (dir) => {
     if (!scrollRef.current) return
+    // Pause auto-scroll during and briefly after manual scroll
+    setIsManualScrolling(true)
+    if (manualScrollTimer.current) clearTimeout(manualScrollTimer.current)
     scrollRef.current.scrollBy({ left: dir === "left" ? -380 : 380, behavior: "smooth" })
+    manualScrollTimer.current = setTimeout(() => setIsManualScrolling(false), 900)
   }
 
   return (
     <div className="mb-4">
-      {/* Clean Title Header without SVGs */}
+      {/* Row Title Header */}
       <div className="flex items-center justify-between mb-1 px-2">
-        <h3 className="font-heading text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">
+        <h3 className="font-heading text-xl sm:text-2xl font-medium tracking-tight text-foreground">
           {label}
         </h3>
         <div className="flex items-center gap-2">
@@ -140,7 +146,7 @@ function DestinationRow({ destinations, label, hoveredId, setHoveredId, onCardCl
             type="button"
             onClick={() => handleScroll("left")}
             aria-label="Scroll left"
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#5B8DEF] hover:text-[#0F172A] cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#DDD0EA] hover:text-[#100B12] cursor-pointer"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -148,7 +154,7 @@ function DestinationRow({ destinations, label, hoveredId, setHoveredId, onCardCl
             type="button"
             onClick={() => handleScroll("right")}
             aria-label="Scroll right"
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#5B8DEF] hover:text-[#0F172A] cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background/90 text-foreground shadow-xs transition-colors hover:bg-[#DDD0EA] hover:text-[#100B12] cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -219,10 +225,10 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
               <div
                 className="flex flex-col items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-md min-w-[85px] px-3 py-1.5 backdrop-blur-xl text-center"
               >
-                <span className="font-heading text-[9px] font-extrabold text-[#5B8DEF] uppercase tracking-widest block leading-none">
+                <span className="font-heading text-[9px] font-medium text-[#8E5AB5] uppercase tracking-widest block leading-none">
                   {petal.label}
                 </span>
-                <span className="font-sans text-xs font-bold text-foreground mt-0.5 whitespace-nowrap max-w-[90px] truncate block leading-tight">
+                <span className="font-sans text-xs font-normal text-foreground mt-0.5 whitespace-nowrap max-w-[90px] truncate block leading-tight">
                   {getPetalValue(petal.key)}
                 </span>
               </div>
@@ -256,7 +262,7 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
 
           {/* Temperature badge */}
           <span
-            className="absolute top-2 right-2 flex items-center gap-1 rounded-xs px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-xs border border-white/30 z-10"
+            className="absolute top-2 right-2 flex items-center gap-1 rounded-xs px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white shadow-xs border border-white/30 z-10"
             style={{ background: item.color || "#10B981" }}
           >
             {item.temp || "25°C"}
@@ -267,12 +273,12 @@ function ArchCard({ item, isHovered, onHover, onLeave, onClick }) {
       {/* Name & Subtitle Below the Shape */}
       <div className="mt-3 text-center relative z-10">
         <h4
-          className="font-heading text-base sm:text-lg font-bold transition-colors"
+          className="font-heading text-base sm:text-lg font-normal transition-colors"
           style={{ color: isHovered ? (item.color || "#10B981") : "var(--foreground)" }}
         >
           {item.name}
         </h4>
-        <p className="text-xs text-muted-foreground font-medium mt-0.5">{item.subtitle}</p>
+        <p className="text-xs text-muted-foreground font-normal mt-0.5">{item.subtitle}</p>
       </div>
     </div>
   )
@@ -407,7 +413,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
               coordinates={`15°28′N 73°49′E · ${destination.country?.toUpperCase() || "INDIA"}`}
               destinationName={destination.name}
             >
-              <p className="text-xs font-semibold text-white/90 drop-shadow">{destination.subtitle}</p>
+              <p className="text-xs font-normal text-white/90 drop-shadow">{destination.subtitle}</p>
             </CoordinateReveal>
           </div>
         </div>
@@ -426,8 +432,8 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                   { icon: <Coins className="h-4 w-4" />, label: "Budget", value: destination.startingBudget || "₹8,500", color: "#10B981" },
                 ].map((detail, i) => (
                   <div key={i} className="rounded-md border border-border bg-card p-2.5 text-center">
-                    <span className="block text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{detail.label}</span>
-                    <span className="mt-0.5 block text-xs font-semibold text-foreground truncate">{detail.value}</span>
+                    <span className="block text-[9px] font-normal uppercase tracking-wider text-muted-foreground">{detail.label}</span>
+                    <span className="mt-0.5 block text-xs font-normal text-foreground truncate">{detail.value}</span>
                   </div>
                 ))}
               </div>
@@ -445,11 +451,11 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-border pb-2">
-                <h4 className="font-heading text-sm font-extrabold text-foreground flex items-center gap-1.5">
-                  <Ticket className="h-4 w-4 text-[#5A8CB2]" />
+                <h4 className="font-heading text-sm font-medium text-foreground flex items-center gap-1.5">
+                  <Ticket className="h-4 w-4 text-[#8E5AB5]" />
                   Verified Packages for {destination.name}
                 </h4>
-                <span className="text-[10px] font-bold text-[#5A8CB2] bg-[#C8D9E6]/40 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-normal text-[#8E5AB5] bg-[#DDD0EA]/60 px-2 py-0.5 rounded-full">
                   5 Top Companies
                 </span>
               </div>
@@ -463,20 +469,20 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                       onClose()
                       onNavigateView?.("packages")
                     }}
-                    className="p-3.5 rounded-2xl border border-border bg-background hover:border-[#5A8CB2]/70 hover:shadow-md transition-all space-y-2 cursor-pointer group"
+                    className="p-3.5 rounded-lg border border-border bg-background hover:border-[#8E5AB5]/50 hover:shadow-md transition-all space-y-2 cursor-pointer group"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-extrabold text-white bg-[#5A8CB2] px-2.5 py-0.5 rounded-md">
+                      <span className="text-[11px] font-medium text-white bg-[#8E5AB5] px-2.5 py-0.5 rounded-md">
                         {pkg.provider}
                       </span>
-                      <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400">
+                      <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
                         {pkg.price} / person
                       </span>
                     </div>
-                    <h5 className="font-bold text-xs text-foreground group-hover:text-[#5A8CB2] transition-colors">{pkg.name}</h5>
+                    <h5 className="font-normal text-xs text-foreground group-hover:text-[#8E5AB5] transition-colors">{pkg.name}</h5>
                     <p className="text-[10px] text-muted-foreground">{pkg.highlights}</p>
                     
-                    <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground pt-1 border-t border-border/40">
+                    <div className="flex items-center justify-between text-[10px] font-normal text-muted-foreground pt-1 border-t border-border/40">
                       <span>⏱️ {pkg.duration}</span>
                       <div className="flex items-center gap-2">
                         <Button
@@ -487,7 +493,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                             onClose()
                             onNavigateView?.("packages")
                           }}
-                          className="rounded-lg bg-[#5A8CB2] hover:bg-[#4A7CA2] text-white text-[10px] font-extrabold px-3 py-1 flex items-center gap-1 cursor-pointer h-7 shadow-sm"
+                          className="rounded-lg bg-[#8E5AB5] hover:bg-[#7A4A9E] text-white text-[10px] font-medium px-3 py-1 flex items-center gap-1 cursor-pointer h-7 shadow-sm"
                         >
                           <Sparkles className="h-3 w-3 text-amber-300" />
                           View Package Details
@@ -501,7 +507,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                             onClose()
                             onNavigateView?.("packages")
                           }}
-                          className="rounded-lg border-[#5A8CB2]/40 text-[#5A8CB2] hover:bg-[#5A8CB2]/10 text-[10px] font-bold px-2 py-0.5 flex items-center gap-1 cursor-pointer h-7"
+                          className="rounded-lg border-[#8E5AB5]/40 text-[#8E5AB5] hover:bg-[#8E5AB5]/10 text-[10px] font-normal px-2 py-0.5 flex items-center gap-1 cursor-pointer h-7"
                         >
                           <ArrowRightLeft className="h-3 w-3" />
                           Compare
@@ -517,7 +523,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                   variant="outline"
                   size="sm"
                   onClick={() => setShowPackagesView(false)}
-                  className="rounded-xl border-border text-xs font-bold px-4 py-2 hover:bg-accent cursor-pointer"
+                  className="rounded-lg border-border text-xs font-normal px-4 py-2 hover:bg-accent cursor-pointer"
                 >
                   <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
                   Back
@@ -547,7 +553,7 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
   const [selectedCategoryKey, setSelectedCategoryKey] = useState(null)
 
   const toggleFilter = (key, value) => {
-    setActiveFilters(prev => {
+    setActiveFilters((prev) => {
       const next = { ...prev }
       if (next[key] === value) {
         delete next[key]
@@ -559,155 +565,128 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
   }
 
   const activeCount = Object.keys(activeFilters).length
-  const selectedCatObj = filterCategories.find(c => c.key === selectedCategoryKey)
-
-  // Radial Arc Angles for 5 Category Petals (Blooming outward from trigger)
-  const categoryAngles = [-86, -64, -42, -20, 2]
-  const categoryDistance = 145
+  const selectedCatObj = filterCategories.find((c) => c.key === selectedCategoryKey)
 
   return (
     <div className="fixed bottom-8 left-8 sm:bottom-10 sm:left-10 z-40">
-      {/* RADIAL PETAL FORMAT MENU */}
+      {/* LUXURY LAVENDER GLASS PANEL FILTER POPUP */}
       <AnimatePresence>
         {isOpen && (
-          <>
-            {/* LEVEL 1: 5 CATEGORY PETALS BLOOMING OUT IN RADIAL ARC */}
+          <motion.div
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.96 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute bottom-16 left-0 z-50 w-[320px] sm:w-[360px] max-h-[440px] overflow-y-auto rounded-2xl border border-neutral-200/80 bg-white p-4 shadow-2xl text-[#100B12] select-none"
+          >
             {!selectedCategoryKey ? (
-              filterCategories.map((cat, i) => {
-                const angleDeg = categoryAngles[i]
-                const rad = (angleDeg * Math.PI) / 180
-                const x = Math.cos(rad) * categoryDistance
-                const y = Math.sin(rad) * categoryDistance
-                const activeVal = activeFilters[cat.key]
-
-                return (
-                  <motion.div
-                    key={cat.key}
-                    initial={{ opacity: 0, x: 0, y: 0, scale: 0.2 }}
-                    animate={{ opacity: 1, x, y, scale: 1 }}
-                    exit={{ opacity: 0, x: 0, y: 0, scale: 0.2 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 220,
-                      damping: 19,
-                      mass: 0.75,
-                      delay: i * 0.04,
-                    }}
-                    className="absolute bottom-2 left-2"
-                    style={{ zIndex: 50 }}
-                  >
+              /* LEVEL 1: CATEGORY SELECTION LIST */
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-200 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <SlidersHorizontal className="h-4 w-4 text-[#8E5AB5]" />
+                    <span className="font-heading text-xs font-medium uppercase tracking-wider text-[#100B12]">
+                      Filter Destinations
+                    </span>
+                  </div>
+                  {activeCount > 0 && (
                     <button
                       type="button"
-                      onClick={() => setSelectedCategoryKey(cat.key)}
-                      className={cn(
-                        "rounded-t-2xl rounded-b-md px-3.5 py-2.5 border shadow-2xl backdrop-blur-2xl flex flex-col items-center justify-center transition-all cursor-pointer min-w-[80px] max-w-[110px] text-center group",
-                        activeVal
-                          ? "bg-[#5B8DEF] text-[#0F172A] border-[#5B8DEF] font-extrabold shadow-[#5B8DEF]/30"
-                          : "bg-[#0F172A]/95 text-white border-neutral-700 hover:border-[#5B8DEF] hover:scale-108"
-                      )}
+                      onClick={() => setActiveFilters({})}
+                      className="text-[11px] font-normal text-[#8E5AB5] hover:underline cursor-pointer font-button"
                     >
-                      <span className={cn(
-                        "font-heading text-[9px] font-extrabold uppercase tracking-widest block leading-none",
-                        activeVal ? "text-[#0F172A]" : "text-[#5B8DEF]"
-                      )}>
-                        {cat.label}
-                      </span>
-                      <span className="text-[11px] font-bold mt-1 truncate max-w-[95px] block leading-tight">
-                        {activeVal ? activeVal : "Tap to choose"}
-                      </span>
+                      Clear All ({activeCount})
                     </button>
-                  </motion.div>
-                )
-              })
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-2">
+                  {filterCategories.map((cat) => {
+                    const activeVal = activeFilters[cat.key]
+                    return (
+                      <button
+                        key={cat.key}
+                        type="button"
+                        onClick={() => setSelectedCategoryKey(cat.key)}
+                        className={`w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-left transition-all cursor-pointer font-button ${
+                          activeVal
+                            ? "bg-[#8E5AB5] text-white border border-[#9560BC] shadow-md"
+                            : "bg-[#DDD0EA]/50 hover:bg-[#DDD0EA] text-[#100B12] border border-[#B9A6C9]/40"
+                        }`}
+                      >
+                        <div>
+                          <div className={`text-[10px] font-medium uppercase tracking-wider ${activeVal ? "text-white/80" : "text-[#8E5AB5]"}`}>
+                            {cat.label}
+                          </div>
+                          <div className="text-xs font-normal mt-0.5">
+                            {activeVal || "All Options"}
+                          </div>
+                        </div>
+                        <ChevronRight className={`h-4 w-4 shrink-0 ml-2 ${activeVal ? "text-white/70" : "text-[#8E5AB5]/60"}`} />
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
             ) : (
-              /* LEVEL 2: DETAIL OPTIONS SUB-PETALS BLOOMING IN FAN ARC */
-              <>
-                {/* Central Back Petal Button */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.5 }}
-                  className="absolute bottom-16 left-0"
-                  style={{ zIndex: 60 }}
-                >
+              /* LEVEL 2: SPECIFIC CATEGORY OPTIONS LIST */
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-200 pb-2.5">
                   <button
                     type="button"
                     onClick={() => setSelectedCategoryKey(null)}
-                    className="rounded-full px-3.5 py-1.5 border border-[#5B8DEF] bg-[#5B8DEF] text-[#0F172A] text-xs font-black uppercase tracking-wider shadow-xl hover:scale-105 transition-all flex items-center gap-1.5 cursor-pointer"
+                    className="rounded-xl bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] px-3 py-1 text-xs font-medium tracking-wider uppercase flex items-center gap-1.5 cursor-pointer font-button shadow-xs"
                   >
                     <ArrowLeft className="h-3.5 w-3.5" />
-                    Back to Petals
+                    Back
                   </button>
-                </motion.div>
+                  <span className="text-xs font-medium text-[#8E5AB5]">
+                    {selectedCatObj?.label}
+                  </span>
+                </div>
 
-                {/* Sub-Petal Options Blooming Out */}
-                {selectedCatObj?.options.map((opt, j) => {
-                  const totalOpts = selectedCatObj.options.length
-                  const stepAngle = totalOpts > 5 ? 24 : 32
-                  const startAngle = -90 - ((totalOpts - 1) * stepAngle) / 2
-                  const angleDeg = startAngle + j * stepAngle
-                  const rad = (angleDeg * Math.PI) / 180
-                  const subDist = 155
-                  const x = Math.cos(rad) * subDist
-                  const y = Math.sin(rad) * subDist
-                  const isActive = activeFilters[selectedCatObj.key] === opt
-
-                  return (
-                    <motion.div
-                      key={opt}
-                      initial={{ opacity: 0, x: 0, y: 0, scale: 0.2 }}
-                      animate={{ opacity: 1, x, y, scale: 1 }}
-                      exit={{ opacity: 0, x: 0, y: 0, scale: 0.2 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 230,
-                        damping: 18,
-                        mass: 0.7,
-                        delay: j * 0.04,
-                      }}
-                      className="absolute bottom-2 left-2"
-                      style={{ zIndex: 55 }}
-                    >
+                <div className="grid grid-cols-1 gap-2 max-h-[320px] overflow-y-auto pr-1">
+                  {selectedCatObj?.options.map((opt) => {
+                    const isActive = activeFilters[selectedCatObj.key] === opt
+                    return (
                       <button
+                        key={opt}
                         type="button"
                         onClick={() => toggleFilter(selectedCatObj.key, opt)}
-                        className={cn(
-                          "rounded-full px-3.5 py-1.5 border text-xs font-bold whitespace-nowrap shadow-2xl backdrop-blur-2xl transition-all cursor-pointer flex items-center gap-1.5",
+                        className={`w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-xs font-normal transition-all cursor-pointer font-button ${
                           isActive
-                            ? "bg-[#5B8DEF] text-[#0F172A] border-[#5B8DEF] font-extrabold scale-110 shadow-[#5B8DEF]/30"
-                            : "bg-[#0F172A]/95 text-white border-neutral-700 hover:border-[#5B8DEF] hover:scale-108"
-                        )}
+                            ? "bg-[#8E5AB5] text-white border border-[#9560BC] shadow-md"
+                            : "bg-[#DDD0EA]/50 hover:bg-[#DDD0EA] text-[#100B12] border border-[#B9A6C9]/40"
+                        }`}
                       >
                         <span>{opt}</span>
-                        {isActive && <CheckCircle2 className="h-3.5 w-3.5 text-[#0F172A]" />}
+                        {isActive && <CheckCircle2 className="h-4 w-4 text-white shrink-0 ml-2" />}
                       </button>
-                    </motion.div>
-                  )
-                })}
-              </>
+                    )
+                  })}
+                </div>
+              </div>
             )}
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Rectangular Customize Trigger Button with Slightly Curved Corners (Primary Yale Blue Theme) */}
+      {/* RECTANGULAR LAVENDER CUSTOMIZE TRIGGER BUTTON WITH SLIGHT CURVES */}
       <motion.button
         type="button"
         onClick={() => {
           setIsOpen(!isOpen)
           if (isOpen) setSelectedCategoryKey(null)
         }}
-        whileHover={{ scale: 1.04 }}
-        whileTap={{ scale: 0.96 }}
-        className="relative flex items-center justify-center gap-2.5 rounded-xl px-5 py-3 shadow-xl transition-all cursor-pointer bg-[#00356B] text-white hover:bg-[#002852] font-button"
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+        className="relative flex items-center justify-center gap-2.5 rounded-lg px-5 py-3 shadow-xl transition-all cursor-pointer bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] font-button font-medium text-xs uppercase tracking-wider border border-[#B9A6C9]"
       >
-        <SlidersHorizontal className={`h-4 w-4 text-white transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
-        <span className="font-heading text-xs font-semibold uppercase tracking-wider text-white">
-          {isOpen ? "Close Petals" : "Customize"}
-        </span>
+        <SlidersHorizontal className={`h-4 w-4 text-[#100B12] transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
+        <span>{isOpen ? "Close Filters" : "Customize"}</span>
 
         {activeCount > 0 && (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#00356B] shadow-xs">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#8E5AB5] text-[10px] font-medium text-white shadow-xs">
             {activeCount}
           </span>
         )}
@@ -731,7 +710,7 @@ function FilterPills({ activeFilters, setActiveFilters }) {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-wrap items-center gap-2 mb-6"
     >
-      <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+      <span className="text-xs font-normal text-muted-foreground flex items-center gap-1">
         <Filter className="h-3.5 w-3.5" /> Active Filters:
       </span>
       {entries.map(([key, value]) => (
@@ -747,7 +726,7 @@ function FilterPills({ activeFilters, setActiveFilters }) {
               return next
             })
           }}
-          className="inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1 text-xs font-bold shadow-sm transition hover:shadow-md hover:scale-105"
+          className="inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1 text-xs font-normal shadow-sm transition hover:shadow-md hover:scale-105"
           style={{
             borderColor: getCatColor(key),
             color: getCatColor(key),
@@ -760,7 +739,7 @@ function FilterPills({ activeFilters, setActiveFilters }) {
       ))}
       <button
         onClick={() => setActiveFilters({})}
-        className="text-xs font-bold text-destructive hover:underline ml-1"
+        className="text-xs font-normal text-destructive hover:underline ml-1"
       >
         Clear all
       </button>
@@ -838,7 +817,18 @@ export function ExploreWorkspace({ onBack, onSelectDestination, onNavigateView }
   const [panelPosition, setPanelPosition] = useState("right")
 
   const filteredDestinations = allDestinations.filter(dest => {
-    return Object.entries(activeFilters).every(([key, value]) => dest[key] === value)
+    return Object.entries(activeFilters).every(([key, value]) => {
+      if (key === "bestTime") {
+        // Season-range matching: check if any months overlap
+        const destVal = (dest.bestTime || "").toLowerCase()
+        const filterVal = value.toLowerCase()
+        if (filterVal === "year round") return destVal.includes("year")
+        // Extract the start month abbreviation from the filter value
+        const filterStart = filterVal.split("–")[0].trim().substring(0, 3)
+        return destVal.includes(filterStart)
+      }
+      return dest[key] === value
+    })
   })
 
   // Auto-Changing Cultural Background Reel across uploaded photos
