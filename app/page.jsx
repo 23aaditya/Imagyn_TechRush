@@ -47,6 +47,7 @@ function MainApp() {
     if (destName) {
       setDestination(destName)
     }
+
     if (view !== "home" && !user) {
       setPendingView(view)
       if (destName) setPendingDestination(destName)
@@ -54,6 +55,7 @@ function MainApp() {
       setAuthModalOpen(true)
       return
     }
+
     setActiveView(view)
   }
 
@@ -76,12 +78,9 @@ function MainApp() {
       setDestination(pendingDestination)
       setPendingDestination(null)
     }
-    if (pendingView) {
-      setActiveView(pendingView)
-      setPendingView(null)
-    } else if (activeView === "home") {
-      setActiveView("itinerary")
-    }
+    // After login or signup, navigate directly to Overview page ("home")
+    setActiveView("home")
+    setPendingView(null)
   }
 
   const handleLogout = () => {
@@ -130,7 +129,7 @@ function MainApp() {
       {/* Dynamic View Router */}
       {activeView === "home" && (
         <div className="relative z-10 animate-in fade-in duration-300">
-          <Hero onStartPlanning={(view) => handleViewChange(view || "itinerary")} />
+          <Hero onStartPlanning={(view, destName) => handleViewChange(view || "itinerary", destName)} user={user} onRequireAuth={() => openAuth("login")} />
           <TrendingDestinations onNavigateView={handleViewChange} onSelectDestination={handleSelectDestination} />
           <WhyTripNest onNavigateView={handleViewChange} />
           <ExploreWorld onNavigateView={handleViewChange} onSelectDestination={handleSelectDestination} />
@@ -199,7 +198,12 @@ function MainApp() {
       )}
 
       {/* Floating AI Travel Concierge Assistant */}
-      <AiChatbot currentView={activeView} onNavigate={handleViewChange} />
+      <AiChatbot
+        currentView={activeView}
+        onNavigate={handleViewChange}
+        user={user}
+        onRequireAuth={() => openAuth("login")}
+      />
     </main>
   )
 }

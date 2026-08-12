@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { generateFallbackResponse, DESTINATION_KNOWLEDGE } from "@/lib/ai-travel-knowledge"
+import { useTrip } from "@/context/trip-context"
 
 // Categorized Prompt Chips for organized browsing
 const PROMPT_CATEGORIES = [
@@ -59,14 +60,77 @@ const CATEGORIZED_PROMPTS = {
   ],
 }
 
-export function AiChatbot({ currentView, onNavigate }) {
+export function AiChatbot({ currentView, onNavigate, user, onRequireAuth }) {
+  const tripContext = useTrip()
+  const { itinerary, addSpotToItinerary, removeSpotByName, reorderDayActivities, generateTripItinerary, destination, setDestination, setStartDate, setEndDate, setDays } = tripContext;
+
   const [isOpen, setIsOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isLiveAudioOpen, setIsLiveAudioOpen] = useState(false)
+  const [isRecordingMic, setIsRecordingMic] = useState(false)
   const [apiKey, setApiKey] = useState("")
   const [showSettings, setShowSettings] = useState(false)
   const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeCategory, setActiveCategory] = useState("all")
+  const recognitionRef = useRef(null)
+
+  const toggleMicRecording = () => {
+    if (!user && onRequireAuth) {
+      onRequireAuth()
+      return
+    }
+    if (isRecordingMic) {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop() } catch (e) {}
+      }
+      setIsRecordingMic(false)
+      return
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      setIsLiveAudioOpen(true)
+      return
+    }
+
+    try {
+      const rec = new SpeechRecognition()
+      rec.continuous = false
+      rec.interimResults = true
+      rec.lang = "en-US"
+
+      rec.onstart = () => {
+        setIsRecordingMic(true)
+      }
+
+      rec.onresult = (e) => {
+        let transcript = ""
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          transcript += e.results[i][0].transcript
+        }
+        if (transcript) {
+          setInputMessage(transcript)
+        }
+      }
+
+      rec.onerror = (e) => {
+        console.warn("Mic recording error:", e.error)
+        setIsRecordingMic(false)
+      }
+
+      rec.onend = () => {
+        setIsRecordingMic(false)
+      }
+
+      recognitionRef.current = rec
+      rec.start()
+    } catch (e) {
+      console.error("Failed to start mic recording:", e)
+      setIsRecordingMic(false)
+      setIsLiveAudioOpen(true)
+    }
+  }
   
   const [messages, setMessages] = useState([
     {
@@ -112,6 +176,10 @@ export function AiChatbot({ currentView, onNavigate }) {
   }
 
   const handleSendMessage = async (textToSend) => {
+    if (!user && onRequireAuth) {
+      onRequireAuth()
+      return
+    }
     const messageText = textToSend || inputMessage
     if (!messageText.trim() || isLoading) return
 

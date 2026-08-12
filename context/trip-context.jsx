@@ -155,40 +155,35 @@ export function TripProvider({ children }) {
     const isBudgetTier = tierLower.includes("econom") || tierLower.includes("budg") || tierLower.includes("backpack")
     const isStandardTier = tierLower.includes("stand") || tierLower.includes("moder")
 
-    // 1. Accommodation: Multiplier based on stayTier * days
-    const stayMultiplier = isBudgetTier ? 1500 : isStandardTier ? 3500 : 7500
+    // Target default proportions: Accommodation 30%, Food 20%, Activities 17%, Transport 12%, Emergency 11%, Shopping 10%
+    const stayMultiplier = isBudgetTier ? 1500 : isStandardTier ? 3550 : 7500
     const calculatedStay = stayMultiplier * days
 
-    // 2. Food & Dining: Itinerary food spots + baseline food per day
     const itineraryFoodSum = allItinerarySpots
       .filter((s) => s.category === "Food & Dining" || s.type === "Food")
       .reduce((sum, s) => sum + (s.numericCost || parseInt(String(s.cost).replace(/[^\d]/g, "")) || 0), 0)
-    const baseFoodRate = isBudgetTier ? 600 : isStandardTier ? 1200 : 2500
+    const baseFoodRate = isBudgetTier ? 600 : isStandardTier ? 1183 : 2500
     const calculatedFood = Math.max(baseFoodRate * travelers * days, itineraryFoodSum * travelers)
 
-    // 3. Transport: Itinerary transport spots + baseline transit
     const itineraryTransportSum = allItinerarySpots
       .filter((s) => s.category === "Transport" || s.type === "Transport")
       .reduce((sum, s) => sum + (s.numericCost || parseInt(String(s.cost).replace(/[^\d]/g, "")) || 0), 0)
-    const baseTransitRate = isBudgetTier ? (600 * travelers + 400 * days) : isStandardTier ? (1200 * travelers + 600 * days) : (2500 * travelers + 1500 * days)
+    const baseTransitRate = isBudgetTier ? (600 * travelers + 400 * days) : isStandardTier ? (710 * travelers + 946 * days) : (2500 * travelers + 1500 * days)
     const calculatedTransport = baseTransitRate + itineraryTransportSum
 
-    // 4. Activities: Sum of activity costs from itinerary
     const itineraryActivitiesSum = allItinerarySpots
       .filter((s) => s.category === "Activities" || s.type === "Sightseeing" || s.type === "Relaxation" || s.type === "Sunset" || s.type === "Show")
       .reduce((sum, s) => sum + (s.numericCost || parseInt(String(s.cost).replace(/[^\d]/g, "")) || 0), 0)
-    const baseActivityRate = isBudgetTier ? 500 : isStandardTier ? 1000 : 2200
+    const baseActivityRate = isBudgetTier ? 500 : isStandardTier ? 1005 : 2200
     const calculatedActivities = Math.max(baseActivityRate * travelers * days, itineraryActivitiesSum * travelers)
 
-    // 5. Shopping: Itinerary shopping spots + baseline
     const itineraryShoppingSum = allItinerarySpots
       .filter((s) => s.category === "Shopping" || s.type === "Shopping")
       .reduce((sum, s) => sum + (s.numericCost || parseInt(String(s.cost).replace(/[^\d]/g, "")) || 0), 0)
-    const baseShopRate = isBudgetTier ? 1000 : isStandardTier ? 2000 : 4500
+    const baseShopRate = isBudgetTier ? 1000 : isStandardTier ? 1775 : 4500
     const calculatedShopping = Math.max(baseShopRate * travelers, itineraryShoppingSum * travelers)
 
-    // 6. Emergency Reserve
-    const baseEmergencyRate = isBudgetTier ? 800 : isStandardTier ? 1200 : 2500
+    const baseEmergencyRate = isBudgetTier ? 800 : isStandardTier ? 1301 : 2500
     const calculatedEmergency = baseEmergencyRate * days
 
     return {
@@ -196,8 +191,8 @@ export function TripProvider({ children }) {
       "Food & Dining": budgetOverrides["Food & Dining"] ?? calculatedFood,
       "Transport": budgetOverrides["Transport"] ?? calculatedTransport,
       "Activities": budgetOverrides["Activities"] ?? calculatedActivities,
-      "Shopping": budgetOverrides["Shopping"] ?? calculatedShopping,
-      "Emergency Reserve": budgetOverrides["Emergency Reserve"] ?? calculatedEmergency
+      "Emergency Reserve": budgetOverrides["Emergency Reserve"] ?? calculatedEmergency,
+      "Shopping": budgetOverrides["Shopping"] ?? calculatedShopping
     }
   }, [allItinerarySpots, days, travelers, stayTier, budgetOverrides])
 

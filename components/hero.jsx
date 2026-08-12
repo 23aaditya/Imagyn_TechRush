@@ -83,7 +83,7 @@ const fadeUp = {
   }),
 }
 
-export function Hero({ onStartPlanning }) {
+export function Hero({ onStartPlanning, user, onRequireAuth }) {
   const [activeSlide, setActiveSlide] = useState(0)
 
   // Video Playlist State
@@ -156,6 +156,10 @@ export function Hero({ onStartPlanning }) {
   }, [fromDate, toDate])
 
   const handleSelectDestination = (destName) => {
+    if (!user && onRequireAuth) {
+      onRequireAuth()
+      return
+    }
     setQuery(destName)
     setIsDropdownOpen(false)
 
@@ -587,6 +591,10 @@ export function Hero({ onStartPlanning }) {
             {/* Submit CTA */}
             <Button
               onClick={() => {
+                if (!user && onRequireAuth) {
+                  onRequireAuth()
+                  return
+                }
                 const targetDest = query.trim() || "Goa"
                 onStartPlanning?.("itinerary", targetDest)
               }}
