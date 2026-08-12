@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   Bed,
   UtensilsCrossed,
@@ -23,6 +23,7 @@ import { PieChart } from "@/components/charts/pie-chart"
 import { PieSlice } from "@/components/charts/pie-slice"
 import { PieCenter } from "@/components/charts/pie-center"
 import { PieLabels } from "@/components/charts/pie-labels"
+import { BudgetEntranceLoader } from "@/components/budget-entrance-loader"
 
 const RADIUS = 100
 const CIRCUM = 2 * Math.PI * RADIUS
@@ -30,6 +31,7 @@ const SVG_SIZE = 350
 const CENTER = SVG_SIZE / 2
 
 export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace }) {
+  const [showEntranceLoader, setShowEntranceLoader] = useState(true)
   const {
     days,
     setDays,
@@ -160,6 +162,13 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
   return (
     <section id="budget" className={`relative w-full overflow-hidden ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
+      {/* Entrance Animation Overlay */}
+      <AnimatePresence>
+        {showEntranceLoader && (
+          <BudgetEntranceLoader onComplete={() => setShowEntranceLoader(false)} />
+        )}
+      </AnimatePresence>
+
       {/* Travel Doodles Background */}
       <DoodleBackground />
       <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
