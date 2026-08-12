@@ -305,4 +305,46 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     padding-right: 0.5rem !important;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   ANIMATED TOURIST SPOT BADGE KEYFRAMES
+   ───────────────────────────────────────────────────────────── */
+@keyframes palmSway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(8deg); }
+}
+
+@keyframes waveRipple {
+  0%, 100% { transform: translateX(0) scaleY(1); }
+  50% { transform: translateX(6px) scaleY(1.15); }
+}
+
+@keyframes snowFloat {
+  0% { transform: translateY(-6px) translateX(0); opacity: 0.9; }
+  50% { transform: translateY(4px) translateX(3px); opacity: 0.5; }
+  100% { transform: translateY(12px) translateX(-2px); opacity: 0.9; }
+}
+
+@keyframes palaceGlow {
+  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.4)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.9)); }
+}
+
+@keyframes flameFlicker {
+  0%, 100% { transform: scale(1) rotate(-2deg); opacity: 0.85; }
+  25% { transform: scale(1.12) rotate(3deg); opacity: 1; }
+  75% { transform: scale(0.95) rotate(-1deg); opacity: 0.75; }
+}
+
+@keyframes leafFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(12deg); }
+}
+
+.animate-palm-sway { animation: palmSway 3.5s ease-in-out infinite; transform-origin: bottom center; }
+.animate-wave-ripple { animation: waveRipple 2.5s ease-in-out infinite; }
+.animate-snow-float { animation: snowFloat 3s linear infinite; }
+.animate-palace-glow { animation: palaceGlow 2.5s ease-in-out infinite; }
+.animate-flame-flicker { animation: flameFlicker 1.8s ease-in-out infinite; transform-origin: bottom center; }
+.animate-leaf-float { animation: leafFloat 3s ease-in-out infinite; }
 

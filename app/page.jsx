@@ -86,8 +86,8 @@ function MainApp() {
       setDestination(pendingDestination)
       setPendingDestination(null)
     }
-    // Respect pendingView if available, otherwise default to requested view or profile
-    setActiveView(pendingView || "profile")
+    // Navigate directly to Overview page on login
+    setActiveView("home")
     setPendingView(null)
   }
 

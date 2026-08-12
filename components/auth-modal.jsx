@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, CheckCircle2, AlertCircle, ArrowRight, Lock, Mail, User } from "lucide-react"
+import { X, CheckCircle2, AlertCircle, ArrowRight, Lock, Mail, User, Eye, EyeOff, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login" }) {
@@ -10,9 +10,63 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState("")
   const [errorMsg, setErrorMsg] = useState("")
+
+  // Password Strength Evaluation Helper
+  const getPasswordStrength = (pass) => {
+    if (!pass) {
+      return {
+        score: 0,
+        label: "",
+        color: "bg-white/20",
+        percent: 0,
+        checks: { length: false, number: false, upperLower: false, special: false }
+      }
+    }
+
+    const checks = {
+      length: pass.length >= 8,
+      number: /\d/.test(pass),
+      upperLower: /[a-z]/.test(pass) && /[A-Z]/.test(pass),
+      special: /[^A-Za-z0-9]/.test(pass)
+    }
+
+    let count = 0
+    if (pass.length >= 6) count++
+    if (checks.length) count++
+    if (checks.number) count++
+    if (checks.upperLower) count++
+    if (checks.special) count++
+
+    let label = "Too Weak"
+    let color = "bg-rose-500"
+    let percent = 20
+
+    if (count === 2) {
+      label = "Weak"
+      color = "bg-orange-500"
+      percent = 40
+    } else if (count === 3) {
+      label = "Fair"
+      color = "bg-amber-400"
+      percent = 60
+    } else if (count === 4) {
+      label = "Strong"
+      color = "bg-emerald-400"
+      percent = 80
+    } else if (count >= 5) {
+      label = "Very Strong 💪"
+      color = "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"
+      percent = 100
+    }
+
+    return { score: count, label, color, percent, checks }
+  }
+
+  const passwordStrength = getPasswordStrength(password)
 
   // Helper to read registered users from localStorage
   const getRegisteredUsers = () => {
@@ -299,15 +353,74 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-white/90">Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full rounded-md border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
-                  />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-semibold text-white/90">Password</label>
+                    {password && (
+                      <span className={`text-[11px] font-bold transition-all ${
+                        passwordStrength.score <= 1 ? "text-rose-300" :
+                        passwordStrength.score === 2 ? "text-orange-300" :
+                        passwordStrength.score === 3 ? "text-amber-200" :
+                        "text-emerald-300"
+                      }`}>
+                        {passwordStrength.label}
+                      </span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full rounded-md border-0 bg-white/90 pl-4 pr-11 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 transition-colors p-1 cursor-pointer"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+
+                  {/* Password Strength Indicator Bar */}
+                  {password && (
+                    <div className="mt-2.5 space-y-1.5 animate-in fade-in duration-200">
+                      <div className="flex items-center gap-1.5 h-1.5 w-full bg-black/40 p-0.5 rounded-full overflow-hidden border border-white/20">
+                        {[1, 2, 3, 4].map((step) => {
+                          const isActive = (passwordStrength.percent / 25) >= step
+                          return (
+                            <div
+                              key={step}
+                              className={`h-full flex-1 rounded-full transition-all duration-300 ${
+                                isActive ? passwordStrength.color : "bg-white/10"
+                              }`}
+                            />
+                          )
+                        })}
+                      </div>
+
+                      {/* Criteria Checklist on Signup */}
+                      {tab === "signup" && (
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-1 pt-1 text-[10px] text-white/80">
+                          <div className={`flex items-center gap-1 font-medium ${passwordStrength.checks.length ? 'text-emerald-300 font-bold' : 'text-white/60'}`}>
+                            <span>{passwordStrength.checks.length ? "✓" : "○"}</span> 8+ characters
+                          </div>
+                          <div className={`flex items-center gap-1 font-medium ${passwordStrength.checks.upperLower ? 'text-emerald-300 font-bold' : 'text-white/60'}`}>
+                            <span>{passwordStrength.checks.upperLower ? "✓" : "○"}</span> Upper & lowercase
+                          </div>
+                          <div className={`flex items-center gap-1 font-medium ${passwordStrength.checks.number ? 'text-emerald-300 font-bold' : 'text-white/60'}`}>
+                            <span>{passwordStrength.checks.number ? "✓" : "○"}</span> Contains number
+                          </div>
+                          <div className={`flex items-center gap-1 font-medium ${passwordStrength.checks.special ? 'text-emerald-300 font-bold' : 'text-white/60'}`}>
+                            <span>{passwordStrength.checks.special ? "✓" : "○"}</span> Special character
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {tab === "login" && (
