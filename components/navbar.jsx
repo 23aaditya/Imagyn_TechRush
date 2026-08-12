@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Moon, Sun, LogOut, User, Bell, AlertTriangle, ShieldAlert, X, CheckCircle2 } from "lucide-react"
+import { Moon, Sun, LogOut, User, Bell, AlertTriangle, ShieldAlert, X, CheckCircle2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTrip } from "@/context/trip-context"
@@ -269,119 +269,186 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
       {/* Alert Center Slide-Over Drawer Modal */}
       <AnimatePresence>
         {isAlertCenterOpen && (
-          <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm">
             <motion.div
               initial={{ x: "100%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "100%", opacity: 0 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-md h-full bg-background border-l border-border/80 shadow-2xl flex flex-col overflow-hidden text-foreground"
+              className="w-full max-w-md h-full bg-[#0B0D11] border-l border-white/15 shadow-2xl flex flex-col overflow-hidden text-white"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-border/60 bg-muted/20">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#12151C] shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-amber-400 border border-white/10">
+                    <ShieldAlert className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-semibold text-base text-white leading-tight">
+                      Travel Alerts
+                    </h3>
+                    <p className="text-[11px] text-neutral-400 font-medium">
+                      Live crowd & safety context
+                    </p>
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-2">
-                  <ShieldAlert className="h-5 w-5 text-[#00356B]" />
-                  <h3 className="font-heading font-bold text-base text-foreground">
-                    TripNest Alert Center
-                  </h3>
                   {unreadAlertCount > 0 && (
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                    <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                       {unreadAlertCount} Active
                     </span>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => setIsAlertCenterOpen(false)}
+                    className="h-8 w-8 flex items-center justify-center rounded-xl text-neutral-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsAlertCenterOpen(false)}
-                  className="h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors cursor-pointer"
-                >
-                  <X className="h-4 w-4" />
-                </button>
               </div>
 
               {/* Push Permission Prompt */}
               {notificationPermission !== "granted" && (
-                <div className="p-3.5 mx-4 mt-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs">
+                <div className="p-3.5 mx-4 mt-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs shrink-0">
                   <div className="space-y-0.5">
-                    <span className="font-bold text-amber-800 dark:text-amber-200">Background Alerts</span>
-                    <p className="text-[11px] text-muted-foreground">Get notified when site is closed</p>
+                    <span className="font-semibold text-white">Background Push Advisories</span>
+                    <p className="text-[11px] text-neutral-400">Get notified when site is closed</p>
                   </div>
                   <Button
                     size="sm"
                     onClick={requestNotifications}
-                    className="rounded-xl bg-amber-600 text-white hover:bg-amber-700 text-xs font-semibold px-3 py-1 font-button shadow-xs"
+                    className="rounded-xl bg-white text-black hover:bg-neutral-200 text-xs font-semibold px-3 py-1 font-button shadow-xs cursor-pointer"
                   >
                     Enable
                   </Button>
                 </div>
               )}
 
+              {/* Swipe Hint for Mobile */}
+              {alerts.length > 0 && (
+                <div className="px-4 pt-3 text-[10px] text-neutral-500 font-medium text-center uppercase tracking-wider flex items-center justify-center gap-1.5 shrink-0">
+                  <span>← Swipe left to dismiss alert</span>
+                </div>
+              )}
+
               {/* Alerts List */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {alerts.map((alt) => {
-                  const severityMeta = ALERT_SEVERITY[alt.severity] || ALERT_SEVERITY[1]
-                  return (
-                    <div
-                      key={alt.id}
-                      className={cn(
-                        "p-4 rounded-2xl border space-y-2.5 transition-all text-left shadow-2xs",
-                        severityMeta.bg,
-                        severityMeta.border
-                      )}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className={cn("text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md border", severityMeta.color, severityMeta.border)}>
-                          {severityMeta.label}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground font-medium">
-                          {alt.timestamp}
-                        </span>
-                      </div>
+                {alerts.length === 0 ? (
+                  <div className="py-16 text-center text-neutral-400 text-xs space-y-2">
+                    <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto opacity-80" />
+                    <p className="font-medium text-white">All clear around your itinerary</p>
+                    <p className="text-[11px]">No active crowd or safety alerts</p>
+                  </div>
+                ) : (
+                  alerts.map((alt) => {
+                    const severityMeta = ALERT_SEVERITY[alt.severity] || ALERT_SEVERITY[1]
+                    const isSafety = alt.severity >= 4
 
-                      <div>
-                        <h4 className="font-heading font-bold text-sm text-foreground">
-                          {alt.placeName} — {alt.title}
-                        </h4>
-                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                          {alt.message}
-                        </p>
-                      </div>
-
-                      <div className="p-2.5 rounded-xl bg-background/80 border border-border/50 text-xs text-foreground space-y-1">
-                        <div className="font-semibold text-[11px] text-[#00356B]">
-                          Recommended Action:
+                    return (
+                      <motion.div
+                        key={alt.id}
+                        layout
+                        drag="x"
+                        dragConstraints={{ left: -120, right: 0 }}
+                        dragElastic={0.15}
+                        onDragEnd={(e, info) => {
+                          if (info.offset.x < -60 || info.velocity.x < -300) {
+                            dismissAlert(alt.id)
+                          }
+                        }}
+                        initial={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -200, height: 0, marginBottom: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="relative group touch-pan-y"
+                      >
+                        {/* Red background container revealed during swipe */}
+                        <div className="absolute inset-0 bg-rose-600/30 border border-rose-500/40 rounded-2xl flex items-center justify-end px-5 text-rose-300 text-xs font-semibold">
+                          <span className="flex items-center gap-1.5">
+                            <Trash2 className="h-4 w-4" /> Dismiss
+                          </span>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          {alt.recommendation}
-                        </p>
-                        {alt.peakHours && (
-                          <p className="text-[11px] text-muted-foreground pt-0.5">
-                            <strong>Peak Period:</strong> {alt.peakHours}
-                          </p>
-                        )}
-                      </div>
 
-                      <div className="flex items-center justify-between pt-1 border-t border-border/40 text-[11px] text-muted-foreground">
-                        <span>Source: {alt.source}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsAlertCenterOpen(false)
-                            if (setActiveView) setActiveView("itinerary")
-                            window.dispatchEvent(
-                              new CustomEvent("tripnest-focus-spot", {
-                                detail: { spotTitle: alt.affectedSpotTitle || alt.placeName }
-                              })
-                            )
-                          }}
-                          className="font-semibold text-[#00356B] hover:underline cursor-pointer font-button"
-                        >
-                          Focus in Itinerary →
-                        </button>
-                      </div>
-                    </div>
-                  )
-                })}
+                        {/* Foreground Alert Card */}
+                        <div className="relative bg-[#151821] border border-white/10 rounded-2xl p-4 space-y-3 text-left shadow-md">
+                          <div className="flex items-center justify-between gap-2">
+                            <span
+                              className={cn(
+                                "text-[10px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-md border",
+                                isSafety
+                                  ? "bg-rose-500/20 border-rose-500/40 text-rose-300"
+                                  : alt.severity >= 2
+                                  ? "bg-amber-500/20 border-amber-500/40 text-amber-300"
+                                  : "bg-neutral-800 border-white/10 text-neutral-300"
+                              )}
+                            >
+                              {severityMeta.label}
+                            </span>
+
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] text-neutral-400 font-medium">
+                                {alt.timestamp}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => dismissAlert(alt.id)}
+                                title="Dismiss Alert"
+                                className="text-neutral-500 hover:text-neutral-300 p-0.5 transition-colors cursor-pointer"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div>
+                            <h4 className="font-heading font-semibold text-sm text-white flex items-center gap-1.5">
+                              {alt.placeName}
+                              <span className="text-neutral-500">•</span>
+                              <span className="font-normal text-neutral-300">{alt.title}</span>
+                            </h4>
+                            <p className="text-xs text-neutral-300 mt-1 leading-relaxed">
+                              {alt.message}
+                            </p>
+                          </div>
+
+                          <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-xs space-y-1">
+                            <div className="font-medium text-[11px] text-amber-300">
+                              Recommended Action
+                            </div>
+                            <p className="text-xs text-neutral-300 leading-normal">
+                              {alt.recommendation}
+                            </p>
+                            {alt.peakHours && (
+                              <p className="text-[11px] text-neutral-400 pt-0.5 font-mono">
+                                Peak: {alt.peakHours}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1 border-t border-white/10 text-[11px] text-neutral-400">
+                            <span>{alt.source}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsAlertCenterOpen(false)
+                                if (setActiveView) setActiveView("itinerary")
+                                window.dispatchEvent(
+                                  new CustomEvent("tripnest-focus-spot", {
+                                    detail: { spotTitle: alt.affectedSpotTitle || alt.placeName }
+                                  })
+                                )
+                              }}
+                              className="font-medium text-sky-400 hover:text-sky-300 hover:underline cursor-pointer font-button"
+                            >
+                              Focus in Itinerary →
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )
+                  })
+                )}
               </div>
             </motion.div>
           </div>

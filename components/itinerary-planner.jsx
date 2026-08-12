@@ -41,8 +41,10 @@ import {
   Wallet
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { useTrip } from "@/context/trip-context"
 import destinationsData from "@/destinations_105.json"
+import { ItineraryGenerationLoader } from "./itinerary-generation-loader"
 
 // Dynamic import of Leaflet Map component with SSR disabled
 const TripMap = dynamic(() => import("./map").then((mod) => mod.default || mod.TripMap || mod), { ssr: false })
@@ -438,6 +440,39 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
   const [isMapVisible, setIsMapVisible] = useState(false)
   const [nearbyCategory, setNearbyCategory] = useState(null)
 
+  // Resizable Layout Split Ratio (Default 50% / 50%, bounded between 25% and 75%)
+  const [mapSplitPercent, setMapSplitPercent] = useState(50)
+  const isResizingRef = useRef(false)
+
+  const handleMouseDownResize = (e) => {
+    e.preventDefault()
+    isResizingRef.current = true
+    document.body.style.cursor = "col-resize"
+    document.body.style.userSelect = "none"
+
+    const handleMouseMove = (moveEvent) => {
+      if (!isResizingRef.current) return
+      const container = document.getElementById("notebook-spread-container")
+      if (!container) return
+      const rect = container.getBoundingClientRect()
+      const offsetX = moveEvent.clientX - rect.left
+      const newPercent = (offsetX / rect.width) * 100
+      const clamped = Math.max(25, Math.min(75, newPercent))
+      setMapSplitPercent(clamped)
+    }
+
+    const handleMouseUp = () => {
+      isResizingRef.current = false
+      document.body.style.cursor = ""
+      document.body.style.userSelect = ""
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mouseup", handleMouseUp)
+    }
+
+    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mouseup", handleMouseUp)
+  }
+
   // Search & Auto-Suggest & Mini Google Tab Widget State
   const [searchQuery, setSearchQuery] = useState("")
   const [searchSuggestions, setSearchSuggestions] = useState([])
@@ -484,45 +519,46 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
   // Synchronize itinerary & load destination-aware checklist presets
   useEffect(() => {
-    if (destination) {
-      if (!itinerary || itinerary.length === 0) {
-        const newPlan = buildItineraryData(destination, days, startDate)
-        setItinerary(newPlan)
-        setActiveDayIndex(0)
-      }
-
-      // Load destination-specific checklist items
-      const destLower = destination.toLowerCase()
-      let presets = []
-      if (destLower.includes("goa") || destLower.includes("bali") || destLower.includes("maldives") || destLower.includes("kerala") || destLower.includes("thailand")) {
-        presets = [
-          { id: Date.now() + 1, text: "Sunscreen SPF 50 & Beach Lotion 🧴", checked: false, category: `${destination} Coastal` },
-          { id: Date.now() + 2, text: "Polarized Sunglasses & Wide Straw Hat 👒", checked: true, category: `${destination} Coastal` },
-          { id: Date.now() + 3, text: "Waterproof Phone Pouch & Flip Flops 🩴", checked: false, category: `${destination} Coastal` }
-        ]
-      } else if (destLower.includes("manali") || destLower.includes("ladakh") || destLower.includes("shimla") || destLower.includes("switzerland")) {
-        presets = [
-          { id: Date.now() + 1, text: "Heavy Puffer Jacket & Thermal Innerwear 🧥", checked: false, category: `${destination} Alpine` },
-          { id: Date.now() + 2, text: "Waterproof Snow Boots & Woolen Socks 🥾", checked: true, category: `${destination} Alpine` },
-          { id: Date.now() + 3, text: "Woolen Beanie, Gloves & Cold Lip Balm 🧤", checked: false, category: `${destination} Alpine` }
-        ]
-      } else {
-        presets = [
-          { id: Date.now() + 1, text: "Comfortable Heritage Walking Shoes 👟", checked: false, category: `${destination} Culture` },
-          { id: Date.now() + 2, text: "Universal Power Adapter & Camera 📷", checked: true, category: `${destination} Culture` },
-          { id: Date.now() + 3, text: "City Transit Card & Museum Passes 🎟️", checked: false, category: `${destination} Culture` }
-        ]
-      }
-
-      setChecklistItems([
-        ...presets,
-        { id: Date.now() + 4, text: "Government ID / Passport Copies 🪪", checked: true, category: "Essentials" },
-        { id: Date.now() + 5, text: "10,000mAh Power Bank & Charger ⚡", checked: true, category: "Electronics" },
-        { id: Date.now() + 6, text: "Emergency Cash & Driving License 💳", checked: false, category: "Essentials" }
-      ])
-    } else {
-      setItinerary([])
+    const targetDest = destination || "Goa"
+    if (!destination) {
+      setDestination("Goa")
     }
+
+    if (!itinerary || itinerary.length === 0) {
+      const newPlan = buildItineraryData(targetDest, days, startDate)
+      setItinerary(newPlan)
+      setActiveDayIndex(0)
+    }
+
+    // Load destination-specific checklist items
+    const destLower = targetDest.toLowerCase()
+    let presets = []
+    if (destLower.includes("goa") || destLower.includes("bali") || destLower.includes("maldives") || destLower.includes("kerala") || destLower.includes("thailand")) {
+      presets = [
+        { id: Date.now() + 1, text: "Sunscreen SPF 50 & Beach Lotion 🧴", checked: false, category: `${targetDest} Coastal` },
+        { id: Date.now() + 2, text: "Polarized Sunglasses & Wide Straw Hat 👒", checked: true, category: `${targetDest} Coastal` },
+        { id: Date.now() + 3, text: "Waterproof Phone Pouch & Flip Flops 🩴", checked: false, category: `${targetDest} Coastal` }
+      ]
+    } else if (destLower.includes("manali") || destLower.includes("ladakh") || destLower.includes("shimla") || destLower.includes("switzerland")) {
+      presets = [
+        { id: Date.now() + 1, text: "Heavy Puffer Jacket & Thermal Innerwear 🧥", checked: false, category: `${targetDest} Alpine` },
+        { id: Date.now() + 2, text: "Waterproof Snow Boots & Woolen Socks 🥾", checked: true, category: `${targetDest} Alpine` },
+        { id: Date.now() + 3, text: "Woolen Beanie, Gloves & Cold Lip Balm 🧤", checked: false, category: `${targetDest} Alpine` }
+      ]
+    } else {
+      presets = [
+        { id: Date.now() + 1, text: "Comfortable Heritage Walking Shoes 👟", checked: false, category: `${targetDest} Culture` },
+        { id: Date.now() + 2, text: "Universal Power Adapter & Camera 📷", checked: true, category: `${targetDest} Culture` },
+        { id: Date.now() + 3, text: "City Transit Card & Museum Passes 🎟️", checked: false, category: `${targetDest} Culture` }
+      ]
+    }
+
+    setChecklistItems([
+      ...presets,
+      { id: Date.now() + 4, text: "Government ID / Passport Copies 🪪", checked: true, category: "Essentials" },
+      { id: Date.now() + 5, text: "10,000mAh Power Bank & Charger ⚡", checked: true, category: "Electronics" },
+      { id: Date.now() + 6, text: "Emergency Cash & Driving License 💳", checked: false, category: "Essentials" }
+    ])
   }, [destination])
 
   // Handle Search Input Change -> Auto Suggestions from 105 Destinations
@@ -549,9 +585,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
     setShowSearchDropdown(true)
   }
 
-  // Select Destination from Search Suggestion
+  // Select Destination from Search Suggestion (Auto-generates itinerary immediately)
   const handleSelectSearchDestination = (dest) => {
     setDestination(dest.name)
+    setCustomDestInput(dest.name)
     setSearchQuery("")
     setShowSearchDropdown(false)
     setIsGenerating(true)
@@ -562,7 +599,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
       setItinerary(newPlan)
       setActiveDayIndex(0)
       setShowPreferences(false)
-    }, 500)
+    }, 400)
   }
 
   // Hover image slider logic
@@ -593,21 +630,51 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
     }
   }
 
-  // Generate Itinerary Action
+  // Dual-condition state for 3-second minimum animation + API completion
+  const [minTimerDone, setMinTimerDone] = useState(false)
+  const [apiDone, setApiDone] = useState(false)
+  const [pendingPlan, setPendingPlan] = useState(null)
+
+  // Generate Itinerary Action (Starts generation immediately & enforces 3.0s minimum visual animation)
   const handleGenerate = (destOverride) => {
     const targetDest = destOverride || (destPlanningMode === "custom" ? customDestInput.trim() : destination) || destination || "Goa"
     if (!targetDest) return
 
     setDestination(targetDest)
     setIsGenerating(true)
-    setTimeout(() => {
-      setIsGenerating(false)
+    setMinTimerDone(false)
+    setApiDone(false)
+    setPendingPlan(null)
+
+    // 1. Minimum 3.0-Second Visual Animation Timer
+    const minTimer = setTimeout(() => {
+      setMinTimerDone(true)
+    }, 3000)
+
+    // 2. Perform Generation immediately (Asynchronous logic)
+    try {
       const newPlan = buildItineraryData(targetDest, days, startDate)
-      setItinerary(newPlan)
-      setActiveDayIndex(0)
-      setShowPreferences(false)
-    }, 600)
+      setPendingPlan(newPlan)
+      setApiDone(true)
+    } catch (err) {
+      console.error("Failed to generate itinerary:", err)
+      clearTimeout(minTimer)
+      setIsGenerating(false)
+    }
   }
+
+  // Combined Reveal Effect: Triggers ONLY when BOTH minimum 3 seconds AND generation logic have completed!
+  useEffect(() => {
+    if (isGenerating && minTimerDone && apiDone && pendingPlan) {
+      const revealTimer = setTimeout(() => {
+        setItinerary(pendingPlan)
+        setActiveDayIndex(0)
+        setShowPreferences(false)
+        setIsGenerating(false)
+      }, 350)
+      return () => clearTimeout(revealTimer)
+    }
+  }, [isGenerating, minTimerDone, apiDone, pendingPlan])
 
   // Reorder Spot
   const moveSpot = (dayIdx, spotIdx, dir) => {
@@ -770,9 +837,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         backgroundImage: `linear-gradient(to bottom, rgba(248, 246, 242, 0.86), rgba(248, 246, 242, 0.92)), url('/itinerary-bg.jpg')`
       }}
     >
-      <div className="container-responsive">
-
-        {/* Navigation Top Bar */}
+      {/* Top Header & Navigation Bar */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-4">
           <div className="flex items-center gap-3">
             <Button
@@ -861,23 +927,39 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
             </form>
           </div>
         </div>
+      </div>
 
-        {/* Dynamic Left/Right Split Workspace */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-          {/* LEFT SIDE (4 OR 6 COLS): Interactive Map (When Globe Clicked) OR Trip Preferences Form */}
+      {/* Dynamic Edge-to-Edge Master Two-Panel Layout Region (No floating box margin, no side gaps) */}
+      <div
+        id="notebook-spread-container"
+        className="w-full border-y border-border/80 bg-card overflow-hidden flex flex-col lg:flex-row gap-0 items-stretch my-2 transition-all rounded-none"
+      >
+          {/* LEFT SIDE: Map (Slides in from Left) OR Preferences Panel */}
           <AnimatePresence mode="wait">
             {isMapVisible ? (
-              /* MAP APPEARS ON THE LEFT SIDE WHEN GLOBE CLICKED */
               <motion.div
-                key="map-view"
-                initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="lg:col-span-6 flex flex-col space-y-3 sticky top-24"
+                key="map-page"
+                initial={{ x: "-100%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "-100%", opacity: 0 }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  width: typeof window !== "undefined" && window.innerWidth >= 1024 ? `${mapSplitPercent}%` : "100%"
+                }}
+                className="relative flex flex-col h-[640px] border-b lg:border-b-0 lg:border-r border-border/80 shrink-0 bg-background overflow-hidden shadow-[inset_-12px_0_20px_-8px_rgba(0,0,0,0.06)]"
               >
-                <div className="rounded-none border border-border/80 bg-card flex flex-col h-[520px] relative overflow-hidden">
+                {/* Minimal Left Page Atlas Header */}
+                <div className="flex items-center justify-between px-4 py-2 border-b border-border/60 bg-card/90 text-xs font-semibold text-muted-foreground shrink-0 font-button">
+                  <span className="flex items-center gap-1.5 text-foreground font-heading">
+                    <Compass className="h-3.5 w-3.5 text-[#00356B]" />
+                    Atlas Map Page
+                  </span>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider hidden sm:inline">
+                    Drag spine to resize ↔
+                  </span>
+                </div>
+
+                <div className="flex-1 relative w-full h-full">
                   <TripMap
                     spots={activeSpots}
                     nearbyPlaces={activeNearbyPlaces}
@@ -886,15 +968,18 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   />
                 </div>
               </motion.div>
-            ) : (showPreferences || !itinerary || itinerary.length === 0) ? (
-              /* TRIP PREFERENCES PANEL ON THE LEFT */
+            ) : (
+              /* TRIP PREFERENCES & GENERATE ITINERARY PANEL ON THE LEFT */
               <motion.div
                 key="pref-view"
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -30 }}
                 transition={{ duration: 0.35 }}
-                className="lg:col-span-4 rounded-3xl border border-border bg-card p-6 shadow-xl space-y-6 sticky top-24"
+                style={{
+                  width: typeof window !== "undefined" && window.innerWidth >= 1024 ? `${mapSplitPercent}%` : "100%"
+                }}
+                className="relative flex flex-col border-b lg:border-b-0 lg:border-r border-border/80 bg-card p-6 space-y-6 shrink-0 shadow-[inset_-12px_0_20px_-8px_rgba(0,0,0,0.06)] overflow-y-auto max-h-[640px]"
               >
                 <div className="border-b border-border/80 pb-4 space-y-1">
                   <div className="flex items-center justify-between">
@@ -1135,11 +1220,37 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                   )}
                 </Button>
               </motion.div>
-            ) : null}
+            )}
           </AnimatePresence>
 
+          {/* INTERACTIVE RESIZABLE CENTER SPINE HANDLE */}
+          <div
+            onMouseDown={handleMouseDownResize}
+            onTouchStart={(e) => {
+              const touch = e.touches[0]
+              handleMouseDownResize({ preventDefault: () => {}, clientX: touch.clientX })
+            }}
+            className="hidden lg:flex w-2.5 bg-muted/60 hover:bg-[#00356B]/30 border-x border-border/60 cursor-col-resize items-center justify-center transition-colors group shrink-0 select-none z-20"
+            title="Drag left/right to resize split width"
+          >
+              <div className="h-8 w-1 rounded-full bg-muted-foreground/40 group-hover:bg-[#00356B] transition-colors flex items-center justify-center">
+                <GripVertical className="h-3 w-3 text-muted-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+
           {/* RIGHT SIDE / MAIN TIMELINE: Itinerary Cards & Live Budget Overview */}
-          <div className={`${isMapVisible ? "lg:col-span-6" : (showPreferences || !itinerary || itinerary.length === 0) ? "lg:col-span-8" : "lg:col-span-12"} space-y-6`}>
+          <div
+            style={{
+              width: typeof window !== "undefined" && window.innerWidth >= 1024 ? `${100 - mapSplitPercent}%` : "100%"
+            }}
+            className="flex-1 flex flex-col p-5 sm:p-7 space-y-6 overflow-y-auto bg-card"
+          >
+            {/* Full-Screen Centered Backdrop Blur Loader */}
+            <AnimatePresence>
+              {isGenerating && (
+                <ItineraryGenerationLoader destination={destination || "Goa"} days={days || 3} />
+              )}
+            </AnimatePresence>
 
             {!itinerary || itinerary.length === 0 || !destination ? (
               <div className="rounded-3xl border border-dashed border-border bg-card/60 p-12 text-center space-y-4 flex flex-col items-center justify-center min-h-[420px]">
@@ -1525,7 +1636,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
         {/* BOTTOM SECTION: Popular Attractions for Current Destination */}
         {destination && currentAttractions.length > 0 && (
-          <div className="mt-16 border-t border-border/60 pt-10">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 border-t border-border/60 pt-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
               <div>
                 <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary">
@@ -1595,8 +1706,6 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
             </div>
           </div>
         )}
-
-      </div>
 
       {/* Floating Tools Dock (Primary Yale Blue Theme) */}
       <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2.5">
