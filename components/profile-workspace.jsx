@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
+import { DoodleBackground } from "@/components/doodle-background"
 
 // Gamified Badges Dataset
 const USER_BADGES = [
@@ -138,8 +139,10 @@ export function ProfileWorkspace({ onBack }) {
   }
 
   return (
-    <section className="min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-28">
-      <div className="mx-auto max-w-6xl px-4 md:px-6 space-y-8">
+    <section className="relative w-full overflow-hidden min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-28">
+      {/* Travel Doodles Background */}
+      <DoodleBackground />
+      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6 space-y-8">
         
         {/* Navigation Top Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-4">

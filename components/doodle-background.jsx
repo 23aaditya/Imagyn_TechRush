@@ -4,9 +4,9 @@ import React from "react"
 
 export function DoodleBackground({ className = "" }) {
   return (
-    <div className={`absolute inset-0 pointer-events-none overflow-hidden z-0 select-none ${className}`}>
+    <div className={`absolute inset-0 pointer-events-none overflow-hidden -z-10 select-none ${className}`}>
       <svg
-        className="w-full h-full opacity-[0.18] dark:opacity-[0.14] text-foreground transition-opacity duration-300"
+        className="w-full h-full opacity-[0.15] dark:opacity-[0.11] text-foreground/70 transition-opacity duration-300 pointer-events-none"
         xmlns="http://www.w3.org/2000/svg"
         width="100%"
         height="100%"

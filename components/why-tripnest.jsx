@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { DoodleBackground } from "@/components/doodle-background"
 
 const features = [
   {
@@ -82,7 +83,9 @@ export function WhyTripNest() {
 
   return (
     <section id="features" className="relative bg-background px-4 py-20 sm:px-6 lg:py-28 border-t border-border/60 overflow-hidden select-none">
-      <div className="mx-auto max-w-7xl">
+      {/* Travel Doodles Background */}
+      <DoodleBackground />
+      <div className="relative z-10 mx-auto max-w-7xl">
         
         {/* Section Header */}
         <div className="mx-auto max-w-4xl text-center mb-16 space-y-4">

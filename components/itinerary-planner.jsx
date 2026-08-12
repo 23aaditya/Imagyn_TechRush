@@ -42,6 +42,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
+import { DoodleBackground } from "@/components/doodle-background"
 import destinationsData from "@/destinations_105.json"
 
 // Dynamic import of Leaflet Map component with SSR disabled
@@ -728,8 +729,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
   const activeNearbyPlaces = nearbyCategory && nearbyPlacesData[nearbyCategory] ? nearbyPlacesData[nearbyCategory] : []
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20 relative overflow-x-hidden">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20 relative overflow-hidden">
+      {/* Travel Doodles Background */}
+      <DoodleBackground />
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Navigation Top Bar */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-4">

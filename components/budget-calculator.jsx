@@ -19,6 +19,10 @@ import {
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
 import { DoodleBackground } from "@/components/doodle-background"
+import { PieChart } from "@/components/charts/pie-chart"
+import { PieSlice } from "@/components/charts/pie-slice"
+import { PieCenter } from "@/components/charts/pie-center"
+import { PieLabels } from "@/components/charts/pie-labels"
 
 const RADIUS = 100
 const CIRCUM = 2 * Math.PI * RADIUS
@@ -52,48 +56,48 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
   const TOTAL = totalBudget || 35500
   const perPerson = Math.round(TOTAL / Math.max(1, travelers))
 
-  // Curated Premium Pastel Color Palette matching user's design aesthetic
+  // Curated Soft Pastel Color Palette
   const segments = [
     {
       id: "Accommodation",
       label: "Accommodation",
       value: categoryBudgets["Accommodation"] || Math.round(TOTAL * 0.30),
-      color: "#9066D6", // Soft Pastel Purple
+      color: "#B39DDB", // Soft Pastel Lavender
       icon: Bed
     },
     {
       id: "Food & Dining",
       label: "Food & Dining",
       value: categoryBudgets["Food & Dining"] || Math.round(TOTAL * 0.20),
-      color: "#9FE165", // Soft Pastel Lime
+      color: "#C5E1A5", // Soft Pastel Sage Green
       icon: UtensilsCrossed
     },
     {
       id: "Activities",
       label: "Activities",
       value: categoryBudgets["Activities"] || Math.round(TOTAL * 0.17),
-      color: "#F46593", // Soft Pastel Rose Pink
+      color: "#F48FB1", // Soft Pastel Rose Pink
       icon: Ticket
     },
     {
       id: "Shopping",
       label: "Shopping",
       value: categoryBudgets["Shopping"] || Math.round(TOTAL * 0.11),
-      color: "#F7A361", // Soft Pastel Peach Orange
+      color: "#FFCC80", // Soft Pastel Warm Apricot
       icon: ShoppingBag
     },
     {
       id: "Emergency Reserve",
       label: "Emergency",
       value: categoryBudgets["Emergency Reserve"] || Math.round(TOTAL * 0.10),
-      color: "#66D5B4", // Soft Pastel Mint Teal
+      color: "#80CBC4", // Soft Pastel Mint Teal
       icon: ShieldAlert
     },
     {
       id: "Transport",
       label: "Transport",
       value: categoryBudgets["Transport"] || Math.round(TOTAL * 0.12),
-      color: "#38B2B0", // Soft Pastel Cyan Teal
+      color: "#90CAF9", // Soft Pastel Sky Blue
       icon: Bus
     },
   ]
@@ -107,28 +111,28 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
     const currentOffset = offsetAccum
     offsetAccum += dash
 
-    // Mid-angle calculation in standard unrotated screen space (where -90° is 12 o'clock)
+    // Mid-angle calculation starting from 12 o'clock (-90° / -PI/2) moving clockwise
     const startFraction = currentOffset / CIRCUM
     const midFraction = startFraction + fraction / 2
     const midAngleRotatedDeg = midFraction * 360 - 90
     const midAngleRad = (midAngleRotatedDeg * Math.PI) / 180
 
-    // Inner Ring Percentage Coordinates (Radius = 100, dead-center in stroke)
+    // Inner Ring Percentage Coordinates (Radius = 100)
     const innerX = CENTER + RADIUS * Math.cos(midAngleRad)
     const innerY = CENTER + RADIUS * Math.sin(midAngleRad)
 
-    // Outer Perimeter Category Label Coordinates (Radius = 132 for perfect 10px spacing from ring)
-    const outerX = CENTER + 132 * Math.cos(midAngleRad)
-    const outerY = CENTER + 132 * Math.sin(midAngleRad)
+    // Outer Perimeter Category Label Coordinates (Radius = 142 for perfect 15px clearance around the donut slices)
+    const outerX = CENTER + 142 * Math.cos(midAngleRad)
+    const outerY = CENTER + 142 * Math.sin(midAngleRad)
 
-    // Precise quadrant-aware text alignment parameters for tight, readable spacing
+    // Precise quadrant-aware text alignment parameters for tight, readable spacing next to its slice
     let textAnchor = "middle"
-    if (outerX > CENTER + 15) textAnchor = "start"
-    else if (outerX < CENTER - 15) textAnchor = "end"
+    if (outerX > CENTER + 20) textAnchor = "start"
+    else if (outerX < CENTER - 20) textAnchor = "end"
 
     let dy = "0.35em"
-    if (outerY < CENTER - 30) dy = "-0.3em"
-    else if (outerY > CENTER + 30) dy = "0.85em"
+    if (outerY < CENTER - 40) dy = "-0.2em"
+    else if (outerY > CENTER + 40) dy = "0.75em"
 
     return {
       ...seg,
@@ -155,10 +159,10 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
   }
 
   return (
-    <section id="budget" className={`relative w-full ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
+    <section id="budget" className={`relative w-full overflow-hidden ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20" : "bg-secondary/40 py-20 md:py-28"}`}>
       {/* Travel Doodles Background */}
       <DoodleBackground />
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
         
         {/* Workspace Top Bar */}
         {isWorkspace && (
@@ -168,19 +172,13 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                 variant="outline"
                 size="sm"
                 onClick={onBack}
-                className="rounded-xl border-border bg-background hover:bg-accent text-xs sm:text-sm cursor-pointer"
+                className="rounded-sm border border-[#B5D9F3] bg-[#D8EBF9] hover:bg-[#C5E2F6] text-[#0F172A] text-xs sm:text-sm font-bold cursor-pointer transition-all shadow-xs"
               >
-                <ArrowLeft className="mr-1.5 h-4 w-4" />
+                <ArrowLeft className="mr-1.5 h-4 w-4 text-[#0F172A]" />
                 Back to Overview
               </Button>
               <span className="text-muted-foreground">/</span>
               <span className="font-medium text-foreground text-sm">Interactive Budget Workspace</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary border border-primary/20">
-                <Sparkles className="h-3.5 w-3.5" />
-                Live Synced with AI Itinerary & Expenses
-              </span>
             </div>
           </div>
         )}
@@ -200,13 +198,6 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
           {/* White Font BUDGET Title & Subtitle Overlay */}
           <div className="relative z-10 text-center px-4 max-w-3xl">
-            <motion.span
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="font-heading text-xs sm:text-sm font-extrabold uppercase tracking-[0.25em] text-[#5B8DEF] block mb-2"
-            >
-              FINANCIAL TRAVEL ARCHITECT
-            </motion.span>
             <motion.h1
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -228,26 +219,28 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
 
         {/* Selected Package Callout Banner */}
         {selectedPackage && (
-          <div className="mx-auto mb-8 max-w-4xl rounded-2xl border border-teal-500/30 bg-[#0D2B45] p-5 md:p-6 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <span className="text-xs uppercase font-bold text-teal-300 tracking-wider block">
-                Selected Package Active
-              </span>
-              <h4 className="font-heading text-xl font-bold">{selectedPackage.name}</h4>
-              <p className="text-xs text-slate-300">
-                Base Package Price: <strong className="text-white">₹{packageBaseCost.toLocaleString("en-IN")}</strong> · Extra Attractions: <strong className="text-amber-400">+₹{additionalExpenses.toLocaleString("en-IN")}</strong>
-              </p>
-            </div>
-            <div className="sm:text-right border-t sm:border-t-0 sm:border-l border-white/20 pt-3 sm:pt-0 sm:pl-6">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Est. Cost</span>
-              <span className="font-heading text-2xl font-bold text-teal-300">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
+          <div className="mb-10 w-full rounded-sm border border-[#E2DDCB] dark:border-[#38332A] bg-[#F4F1E2] dark:bg-[#25221C] p-5 sm:p-6 text-[#1E293B] dark:text-[#F1ECE2] shadow-sm select-none">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="space-y-1.5">
+                <span className="inline-block text-[11px] uppercase font-black text-[#0F172A] bg-[#D8EBF9] border border-[#B5D9F3] px-3 py-1 rounded-sm tracking-wider">
+                  Selected Package Active
+                </span>
+                <h4 className="font-heading text-xl sm:text-2xl font-black text-black dark:text-white">{selectedPackage.name}</h4>
+                <p className="text-xs text-[#475569] dark:text-[#A9A092] font-medium">
+                  Base Package Price: <strong className="text-black dark:text-white">₹{packageBaseCost.toLocaleString("en-IN")}</strong> · Extra Attractions: <strong className="text-[#B45309] dark:text-amber-400">+₹{additionalExpenses.toLocaleString("en-IN")}</strong>
+                </p>
+              </div>
+              <div className="sm:text-right border-t sm:border-t-0 sm:border-l border-[#D4CEB8] dark:border-[#38332A] pt-3 sm:pt-0 sm:pl-8">
+                <span className="text-[10px] uppercase font-bold text-[#64748B] dark:text-[#A9A092] block tracking-wider">Total Est. Cost</span>
+                <span className="font-heading text-2xl sm:text-3xl font-black text-black dark:text-white">₹{estimatedTotalTripCost.toLocaleString("en-IN")}</span>
+              </div>
             </div>
           </div>
         )}
 
         {/* Interactive Sliders Control */}
         {isWorkspace && (
-          <div className="mb-10 grid gap-6 rounded-3xl border border-border bg-card p-6 shadow-sm md:grid-cols-3">
+          <div className="mb-10 grid gap-6 rounded-sm border border-border bg-card p-6 shadow-sm md:grid-cols-3">
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Trip Duration</label>
@@ -259,7 +252,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                 max="14"
                 value={days}
                 onChange={(e) => setDays(Number(e.target.value))}
-                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+                className="w-full accent-[#5B8DEF] cursor-pointer h-2 bg-muted rounded-none"
               />
             </div>
 
@@ -274,7 +267,7 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                 max="8"
                 value={travelers}
                 onChange={(e) => setTravelers(Number(e.target.value))}
-                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+                className="w-full accent-[#5B8DEF] cursor-pointer h-2 bg-muted rounded-none"
               />
             </div>
 
@@ -289,10 +282,10 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                       setStayTier(tier)
                       setCustomTargetBudget(null)
                     }}
-                    className={`rounded-xl py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    className={`rounded-sm py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                       stayTier === tier
-                        ? "bg-primary text-primary-foreground shadow-sm scale-[1.02]"
-                        : "border border-border text-muted-foreground hover:bg-muted"
+                        ? "bg-[#D8EBF9] text-[#0F172A] border border-[#B5D9F3] shadow-sm scale-[1.02]"
+                        : "border border-border text-muted-foreground hover:bg-[#D8EBF9]/30 hover:text-foreground"
                     }`}
                   >
                     {tier}
@@ -304,122 +297,72 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
         )}
 
         {/* Dynamic Elevated Donut Chart & Breakdown Grid Container */}
-        <div className="grid items-center gap-10 rounded-3xl border border-border/80 bg-card p-6 shadow-lg md:grid-cols-12 md:p-10">
+        <div className="grid items-center gap-10 rounded-sm border border-border/80 bg-card p-6 shadow-lg md:grid-cols-12 md:p-10">
           
           {/* Main Donut Chart Container (Col-span 6) */}
-          <div className="md:col-span-6 flex flex-col items-center justify-center relative py-4">
-            <div className="relative flex h-[340px] w-[340px] items-center justify-center">
+          <div className="md:col-span-6 flex flex-col items-center justify-center relative py-2">
+            <div className="relative flex h-[400px] w-full max-w-[400px] items-center justify-center overflow-visible">
               
-              {/* SVG Donut Ring */}
-              <svg viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`} className="h-full w-full overflow-visible">
-                {/* SVG Rotated Group for Ring Drawing starting at 12 o'clock */}
-                <g transform={`rotate(-90 ${CENTER} ${CENTER})`}>
-                  {/* Track background */}
-                  <circle
-                    cx={CENTER}
-                    cy={CENTER}
-                    r={RADIUS}
-                    fill="none"
-                    stroke="currentColor"
-                    className="text-muted/15"
-                    strokeWidth="44"
-                  />
+              {/* @bklit/pie-chart Component */}
+              <PieChart
+                data={processedSegments.map((seg) => ({
+                  id: seg.id,
+                  label: seg.label,
+                  value: seg.value,
+                  color: seg.color,
+                }))}
+                innerRadius={68}
+                hoverOffset={55}
+                padAngle={0.03}
+                cornerRadius={4}
+                hoveredIndex={
+                  hoveredCategory
+                    ? processedSegments.findIndex((s) => s.id === hoveredCategory)
+                    : null
+                }
+                onHoverChange={(index) => {
+                  if (index !== null && index >= 0 && processedSegments[index]) {
+                    setHoveredCategory(processedSegments[index].id)
+                  } else {
+                    setHoveredCategory(null)
+                  }
+                }}
+                className="w-full h-full"
+              >
+                {processedSegments.map((seg, idx) => (
+                  <PieSlice key={seg.id} index={idx} color={seg.color} />
+                ))}
 
-                  {/* Donut Slices */}
-                  {processedSegments.map((seg) => {
-                    const isHovered = hoveredCategory === seg.id
-                    return (
-                      <motion.circle
-                        key={seg.id}
-                        cx={CENTER}
-                        cy={CENTER}
-                        r={RADIUS}
-                        fill="none"
-                        stroke={seg.color}
-                        strokeWidth={isHovered ? 50 : 44}
-                        strokeDasharray={`${Math.max(0, seg.dash - 2.5)} ${CIRCUM - Math.max(0, seg.dash - 2.5)}`}
-                        initial={{ strokeDashoffset: CIRCUM }}
-                        animate={{ strokeDashoffset: -seg.currentOffset }}
-                        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                        onMouseEnter={() => setHoveredCategory(seg.id)}
-                        onMouseLeave={() => setHoveredCategory(null)}
-                        className="cursor-pointer transition-all duration-200 hover:opacity-90"
-                      />
-                    )
-                  })}
-                </g>
+                {/* Exact Outer Category Labels Aligned to Slices */}
+                <PieLabels
+                  hoverColor="#513229"
+                  labelRadiusOffset={20}
+                  onHoverChange={(index) => {
+                    if (index !== null && index >= 0 && processedSegments[index]) {
+                      setHoveredCategory(processedSegments[index].id)
+                    } else {
+                      setHoveredCategory(null)
+                    }
+                  }}
+                />
 
-                {/* Inner Ring Percentage Typography */}
-                {processedSegments.map((seg) => {
-                  if (seg.pct < 3) return null
-                  return (
-                    <text
-                      key={`pct-${seg.id}`}
-                      x={seg.innerX}
-                      y={seg.innerY}
-                      textAnchor="middle"
-                      dominantBaseline="central"
-                      className="fill-white font-extrabold font-sans pointer-events-none"
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 800,
-                        filter: "drop-shadow(0px 1px 2px rgba(0,0,0,0.5))"
-                      }}
-                    >
-                      {seg.pct}%
-                    </text>
-                  )
-                })}
+                <PieCenter>
+                  {() => (
+                    <div className="flex flex-col items-center justify-center text-center p-2">
+                      <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        TOTAL ESTIMATED
+                      </span>
+                      <span className="font-heading text-xl sm:text-2xl font-extrabold text-[#0D2B45] dark:text-white leading-tight my-0.5">
+                        ₹{TOTAL.toLocaleString("en-IN")}
+                      </span>
+                      <span className="mt-1 text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 block">
+                        ₹{perPerson.toLocaleString("en-IN")} / person
+                      </span>
+                    </div>
+                  )}
+                </PieCenter>
+              </PieChart>
 
-                {/* Outer Perimeter Category Label Typography (Optimized 10px spacing for perfect readability) */}
-                {processedSegments.map((seg) => {
-                  const isHovered = hoveredCategory === seg.id
-                  return (
-                    <text
-                      key={`outer-${seg.id}`}
-                      x={seg.outerX}
-                      y={seg.outerY}
-                      dy={seg.dy}
-                      textAnchor={seg.textAnchor}
-                      className={`font-bold text-[11.5px] font-sans transition-all duration-200 pointer-events-none ${
-                        isHovered ? "fill-primary font-extrabold scale-105" : "fill-foreground"
-                      }`}
-                      style={{
-                        fontSize: isHovered ? "12px" : "11px",
-                        fontWeight: isHovered ? 900 : 700,
-                      }}
-                    >
-                      {seg.label}
-                    </text>
-                  )
-                })}
-              </svg>
-
-              {/* Central Elevated White Badge (Exact Match to User's Design) */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="flex h-36 w-36 sm:h-38 sm:w-38 flex-col items-center justify-center rounded-full bg-slate-50 dark:bg-slate-900 border-4 border-white dark:border-slate-800 shadow-xl shadow-slate-900/10 p-2 text-center pointer-events-auto transition-transform hover:scale-105">
-                  
-                  {/* Circular Rupee Coin Badge */}
-                  <div className="mb-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 shadow-2xs">
-                    <IndianRupee className="h-3 w-3 stroke-[2.5]" />
-                  </div>
-
-                  {/* Title */}
-                  <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                    TOTAL ESTIMATED
-                  </span>
-
-                  {/* Main Rupee Amount */}
-                  <span className="font-heading text-xl sm:text-2xl font-extrabold text-[#0D2B45] dark:text-white leading-tight my-0.5">
-                    ₹{TOTAL.toLocaleString("en-IN")}
-                  </span>
-
-                  {/* Per Person Pill Badge */}
-                  <span className="mt-0.5 inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                    ₹{perPerson.toLocaleString("en-IN")} / person
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -435,24 +378,24 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                   key={seg.label}
                   onMouseEnter={() => setHoveredCategory(seg.id)}
                   onMouseLeave={() => setHoveredCategory(null)}
-                  className={`flex flex-col justify-between rounded-2xl border p-4 transition-all duration-200 ${
+                  className={`flex flex-col justify-between rounded-sm border p-4 transition-all duration-200 cursor-pointer ${
                     isHovered
-                      ? "border-primary shadow-md scale-[1.02] bg-accent/40"
+                      ? "border-[#D4CEB8] shadow-md scale-[1.02] bg-[#F4F1E2] text-[#513229] dark:bg-[#2B2822] dark:text-[#F1ECE2] dark:border-[#423D33]"
                       : isOverridden
                       ? "border-primary/50 bg-primary/5"
-                      : "border-border/80 bg-background hover:border-primary/40"
+                      : "border-border/80 bg-background hover:bg-[#F4F1E2] hover:border-[#D4CEB8] dark:hover:bg-[#2B2822] dark:hover:border-[#423D33]"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2.5">
                       <span
-                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-2xs"
+                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-sm shadow-2xs"
                         style={{ backgroundColor: `${seg.color}20`, color: seg.color }}
                       >
                         <Icon className="h-4 w-4 stroke-[2.5]" aria-hidden />
                       </span>
                       <div>
-                        <h4 className="truncate text-xs font-bold text-foreground leading-snug">{seg.label}</h4>
+                        <h4 className={`truncate text-sm sm:text-base font-extrabold transition-colors leading-snug ${isHovered ? "text-[#513229]" : "text-foreground"}`}>{seg.label}</h4>
                         <span className="text-[10px] font-extrabold" style={{ color: seg.color }}>
                           {seg.pct}% Allocation
                         </span>
@@ -467,13 +410,13 @@ export function BudgetCalculator({ isWorkspace = false, onBack, onOpenWorkspace 
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
                         placeholder={`₹${seg.value}`}
-                        className="w-full rounded-xl border border-primary bg-background px-2.5 py-1 text-xs font-bold text-foreground focus:outline-none"
+                        className="w-full rounded-sm border border-primary bg-background px-2.5 py-1 text-xs font-bold text-foreground focus:outline-none"
                         autoFocus
                       />
                       <Button
                         size="sm"
                         onClick={() => handleSaveOverride(seg.label)}
-                        className="rounded-lg text-[10px] font-bold px-2.5 py-1 bg-primary text-primary-foreground"
+                        className="rounded-sm text-[10px] font-bold px-2.5 py-1 bg-[#D8EBF9] text-[#0F172A] hover:bg-[#C5E2F6] border border-[#B5D9F3] cursor-pointer"
                       >
                         Save
                       </Button>
