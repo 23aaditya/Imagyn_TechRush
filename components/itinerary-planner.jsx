@@ -829,12 +829,15 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
 
   const currentAttractions = getAttractionsForDestination(destination)
 
+  // Drag and Drop Ref
+  const dragItemRef = useRef(null)
+
   // Active Spots for Map
   const activeSpots = itinerary && itinerary[activeDayIndex] ? itinerary[activeDayIndex].activities : []
   const activeNearbyPlaces = nearbyCategory && nearbyPlacesData[nearbyCategory] ? nearbyPlacesData[nearbyCategory] : []
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-20 relative overflow-hidden">
+    <div className="min-h-screen bg-white text-[#100B12] pt-24 pb-20 relative overflow-hidden font-button">
       {/* Overview Search -> Planner Transition Overlay */}
       <AnimatePresence>
         {showTransitionLoader && (
@@ -842,8 +845,6 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         )}
       </AnimatePresence>
 
-      {/* Travel Doodles Background */}
-      <DoodleBackground />
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Navigation Top Bar */}
@@ -863,16 +864,6 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
           </div>
 
           <div className="flex items-center gap-2">
-            {itinerary && itinerary.length > 0 && (
-              <Button
-                size="sm"
-                onClick={() => setShowPreferences((prev) => !prev)}
-                className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] text-xs font-medium px-4 py-2 flex items-center gap-1.5 cursor-pointer transition-all shadow-md font-button"
-              >
-                <SlidersHorizontal className="h-4 w-4 text-white" />
-                <span>{showPreferences ? "Hide Trip Options" : "Edit Trip Options"}</span>
-              </Button>
-            )}
             <Button
               onClick={() => {
                 saveCurrentTrip()
@@ -1380,21 +1371,34 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                       </span>
                     </div>
 
-                    {/* Day Activities Stream with Distance Connectors */}
-                    <div className="space-y-3 max-h-[620px] overflow-y-auto pr-1">
-                      {itinerary[activeDayIndex]?.activities.map((act, idx) => {
+                    {/* Day Activities Stream with Distance Connectors & Motion Transitions */}
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeDayIndex}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                        className="space-y-3 max-h-[620px] overflow-y-auto pr-1"
+                      >
+                        {itinerary[activeDayIndex]?.activities.map((act, idx) => {
                         const spotImages = act.images || [
                           "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
                         ]
                         const distToNext = idx === 0 ? "5.5 km • 18 mins travel" : "3.0 km • 10 mins travel"
 
+                        const alertConflict = activeItineraryAlerts.find(
+                          (conf) => (conf.spotTitle || "").toLowerCase().includes((act.title || "").toLowerCase()) || (act.title || "").toLowerCase().includes((conf.spotTitle || "").toLowerCase())
+                        )
+                        const hasCrowdAlert = !!alertConflict
+
                         return (
                           <div key={act.id || idx} className="space-y-3">
-                            {/* Distance Connector Pill */}
+                            {/* Distance Connector (Plain Black Text) */}
                             {idx > 0 && (
-                              <div className="flex items-center justify-start ml-10 my-1">
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#27A84D] text-white text-[11px] font-medium px-3 py-1">
-                                  <MapPin className="h-3 w-3" />
+                              <div className="flex items-center justify-start ml-10 my-1 font-button">
+                                <span className="flex items-center gap-1.5 text-xs font-medium text-black dark:text-white">
+                                  <MapPin className="h-3.5 w-3.5 text-black dark:text-white" />
                                   <span>{act.distanceToNext || distToNext}</span>
                                 </span>
                               </div>
@@ -1404,6 +1408,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                             <div
                               draggable={true}
                               onDragStart={(e) => {
+                                dragItemRef.current = idx
                                 setDraggedSpotIdx(idx)
                                 e.dataTransfer.setData("text/plain", idx.toString())
                                 e.dataTransfer.effectAllowed = "move"
@@ -1418,23 +1423,30 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                               }}
                               onDrop={(e) => {
                                 e.preventDefault()
-                                const fromIdx = parseInt(e.dataTransfer.getData("text/plain"), 10)
+                                const fromData = e.dataTransfer.getData("text/plain")
+                                const fromIdx = dragItemRef.current !== null ? dragItemRef.current : (fromData ? parseInt(fromData, 10) : null)
                                 setDraggedSpotIdx(null)
                                 setDragOverSpotIdx(null)
-                                if (!isNaN(fromIdx) && fromIdx !== idx) {
-                                  reorderDayActivities(activeDayIndex, fromIdx, idx)
+                                if (fromIdx !== null && !isNaN(fromIdx) && fromIdx !== idx) {
+                                  if (typeof reorderDayActivities === "function") {
+                                    reorderDayActivities(activeDayIndex, fromIdx, idx)
+                                  }
                                 }
+                                dragItemRef.current = null
                               }}
                               onDragEnd={() => {
                                 setDraggedSpotIdx(null)
                                 setDragOverSpotIdx(null)
+                                dragItemRef.current = null
                               }}
-                              className={`group relative rounded-2xl border p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all cursor-grab active:cursor-grabbing ${
-                                draggedSpotIdx === idx
-                                  ? "opacity-30 border-dashed border-[#8E5AB5] bg-[#8E5AB5]/5 scale-[0.98]"
+                              className={`group relative rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all cursor-grab active:cursor-grabbing font-button ${
+                                hasCrowdAlert
+                                  ? "border-2 border-red-500 bg-red-500/5 dark:bg-red-500/10 shadow-sm"
+                                  : draggedSpotIdx === idx
+                                  ? "opacity-30 border-dashed border-[#100B12] bg-[#DDD0EA]/20 scale-[0.98]"
                                   : dragOverSpotIdx === idx
-                                  ? "border-2 border-[#8E5AB5] bg-[#8E5AB5]/10 shadow-lg scale-[1.01]"
-                                  : "border-border bg-background/60 hover:shadow-sm"
+                                  ? "border-2 border-[#100B12] bg-[#DDD0EA]/40 shadow-md scale-[1.01]"
+                                  : "border border-neutral-200 bg-white hover:shadow-sm"
                               }`}
                             >
                               <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -1443,7 +1455,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 {/* Spot Coin Avatar */}
                                 <div
                                   onClick={() => setActiveSpotDetail({ ...act, dayIndex: activeDayIndex, spotIndex: idx })}
-                                  className="h-11 w-11 rounded-full overflow-hidden border-2 border-[#27A84D] shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                                  className="h-11 w-11 rounded-full overflow-hidden border-2 border-neutral-300 shrink-0 cursor-pointer hover:scale-105 transition-transform"
                                   title="Click to view place photos & info"
                                 >
                                   <img src={spotImages[0]} alt={act.title} className="h-full w-full object-cover" />
@@ -1454,7 +1466,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                     <h4 className="font-heading text-sm font-semibold text-foreground truncate">
                                       {act.title}
                                     </h4>
-                                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-medium text-[11px] px-2.5 py-0.5 shrink-0">
+                                    <span className="rounded-full bg-neutral-100 text-[#100B12] font-medium text-[11px] px-2.5 py-0.5 shrink-0">
                                       {act.cost}
                                     </span>
                                   </div>
@@ -1466,70 +1478,29 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                     <span>Open: {act.openingHours || "10:00 AM - 07:00 PM"}</span>
                                   </div>
 
-                                  {/* Contextual Crowd & Safety Alert Badge */}
-                                  {(() => {
-                                    const alertConflict = activeItineraryAlerts.find(
-                                      (conf) => (conf.spotTitle || "").toLowerCase().includes((act.title || "").toLowerCase()) || (act.title || "").toLowerCase().includes((conf.spotTitle || "").toLowerCase())
-                                    )
-                                    if (!alertConflict) return null
+                                  {/* Contextual Crowd & Safety Alert Badge (Red Outline & High Crowd Text) */}
+                                  {hasCrowdAlert && (() => {
                                     const alt = alertConflict.alert
-                                    const isSafety = alt.severity >= 4
                                     return (
                                       <div
-                                        className={cn(
-                                          "mt-2 p-2.5 rounded-xl border text-xs space-y-1.5 transition-all text-left font-button",
-                                          isSafety ? "bg-rose-500/10 border-rose-500/30 text-rose-800 dark:text-rose-200" : "bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-200"
-                                        )}
+                                        className="mt-2.5 p-2 rounded-xl border border-red-500 bg-red-500/10 text-red-700 text-xs font-button flex items-center justify-between gap-2"
                                       >
-                                        <div className="flex items-center justify-between font-bold text-[11px] gap-2">
-                                          <span className="flex items-center gap-1.5">
-                                            <AlertTriangle className={cn("h-3.5 w-3.5 shrink-0", isSafety ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400")} />
-                                            <span>{alt.title}</span>
-                                          </span>
-                                          {alt.peakHours && <span className="text-[10px] opacity-85 font-mono">{alt.peakHours}</span>}
+                                        <div className="flex items-center gap-1.5 font-medium text-xs text-red-600">
+                                          <AlertTriangle className="h-3.5 w-3.5 text-red-600 shrink-0" />
+                                          <span>High Crowd</span>
                                         </div>
-                                        <p className="text-[11px] opacity-90 leading-tight">
-                                          {alt.recommendation}
-                                        </p>
-                                        <div className="flex items-center gap-2 pt-0.5">
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              const [timeStr, period] = (act.time || "10:00 AM").split(" ")
-                                              let [h, m] = (timeStr || "10:00").split(":").map(Number)
-                                              if (period === "PM" && h < 12) h += 12
-                                              if (period === "AM" && h === 12) h = 0
-                                              h = (h + 1) % 24
-                                              const newPeriod = h >= 12 ? "PM" : "AM"
-                                              const newH = h % 12 === 0 ? 12 : h % 12
-                                              const newTime = `${newH.toString().padStart(2, '0')}:${(m || 0).toString().padStart(2, '0')} ${newPeriod}`
-                                              
-                                              updateItinerary(activeDayIndex, act.id, { time: newTime })
-                                            }}
-                                            className="rounded-lg bg-amber-600/20 hover:bg-amber-600/30 text-amber-900 dark:text-amber-100 font-semibold px-2 py-0.5 text-[10px] transition-colors cursor-pointer"
-                                          >
-                                            Shift +1 Hr
-                                          </button>
-
-                                          <button
-                                            type="button"
-                                            onClick={() => dismissAlert(alt.id)}
-                                            className="text-[10px] text-muted-foreground hover:underline cursor-pointer"
-                                          >
-                                            Dismiss
-                                          </button>
-                                        </div>
+                                        {alt.peakHours && <span className="text-[10px] opacity-85 font-mono text-red-600">{alt.peakHours}</span>}
                                       </div>
                                     )
                                   })()}
                                 </div>
                               </div>
 
-                              <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-border">
+                              <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-neutral-100">
                                 <button
                                   type="button"
                                   onClick={() => setActiveSpotDetail({ ...act, dayIndex: activeDayIndex, spotIndex: idx })}
-                                  className="rounded-xl border border-[#8E5AB5] bg-[#8E5AB5]/15 text-[#8E5AB5] dark:text-[#86B3E6] hover:bg-[#8E5AB5] hover:text-white px-3.5 py-1 text-xs font-medium transition-all flex items-center gap-1 cursor-pointer shadow-xs font-button"
+                                  className="rounded-xl border border-none bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] px-3.5 py-1 text-xs font-medium transition-all flex items-center gap-1 cursor-pointer shadow-xs font-button"
                                 >
                                   <Globe className="h-3 w-3" />
                                   <span>More Info</span>
@@ -1538,8 +1509,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 <button
                                   type="button"
                                   disabled={idx === 0}
-                                  onClick={() => idx > 0 && reorderDayActivities(activeDayIndex, idx, idx - 1)}
-                                  className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer"
+                                  onClick={() => idx > 0 && typeof reorderDayActivities === "function" && reorderDayActivities(activeDayIndex, idx, idx - 1)}
+                                  className="p-1 text-neutral-600 hover:text-black disabled:opacity-30 cursor-pointer"
                                   title="Move Up"
                                 >
                                   <MoveUp className="h-3.5 w-3.5" />
@@ -1548,8 +1519,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 <button
                                   type="button"
                                   disabled={idx === (itinerary[activeDayIndex]?.activities?.length || 1) - 1}
-                                  onClick={() => idx < (itinerary[activeDayIndex]?.activities?.length || 1) - 1 && reorderDayActivities(activeDayIndex, idx, idx + 1)}
-                                  className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer"
+                                  onClick={() => idx < (itinerary[activeDayIndex]?.activities?.length || 1) - 1 && typeof reorderDayActivities === "function" && reorderDayActivities(activeDayIndex, idx, idx + 1)}
+                                  className="p-1 text-neutral-600 hover:text-black disabled:opacity-30 cursor-pointer"
                                   title="Move Down"
                                 >
                                   <MoveDown className="h-3.5 w-3.5" />
@@ -1568,7 +1539,8 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                           </div>
                         )
                       })}
-                    </div>
+                      </motion.div>
+                    </AnimatePresence>
 
                     {/* Add Custom Spot & Add Day Actions */}
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border">
@@ -2302,68 +2274,68 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         )}
       </AnimatePresence>
 
-      {/* Google Maps Style Place Information & Photo Modal */}
+      {/* Clean White Theme Place Information Modal */}
       <AnimatePresence>
         {activeSpotDetail && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl space-y-0"
+              className="w-full max-w-xl overflow-hidden rounded-2xl border border-neutral-200 bg-white text-[#100B12] shadow-2xl space-y-0 font-button"
             >
-              {/* Google Maps Style Header Bar */}
-              <div className="flex items-center justify-between bg-[#1E293B] text-white px-5 py-3 border-b border-slate-700">
+              {/* Header Bar */}
+              <div className="flex items-center justify-between bg-white text-[#100B12] px-5 py-3.5 border-b border-neutral-100">
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-emerald-400" />
-                  <span className="text-xs font-medium uppercase tracking-wider text-slate-300">
-                    Google Maps Place Information
+                  <MapPin className="h-4 w-4 text-[#8E5AB5]" />
+                  <span className="text-xs font-medium uppercase tracking-wider text-neutral-500 font-button">
+                    Place Information
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setActiveSpotDetail(null)}
-                  className="rounded-xl bg-white/10 p-1 text-slate-300 hover:bg-white/20 hover:text-white transition-colors cursor-pointer"
+                  className="rounded-xl bg-neutral-100 p-1.5 text-neutral-500 hover:bg-neutral-200 hover:text-black transition-colors cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
               {/* Cover Image & Rating Header */}
-              <div className="relative h-56 w-full overflow-hidden bg-slate-900">
+              <div className="relative h-56 w-full overflow-hidden bg-neutral-100">
                 <img
                   src={activeSpotDetail.images?.[0] || activeSpotDetail.img || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"}
                   alt={activeSpotDetail.title}
                   className="h-full w-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                 <div className="absolute bottom-3 left-5 right-5 text-white">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="rounded-full bg-emerald-500 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                    <span className="rounded-full bg-[#DDD0EA] px-2.5 py-0.5 text-[10px] font-normal uppercase tracking-wider text-[#100B12]">
                       {activeSpotDetail.category || "Sightseeing"}
                     </span>
-                    <div className="flex items-center gap-1 text-xs font-medium text-amber-400 bg-black/60 px-2 py-0.5 rounded-full border border-white/10">
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      <span>4.8 (1,280 reviews)</span>
+                    <div className="flex items-center gap-1 text-xs font-normal text-amber-300 bg-black/60 px-2 py-0.5 rounded-full border border-white/10">
+                      <Star className="h-3 w-3 fill-amber-300 text-amber-300" />
+                      <span>4.8 Rating</span>
                     </div>
                   </div>
 
-                  <h3 className="font-heading text-2xl font-bold leading-tight text-white">
+                  <h3 className="font-button text-2xl font-medium leading-tight text-white">
                     {activeSpotDetail.title}
                   </h3>
                 </div>
               </div>
 
-              {/* Google Maps Style Quick Actions Bar */}
-              <div className="bg-muted/40 border-b border-border px-5 py-2.5 flex items-center justify-between gap-2 overflow-x-auto">
+              {/* Quick Actions Bar */}
+              <div className="bg-neutral-50 border-b border-neutral-100 px-5 py-2.5 flex items-center justify-between gap-2 overflow-x-auto">
                 <button
                   type="button"
                   onClick={() => {
                     const query = encodeURIComponent(`${activeSpotDetail.title} ${destination || ""}`)
                     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank")
                   }}
-                  className="rounded-xl bg-[#8E5AB5] text-white hover:bg-[#7B4A9E] font-medium text-xs px-3.5 py-1.5 shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0 font-button"
+                  className="rounded-xl bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] font-normal text-xs px-3.5 py-1.5 shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0 font-button"
                 >
                   <Compass className="h-3.5 w-3.5" />
                   <span>Open Directions</span>
@@ -2375,58 +2347,58 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     const query = encodeURIComponent(`photos of ${activeSpotDetail.title} ${destination || ""}`)
                     window.open(`https://www.google.com/search?tbm=isch&q=${query}`, "_blank")
                   }}
-                  className="rounded-xl border border-border bg-background hover:bg-accent text-foreground font-medium text-xs px-3.5 py-1.5 shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0 font-button"
+                  className="rounded-xl border border-neutral-200 bg-white hover:bg-neutral-100 text-[#100B12] font-normal text-xs px-3.5 py-1.5 shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0 font-button"
                 >
-                  <Camera className="h-3.5 w-3.5 text-primary" />
+                  <Camera className="h-3.5 w-3.5 text-neutral-700" />
                   <span>Google Photos</span>
                 </button>
 
-                <span className="font-semibold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 shrink-0">
+                <span className="font-normal text-xs text-[#100B12] bg-[#DDD0EA]/60 px-3 py-1 rounded-full border-none shrink-0">
                   Est. {activeSpotDetail.cost}
                 </span>
               </div>
 
               {/* Spot Details Body */}
-              <div className="p-5 space-y-4">
+              <div className="p-5 space-y-4 font-button">
                 <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="rounded-xl border border-border/70 bg-background p-3 space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground block">
+                  <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 space-y-1">
+                    <span className="text-[10px] font-normal uppercase tracking-wider text-neutral-500 block">
                       Scheduled & Hours
                     </span>
-                    <p className="font-medium text-foreground flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5 text-primary" />
+                    <p className="font-normal text-[#100B12] flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5 text-neutral-600" />
                       {activeSpotDetail.time}
                     </p>
-                    <p className="text-[11px] text-muted-foreground font-medium">
+                    <p className="text-[11px] text-neutral-500 font-normal">
                       Open: {activeSpotDetail.openingHours || "08:00 AM - 08:00 PM"}
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-border/70 bg-background p-3 space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground block">
+                  <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 space-y-1">
+                    <span className="text-[10px] font-normal uppercase tracking-wider text-neutral-500 block">
                       Location & Vibe
                     </span>
-                    <p className="font-medium text-foreground flex items-center gap-1 truncate">
-                      <MapPin className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                    <p className="font-normal text-[#100B12] flex items-center gap-1 truncate">
+                      <MapPin className="h-3.5 w-3.5 text-neutral-600 shrink-0" />
                       {destination || "Goa"}
                     </p>
-                    <p className="text-[11px] text-muted-foreground font-medium">
+                    <p className="text-[11px] text-neutral-500 font-normal">
                       Verified Place Highlight
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">
+                  <span className="text-[11px] font-normal text-neutral-500 uppercase tracking-wider block">
                     About Place / Overview
                   </span>
-                  <p className="text-xs leading-relaxed text-card-foreground font-medium">
+                  <p className="text-xs leading-relaxed text-neutral-700 font-normal">
                     {activeSpotDetail.desc || `Popular destination landmark and curated experience for your trip in ${destination || "Goa"}.`}
                   </p>
                 </div>
 
                 {/* Actions Footer */}
-                <div className="flex items-center justify-between pt-3 border-t border-border">
+                <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
                   <Button
                     type="button"
                     variant="outline"
@@ -2435,7 +2407,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                       removeSpot(activeSpotDetail.dayIndex, activeSpotDetail.spotIndex)
                       setActiveSpotDetail(null)
                     }}
-                    className="rounded-xl border-rose-500/30 text-rose-500 hover:bg-rose-500/10 text-xs font-medium px-3.5 py-1.5 cursor-pointer font-button"
+                    className="rounded-xl border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-normal px-3.5 py-1.5 cursor-pointer font-button"
                   >
                     <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                     Remove from Day
@@ -2445,7 +2417,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                     type="button"
                     size="sm"
                     onClick={() => setActiveSpotDetail(null)}
-                    className="rounded-xl bg-secondary text-secondary-foreground hover:bg-accent font-medium text-xs px-5 py-1.5 cursor-pointer font-button"
+                    className="rounded-xl bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] font-normal text-xs px-5 py-1.5 cursor-pointer font-button border-none"
                   >
                     Close Card
                   </Button>

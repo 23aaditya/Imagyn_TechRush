@@ -133,7 +133,7 @@ function MainApp() {
   }
 
   return (
-    <main className={`relative min-h-screen ${activeView === "home" ? "bg-background" : "bg-background dark:bg-[#11100E] text-foreground dark:text-[#F1ECE2]"}`} suppressHydrationWarning>
+    <main className="relative min-h-screen bg-white text-[#100B12]" suppressHydrationWarning>
       {/* Signature Journey Line Transition */}
       <JourneyLine isNavigating={isNavigatingLine} triggerKey={activeView} />
 

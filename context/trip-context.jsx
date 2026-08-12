@@ -1209,6 +1209,7 @@ export function TripProvider({ children }) {
     updateItinerary,
     addSpotToItinerary,
     removeSpotFromItinerary,
+    reorderDayActivities,
     removeSpotByName,
     removeDayFromItinerary,
     restoreLastRemovedDay,

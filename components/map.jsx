@@ -81,7 +81,50 @@ const TRANSIT_MODES = [
   { id: "walk", label: "Walk", icon: Footprints, speedKmh: 5.5 }
 ]
 
-// ─── Discovery Category Tabs ────────────────────────────────────────────
+// ─── Curated Unique Photos by Category ───────────────────────────────
+const DISCOVERY_CATEGORY_PHOTOS = {
+  cafes: [
+    "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&auto=format&fit=crop&q=80"
+  ],
+  restaurants: [
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&auto=format&fit=crop&q=80"
+  ],
+  attractions: [
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80"
+  ],
+  hotels: [
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600&auto=format&fit=crop&q=80"
+  ]
+}
+
+function getCategoryPhoto(place) {
+  if (!place) return "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=80"
+  if (place.img) return place.img
+  if (place.images && place.images.length > 0) return place.images[0]
+  const cat = place.category || "cafes"
+  const photoList = DISCOVERY_CATEGORY_PHOTOS[cat] || DISCOVERY_CATEGORY_PHOTOS.cafes
+  const nameStr = place.name || place.title || ""
+  let hash = 0
+  for (let i = 0; i < nameStr.length; i++) hash += nameStr.charCodeAt(i)
+  return photoList[Math.abs(hash) % photoList.length]
+}
+
+// ─── Proximity Distance Rings ───────────────────────────────────────────
 const DISCOVERY_CATEGORIES = [
   { id: "cafes", label: "Cafes", icon: Coffee, color: "#f59e0b", emoji: "☕" },
   { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed, color: "#ef4444", emoji: "🍽️" },
@@ -485,26 +528,26 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       stayMarkerRef.current = null
     }
 
-    // ── Stay Anchor Marker (Both Modes) ───────────────────────────────
+    // ── Stay Anchor Marker (Red Pin Theme) ───────────────────────────────
     if (activeStay && activeStay.lat && activeStay.lng) {
       const stayIcon = L.divIcon({
         className: "stay-anchor-marker",
         html: `
-          <div style="position: relative; width: 48px; height: 56px; filter: drop-shadow(0px 6px 16px rgba(90,140,178,0.7));">
-            <svg viewBox="0 0 384 512" width="48" height="56" fill="#5B8DEF">
+          <div style="position: relative; width: 44px; height: 52px; filter: drop-shadow(0px 6px 14px rgba(239,68,68,0.5));">
+            <svg viewBox="0 0 384 512" width="44" height="52" fill="#EF4444">
               <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z"/>
             </svg>
-            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: 20px;">🏠</div>
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: white; font-size: 18px;">📍</div>
             <div style="
-              position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
-              width: 56px; height: 56px; border-radius: 50%;
-              border: 2px solid rgba(90,140,178,0.4);
+              position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+              width: 52px; height: 52px; border-radius: 50%;
+              border: 2px solid rgba(239,68,68,0.4);
               animation: stayPulse 2s ease-in-out infinite;
             "></div>
           </div>
         `,
-        iconSize: [48, 56],
-        iconAnchor: [24, 56]
+        iconSize: [44, 52],
+        iconAnchor: [22, 52]
       })
 
       const stayMarker = L.marker([activeStay.lat, activeStay.lng], { icon: stayIcon, zIndexOffset: 1000 }).addTo(map)
@@ -530,9 +573,9 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
         if (ring.radiusKm <= maxRingKm) {
           const circle = L.circle([activeStay.lat, activeStay.lng], {
             radius: ring.radiusKm * 1000,
-            color: ring.color,
-            fillColor: ring.color,
-            fillOpacity: ring.opacity,
+            color: "#8E5AB5",
+            fillColor: "#8E5AB5",
+            fillOpacity: ring.opacity * 0.5,
             weight: 1,
             dashArray: "6, 4",
             interactive: false
@@ -541,33 +584,32 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
         }
       })
 
-      // ── Discovery POI Markers ────────────────────────────────────────
-      const catMeta = CATEGORY_META[activeDiscoveryCategory] || { emoji: "📍", color: "#6b7280" }
+      // ── Discovery POI Markers (Plain White Button Format, No Yellow Border!) ──
+      const catMeta = CATEGORY_META[activeDiscoveryCategory] || { emoji: "📍", color: "#8E5AB5" }
       activeDiscoveredPlaces.forEach((place, idx) => {
         if (!place.lat || !place.lng) return
 
         const isSelected = selectedDiscoveryPlace?.id === place.id
-        const markerColor = isSelected ? "#1e293b" : catMeta.color
 
         const poiIcon = L.divIcon({
           className: "discovery-poi-marker",
           html: `
             <div style="
-              display: inline-flex; align-items: center; gap: 5px;
-              background: #ffffff; border: 2px solid ${markerColor};
-              padding: 4px 10px; border-radius: 20px;
-              box-shadow: 0 4px 12px ${markerColor}44;
+              display: inline-flex; align-items: center; gap: 6px;
+              background: #ffffff; border: ${isSelected ? '2px solid #8E5AB5' : '1px solid #e5e5e5'};
+              padding: 5px 12px; border-radius: 12px;
+              box-shadow: ${isSelected ? '0 4px 16px rgba(142,90,181,0.3)' : '0 2px 8px rgba(0,0,0,0.08)'};
               font-family: 'Instrument Sans', system-ui, sans-serif;
-              transform: ${isSelected ? 'scale(1.15)' : 'scale(1)'};
+              transform: ${isSelected ? 'scale(1.08)' : 'scale(1)'};
               transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
               white-space: nowrap; cursor: pointer;
             ">
               <span style="font-size: 13px; line-height: 1;">${catMeta.emoji}</span>
-              <span style="font-size: 11px; font-weight: 600; color: #0F172A; max-width: 110px; overflow: hidden; text-overflow: ellipsis;">${place.name}</span>
+              <span style="font-size: 11px; font-weight: 500; color: #100B12; max-width: 120px; overflow: hidden; text-overflow: ellipsis;">${place.name}</span>
             </div>
           `,
-          iconSize: [120, 32],
-          iconAnchor: [20, 16]
+          iconSize: [130, 34],
+          iconAnchor: [20, 17]
         })
 
         const marker = L.marker([place.lat, place.lng], { icon: poiIcon }).addTo(map)
@@ -663,29 +705,54 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
         stayLinesRef.current.push(lineFromLast)
       }
 
-      // ── OSRM Route Polyline ──────────────────────────────────────────
+      // ── OSRM Route Polyline (Progressive Route Draw & Morphing Animation) ──
       if (routePathCoords.length > 1) {
-        const glowLine = L.polyline(routePathCoords, {
-          color: "#8493A5",
-          weight: 8,
-          opacity: 0.3,
-          lineCap: "round",
-          lineJoin: "round"
-        })
+        const isReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        
+        if (isReducedMotion) {
+          const glowLine = L.polyline(routePathCoords, { color: "#8493A5", weight: 8, opacity: 0.3, lineCap: "round", lineJoin: "round" })
+          const mainLine = L.polyline(routePathCoords, { color: "#2563EB", weight: 4, opacity: 0.9, lineCap: "round", lineJoin: "round" })
+          const group = L.layerGroup([glowLine, mainLine]).addTo(map)
+          polylineRef.current = group
+        } else {
+          let currentStep = 0
+          const totalSteps = 25
+          const drawInterval = setInterval(() => {
+            currentStep++
+            const progress = currentStep / totalSteps
+            const sliceCount = Math.max(2, Math.floor(routePathCoords.length * progress))
+            const sliceCoords = routePathCoords.slice(0, sliceCount)
 
-        const mainLine = L.polyline(routePathCoords, {
-          color: "#2563EB",
-          weight: 4,
-          opacity: 0.9,
-          lineCap: "round",
-          lineJoin: "round"
-        })
+            if (polylineRef.current) {
+              map.removeLayer(polylineRef.current)
+            }
 
-        const group = L.layerGroup([glowLine, mainLine]).addTo(map)
-        polylineRef.current = group
+            const glowLine = L.polyline(sliceCoords, { color: "#8493A5", weight: 8, opacity: 0.3, lineCap: "round", lineJoin: "round" })
+            const mainLine = L.polyline(sliceCoords, { color: "#2563EB", weight: 4, opacity: 0.9, lineCap: "round", lineJoin: "round" })
+            const group = L.layerGroup([glowLine, mainLine]).addTo(map)
+            polylineRef.current = group
+
+            if (currentStep >= totalSteps) {
+              clearInterval(drawInterval)
+            }
+          }, 20)
+        }
       }
     }
   }, [visibleSpots, nearbyPlaces, hoveredSpotId, activeStay, routePathCoords, mapMode, activeDiscoveredPlaces, activeDiscoveryCategory, selectedDiscoveryPlace, activeDayFilter, itinerary, discoveryRadius])
+
+  // ─── Smoothly focus map when hoveredSpotId or selectedMarkerSpot changes ─
+  useEffect(() => {
+    const map = mapInstanceRef.current
+    if (!map) return
+    const targetSpot = visibleSpots.find((s) => s.id === hoveredSpotId) || selectedMarkerSpot
+    if (targetSpot && targetSpot.lat && targetSpot.lng) {
+      map.flyTo([targetSpot.lat, targetSpot.lng], Math.max(map.getZoom(), 14), {
+        duration: 0.8,
+        easeLinearity: 0.25
+      })
+    }
+  }, [hoveredSpotId, selectedMarkerSpot, visibleSpots])
 
   // ─── Fit map to content ───────────────────────────────────────────────
   const handleZoomIntoPlaces = () => {
@@ -719,7 +786,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
   }
 
   return (
-    <div className="h-full w-full relative overflow-hidden rounded-none min-h-[500px] sm:min-h-[620px] bg-card flex flex-col border border-border">
+    <div className="h-full w-full relative overflow-hidden rounded-none min-h-[500px] sm:min-h-[620px] bg-white flex flex-col border border-neutral-200">
 
       {/* ─── CSS for Animations ──────────────────────────────────────── */}
       <style>{`
@@ -1056,63 +1123,62 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       )}
 
       {/* ═════════════════════════════════════════════════════════════════
-          4. SELECTED DISCOVERY PLACE DETAIL CARD
+          4. SELECTED DISCOVERY PLACE DETAIL CARD (WITH THUMBNAIL IMAGE)
          ═════════════════════════════════════════════════════════════════ */}
       {selectedDiscoveryPlace && mapMode === "discovery" && (
-        <div className="absolute bottom-16 left-3 z-[1000] pointer-events-auto max-w-xs w-full">
-          <div className="bg-background/95 backdrop-blur-md p-4 rounded-lg border border-border space-y-2.5 relative">
+        <div className="absolute bottom-16 left-3 z-[1000] pointer-events-auto max-w-sm w-full font-button">
+          <div className="bg-white p-3.5 rounded-2xl border border-neutral-200 shadow-2xl space-y-2.5 relative text-[#100B12]">
             <button
               type="button"
               onClick={() => setSelectedDiscoveryPlace(null)}
-              className="absolute top-2.5 right-2.5 text-muted-foreground hover:text-foreground"
+              className="absolute top-3 right-3 z-10 rounded-full bg-white/80 p-1 text-neutral-600 hover:text-black shadow-xs cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
 
-            <div className="flex items-start gap-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-semibold" style={{ backgroundColor: CATEGORY_META[selectedDiscoveryPlace.category]?.color || "#E60023" }}>
-                {CATEGORY_META[selectedDiscoveryPlace.category]?.emoji || "📍"}
-              </div>
+            {/* Place Thumbnail Photo */}
+            <div className="relative h-32 w-full rounded-xl overflow-hidden bg-neutral-100">
+              <img
+                src={getCategoryPhoto(selectedDiscoveryPlace)}
+                alt={selectedDiscoveryPlace.name}
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute bottom-2 left-2 rounded-full bg-black/60 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-medium text-white">
+                {selectedDiscoveryPlace.categoryLabel || "Place Highlight"}
+              </span>
+            </div>
+
+            <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground line-clamp-1">{selectedDiscoveryPlace.name}</p>
-                <p className="text-[10px] text-muted-foreground line-clamp-1">
-                  {selectedDiscoveryPlace.categoryLabel} • {selectedDiscoveryPlace.distanceKm?.toFixed(1)} km from stay
+                <h4 className="text-sm font-semibold text-[#100B12] line-clamp-1 font-button">{selectedDiscoveryPlace.name}</h4>
+                <p className="text-xs text-neutral-500 font-normal mt-0.5">
+                  {selectedDiscoveryPlace.distanceKm?.toFixed(1)} km away • 4.8 ⭐ Rating
                 </p>
               </div>
             </div>
 
+            {/* Brief Concise Description */}
+            <p className="text-xs text-neutral-600 font-normal leading-relaxed">
+              {selectedDiscoveryPlace.cuisine ? `Specialty food & dining highlight.` : selectedDiscoveryPlace.address ? `Curated travel spot at ${selectedDiscoveryPlace.address}.` : `Popular local spot for dining, culture, and exploration.`}
+            </p>
+
             {/* Transport Estimates */}
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-1">
               {getAllTransportEstimates(selectedDiscoveryPlace.distanceKm).filter(t => t.mode !== "bus").map((t) => (
-                <div key={t.mode} className="flex items-center gap-1 bg-accent/50 px-2 py-1 rounded-lg shrink-0">
-                  <span className="text-[9px] font-medium text-foreground">{t.label}</span>
-                  <span className="text-[9px] font-semibold text-[#E60023]">₹{t.cost}</span>
-                  <span className="text-[9px] text-muted-foreground">{t.duration}</span>
+                <div key={t.mode} className="flex items-center gap-1 bg-neutral-100 px-2 py-1 rounded-lg shrink-0 text-[11px]">
+                  <span className="font-normal text-neutral-700">{t.label}</span>
+                  <span className="font-medium text-[#100B12]">₹{t.cost}</span>
+                  <span className="text-neutral-500 text-[10px]">{t.duration}</span>
                 </div>
               ))}
             </div>
 
-            {/* Meta Info */}
-            {(selectedDiscoveryPlace.cuisine || selectedDiscoveryPlace.openingHours || selectedDiscoveryPlace.address) && (
-              <div className="space-y-1">
-                {selectedDiscoveryPlace.cuisine && (
-                  <p className="text-[10px] text-muted-foreground">🍴 Cuisine: {selectedDiscoveryPlace.cuisine}</p>
-                )}
-                {selectedDiscoveryPlace.openingHours && (
-                  <p className="text-[10px] text-muted-foreground">🕐 {selectedDiscoveryPlace.openingHours}</p>
-                )}
-                {selectedDiscoveryPlace.address && (
-                  <p className="text-[10px] text-muted-foreground line-clamp-1">📍 {selectedDiscoveryPlace.address}</p>
-                )}
-              </div>
-            )}
-
             {/* Add to Itinerary */}
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2 pt-2 border-t border-neutral-100">
               <select
                 value={addToDayIndex}
                 onChange={(e) => setAddToDayIndex(parseInt(e.target.value, 10))}
-                className="text-xs font-medium bg-accent rounded-lg px-2.5 py-1.5 border border-border outline-none focus:ring-1 focus:ring-primary w-16 text-center font-button"
+                className="text-xs font-normal bg-neutral-100 rounded-xl px-2.5 py-2 border-none outline-none w-20 text-center font-button text-[#100B12] cursor-pointer"
               >
                 {itinerary?.length > 0 ? (
                   itinerary.map((d, i) => (
@@ -1125,20 +1191,10 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               <button
                 type="button"
                 onClick={() => handleAddDiscoveredPlace(selectedDiscoveryPlace)}
-                className="flex-1 rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-xs py-2 flex items-center justify-center gap-1 cursor-pointer shadow-sm font-button"
+                className="flex-1 rounded-xl bg-[#DDD0EA] text-[#100B12] hover:bg-[#C8B8DD] font-normal text-xs py-2 flex items-center justify-center gap-1.5 cursor-pointer transition-all font-button border-none"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add to Itinerary
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setWishlist((prev) => [...prev, selectedDiscoveryPlace.name])
-                }}
-                className="p-2 rounded-xl border border-border hover:bg-accent text-rose-500 cursor-pointer"
-                title="Save to Wishlist"
-              >
-                <Heart className="h-4 w-4 fill-rose-500" />
               </button>
             </div>
           </div>
@@ -1146,22 +1202,35 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       )}
 
       {/* ═════════════════════════════════════════════════════════════════
-          5. SELECTED ITINERARY SPOT INFO CARD (Itinerary Mode)
+          5. SELECTED ITINERARY SPOT INFO CARD (WITH THUMBNAIL IMAGE)
          ═════════════════════════════════════════════════════════════════ */}
       {selectedMarkerSpot && !selectedDiscoveryPlace && (
-        <div className="absolute bottom-16 left-3 z-[1000] pointer-events-auto max-w-xs w-full">
-          <div className="bg-background/95 backdrop-blur-md p-4 rounded-2xl border border-border space-y-2 relative">
+        <div className="absolute bottom-16 left-3 z-[1000] pointer-events-auto max-w-sm w-full font-button">
+          <div className="bg-white p-3.5 rounded-2xl border border-neutral-200 shadow-2xl space-y-2.5 relative text-[#100B12]">
             <button
               type="button"
               onClick={() => setSelectedMarkerSpot(null)}
-              className="absolute top-2.5 right-2.5 text-muted-foreground hover:text-foreground"
+              className="absolute top-3 right-3 z-10 rounded-full bg-white/80 p-1 text-neutral-600 hover:text-black shadow-xs cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-foreground">{selectedMarkerSpot.title}</span>
+
+            {/* Spot Photo */}
+            <div className="relative h-32 w-full rounded-xl overflow-hidden bg-neutral-100">
+              <img
+                src={selectedMarkerSpot.images?.[0] || selectedMarkerSpot.img || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"}
+                alt={selectedMarkerSpot.title}
+                className="h-full w-full object-cover"
+              />
             </div>
-            <p className="text-[11px] text-muted-foreground line-clamp-2">{selectedMarkerSpot.desc || "Popular highlight on map"}</p>
+
+            <div className="flex items-center justify-between gap-2">
+              <h4 className="text-sm font-semibold text-[#100B12] line-clamp-1">{selectedMarkerSpot.title}</h4>
+              <span className="text-xs font-medium text-[#100B12] bg-[#DDD0EA] px-2 py-0.5 rounded-full shrink-0">
+                {selectedMarkerSpot.cost || "₹500"}
+              </span>
+            </div>
+            <p className="text-xs text-neutral-600 font-normal line-clamp-2">{selectedMarkerSpot.desc || "Popular highlight on map"}</p>
             <div className="flex items-center justify-between text-xs font-medium text-[#E60023] pt-1">
               <span>{selectedMarkerSpot.cost || "₹500"}</span>
               <span>⭐ 4.8 Rating</span>
