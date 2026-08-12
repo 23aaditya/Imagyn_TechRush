@@ -90,18 +90,11 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
           className="flex items-center text-left focus:outline-none group py-0.5 bg-transparent border-none cursor-pointer shrink-0"
           aria-label="TripNest Homepage"
         >
-          <div className={cn(
-            "rounded-md px-3 py-1.5 border shadow-sm transition-all backdrop-blur-md",
-            isLightBg
-              ? "bg-neutral-900/10 border-neutral-900/20 hover:bg-neutral-900/20"
-              : "bg-white/20 border-white/30 hover:bg-white/30"
-          )}>
-            <img
-              src="/tripnest-logo.png"
-              alt="TripNest Imagyn"
-              className="h-7 sm:h-8 w-auto object-contain"
-            />
-          </div>
+          <img
+            src="/tripnest-logo.png"
+            alt="TripNest by Imagyn"
+            className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
+          />
         </button>
 
         {/* Top Navbar Menu Links (Clean underline for active view, no blue background) */}

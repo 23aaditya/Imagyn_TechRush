@@ -13,13 +13,11 @@ export function Footer({ onNavigateView }) {
           }}
           className="flex items-center text-left focus:outline-none group cursor-pointer"
         >
-          <div className="rounded-md bg-white/95 backdrop-blur-md px-3 py-1.5 border border-border shadow-xs transition-opacity hover:opacity-90">
-            <img
-              src="/tripnest-logo.png"
-              alt="TripNest Imagyn"
-              className="h-7 w-auto object-contain"
-            />
-          </div>
+          <img
+            src="/tripnest-logo.png"
+            alt="TripNest Imagyn"
+            className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
+          />
         </button>
 
         {/* Essential Navigation Links */}
