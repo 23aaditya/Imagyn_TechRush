@@ -882,15 +882,6 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
 
               {/* Header Actions */}
               <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setIsLiveAudioOpen(true)}
-                  className="rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-semibold text-[11px] h-7 px-2.5 flex items-center gap-1.5 transition-all cursor-pointer font-button"
-                  title="Open Live Voice Mode"
-                >
-                  <Radio className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
-                  <span>Voice</span>
-                </button>
 
                 <button
                   type="button"
@@ -983,7 +974,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
                           "rounded-2xl px-4 py-3 shadow-2xs",
                           isAssistant
                             ? "bg-card border border-border/60 text-card-foreground rounded-tl-xs"
-                            : "bg-[#00356B] text-white rounded-tr-xs"
+                            : "bg-[#8d5bb3] text-white rounded-tr-xs"
                         )}
                       >
                         {renderFormattedText(msg.content)}
@@ -1028,7 +1019,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
                                 }
                                 onNavigate?.("itinerary")
                               }}
-                              className="w-full rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-semibold text-xs py-2 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all font-button"
+                              className="w-full rounded-xl bg-[#8d5bb3] text-white hover:bg-[#7a4aa0] font-semibold text-xs py-2 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all font-button"
                             >
                               <Calendar className="h-4 w-4" />
                               Plan Itinerary & Sync Map
@@ -1055,7 +1046,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
                           <div className="mt-3 rounded-xl border border-border/60 bg-accent/30 p-3 space-y-2">
                             <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
                               <span className="font-bold text-xs text-foreground flex items-center gap-1">
-                                <Calendar className="h-3.5 w-3.5 text-[#00356B]" />
+                                <Calendar className="h-3.5 w-3.5 text-[#8d5bb3]" />
                                 Day {msg.dayPlanCard.dayNumber}: {msg.dayPlanCard.theme}
                               </span>
                             </div>
@@ -1092,7 +1083,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
                                     })
                                     onNavigate?.("itinerary")
                                   }}
-                                  className="mt-1 w-full rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-semibold text-[11px] py-1 shadow-2xs flex items-center justify-center gap-1 cursor-pointer font-button"
+                                  className="mt-1 w-full rounded-xl bg-[#8d5bb3] text-white hover:bg-[#7a4aa0] font-semibold text-[11px] py-1 shadow-2xs flex items-center justify-center gap-1 cursor-pointer font-button"
                                 >
                                   <Plus className="h-3.5 w-3.5" />
                                   Add to Itinerary (Day 1)
@@ -1110,7 +1101,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
                               onNavigate?.("itinerary")
                               setIsOpen(false)
                             }}
-                            className="mt-2.5 w-full rounded-xl bg-[#00356B] text-white text-xs font-semibold py-1.5 shadow-2xs flex items-center justify-center gap-1.5 font-button"
+                            className="mt-2.5 w-full rounded-xl bg-[#8d5bb3] text-white text-xs font-semibold py-1.5 shadow-2xs flex items-center justify-center gap-1.5 font-button"
                           >
                             <Compass className="h-3.5 w-3.5" />
                             Open Itinerary Workspace
@@ -1135,7 +1126,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
               {/* Typing indicator */}
               {isLoading && (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground py-2 font-medium">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#00356B]/15 text-[#00356B] animate-spin">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#8d5bb3]/15 text-[#8d5bb3] animate-spin">
                     <RefreshCw className="h-3.5 w-3.5" />
                   </div>
                   <span>Boots is checking your itinerary...</span>
@@ -1160,7 +1151,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
                   placeholder={isRecordingMic ? "Listening to your voice..." : "Ask Boots about your trip..."}
                   disabled={isLoading}
                   className={cn(
-                    "h-11 rounded-2xl bg-background pl-4 pr-20 text-xs sm:text-sm border-border/70 focus-visible:ring-[#00356B]/30 font-button transition-all",
+                    "h-11 rounded-2xl bg-background pl-4 pr-20 text-xs sm:text-sm border-border/70 focus-visible:ring-[#8d5bb3]/30 font-button transition-all",
                     isRecordingMic && "border-rose-500 ring-2 ring-rose-500/20 bg-rose-500/5 text-rose-600 dark:text-rose-400 font-semibold"
                   )}
                 />
@@ -1182,7 +1173,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
                   <button
                     type="submit"
                     disabled={!inputMessage.trim() || isLoading}
-                    className="h-8 w-8 flex items-center justify-center rounded-xl bg-[#00356B] text-white hover:bg-[#002852] disabled:opacity-40 transition-all cursor-pointer font-button shadow-xs"
+                    className="h-8 w-8 flex items-center justify-center rounded-xl bg-[#8d5bb3] text-white hover:bg-[#7a4aa0] disabled:opacity-40 transition-all cursor-pointer font-button shadow-xs"
                   >
                     <Send className="h-3.5 w-3.5" />
                   </button>

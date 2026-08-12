@@ -679,19 +679,26 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
     }
   }, [isGenerating, minTimerDone, apiDone, pendingPlan])
 
-  // Reorder Spot
-  const moveSpot = (dayIdx, spotIdx, dir) => {
-    if (!itinerary) return
-    const updated = [...itinerary]
-    const list = [...updated[dayIdx].activities]
-    const target = spotIdx + dir
-    if (target >= 0 && target < list.length) {
-      const temp = list[spotIdx]
-      list[spotIdx] = list[target]
-      list[target] = temp
-      updated[dayIdx].activities = list
-      setItinerary(updated)
+  // Reorder Spot Helper (Safely uses reorderDayActivities or falls back to setItinerary)
+  const handleReorder = (dayIdx, fromIdx, toIdx) => {
+    if (typeof reorderDayActivities === "function") {
+      reorderDayActivities(dayIdx, fromIdx, toIdx)
+    } else if (typeof setItinerary === "function") {
+      setItinerary((prev) => {
+        if (!prev || !prev[dayIdx]) return prev
+        const updated = [...prev]
+        const activities = [...(updated[dayIdx].activities || [])]
+        if (fromIdx < 0 || fromIdx >= activities.length || toIdx < 0 || toIdx >= activities.length) return prev
+        const [moved] = activities.splice(fromIdx, 1)
+        activities.splice(toIdx, 0, moved)
+        updated[dayIdx] = { ...updated[dayIdx], activities }
+        return updated
+      })
     }
+  }
+
+  const moveSpot = (dayIdx, spotIdx, dir) => {
+    handleReorder(dayIdx, spotIdx, spotIdx + dir)
   }
 
   // Remove Spot
@@ -1428,9 +1435,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 setDraggedSpotIdx(null)
                                 setDragOverSpotIdx(null)
                                 if (fromIdx !== null && !isNaN(fromIdx) && fromIdx !== idx) {
-                                  if (typeof reorderDayActivities === "function") {
-                                    reorderDayActivities(activeDayIndex, fromIdx, idx)
-                                  }
+                                  handleReorder(activeDayIndex, fromIdx, idx)
                                 }
                                 dragItemRef.current = null
                               }}
@@ -1509,7 +1514,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 <button
                                   type="button"
                                   disabled={idx === 0}
-                                  onClick={() => idx > 0 && typeof reorderDayActivities === "function" && reorderDayActivities(activeDayIndex, idx, idx - 1)}
+                                  onClick={() => idx > 0 && handleReorder(activeDayIndex, idx, idx - 1)}
                                   className="p-1 text-neutral-600 hover:text-black disabled:opacity-30 cursor-pointer"
                                   title="Move Up"
                                 >
@@ -1519,7 +1524,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                 <button
                                   type="button"
                                   disabled={idx === (itinerary[activeDayIndex]?.activities?.length || 1) - 1}
-                                  onClick={() => idx < (itinerary[activeDayIndex]?.activities?.length || 1) - 1 && typeof reorderDayActivities === "function" && reorderDayActivities(activeDayIndex, idx, idx + 1)}
+                                  onClick={() => idx < (itinerary[activeDayIndex]?.activities?.length || 1) - 1 && handleReorder(activeDayIndex, idx, idx + 1)}
                                   className="p-1 text-neutral-600 hover:text-black disabled:opacity-30 cursor-pointer"
                                   title="Move Down"
                                 >
