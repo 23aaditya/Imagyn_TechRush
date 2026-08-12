@@ -73,7 +73,7 @@ const CATEGORIZED_PROMPTS = {
   ],
 }
 
-export function AiChatbot({ currentView, onNavigate }) {
+export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
   const tripContext = useTrip()
   const { itinerary, addSpotToItinerary, removeSpotByName, reorderDayActivities, generateTripItinerary, destination, setDestination, setStartDate, setEndDate, setDays } = tripContext;
 
@@ -185,6 +185,10 @@ export function AiChatbot({ currentView, onNavigate }) {
   }
 
   const handleSendMessage = async (textToSend) => {
+    if (!user) {
+      if (onOpenAuth) onOpenAuth("login")
+      return
+    }
     const messageText = textToSend || inputMessage
     if (!messageText.trim() || isLoading) return
 

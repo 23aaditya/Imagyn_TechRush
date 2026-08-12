@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, CheckCircle2, AlertCircle, ArrowRight, Lock, Mail, User } from "lucide-react"
+import { X, CheckCircle2, AlertCircle, ArrowRight, Lock, Mail, User, Eye, EyeOff, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login" }) {
@@ -10,9 +10,68 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [dob, setDob] = useState("")
+  const [gender, setGender] = useState("Male")
+  const [language, setLanguage] = useState("English")
+  const [location, setLocation] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState("")
   const [errorMsg, setErrorMsg] = useState("")
+
+  // Password Strength Evaluation Helper
+  const getPasswordStrength = (pass) => {
+    if (!pass) {
+      return {
+        score: 0,
+        label: "",
+        color: "bg-white/20",
+        percent: 0,
+        checks: { length: false, number: false, upperLower: false, special: false }
+      }
+    }
+
+    const checks = {
+      length: pass.length >= 8,
+      number: /\d/.test(pass),
+      upperLower: /[a-z]/.test(pass) && /[A-Z]/.test(pass),
+      special: /[^A-Za-z0-9]/.test(pass)
+    }
+
+    let count = 0
+    if (pass.length >= 6) count++
+    if (checks.length) count++
+    if (checks.number) count++
+    if (checks.upperLower) count++
+    if (checks.special) count++
+
+    let label = "Too Weak"
+    let color = "bg-rose-500"
+    let percent = 20
+
+    if (count === 2) {
+      label = "Weak"
+      color = "bg-orange-500"
+      percent = 40
+    } else if (count === 3) {
+      label = "Fair"
+      color = "bg-amber-400"
+      percent = 60
+    } else if (count === 4) {
+      label = "Strong"
+      color = "bg-emerald-400"
+      percent = 80
+    } else if (count >= 5) {
+      label = "Very Strong 💪"
+      color = "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"
+      percent = 100
+    }
+
+    return { score: count, label, color, percent, checks }
+  }
+
+  const passwordStrength = getPasswordStrength(password)
 
   // Helper to read registered users from localStorage
   const getRegisteredUsers = () => {
@@ -23,7 +82,18 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
       console.error(e)
     }
     // Default demo user for instant testing
-    const defaultUser = [{ email: "demo@tripnest.com", password: "password123", name: "Alex Rivera" }]
+    const defaultUser = [{
+      email: "demo@tripnest.com",
+      password: "password123",
+      name: "Alex Rivera",
+      phone: "+91 98765 43210",
+      dob: "12 May 2003",
+      gender: "Male",
+      language: "English",
+      location: "Pune, Maharashtra, India",
+      joinedDate: "Joined May 2025",
+      statusBadge: "Explorer"
+    }]
     try {
       localStorage.setItem("tripnest_registered_users", JSON.stringify(defaultUser))
     } catch (e) {}
@@ -53,7 +123,14 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
         const loggedInUser = {
           name: existingUser.name || cleanEmail.split("@")[0],
           email: cleanEmail,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${existingUser.name || cleanEmail}`,
+          phone: existingUser.phone || "+91 98765 43210",
+          dob: existingUser.dob || "12 May 2003",
+          gender: existingUser.gender || "Male",
+          language: existingUser.language || "English",
+          location: existingUser.location || "Pune, Maharashtra, India",
+          joinedDate: existingUser.joinedDate || "Joined May 2025",
+          statusBadge: existingUser.statusBadge || "Explorer",
+          avatar: existingUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${existingUser.name || cleanEmail}`,
           initials: (existingUser.name || cleanEmail).substring(0, 2).toUpperCase(),
         }
 
@@ -70,11 +147,18 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
           return
         }
 
-        // Register new user
+        // Register new user with full details
         const newUserObj = {
           email: cleanEmail,
           password: password,
           name: name.trim() || cleanEmail.split("@")[0],
+          phone: phone.trim() || "+91 98765 43210",
+          dob: dob.trim() || "12 May 2003",
+          gender: gender || "Male",
+          language: language.trim() || "English",
+          location: location.trim() || "Pune, Maharashtra, India",
+          joinedDate: `Joined ${new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}`,
+          statusBadge: "Explorer"
         }
 
         const updatedUsers = [...registeredUsers, newUserObj]
@@ -83,8 +167,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
         } catch (e) {}
 
         const newUser = {
-          name: newUserObj.name,
-          email: cleanEmail,
+          ...newUserObj,
           avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newUserObj.name}`,
           initials: newUserObj.name.substring(0, 2).toUpperCase(),
         }
@@ -273,16 +356,83 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
               <form onSubmit={handleSubmit} className="space-y-4">
                 
                 {tab === "signup" && (
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-white/90">Full Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Alex Rivera"
-                      className="w-full rounded-md border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
-                    />
+                  <div className="space-y-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-white/90">Full Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Alex Rivera"
+                        className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-white/90">Phone Number</label>
+                      <input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+91 98765 43210"
+                        className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-white/90">Date of Birth</label>
+                        <input
+                          type="text"
+                          required
+                          value={dob}
+                          onChange={(e) => setDob(e.target.value)}
+                          placeholder="12 May 2003"
+                          className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-white/90">Gender</label>
+                        <select
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          className="w-full rounded-md border-0 bg-white/90 px-3 py-2 text-xs text-neutral-900 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-semibold"
+                        >
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-white/90">Language</label>
+                        <input
+                          type="text"
+                          required
+                          value={language}
+                          onChange={(e) => setLanguage(e.target.value)}
+                          placeholder="English"
+                          className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-white/90">Location / City</label>
+                        <input
+                          type="text"
+                          required
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          placeholder="Pune, Maharashtra"
+                          className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -299,15 +449,74 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-white/90">Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full rounded-md border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
-                  />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-semibold text-white/90">Password</label>
+                    {password && (
+                      <span className={`text-[11px] font-bold transition-all ${
+                        passwordStrength.score <= 1 ? "text-rose-300" :
+                        passwordStrength.score === 2 ? "text-orange-300" :
+                        passwordStrength.score === 3 ? "text-amber-200" :
+                        "text-emerald-300"
+                      }`}>
+                        {passwordStrength.label}
+                      </span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full rounded-md border-0 bg-white/90 pl-4 pr-11 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 transition-colors p-1 cursor-pointer"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+
+                  {/* Password Strength Indicator Bar */}
+                  {password && (
+                    <div className="mt-2.5 space-y-1.5 animate-in fade-in duration-200">
+                      <div className="flex items-center gap-1.5 h-1.5 w-full bg-black/40 p-0.5 rounded-full overflow-hidden border border-white/20">
+                        {[1, 2, 3, 4].map((step) => {
+                          const isActive = (passwordStrength.percent / 25) >= step
+                          return (
+                            <div
+                              key={step}
+                              className={`h-full flex-1 rounded-full transition-all duration-300 ${
+                                isActive ? passwordStrength.color : "bg-white/10"
+                              }`}
+                            />
+                          )
+                        })}
+                      </div>
+
+                      {/* Criteria Checklist on Signup */}
+                      {tab === "signup" && (
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-1 pt-1 text-[10px] text-white/80">
+                          <div className={`flex items-center gap-1 font-medium ${passwordStrength.checks.length ? 'text-emerald-300 font-bold' : 'text-white/60'}`}>
+                            <span>{passwordStrength.checks.length ? "✓" : "○"}</span> 8+ characters
+                          </div>
+                          <div className={`flex items-center gap-1 font-medium ${passwordStrength.checks.upperLower ? 'text-emerald-300 font-bold' : 'text-white/60'}`}>
+                            <span>{passwordStrength.checks.upperLower ? "✓" : "○"}</span> Upper & lowercase
+                          </div>
+                          <div className={`flex items-center gap-1 font-medium ${passwordStrength.checks.number ? 'text-emerald-300 font-bold' : 'text-white/60'}`}>
+                            <span>{passwordStrength.checks.number ? "✓" : "○"}</span> Contains number
+                          </div>
+                          <div className={`flex items-center gap-1 font-medium ${passwordStrength.checks.special ? 'text-emerald-300 font-bold' : 'text-white/60'}`}>
+                            <span>{passwordStrength.checks.special ? "✓" : "○"}</span> Special character
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {tab === "login" && (
