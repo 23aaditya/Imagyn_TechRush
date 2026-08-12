@@ -23,6 +23,7 @@ import {
   CheckCircle2,
   Mic,
   Radio,
+  ChevronRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -793,21 +794,21 @@ export function AiChatbot({ currentView, onNavigate }) {
 
   return (
     <>
-      {/* Floating Trigger Button at Bottom Right */}
+      {/* Floating Concierge Trigger Button at Bottom Right */}
       <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
         <AnimatePresence>
           {!isOpen && (
             <motion.div
-              initial={{ opacity: 0, x: 20, scale: 0.9 }}
+              initial={{ opacity: 0, x: 20, scale: 0.95 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 20, scale: 0.9 }}
-              className="hidden sm:flex items-center gap-2 rounded-md border border-primary/30 bg-card/95 px-3 py-1.5 shadow-md backdrop-blur-xl cursor-pointer hover:border-primary transition-colors"
+              exit={{ opacity: 0, x: 20, scale: 0.95 }}
+              className="hidden sm:flex items-center gap-2.5 rounded-full border border-border/80 bg-background/95 px-4 py-2 shadow-xl backdrop-blur-xl cursor-pointer hover:border-primary/50 transition-all group"
               onClick={() => setIsOpen(true)}
             >
-              <Sparkles className="h-3.5 w-3.5 text-amber-500 animate-spin" />
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-foreground leading-none">Ask AI Boots</span>
-                <span className="text-[10px] font-semibold text-primary">Live Travel Planning Help</span>
+              <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-semibold text-foreground leading-tight font-heading">Boots Concierge</span>
+                <span className="text-[10px] font-medium text-muted-foreground">Ask about your trip</span>
               </div>
             </motion.div>
           )}
@@ -823,29 +824,23 @@ export function AiChatbot({ currentView, onNavigate }) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
-              className="group relative flex h-[64px] w-[64px] items-center justify-center rounded-full bg-background border-2 border-primary/50 shadow-xl transition-all hover:shadow-primary/40 focus:outline-none overflow-hidden cursor-pointer"
-              aria-label="Open Boots AI Assistant"
+              className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-background border border-border/80 shadow-2xl transition-all hover:border-primary/60 focus:outline-none overflow-hidden cursor-pointer shrink-0"
+              aria-label="Open Boots Personal Travel Concierge"
             >
-              {/* Outer pulsing ring */}
-              <span className="absolute -inset-2 rounded-full bg-primary/25 animate-ping opacity-75" />
-
               <img
                 src="/boots-avatar.jpg"
-                alt="Boots AI Chatbot"
+                alt="Boots"
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
-
-              {/* Status indicator dot */}
-              <span className="absolute top-1 right-1 flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-background" />
+              <span className="absolute bottom-1 right-1 flex h-3 w-3">
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-background" />
               </span>
             </motion.button>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Main Chatbot Modal Window */}
+      {/* Main Concierge Workspace Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -854,92 +849,108 @@ export function AiChatbot({ currentView, onNavigate }) {
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              "fixed z-50 flex flex-col overflow-hidden rounded-xl border border-primary/40 bg-background/95 shadow-xl shadow-primary/20 backdrop-blur-2xl transition-all duration-300",
+              "fixed z-50 flex flex-col overflow-hidden rounded-3xl border border-border/60 bg-background/95 shadow-2xl backdrop-blur-2xl transition-all duration-300",
               isExpanded
-                ? "bottom-4 right-4 top-4 left-4 sm:left-auto sm:w-[680px] sm:h-[90vh]"
-                : "bottom-6 right-4 sm:right-6 w-[calc(100vw-32px)] sm:w-[450px] h-[620px] max-h-[88vh]"
+                ? "bottom-4 right-2 left-2 sm:right-4 sm:left-auto sm:w-[680px] sm:h-[90vh]"
+                : "bottom-4 sm:bottom-6 right-2 sm:right-6 w-[calc(100vw-16px)] sm:w-[450px] h-[620px] max-h-[88vh]"
             )}
           >
-            {/* Vibrant Header Bar */}
-            <div className="flex items-center justify-between border-b border-primary/30 bg-gradient-to-r from-primary/15 via-card to-emerald-500/10 px-4 py-3.5 backdrop-blur-md">
+            {/* Concierge Header Bar */}
+            <div className="flex items-center justify-between border-b border-border/60 bg-background/90 px-4 py-3 backdrop-blur-md shrink-0">
               <div className="flex items-center gap-3">
-                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-md overflow-hidden border border-primary/40 shadow-sm">
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full overflow-hidden border border-border/60 shadow-xs">
                   <img
                     src="/boots-avatar.jpg"
-                    alt="Boots Logo"
+                    alt="Boots Avatar"
                     className="h-full w-full object-cover"
                   />
+                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-background" />
                 </div>
                 <div>
-                  <h3 className="font-heading text-base font-bold text-foreground flex items-center gap-2">
+                  <h3 className="font-heading text-sm font-semibold text-foreground flex items-center gap-1.5 leading-none">
                     Boots
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-xs text-primary">
-                      AI Chatbot
-                    </span>
                   </h3>
-                  <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    Your Personal Travel Assistant
+                  <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
+                    Personal Travel Concierge
                   </p>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-1.5">
-                <Button
+              {/* Header Actions */}
+              <div className="flex items-center gap-1">
+                <button
                   type="button"
-                  variant="outline"
-                  size="sm"
                   onClick={() => setIsLiveAudioOpen(true)}
-                  className="rounded-xl border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 font-extrabold text-[11px] h-8 px-2.5 flex items-center gap-1 shadow-xs transition-all"
-                  title="Open Gemini 2.5 Flash Native Audio Live Mode"
+                  className="rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-semibold text-[11px] h-7 px-2.5 flex items-center gap-1.5 transition-all cursor-pointer font-button"
+                  title="Open Live Voice Mode"
                 >
                   <Radio className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
-                  <span>Live Voice</span>
-                </Button>
+                  <span>Voice</span>
+                </button>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <button
+                  type="button"
                   onClick={() => setIsExpanded(!isExpanded)}
                   title={isExpanded ? "Minimize Window" : "Expand Window"}
-                  className="hidden sm:inline-flex h-8 w-8 rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer"
+                  className="hidden sm:inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors cursor-pointer"
                 >
-                  {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                </Button>
+                  {isExpanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+                </button>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <button
+                  type="button"
                   onClick={() => setIsOpen(false)}
                   title="Close Assistant"
-                  className="h-8 w-8 rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer"
+                  className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors cursor-pointer"
                 >
                   <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Category Selector Tab Bar */}
-            <div className="flex items-center gap-1 border-b border-border/40 bg-muted/30 px-3 py-1.5 overflow-x-auto scrollbar-none">
-              {PROMPT_CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={cn(
-                    "shrink-0 rounded-sm px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider transition-all cursor-pointer",
-                    activeCategory === cat.id
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                  )}
-                >
-                  {cat.label}
                 </button>
-              ))}
+              </div>
             </div>
 
             {/* Messages Body */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {/* Empty State Concierge Welcome */}
+              {messages.length === 0 && (
+                <div className="py-8 px-2 text-center space-y-6 flex flex-col items-center justify-center">
+                  <div className="h-14 w-14 rounded-full overflow-hidden border border-border shadow-sm p-0.5 bg-background">
+                    <img src="/boots-avatar.jpg" alt="Boots" className="h-full w-full object-cover rounded-full" />
+                  </div>
+                  <div className="space-y-1 max-w-xs">
+                    <h4 className="font-heading text-base font-bold text-foreground">
+                      TripNest Concierge
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      I understand your itinerary, destination spots, budget, and live routes. Ask me anything about your trip.
+                    </p>
+                  </div>
+
+                  <div className="w-full max-w-sm space-y-2 pt-2 text-left">
+                    <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block px-1">
+                      Suggested prompts
+                    </span>
+                    {[
+                      "Plan a balanced first day for my trip",
+                      "Recommend top places to visit near my hotel",
+                      "Keep tomorrow's spend under ₹2,000"
+                    ].map((promptText, pIdx) => (
+                      <button
+                        key={pIdx}
+                        type="button"
+                        onClick={() => {
+                          setInputMessage(promptText)
+                        }}
+                        className="w-full text-left p-3 rounded-2xl border border-border/60 bg-card hover:bg-accent/60 text-xs font-medium text-foreground transition-all cursor-pointer flex items-center justify-between group shadow-2xs font-button"
+                      >
+                        <span>{promptText}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Conversational Stream */}
               {messages.map((msg) => {
                 const isAssistant = msg.role === "assistant"
                 return (
@@ -953,7 +964,7 @@ export function AiChatbot({ currentView, onNavigate }) {
                     )}
                   >
                     {isAssistant && (
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full overflow-hidden border border-primary/30 shadow-xs mt-0.5">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full overflow-hidden border border-border/60 shadow-2xs mt-0.5">
                         <img
                           src="/boots-avatar.jpg"
                           alt="Boots"
@@ -965,24 +976,24 @@ export function AiChatbot({ currentView, onNavigate }) {
                     <div className={cn("flex flex-col gap-1 max-w-[85%]", isAssistant ? "items-start" : "items-end")}>
                       <div
                         className={cn(
-                          "rounded-2xl px-4 py-3 shadow-sm",
+                          "rounded-2xl px-4 py-3 shadow-2xs",
                           isAssistant
-                            ? "bg-card border border-border/60 text-card-foreground rounded-tl-sm"
-                            : "bg-primary text-primary-foreground rounded-tr-sm"
+                            ? "bg-card border border-border/60 text-card-foreground rounded-tl-xs"
+                            : "bg-[#00356B] text-white rounded-tr-xs"
                         )}
                       >
                         {renderFormattedText(msg.content)}
 
                         {/* Live Action Badges */}
                         {msg.executedActions && msg.executedActions.length > 0 && (
-                          <div className="mt-2.5 p-2.5 rounded-xl bg-emerald-950/20 dark:bg-emerald-950/50 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs space-y-1 shadow-2xs">
-                            <div className="font-extrabold flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 border-b border-emerald-500/20 pb-1">
+                          <div className="mt-2.5 p-2.5 rounded-xl bg-accent/50 border border-border/60 text-xs space-y-1">
+                            <div className="font-semibold flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400">
                               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                              Executed Website Action
+                              <span>Trip Updated</span>
                             </div>
                             {msg.executedActions.map((act, aIdx) => (
-                              <div key={aIdx} className="text-[11px] leading-snug font-medium">
-                                {act}
+                              <div key={aIdx} className="text-[11px] leading-snug text-muted-foreground font-medium">
+                                {act.replace(/^[^\w\d]+/, "")}
                               </div>
                             ))}
                           </div>
@@ -990,17 +1001,17 @@ export function AiChatbot({ currentView, onNavigate }) {
 
                         {/* Plan Itinerary Preview Card */}
                         {msg.planPreviewCard && (
-                          <div className="mt-3 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-background p-3.5 space-y-2.5 shadow-md">
-                            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
+                          <div className="mt-3 rounded-2xl border border-border/80 bg-background/80 p-3.5 space-y-2.5 shadow-sm">
+                            <div className="flex items-center justify-between border-b border-border/60 pb-2">
                               <div>
-                                <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-500">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                   Trip Plan Request
                                 </span>
-                                <h4 className="font-heading font-extrabold text-sm text-foreground">
+                                <h4 className="font-heading font-bold text-sm text-foreground">
                                   {msg.planPreviewCard.days}-Day {msg.planPreviewCard.tier} Trip to {msg.planPreviewCard.destination}
                                 </h4>
                               </div>
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
+                              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-accent text-foreground">
                                 {msg.planPreviewCard.tier}
                               </span>
                             </div>
@@ -1013,17 +1024,18 @@ export function AiChatbot({ currentView, onNavigate }) {
                                 }
                                 onNavigate?.("itinerary")
                               }}
-                              className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold text-xs py-2.5 shadow-lg flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-[1.01]"
+                              className="w-full rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-semibold text-xs py-2 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all font-button"
                             >
-                              <Calendar className="h-4 w-4 stroke-[2.5]" />
+                              <Calendar className="h-4 w-4" />
                               Plan Itinerary & Sync Map
                             </Button>
                           </div>
                         )}
+
                         {msg.destinationCard && (
-                          <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-1.5">
+                          <div className="mt-3 rounded-xl border border-border/60 bg-background/80 p-3 space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="font-bold text-xs text-primary">{msg.destinationCard.title}</span>
+                              <span className="font-bold text-xs text-foreground">{msg.destinationCard.title}</span>
                               <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
                                 {msg.destinationCard.crowdLevel}
                               </span>
@@ -1034,12 +1046,12 @@ export function AiChatbot({ currentView, onNavigate }) {
                           </div>
                         )}
 
-                        {/* Day Plan Timeline Card if available */}
+                        {/* Day Plan Timeline Card */}
                         {msg.dayPlanCard && (
-                          <div className="mt-3 rounded-xl border border-border bg-accent/30 p-3 space-y-2">
+                          <div className="mt-3 rounded-xl border border-border/60 bg-accent/30 p-3 space-y-2">
                             <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
                               <span className="font-bold text-xs text-foreground flex items-center gap-1">
-                                <Calendar className="h-3.5 w-3.5 text-primary" />
+                                <Calendar className="h-3.5 w-3.5 text-[#00356B]" />
                                 Day {msg.dayPlanCard.dayNumber}: {msg.dayPlanCard.theme}
                               </span>
                             </div>
@@ -1051,14 +1063,14 @@ export function AiChatbot({ currentView, onNavigate }) {
                           </div>
                         )}
 
-                        {/* Interactive Suggested Offbeat Spot Cards */}
+                        {/* Suggested Spots Cards */}
                         {msg.suggestedSpots && (
                           <div className="mt-3 space-y-2">
                             {msg.suggestedSpots.map((spot, idx) => (
-                              <div key={idx} className="p-3 rounded-2xl border border-primary/20 bg-background/90 shadow-sm space-y-1 text-left">
+                              <div key={idx} className="p-3 rounded-2xl border border-border/60 bg-background shadow-2xs space-y-1 text-left">
                                 <div className="flex items-center justify-between">
                                   <span className="font-bold text-xs text-foreground">{spot.title}</span>
-                                  <span className="text-[10px] font-extrabold text-[#5A8CB2] bg-[#C8D9E6]/30 px-2 py-0.5 rounded-md">
+                                  <span className="text-[10px] font-semibold text-muted-foreground bg-accent px-2 py-0.5 rounded-md">
                                     {spot.cost}
                                   </span>
                                 </div>
@@ -1076,7 +1088,7 @@ export function AiChatbot({ currentView, onNavigate }) {
                                     })
                                     onNavigate?.("itinerary")
                                   }}
-                                  className="mt-1 w-full rounded-xl bg-[#5A8CB2] text-white hover:bg-[#4A7CA2] font-bold text-[11px] py-1 shadow-sm flex items-center justify-center gap-1 cursor-pointer"
+                                  className="mt-1 w-full rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-semibold text-[11px] py-1 shadow-2xs flex items-center justify-center gap-1 cursor-pointer font-button"
                                 >
                                   <Plus className="h-3.5 w-3.5" />
                                   Add to Itinerary (Day 1)
@@ -1094,7 +1106,7 @@ export function AiChatbot({ currentView, onNavigate }) {
                               onNavigate?.("itinerary")
                               setIsOpen(false)
                             }}
-                            className="mt-2.5 w-full rounded-xl bg-primary text-xs font-semibold text-primary-foreground py-1 shadow flex items-center justify-center gap-1.5"
+                            className="mt-2.5 w-full rounded-xl bg-[#00356B] text-white text-xs font-semibold py-1.5 shadow-2xs flex items-center justify-center gap-1.5 font-button"
                           >
                             <Compass className="h-3.5 w-3.5" />
                             Open Itinerary Workspace
@@ -1108,7 +1120,7 @@ export function AiChatbot({ currentView, onNavigate }) {
                     </div>
 
                     {!isAssistant && (
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground mt-0.5">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-muted-foreground mt-0.5">
                         <User className="h-4 w-4" />
                       </div>
                     )}
@@ -1118,81 +1130,59 @@ export function AiChatbot({ currentView, onNavigate }) {
 
               {/* Typing indicator */}
               {isLoading && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary animate-spin">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground py-2 font-medium">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#00356B]/15 text-[#00356B] animate-spin">
                     <RefreshCw className="h-3.5 w-3.5" />
                   </div>
-                  Analyzing travel categories & peak season intel...
+                  <span>Boots is checking your itinerary...</span>
                 </div>
               )}
 
               <div ref={chatEndRef} />
             </div>
 
-            {/* Quick Workspace Linking Chips Bar */}
-            <div className="flex items-center gap-1.5 overflow-x-auto px-3 py-2 bg-card/90 border-t border-border/40 scrollbar-none text-[11px] font-bold">
-              <span className="text-[10px] text-muted-foreground uppercase font-extrabold shrink-0 mr-1">Quick Links:</span>
-              {[
-                { label: "🗺️ Planner", view: "itinerary" },
-                { label: "💰 Budget", view: "budget" },
-                { label: "📊 Expenses", view: "expenses" },
-                { label: "🌍 Explore", view: "explore" },
-                { label: "📦 Packages", view: "packages" },
-                { label: "👤 Profile", view: "profile" },
-              ].map((lk) => (
-                <button
-                  key={lk.view}
-                  onClick={() => {
-                    onNavigate?.(lk.view)
-                    setIsOpen(false)
-                  }}
-                  className="shrink-0 rounded-xs bg-primary/10 border border-primary/20 hover:bg-amber-400 hover:text-[#0D2B45] hover:border-amber-400 px-2.5 py-1 text-primary text-[10px] font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
-                >
-                  {lk.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Input Form Bar */}
-            <div className="border-t border-border/60 bg-card/80 p-3 backdrop-blur-md">
+            {/* Input Composer Bar */}
+            <div className="border-t border-border/60 bg-card/90 p-3 backdrop-blur-md shrink-0">
               <form
                 onSubmit={(e) => {
                   e.preventDefault()
                   handleSendMessage()
                 }}
-                className="flex items-center gap-2"
+                className="relative flex items-center gap-2"
               >
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder={isRecordingMic ? "🎙️ Listening to your voice..." : "Ask about day plans, peak season, crowds..."}
+                  placeholder={isRecordingMic ? "Listening to your voice..." : "Ask Boots about your trip..."}
                   disabled={isLoading}
                   className={cn(
-                    "h-10 rounded-xl bg-background text-xs sm:text-sm border-border/80 focus-visible:ring-primary transition-colors",
-                    isRecordingMic && "border-red-500 ring-2 ring-red-500/30 bg-red-500/5 text-red-600 dark:text-red-400 font-semibold"
+                    "h-11 rounded-2xl bg-background pl-4 pr-20 text-xs sm:text-sm border-border/70 focus-visible:ring-[#00356B]/30 font-button transition-all",
+                    isRecordingMic && "border-rose-500 ring-2 ring-rose-500/20 bg-rose-500/5 text-rose-600 dark:text-rose-400 font-semibold"
                   )}
                 />
-                <Button
-                  type="button"
-                  onClick={toggleMicRecording}
-                  title={isRecordingMic ? "Stop Voice Recording" : "Voice Recording (Speak Message)"}
-                  className={cn(
-                    "h-10 w-10 shrink-0 rounded-xl transition-all shadow-2xs",
-                    isRecordingMic
-                      ? "bg-red-500 text-white animate-pulse shadow-red-500/50"
-                      : "border border-amber-500/40 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
-                  )}
-                >
-                  <Mic className="h-4 w-4" />
-                </Button>
+                <div className="absolute right-1.5 flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={toggleMicRecording}
+                    title={isRecordingMic ? "Stop Recording" : "Speak Message"}
+                    className={cn(
+                      "h-8 w-8 flex items-center justify-center rounded-xl transition-all cursor-pointer",
+                      isRecordingMic
+                        ? "bg-rose-500 text-white animate-pulse"
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                    )}
+                  >
+                    <Mic className="h-4 w-4" />
+                  </button>
 
-                <Button
-                  type="submit"
-                  disabled={!inputMessage.trim() || isLoading}
-                  className="h-10 w-10 shrink-0 rounded-sm bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 cursor-pointer"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
+                  <button
+                    type="submit"
+                    disabled={!inputMessage.trim() || isLoading}
+                    className="h-8 w-8 flex items-center justify-center rounded-xl bg-[#00356B] text-white hover:bg-[#002852] disabled:opacity-40 transition-all cursor-pointer font-button shadow-xs"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </form>
             </div>
           </motion.div>

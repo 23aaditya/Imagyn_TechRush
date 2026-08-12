@@ -291,12 +291,43 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
     clearSelectedPackage,
     itinerary,
     setItinerary,
+    updateItinerary,
     addSpotToItinerary,
     removeSpotFromItinerary,
     reorderDayActivities,
     updateSpotCostInItinerary,
-    saveCurrentTrip
+    saveCurrentTrip,
+    activeItineraryAlerts,
+    dismissAlert
   } = useTrip()
+
+  // Listen for background notification / alert center deep-linking to focus spot
+  useEffect(() => {
+    const handleFocusSpot = (e) => {
+      const targetSpotTitle = e.detail?.spotTitle
+      if (!targetSpotTitle || !itinerary) return
+
+      itinerary.forEach((dayPlan, dIdx) => {
+        (dayPlan.activities || []).forEach((act, sIdx) => {
+          if (
+            (act.title || "").toLowerCase().includes(targetSpotTitle.toLowerCase()) ||
+            targetSpotTitle.toLowerCase().includes((act.title || "").toLowerCase())
+          ) {
+            setActiveDayIndex(dIdx)
+            setTimeout(() => {
+              const el = document.getElementById(`itinerary-spot-${act.id || sIdx}`)
+              if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "center" })
+              }
+            }, 100)
+          }
+        })
+      })
+    }
+
+    window.addEventListener("tripnest-focus-spot", handleFocusSpot)
+    return () => window.removeEventListener("tripnest-focus-spot", handleFocusSpot)
+  }, [itinerary])
 
   // Main Workspace State
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -739,7 +770,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
         backgroundImage: `linear-gradient(to bottom, rgba(248, 246, 242, 0.86), rgba(248, 246, 242, 0.92)), url('/itinerary-bg.jpg')`
       }}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="container-responsive">
 
         {/* Navigation Top Bar */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-4">
@@ -1299,7 +1330,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                   <img src={spotImages[0]} alt={act.title} className="h-full w-full object-cover" />
                                 </div>
 
-                                <div className="min-w-0 flex-1">
+                                <div className="min-w-0 flex-1" id={`itinerary-spot-${act.id || idx}`}>
                                   <div className="flex items-center gap-2">
                                     <h4 className="font-heading text-sm font-semibold text-foreground truncate">
                                       {act.title}
@@ -1315,6 +1346,63 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                                     <span>•</span>
                                     <span>Open: {act.openingHours || "10:00 AM - 07:00 PM"}</span>
                                   </div>
+
+                                  {/* Contextual Crowd & Safety Alert Badge */}
+                                  {(() => {
+                                    const alertConflict = activeItineraryAlerts.find(
+                                      (conf) => (conf.spotTitle || "").toLowerCase().includes((act.title || "").toLowerCase()) || (act.title || "").toLowerCase().includes((conf.spotTitle || "").toLowerCase())
+                                    )
+                                    if (!alertConflict) return null
+                                    const alt = alertConflict.alert
+                                    const isSafety = alt.severity >= 4
+                                    return (
+                                      <div
+                                        className={cn(
+                                          "mt-2 p-2.5 rounded-xl border text-xs space-y-1.5 transition-all text-left font-button",
+                                          isSafety ? "bg-rose-500/10 border-rose-500/30 text-rose-800 dark:text-rose-200" : "bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-200"
+                                        )}
+                                      >
+                                        <div className="flex items-center justify-between font-bold text-[11px] gap-2">
+                                          <span className="flex items-center gap-1.5">
+                                            <AlertTriangle className={cn("h-3.5 w-3.5 shrink-0", isSafety ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400")} />
+                                            <span>{alt.title}</span>
+                                          </span>
+                                          {alt.peakHours && <span className="text-[10px] opacity-85 font-mono">{alt.peakHours}</span>}
+                                        </div>
+                                        <p className="text-[11px] opacity-90 leading-tight">
+                                          {alt.recommendation}
+                                        </p>
+                                        <div className="flex items-center gap-2 pt-0.5">
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const [timeStr, period] = (act.time || "10:00 AM").split(" ")
+                                              let [h, m] = (timeStr || "10:00").split(":").map(Number)
+                                              if (period === "PM" && h < 12) h += 12
+                                              if (period === "AM" && h === 12) h = 0
+                                              h = (h + 1) % 24
+                                              const newPeriod = h >= 12 ? "PM" : "AM"
+                                              const newH = h % 12 === 0 ? 12 : h % 12
+                                              const newTime = `${newH.toString().padStart(2, '0')}:${(m || 0).toString().padStart(2, '0')} ${newPeriod}`
+                                              
+                                              updateItinerary(activeDayIndex, act.id, { time: newTime })
+                                            }}
+                                            className="rounded-lg bg-amber-600/20 hover:bg-amber-600/30 text-amber-900 dark:text-amber-100 font-semibold px-2 py-0.5 text-[10px] transition-colors cursor-pointer"
+                                          >
+                                            Shift +1 Hr
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            onClick={() => dismissAlert(alt.id)}
+                                            className="text-[10px] text-muted-foreground hover:underline cursor-pointer"
+                                          >
+                                            Dismiss
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )
+                                  })()}
                                 </div>
                               </div>
 

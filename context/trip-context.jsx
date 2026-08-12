@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, useMemo } from "react"
 import { getDestinationSpots } from "@/lib/destination-spots-data"
+import { INITIAL_TRAVEL_ALERTS, checkItineraryAlertConflicts } from "@/lib/alert-engine"
+import { requestNotificationPermission, sendTripNotification } from "@/lib/notification-manager"
 
 // Initial default preset spots for Goa / Bali fallback
 const defaultTemplates = [
@@ -1109,6 +1111,47 @@ export function TripProvider({ children }) {
     })
   }
 
+  // Travel Crowd & Safety Alerts State
+  const [alerts, setAlerts] = useState(INITIAL_TRAVEL_ALERTS)
+  const [dismissedAlertIds, setDismissedAlertIds] = useState([])
+  const [notificationPermission, setNotificationPermission] = useState("default")
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      setNotificationPermission(Notification.permission)
+    }
+  }, [])
+
+  const activeItineraryAlerts = useMemo(() => {
+    const rawConflicts = checkItineraryAlertConflicts(itinerary, destination, alerts)
+    return rawConflicts.filter((conf) => !dismissedAlertIds.includes(conf.alert.id))
+  }, [itinerary, destination, alerts, dismissedAlertIds])
+
+  const unreadAlertCount = useMemo(() => {
+    return alerts.filter((alt) => alt.status === "active" && !dismissedAlertIds.includes(alt.id)).length
+  }, [alerts, dismissedAlertIds])
+
+  const dismissAlert = (alertId) => {
+    setDismissedAlertIds((prev) => [...prev, alertId])
+  }
+
+  const requestNotifications = async () => {
+    const perm = await requestNotificationPermission()
+    setNotificationPermission(perm)
+    return perm
+  }
+
+  // Auto-send browser notifications for severe alerts matching active itinerary
+  useEffect(() => {
+    if (activeItineraryAlerts.length > 0 && notificationPermission === "granted") {
+      activeItineraryAlerts.forEach((conf) => {
+        if (conf.alert.severity >= 3) {
+          sendTripNotification(conf.alert, conf.spotTitle)
+        }
+      })
+    }
+  }, [activeItineraryAlerts, notificationPermission])
+
   const value = {
     destination,
     setDestination,
@@ -1199,7 +1242,16 @@ export function TripProvider({ children }) {
     deleteActualExpense,
     groupMembers,
     setGroupMembers,
-    updateExpensePayer
+    updateExpensePayer,
+
+    // Crowd & Safety Alerts
+    alerts,
+    setAlerts,
+    activeItineraryAlerts,
+    unreadAlertCount,
+    dismissAlert,
+    notificationPermission,
+    requestNotifications
   }
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>
