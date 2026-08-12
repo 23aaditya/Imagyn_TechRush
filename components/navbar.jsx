@@ -113,13 +113,13 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                 <button
                   onClick={() => handleNavClick(link.view)}
                   className={cn(
-                    "relative px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-extrabold tracking-wider uppercase transition-all cursor-pointer border-b-2",
+                    "relative px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer border-b-2 font-button",
                     isLightBg
                       ? isActive
-                        ? "text-neutral-900 border-neutral-900 font-black"
+                        ? "text-neutral-900 border-neutral-900 font-bold"
                         : "text-neutral-600 border-transparent hover:text-neutral-900 hover:border-neutral-400"
                       : isActive
-                        ? "text-white border-white font-black"
+                        ? "text-white border-white font-bold"
                         : "text-white/80 border-transparent hover:text-white hover:border-white/40"
                   )}
                 >
@@ -139,7 +139,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
             aria-label="Toggle dark mode"
             onClick={toggleTheme}
             className={cn(
-              "rounded-full transition-colors cursor-pointer",
+              "rounded-xl transition-colors cursor-pointer",
               isLightBg
                 ? "text-neutral-900 hover:bg-neutral-200/70"
                 : "text-white hover:bg-white/20 hover:text-white"
@@ -154,16 +154,16 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
               <button
                 onClick={() => setUserDropdown(!userDropdown)}
                 className={cn(
-                  "flex items-center gap-2 rounded-full border px-2.5 py-1.5 transition-all cursor-pointer",
+                  "flex items-center gap-2 rounded-xl border px-2.5 py-1.5 transition-all cursor-pointer font-button",
                   isLightBg
                     ? "border-neutral-900/20 bg-neutral-900/10 text-neutral-900 hover:bg-neutral-900/20"
                     : "border-white/30 bg-white/15 text-white hover:bg-white/25"
                 )}
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#5B8DEF] text-[10px] font-bold text-[#0F172A]">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#00356B] text-[10px] font-semibold text-white">
                   {user.initials || "U"}
                 </span>
-                <span className="hidden text-xs font-bold sm:inline-block max-w-[90px] truncate">
+                <span className="hidden text-xs font-semibold sm:inline-block max-w-[90px] truncate">
                   {user.name}
                 </span>
               </button>
@@ -177,7 +177,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                     className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card p-2 shadow-lg backdrop-blur-2xl z-50 text-foreground"
                   >
                     <div className="border-b border-border/40 px-3 py-2">
-                      <p className="text-xs font-bold text-foreground truncate">{user.name}</p>
+                      <p className="text-xs font-semibold text-foreground truncate">{user.name}</p>
                       <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
                     </div>
                     
@@ -186,9 +186,9 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                         setUserDropdown(false)
                         handleNavClick("profile")
                       }}
-                      className="flex w-full items-center gap-2 rounded-xs px-3 py-2 text-xs font-bold text-foreground hover:bg-accent transition-colors cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-xs px-3 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-colors cursor-pointer font-button"
                     >
-                      <User className="h-3.5 w-3.5 text-[#5B8DEF]" />
+                      <User className="h-3.5 w-3.5 text-[#00356B] dark:text-[#86B3E6]" />
                       Profile & Passport
                     </button>
 
@@ -197,7 +197,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                         setUserDropdown(false)
                         setSavedTripsModalOpen(true)
                       }}
-                      className="flex w-full items-center gap-2 rounded-xs px-3 py-2 text-xs font-medium text-foreground hover:bg-accent cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-xs px-3 py-2 text-xs font-medium text-foreground hover:bg-accent cursor-pointer font-button"
                     >
                       My Saved Trips
                     </button>
@@ -206,7 +206,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                         setUserDropdown(false)
                         onLogout()
                       }}
-                      className="flex w-full items-center gap-2 rounded-xs px-3 py-2 text-xs font-medium text-rose-500 hover:bg-rose-500/10 cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-xs px-3 py-2 text-xs font-medium text-rose-500 hover:bg-rose-500/10 cursor-pointer font-button"
                     >
                       <LogOut className="h-3.5 w-3.5" />
                       Sign Out
@@ -220,7 +220,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
               <button
                 onClick={() => handleNavClick("profile")}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold tracking-wide uppercase transition-all cursor-pointer",
+                  "flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer font-button",
                   isLightBg
                     ? "border-neutral-900/20 bg-neutral-900/10 text-neutral-900 hover:bg-neutral-900/20"
                     : "border-white/30 bg-white/15 text-white hover:bg-white/25"
@@ -233,7 +233,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
 
               <Button
                 onClick={() => onOpenAuth("signup")}
-                className="rounded-full bg-[#5B8DEF] text-[#0F172A] text-xs font-bold uppercase tracking-wider hover:bg-[#487AE0] shadow-md shadow-[#5B8DEF]/25 sm:text-xs px-4 sm:px-5 py-2 transition-all cursor-pointer"
+                className="rounded-xl bg-[#00356B] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#002852] shadow-md shadow-[#00356B]/25 sm:text-xs px-4 sm:px-5 py-2 transition-all cursor-pointer font-button"
               >
                 Get Started
               </Button>

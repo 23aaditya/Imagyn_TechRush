@@ -144,7 +144,7 @@ export function TripProvider({ children }) {
   const [activeStay, setActiveStayRaw] = useState(null)
 
   // Map display mode: "discovery" (explore nearby) or "itinerary" (route view)
-  const [mapMode, setMapMode] = useState("discovery")
+  const [mapMode, setMapMode] = useState("itinerary")
 
   // Discovered places from Overpass API, organized by category
   // Schema: { cafes: [], restaurants: [], attractions: [], hotels: [], activities: [], fuel: [], medical: [] }
@@ -460,8 +460,8 @@ export function TripProvider({ children }) {
         desc: spot.desc || `Added attraction for trip itinerary.`,
         cost: typeof spot.cost === "string" ? spot.cost : `₹${numCost.toLocaleString("en-IN")}`,
         numericCost: numCost,
-        lat: spot.lat || 15.55 + (Math.random() - 0.5) * 0.05,
-        lng: spot.lng || 73.75 + (Math.random() - 0.5) * 0.05,
+        lat: spot.lat || (activeStay?.lat || baseStay?.lat || 15.55) + (Math.random() - 0.5) * 0.04,
+        lng: spot.lng || (activeStay?.lng || baseStay?.lng || 73.75) + (Math.random() - 0.5) * 0.04,
         images: spot.images || [
           spot.img || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
         ]

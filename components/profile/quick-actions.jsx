@@ -26,11 +26,11 @@ export function QuickActions({ onNavigateView }) {
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 sm:gap-2 rounded-full border border-border/80 bg-card/90 p-2 shadow-2xl backdrop-blur-2xl"
+        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 sm:gap-2 rounded-2xl border border-border/80 bg-card/90 p-2 shadow-2xl backdrop-blur-2xl"
       >
         <button
           onClick={() => onNavigateView("itinerary")}
-          className="flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-md hover:bg-primary/90 transition-all"
+          className="flex items-center gap-1.5 rounded-xl bg-[#00356B] text-white hover:bg-[#002852] px-3.5 py-2 text-xs font-medium shadow-md transition-all font-button cursor-pointer"
         >
           <Plus className="h-4 w-4" />
           <span className="hidden sm:inline">Create New Trip</span>
@@ -39,7 +39,7 @@ export function QuickActions({ onNavigateView }) {
 
         <button
           onClick={() => onNavigateView("itinerary")}
-          className="flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-all"
+          className="flex items-center gap-1.5 rounded-xl border border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] hover:bg-[#00356B]/25 px-3.5 py-2 text-xs font-medium transition-all font-button cursor-pointer"
         >
           <span className="hidden sm:inline">Continue Planning</span>
           <span className="sm:hidden">Plan</span>
@@ -47,7 +47,7 @@ export function QuickActions({ onNavigateView }) {
 
         <button
           onClick={() => onNavigateView("expenses")}
-          className="flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-all"
+          className="flex items-center gap-1.5 rounded-xl border border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] hover:bg-[#00356B]/25 px-3.5 py-2 text-xs font-medium transition-all font-button cursor-pointer"
         >
           <span className="hidden sm:inline">Track Expenses</span>
           <span className="sm:hidden">Expenses</span>
@@ -55,9 +55,9 @@ export function QuickActions({ onNavigateView }) {
 
         <button
           onClick={() => setChecklistOpen(true)}
-          className="flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-all"
+          className="flex items-center gap-1.5 rounded-xl border border-[#00356B] bg-[#00356B]/15 text-[#00356B] dark:text-[#86B3E6] hover:bg-[#00356B]/25 px-3.5 py-2 text-xs font-medium transition-all font-button cursor-pointer"
         >
-          <CheckSquare className="h-3.5 w-3.5 text-amber-500" />
+          <CheckSquare className="h-3.5 w-3.5 text-[#00356B] dark:text-[#86B3E6]" />
           <span className="hidden sm:inline">Packing List</span>
           <span className="sm:hidden">Checklist</span>
         </button>

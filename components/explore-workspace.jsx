@@ -435,7 +435,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
               <div className="flex flex-col gap-2.5">
                 <Button
                   onClick={() => onExplore(destination.name)}
-                  className="w-full rounded-md py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-xs transition bg-[#5A8CB2] hover:bg-[#4A7CA2] cursor-pointer"
+                  className="w-full rounded-xl py-2.5 text-xs font-medium uppercase tracking-wider text-white shadow-md transition bg-[#00356B] hover:bg-[#002852] cursor-pointer font-button"
                 >
                   <Sparkles className="mr-1.5 h-4 w-4 text-amber-300" />
                   Customize Itinerary directly in Planner
@@ -525,7 +525,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                 <Button
                   size="sm"
                   onClick={() => onExplore(destination.name)}
-                  className="rounded-xl bg-[#5A8CB2] text-white text-xs font-bold px-4 py-2 hover:bg-[#4A7CA2] cursor-pointer"
+                  className="rounded-xl bg-[#00356B] text-white text-xs font-medium px-4 py-2 hover:bg-[#002852] cursor-pointer shadow-md font-button"
                 >
                   <Sparkles className="mr-1.5 h-3.5 w-3.5" />
                   Customize Itinerary
@@ -690,7 +690,7 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
         )}
       </AnimatePresence>
 
-      {/* Rectangular Customize Trigger Button with Slightly Curved Corners */}
+      {/* Rectangular Customize Trigger Button with Slightly Curved Corners (Primary Yale Blue Theme) */}
       <motion.button
         type="button"
         onClick={() => {
@@ -699,15 +699,15 @@ function CustomizeWheel({ activeFilters, setActiveFilters }) {
         }}
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.96 }}
-        className="relative flex items-center justify-center gap-2.5 rounded-lg px-5 py-3 shadow-xl border border-neutral-700 transition-all cursor-pointer bg-neutral-900 text-white hover:bg-neutral-800"
+        className="relative flex items-center justify-center gap-2.5 rounded-xl px-5 py-3 shadow-xl transition-all cursor-pointer bg-[#00356B] text-white hover:bg-[#002852] font-button"
       >
-        <SlidersHorizontal className={`h-4 w-4 text-[#5B8DEF] transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
-        <span className="font-heading text-xs font-bold uppercase tracking-wider text-white">
+        <SlidersHorizontal className={`h-4 w-4 text-white transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
+        <span className="font-heading text-xs font-semibold uppercase tracking-wider text-white">
           {isOpen ? "Close Petals" : "Customize"}
         </span>
 
         {activeCount > 0 && (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B8DEF] text-[10px] font-extrabold text-[#0F172A] shadow-xs">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#00356B] shadow-xs">
             {activeCount}
           </span>
         )}

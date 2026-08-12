@@ -280,7 +280,7 @@ export function Hero({ onStartPlanning }) {
           >
             <button
               onClick={handleScrollDownToSearch}
-              className="inline-flex items-center gap-2 rounded-sm bg-white px-8 py-3.5 text-xs font-bold uppercase tracking-[0.15em] text-neutral-900 shadow-md transition-all hover:bg-white/90 focus:outline-none cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.15em] text-neutral-900 shadow-md transition-all hover:bg-white/90 focus:outline-none cursor-pointer font-button"
             >
               Start Planning
               <ChevronDown className="h-4 w-4 animate-bounce" />
@@ -498,10 +498,10 @@ export function Hero({ onStartPlanning }) {
                       initial={{ opacity: 0, y: 8, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                      className="absolute left-0 right-0 top-full z-50 mt-2 rounded-xl border border-white/25 bg-black/90 p-4 shadow-2xl backdrop-blur-2xl text-white select-none min-w-[280px]"
+                      className="absolute left-0 right-0 top-full z-50 mt-2 rounded-xl border border-neutral-200 bg-white p-4 shadow-2xl text-neutral-900 select-none min-w-[280px]"
                     >
                       {/* Month Header Navigation */}
-                      <div className="flex items-center justify-between mb-3 border-b border-white/15 pb-2">
+                      <div className="flex items-center justify-between mb-3 border-b border-neutral-200 pb-2">
                         <button
                           type="button"
                           onClick={() => {
@@ -512,11 +512,11 @@ export function Hero({ onStartPlanning }) {
                               setCalendarMonth((prev) => prev - 1)
                             }
                           }}
-                          className="p-1 rounded-md hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
+                          className="p-1 rounded-md hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-colors cursor-pointer"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </button>
-                        <span className="text-xs font-bold uppercase tracking-wider text-white">
+                        <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
                           {new Date(calendarYear, calendarMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
                         </span>
                         <button
@@ -529,14 +529,14 @@ export function Hero({ onStartPlanning }) {
                               setCalendarMonth((prev) => prev + 1)
                             }
                           }}
-                          className="p-1 rounded-md hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
+                          className="p-1 rounded-md hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-colors cursor-pointer"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </button>
                       </div>
 
                       {/* Day Name Labels */}
-                      <div className="grid grid-cols-7 text-center text-[10px] font-bold text-white/60 mb-2">
+                      <div className="grid grid-cols-7 text-center text-[10px] font-bold text-neutral-400 mb-2">
                         {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
                           <span key={d}>{d}</span>
                         ))}
@@ -575,14 +575,14 @@ export function Hero({ onStartPlanning }) {
                               }}
                               className={`py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                                 isStart && isEnd
-                                  ? "bg-stone-600 text-white font-black rounded-md shadow-sm border border-white/40"
+                                  ? "bg-neutral-900 text-white font-black rounded-md shadow-sm"
                                   : isStart
-                                  ? "bg-stone-600 text-white font-black rounded-l-md shadow-sm border-l border-y border-white/40"
+                                  ? "bg-neutral-900 text-white font-black rounded-l-md shadow-sm"
                                   : isEnd
-                                  ? "bg-stone-600 text-white font-black rounded-r-md shadow-sm border-r border-y border-white/40"
+                                  ? "bg-neutral-900 text-white font-black rounded-r-md shadow-sm"
                                   : inRange
-                                  ? "bg-stone-500/25 text-white font-bold backdrop-blur-xs border-y border-stone-400/20"
-                                  : "hover:bg-white/20 text-white/90 rounded-md"
+                                  ? "bg-neutral-100 text-neutral-900 font-bold"
+                                  : "hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 rounded-md"
                               }`}
                             >
                               {dayNum}
@@ -592,21 +592,21 @@ export function Hero({ onStartPlanning }) {
                       </div>
 
                       {/* Footer Actions */}
-                      <div className="flex items-center justify-between border-t border-white/15 pt-2.5 mt-3">
+                      <div className="flex items-center justify-between border-t border-neutral-200 pt-2.5 mt-3">
                         <button
                           type="button"
                           onClick={() => {
                             setFromDate("")
                             setToDate("")
                           }}
-                          className="text-[11px] font-semibold text-white/60 hover:text-white underline cursor-pointer"
+                          className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 underline cursor-pointer"
                         >
                           Clear
                         </button>
                         <button
                           type="button"
                           onClick={() => setIsCalendarOpen(false)}
-                          className="rounded-md bg-stone-600 hover:bg-stone-500 text-white text-[11px] font-bold px-3 py-1 cursor-pointer transition-colors"
+                          className="rounded-md bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-3.5 py-1.5 cursor-pointer transition-colors shadow-xs"
                         >
                           Done
                         </button>
@@ -701,9 +701,9 @@ export function Hero({ onStartPlanning }) {
                 const targetDest = query.trim()
                 onStartPlanning?.("itinerary", targetDest)
               }}
-              className="mt-5 h-11 w-full rounded-sm bg-white text-neutral-900 text-xs font-bold uppercase tracking-wider shadow-sm hover:bg-white/90 transition-all cursor-pointer"
+              className="mt-5 h-11 w-full rounded-xl bg-white text-neutral-900 text-xs font-semibold uppercase tracking-wider shadow-sm hover:bg-white/90 transition-all cursor-pointer font-button"
             >
-              <Search className="mr-1.5 h-4 w-4 text-primary" />
+              <Search className="mr-1.5 h-4 w-4 text-[#00356B]" />
               Plan Itinerary
             </Button>
           </motion.div>
