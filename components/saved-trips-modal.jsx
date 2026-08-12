@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Sparkles,
@@ -16,18 +17,21 @@ import {
   CheckCircle2,
   FileText,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Award
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
 
-export function SavedTripsModal({ onSelectDestination }) {
+export function SavedTripsModal({ onSelectDestination, user, onOpenAuth }) {
   const {
     savedTrips,
     savedTripsModalOpen,
     setSavedTripsModalOpen,
     activeReportTrip,
     setActiveReportTrip,
+    saveCurrentTrip,
+    markTripAsCompleted,
     deleteSavedTrip,
     setDestination,
     setStartDate,
@@ -35,6 +39,16 @@ export function SavedTripsModal({ onSelectDestination }) {
     setDays,
     setItinerary
   } = useTrip()
+
+  // Guard: If trying to open saved trips drawer while logged out, redirect to Auth Modal
+  useEffect(() => {
+    if (savedTripsModalOpen && !user) {
+      setSavedTripsModalOpen(false)
+      if (onOpenAuth) {
+        onOpenAuth("login")
+      }
+    }
+  }, [savedTripsModalOpen, user, setSavedTripsModalOpen, onOpenAuth])
 
   // Load a saved trip into active workspace
   const handleLoadTrip = (trip) => {
@@ -76,7 +90,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                     My Saved Trips & Offline Itineraries
                   </h3>
                   <p className="text-xs text-neutral-500 dark:text-[#A9A092] mt-0.5 font-medium">
-                    Access your saved itineraries, open offline summary reports, or load into planner
+                    Access saved itineraries, mark trips as completed, or load into planner
                   </p>
                 </div>
                 <button
@@ -103,13 +117,24 @@ export function SavedTripsModal({ onSelectDestination }) {
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="font-heading text-base font-bold text-[#1E293B] dark:text-[#F1ECE2]">
                               {trip.destination}
                             </span>
                             <span className="text-[10px] font-bold uppercase tracking-wider text-[#5A8CB2] dark:text-[#C98B55] bg-[#5A8CB2]/10 dark:bg-[#C98B55]/10 px-2 py-0.5 rounded-sm border border-[#5A8CB2]/20 dark:border-[#C98B55]/20">
                               {trip.days} Days Itinerary
                             </span>
+                            {trip.status === "completed" ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                                <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                                Completed
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-500/30">
+                                <Clock className="h-3 w-3 text-amber-500" />
+                                Saved Trip
+                              </span>
+                            )}
                           </div>
 
                           <p className="text-xs text-neutral-500 dark:text-[#A9A092] mt-1 flex items-center gap-3 font-medium">
@@ -127,7 +152,7 @@ export function SavedTripsModal({ onSelectDestination }) {
                         <button
                           type="button"
                           onClick={() => deleteSavedTrip(trip.id)}
-                          className="text-neutral-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                          className="text-neutral-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                           title="Delete Saved Trip"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -136,23 +161,34 @@ export function SavedTripsModal({ onSelectDestination }) {
 
                       {/* Action Buttons */}
                       <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-200/80 dark:border-white/10">
+                        {trip.status !== "completed" && (
+                          <Button
+                            size="sm"
+                            onClick={() => markTripAsCompleted(trip.id)}
+                            className="rounded-sm bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 font-semibold text-xs uppercase tracking-wider px-3.5 py-1.5 shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Complete Trip
+                          </Button>
+                        )}
+
                         <Button
                           size="sm"
                           onClick={() => setActiveReportTrip(trip)}
-                          className="rounded-sm bg-[#5A8CB2] dark:bg-[#C98B55] text-white dark:text-[#11100E] hover:bg-[#4A7CA2] dark:hover:bg-[#b07847] font-semibold text-xs uppercase tracking-wider px-4 py-2 shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          className="rounded-sm bg-[#5A8CB2] dark:bg-[#C98B55] text-white dark:text-[#11100E] hover:bg-[#4A7CA2] dark:hover:bg-[#b07847] font-semibold text-xs uppercase tracking-wider px-3.5 py-1.5 shadow-xs flex items-center gap-1.5 cursor-pointer"
                         >
-                          <FileText className="h-4 w-4" />
-                          View Offline Report Pass
+                          <FileText className="h-3.5 w-3.5" />
+                          View Offline Pass
                         </Button>
 
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => handleLoadTrip(trip)}
-                          className="rounded-sm border-neutral-300 dark:border-white/20 text-[#1E293B] dark:text-[#F1ECE2] text-xs font-semibold uppercase tracking-wider px-4 py-2 hover:bg-neutral-100 dark:hover:bg-white/10 flex items-center gap-1.5 cursor-pointer"
+                          className="rounded-sm border-neutral-300 dark:border-white/20 text-[#1E293B] dark:text-[#F1ECE2] text-xs font-semibold uppercase tracking-wider px-3.5 py-1.5 hover:bg-neutral-100 dark:hover:bg-white/10 flex items-center gap-1.5 cursor-pointer"
                         >
                           Open in Planner
-                          <ChevronRight className="h-4 w-4" />
+                          <ChevronRight className="h-3.5 w-3.5" />
                         </Button>
                       </div>
                     </div>

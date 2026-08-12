@@ -1,6 +1,4 @@
-"use client"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   User,
@@ -32,7 +30,9 @@ import {
   Tag,
   Share2,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  FileText,
+  Trash2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
@@ -313,8 +313,19 @@ const VISITED_PLACES_BADGES = [
   }
 ]
 
-export function ProfileWorkspace({ onBack }) {
-  const { destination } = useTrip()
+export function ProfileWorkspace({ onBack, user, onUserUpdate }) {
+  const {
+    savedTrips,
+    markTripAsCompleted,
+    deleteSavedTrip,
+    setActiveReportTrip,
+    setDestination,
+    setStartDate,
+    setEndDate,
+    setDays,
+    setItinerary,
+    setSavedTripsModalOpen
+  } = useTrip()
 
   // User Profile Form State matching reference photo
   const [profileData, setProfileData] = useState({
@@ -330,6 +341,39 @@ export function ProfileWorkspace({ onBack }) {
     avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
     coverUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&auto=format&fit=crop&q=80"
   })
+
+  // Sync profile data from user prop or localStorage on mount/update
+  useEffect(() => {
+    try {
+      const activeUser = user || JSON.parse(localStorage.getItem("tripnest_user") || "null")
+      if (activeUser) {
+        setProfileData((prev) => ({
+          ...prev,
+          ...activeUser,
+          name: activeUser.name || prev.name,
+          email: activeUser.email || prev.email,
+          phone: activeUser.phone || prev.phone,
+          location: activeUser.location || prev.location,
+          dob: activeUser.dob || prev.dob,
+          gender: activeUser.gender || prev.gender,
+          language: activeUser.language || prev.language,
+          avatarUrl: activeUser.avatar || activeUser.avatarUrl || prev.avatarUrl,
+        }))
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }, [user])
+
+  // Load a saved trip into active planner workspace
+  const handleLoadTrip = (trip) => {
+    if (trip.destination) setDestination(trip.destination)
+    if (trip.startDate) setStartDate(trip.startDate)
+    if (trip.endDate) setEndDate(trip.endDate)
+    if (trip.days) setDays(trip.days)
+    if (trip.itinerary) setItinerary(trip.itinerary)
+    if (onBack) onBack()
+  }
 
   // Selected visited badge modal state for displaying detailed itinerary
   const [selectedBadge, setSelectedBadge] = useState(null)
@@ -347,8 +391,20 @@ export function ProfileWorkspace({ onBack }) {
   const handleSaveEdit = (e) => {
     e.preventDefault()
     setProfileData({ ...editForm })
+    try {
+      localStorage.setItem("tripnest_user", JSON.stringify(editForm))
+    } catch (err) {
+      console.error(err)
+    }
+    if (onUserUpdate) {
+      onUserUpdate(editForm)
+    }
     setIsEditModalOpen(false)
   }
+
+  // Computed Trip Categorizations
+  const completedTrips = savedTrips ? savedTrips.filter((t) => t.status === "completed") : []
+  const pendingSavedTrips = savedTrips ? savedTrips.filter((t) => t.status !== "completed") : []
 
   return (
     <section className="min-h-screen bg-background dark:bg-[#11100E] text-foreground dark:text-[#F1ECE2] pt-20 pb-28">
@@ -469,7 +525,9 @@ export function ProfileWorkspace({ onBack }) {
                       <MapIcon className="h-5 w-5" />
                     </div>
                     <div>
-                      <div className="font-heading text-xl font-black text-emerald-700 dark:text-emerald-300 leading-none">7</div>
+                      <div className="font-heading text-xl font-black text-emerald-700 dark:text-emerald-300 leading-none">
+                        {(savedTrips ? savedTrips.length : 0) + 6}
+                      </div>
                       <div className="text-[11px] font-semibold text-emerald-900/70 dark:text-emerald-200/70 mt-0.5">Trips Planned</div>
                     </div>
                   </div>
@@ -480,7 +538,9 @@ export function ProfileWorkspace({ onBack }) {
                       <Luggage className="h-5 w-5" />
                     </div>
                     <div>
-                      <div className="font-heading text-xl font-black text-emerald-700 dark:text-emerald-300 leading-none">15</div>
+                      <div className="font-heading text-xl font-black text-emerald-700 dark:text-emerald-300 leading-none">
+                        {15 + completedTrips.length * 3}
+                      </div>
                       <div className="text-[11px] font-semibold text-emerald-900/70 dark:text-emerald-200/70 mt-0.5">Places Visited</div>
                     </div>
                   </div>
@@ -496,14 +556,16 @@ export function ProfileWorkspace({ onBack }) {
                     </div>
                   </div>
 
-                  {/* Travel Points */}
+                  {/* Completed Badges */}
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-                      <Star className="h-5 w-5 fill-amber-400 text-amber-500" />
+                      <Award className="h-5 w-5 fill-amber-400 text-amber-500" />
                     </div>
                     <div>
-                      <div className="font-heading text-xl font-black text-emerald-700 dark:text-emerald-300 leading-none">120</div>
-                      <div className="text-[11px] font-semibold text-emerald-900/70 dark:text-emerald-200/70 mt-0.5">Travel Points</div>
+                      <div className="font-heading text-xl font-black text-emerald-700 dark:text-emerald-300 leading-none">
+                        {6 + completedTrips.length}
+                      </div>
+                      <div className="text-[11px] font-semibold text-emerald-900/70 dark:text-emerald-200/70 mt-0.5">Badges Earned</div>
                     </div>
                   </div>
 
@@ -511,6 +573,131 @@ export function ProfileWorkspace({ onBack }) {
               </div>
 
             </div>
+          </div>
+        </div>
+
+        {/* ─────────────────────────────────────────────────────────────
+            MY SAVED TRIPS & ACTIVE ITINERARIES SECTION
+           ───────────────────────────────────────────────────────────── */}
+        <div className="rounded-2xl border border-border/70 bg-card p-6 sm:p-7 shadow-sm space-y-5">
+          {/* Section Header */}
+          <div className="flex items-center justify-between border-b border-border/40 pb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <div>
+                <h2 className="font-heading text-lg sm:text-xl font-extrabold tracking-tight text-foreground">
+                  My Saved Trips
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Saved itineraries from your planner. Mark trips as completed to unlock profile badges!
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSavedTripsModalOpen(true)}
+              className="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer shrink-0"
+            >
+              Open Drawer <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          {/* Saved Trips List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+            {(!savedTrips || savedTrips.length === 0) ? (
+              <div className="col-span-2 text-center py-8 space-y-2 border border-dashed border-border/60 rounded-xl">
+                <Sparkles className="h-8 w-8 text-muted-foreground mx-auto" />
+                <p className="text-xs font-bold text-foreground">No Saved Trips Yet</p>
+                <p className="text-[11px] text-muted-foreground">Build an itinerary in the Planner workspace and click "Save Trip" to see it here.</p>
+              </div>
+            ) : (
+              savedTrips.map((trip) => (
+                <div
+                  key={trip.id}
+                  className="rounded-xl border border-border/80 bg-background/50 p-4 sm:p-5 shadow-xs space-y-3 hover:border-emerald-500/40 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-heading text-base font-extrabold text-foreground">
+                          {trip.destination}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-sm border border-emerald-500/20">
+                          {trip.days} Days Itinerary
+                        </span>
+                        {trip.status === "completed" ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                            <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                            Completed
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-500/30">
+                            <Clock className="h-3 w-3 text-amber-500" />
+                            Saved Trip
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-3 font-medium">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                          {trip.startDate} → {trip.endDate}
+                        </span>
+                        <span>•</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                          ₹{(trip.totalBudget || 18500).toLocaleString("en-IN")} Est.
+                        </span>
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => deleteSavedTrip(trip.id)}
+                      className="text-muted-foreground hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      title="Delete Saved Trip"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/40">
+                    {trip.status !== "completed" && (
+                      <Button
+                        size="sm"
+                        onClick={() => markTripAsCompleted(trip.id)}
+                        className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider px-3.5 py-1.5 shadow-xs flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        Complete Trip
+                      </Button>
+                    )}
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setActiveReportTrip(trip)}
+                      className="rounded-lg text-xs font-bold uppercase tracking-wider px-3 py-1.5 flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <FileText className="h-3.5 w-3.5" />
+                      View Pass
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleLoadTrip(trip)}
+                      className="rounded-lg text-xs font-bold uppercase tracking-wider px-3 py-1.5 flex items-center gap-1 cursor-pointer text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
+                    >
+                      Open Planner
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

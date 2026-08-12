@@ -1061,6 +1061,7 @@ export function TripProvider({ children }) {
       stayTier: stayTier || "Standard",
       totalBudget: totalBudget || 18500,
       itinerary: itinerary && itinerary.length > 0 ? itinerary : initialItinerary,
+      status: "saved",
       createdAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
     }
 
@@ -1077,6 +1078,27 @@ export function TripProvider({ children }) {
 
     setActiveReportTrip(newTrip)
     return newTrip
+  }
+
+  const markTripAsCompleted = (id) => {
+    setSavedTrips((prev) => {
+      const updated = prev.map((t) => {
+        if (t.id === id) {
+          return {
+            ...t,
+            status: "completed",
+            completedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+          }
+        }
+        return t
+      })
+      try {
+        localStorage.setItem("tripnest_saved_trips", JSON.stringify(updated))
+      } catch (e) {
+        console.error(e)
+      }
+      return updated
+    })
   }
 
   const deleteSavedTrip = (id) => {
@@ -1222,6 +1244,7 @@ export function TripProvider({ children }) {
     activeReportTrip,
     setActiveReportTrip,
     saveCurrentTrip,
+    markTripAsCompleted,
     deleteSavedTrip,
 
     budgetOverrides,

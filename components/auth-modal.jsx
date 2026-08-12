@@ -10,6 +10,11 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [dob, setDob] = useState("")
+  const [gender, setGender] = useState("Male")
+  const [language, setLanguage] = useState("English")
+  const [location, setLocation] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState("")
@@ -77,7 +82,18 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
       console.error(e)
     }
     // Default demo user for instant testing
-    const defaultUser = [{ email: "demo@tripnest.com", password: "password123", name: "Alex Rivera" }]
+    const defaultUser = [{
+      email: "demo@tripnest.com",
+      password: "password123",
+      name: "Alex Rivera",
+      phone: "+91 98765 43210",
+      dob: "12 May 2003",
+      gender: "Male",
+      language: "English",
+      location: "Pune, Maharashtra, India",
+      joinedDate: "Joined May 2025",
+      statusBadge: "Explorer"
+    }]
     try {
       localStorage.setItem("tripnest_registered_users", JSON.stringify(defaultUser))
     } catch (e) {}
@@ -107,7 +123,14 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
         const loggedInUser = {
           name: existingUser.name || cleanEmail.split("@")[0],
           email: cleanEmail,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${existingUser.name || cleanEmail}`,
+          phone: existingUser.phone || "+91 98765 43210",
+          dob: existingUser.dob || "12 May 2003",
+          gender: existingUser.gender || "Male",
+          language: existingUser.language || "English",
+          location: existingUser.location || "Pune, Maharashtra, India",
+          joinedDate: existingUser.joinedDate || "Joined May 2025",
+          statusBadge: existingUser.statusBadge || "Explorer",
+          avatar: existingUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${existingUser.name || cleanEmail}`,
           initials: (existingUser.name || cleanEmail).substring(0, 2).toUpperCase(),
         }
 
@@ -124,11 +147,18 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
           return
         }
 
-        // Register new user
+        // Register new user with full details
         const newUserObj = {
           email: cleanEmail,
           password: password,
           name: name.trim() || cleanEmail.split("@")[0],
+          phone: phone.trim() || "+91 98765 43210",
+          dob: dob.trim() || "12 May 2003",
+          gender: gender || "Male",
+          language: language.trim() || "English",
+          location: location.trim() || "Pune, Maharashtra, India",
+          joinedDate: `Joined ${new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}`,
+          statusBadge: "Explorer"
         }
 
         const updatedUsers = [...registeredUsers, newUserObj]
@@ -137,8 +167,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
         } catch (e) {}
 
         const newUser = {
-          name: newUserObj.name,
-          email: cleanEmail,
+          ...newUserObj,
           avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newUserObj.name}`,
           initials: newUserObj.name.substring(0, 2).toUpperCase(),
         }
@@ -327,16 +356,83 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, initialTab = "login"
               <form onSubmit={handleSubmit} className="space-y-4">
                 
                 {tab === "signup" && (
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-white/90">Full Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Alex Rivera"
-                      className="w-full rounded-md border-0 bg-white/90 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner"
-                    />
+                  <div className="space-y-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-white/90">Full Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Alex Rivera"
+                        className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-white/90">Phone Number</label>
+                      <input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+91 98765 43210"
+                        className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-white/90">Date of Birth</label>
+                        <input
+                          type="text"
+                          required
+                          value={dob}
+                          onChange={(e) => setDob(e.target.value)}
+                          placeholder="12 May 2003"
+                          className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-white/90">Gender</label>
+                        <select
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          className="w-full rounded-md border-0 bg-white/90 px-3 py-2 text-xs text-neutral-900 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-semibold"
+                        >
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-white/90">Language</label>
+                        <input
+                          type="text"
+                          required
+                          value={language}
+                          onChange={(e) => setLanguage(e.target.value)}
+                          placeholder="English"
+                          className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-white/90">Location / City</label>
+                        <input
+                          type="text"
+                          required
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          placeholder="Pune, Maharashtra"
+                          className="w-full rounded-md border-0 bg-white/90 px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 shadow-inner font-medium"
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
 

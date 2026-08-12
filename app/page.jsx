@@ -45,21 +45,22 @@ function MainApp() {
     }
   }, [])
 
-  // Guarded View Transition: Require auth for profile/saved features, allow free exploration for planner
+  // Strict Guarded View Transition: Require auth for ALL workspaces when !user
   const handleViewChange = (view, destName) => {
     setIsNavigatingLine(true)
     setTimeout(() => setIsNavigatingLine(false), 700)
 
-    if (destName) {
-      setDestination(destName)
-      generateTripItinerary(destName, days || 3)
-    }
-    if (view === "profile" && !user) {
+    if (view !== "home" && !user) {
       setPendingView(view)
       if (destName) setPendingDestination(destName)
       setAuthInitialTab("login")
       setAuthModalOpen(true)
       return
+    }
+
+    if (destName) {
+      setDestination(destName)
+      generateTripItinerary(destName, days || 3)
     }
     setActiveView(view)
   }
@@ -68,12 +69,27 @@ function MainApp() {
     setIsNavigatingLine(true)
     setTimeout(() => setIsNavigatingLine(false), 700)
 
+    if (!user) {
+      if (destName) setPendingDestination(destName)
+      setPendingView("itinerary")
+      setAuthInitialTab("login")
+      setAuthModalOpen(true)
+      return
+    }
+
     const targetDest = destName || destination || "Goa (India)"
     const targetDays = numDays || days || 3
     setDestination(targetDest)
     generateTripItinerary(targetDest, targetDays)
     setActiveView("itinerary")
   }
+
+  // Force activeView back to home if user logs out while in a workspace
+  useEffect(() => {
+    if (!user && activeView !== "home") {
+      setActiveView("home")
+    }
+  }, [user, activeView])
 
   const handleAuthSuccess = (userData) => {
     setUser(userData)
@@ -82,12 +98,14 @@ function MainApp() {
     } catch (e) {
       console.error(e)
     }
+    const targetView = pendingView || "home"
     if (pendingDestination) {
-      setDestination(pendingDestination)
+      const targetDest = pendingDestination
+      setDestination(targetDest)
+      generateTripItinerary(targetDest, days || 3)
       setPendingDestination(null)
     }
-    // Navigate directly to Overview page on login
-    setActiveView("home")
+    setActiveView(targetView)
     setPendingView(null)
   }
 
@@ -201,15 +219,26 @@ function MainApp() {
       {/* Dedicated Workspace: User Profile & Passport */}
       {activeView === "profile" && (
         <div className="relative z-10 animate-in fade-in duration-300">
-          <ProfileWorkspace onBack={() => handleViewChange("home")} />
+          <ProfileWorkspace
+            onBack={() => handleViewChange("home")}
+            user={user}
+            onUserUpdate={(updatedUser) => {
+              setUser(updatedUser)
+              try {
+                localStorage.setItem("tripnest_user", JSON.stringify(updatedUser))
+              } catch (e) {
+                console.error(e)
+              }
+            }}
+          />
         </div>
       )}
 
       {/* Saved Trips & Offline Summary Report Modal */}
-      <SavedTripsModal onSelectDestination={handleSelectDestination} />
+      <SavedTripsModal onSelectDestination={handleSelectDestination} user={user} onOpenAuth={openAuth} />
 
       {/* Floating AI Travel Concierge Assistant */}
-      <AiChatbot currentView={activeView} onNavigate={handleViewChange} />
+      <AiChatbot currentView={activeView} onNavigate={handleViewChange} user={user} onOpenAuth={openAuth} />
     </main>
   )
 }
