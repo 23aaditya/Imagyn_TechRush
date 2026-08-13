@@ -50,7 +50,8 @@ import {
   Building2,
   Landmark,
   Theater,
-  Star
+  Star,
+  Trash2
 } from "lucide-react"
 
 // ─── Tile Layer Configurations ──────────────────────────────────────────
@@ -176,6 +177,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
   const stayLinesRef = useRef([])
   const proximityRingsRef = useRef([])
   const discoveryFetchRef = useRef(null)
+  const routeAnimTimerRef = useRef(null)
 
   // ─── State ──────────────────────────────────────────────────────────────
   const [activeStyle, setActiveStyle] = useState("voyager")
@@ -196,6 +198,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
   const [discoveryPanelOpen, setDiscoveryPanelOpen] = useState(true)
   const [selectedDiscoveryPlace, setSelectedDiscoveryPlace] = useState(null)
   const [addToDayIndex, setAddToDayIndex] = useState(0)
+  const [searchedLocation, setSearchedLocation] = useState(null)
 
   // ─── Computed: Active discovered places for the selected category ──────
   const activeDiscoveredPlaces = useMemo(() => {
@@ -490,22 +493,54 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
     const marker = L.marker([lat, lng], { icon: searchIcon }).addTo(map)
     searchMarkerRef.current = marker
 
+    setSearchedLocation({
+      title: placeName,
+      fullAddress: result.display_name,
+      lat,
+      lng
+    })
+
     setSelectedMarkerSpot({
       title: placeName,
       cost: "₹500",
       numericCost: 500,
       desc: result.display_name,
       lat,
-      lng
+      lng,
+      isSearchedLocation: true
     })
 
     map.flyTo([lat, lng], 14, { duration: 1.2 })
+  }
+
+  const handleClearSearchedLocation = () => {
+    const map = mapInstanceRef.current
+    if (searchMarkerRef.current && map) {
+      try {
+        map.removeLayer(searchMarkerRef.current)
+      } catch (e) {
+        console.warn(e)
+      }
+      searchMarkerRef.current = null
+    }
+    setSearchedLocation(null)
+    setMapSearchQuery("")
+    setSearchResults([])
+    setShowResultsDropdown(false)
+    if (selectedMarkerSpot?.isSearchedLocation) {
+      setSelectedMarkerSpot(null)
+    }
   }
 
   // ─── Render Map Layers (Markers, Routes, Rings) ───────────────────────
   useEffect(() => {
     const map = mapInstanceRef.current
     if (!map) return
+
+    if (routeAnimTimerRef.current) {
+      clearInterval(routeAnimTimerRef.current)
+      routeAnimTimerRef.current = null
+    }
 
     // Clear existing layers
     markersRef.current.forEach((m) => map.removeLayer(m))
@@ -706,36 +741,69 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       }
 
       // ── OSRM Route Polyline (Progressive Route Draw & Morphing Animation) ──
-      if (routePathCoords.length > 1) {
+      const validCoords = (routePathCoords || []).filter(
+        (pt) => Array.isArray(pt) && pt.length >= 2 && typeof pt[0] === "number" && typeof pt[1] === "number" && !isNaN(pt[0]) && !isNaN(pt[1])
+      )
+
+      if (validCoords.length > 1) {
         const isReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        
+
         if (isReducedMotion) {
-          const glowLine = L.polyline(routePathCoords, { color: "#8493A5", weight: 8, opacity: 0.3, lineCap: "round", lineJoin: "round" })
-          const mainLine = L.polyline(routePathCoords, { color: "#2563EB", weight: 4, opacity: 0.9, lineCap: "round", lineJoin: "round" })
-          const group = L.layerGroup([glowLine, mainLine]).addTo(map)
-          polylineRef.current = group
-        } else {
-          let currentStep = 0
-          const totalSteps = 25
-          const drawInterval = setInterval(() => {
-            currentStep++
-            const progress = currentStep / totalSteps
-            const sliceCount = Math.max(2, Math.floor(routePathCoords.length * progress))
-            const sliceCoords = routePathCoords.slice(0, sliceCount)
-
-            if (polylineRef.current) {
-              map.removeLayer(polylineRef.current)
-            }
-
-            const glowLine = L.polyline(sliceCoords, { color: "#8493A5", weight: 8, opacity: 0.3, lineCap: "round", lineJoin: "round" })
-            const mainLine = L.polyline(sliceCoords, { color: "#2563EB", weight: 4, opacity: 0.9, lineCap: "round", lineJoin: "round" })
+          try {
+            const glowLine = L.polyline(validCoords, { color: "#8493A5", weight: 8, opacity: 0.3, lineCap: "round", lineJoin: "round" })
+            const mainLine = L.polyline(validCoords, { color: "#2563EB", weight: 4, opacity: 0.9, lineCap: "round", lineJoin: "round" })
             const group = L.layerGroup([glowLine, mainLine]).addTo(map)
             polylineRef.current = group
+          } catch (err) {
+            console.warn("Failed to render static polyline:", err)
+          }
+        } else {
+          let currentStep = 0
+          const totalSteps = 20
+          routeAnimTimerRef.current = setInterval(() => {
+            const currentMap = mapInstanceRef.current
+            if (!currentMap) {
+              if (routeAnimTimerRef.current) {
+                clearInterval(routeAnimTimerRef.current)
+                routeAnimTimerRef.current = null
+              }
+              return
+            }
+
+            currentStep++
+            const progress = currentStep / totalSteps
+            const sliceCount = Math.max(2, Math.floor(validCoords.length * progress))
+            const sliceCoords = validCoords.slice(0, sliceCount)
+
+            if (sliceCoords.length >= 2) {
+              try {
+                if (polylineRef.current && currentMap.hasLayer && currentMap.hasLayer(polylineRef.current)) {
+                  currentMap.removeLayer(polylineRef.current)
+                }
+
+                const glowLine = L.polyline(sliceCoords, { color: "#8493A5", weight: 8, opacity: 0.3, lineCap: "round", lineJoin: "round" })
+                const mainLine = L.polyline(sliceCoords, { color: "#2563EB", weight: 4, opacity: 0.9, lineCap: "round", lineJoin: "round" })
+                const group = L.layerGroup([glowLine, mainLine]).addTo(currentMap)
+                polylineRef.current = group
+              } catch (err) {
+                console.warn("Polyline draw step exception:", err)
+              }
+            }
 
             if (currentStep >= totalSteps) {
-              clearInterval(drawInterval)
+              if (routeAnimTimerRef.current) {
+                clearInterval(routeAnimTimerRef.current)
+                routeAnimTimerRef.current = null
+              }
             }
           }, 20)
+        }
+      }
+
+      return () => {
+        if (routeAnimTimerRef.current) {
+          clearInterval(routeAnimTimerRef.current)
+          routeAnimTimerRef.current = null
         }
       }
     }
@@ -819,20 +887,37 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               className="w-full bg-transparent text-xs font-semibold text-foreground outline-none placeholder:text-muted-foreground"
             />
             {mapSearchQuery && (
-              <button type="button" onClick={() => setMapSearchQuery("")} className="text-muted-foreground hover:text-foreground">
+              <button type="button" onClick={handleClearSearchedLocation} className="text-muted-foreground hover:text-rose-500" title="Remove Searched Location">
                 <X className="h-3.5 w-3.5" />
               </button>
             )}
             <button
               type="submit"
               disabled={isSearching}
-              className="rounded-xl bg-[#00356B] text-white hover:bg-[#002852] font-medium text-[11px] uppercase tracking-wider px-4 py-1.5 shrink-0 cursor-pointer shadow-sm font-button"
+              className="rounded-xl bg-[#8d5bb3] text-white hover:bg-[#7a4aa0] font-medium text-[11px] uppercase tracking-wider px-4 py-1.5 shrink-0 cursor-pointer shadow-sm font-button"
             >
               {isSearching ? "..." : "Search"}
             </button>
           </form>
 
-
+          {/* Searched Location Active Pin Badge */}
+          {searchedLocation && (
+            <div className="mt-2 flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-[#8d5bb3] text-white shadow-lg text-xs font-medium backdrop-blur-md border border-white/20">
+              <span className="flex items-center gap-1.5 min-w-0 font-button">
+                <span className="text-amber-300 font-bold">🔍 Pin:</span>
+                <span className="font-semibold truncate max-w-[180px] sm:max-w-[220px]">{searchedLocation.title}</span>
+              </span>
+              <button
+                type="button"
+                onClick={handleClearSearchedLocation}
+                className="flex items-center gap-1 bg-rose-500 hover:bg-rose-600 text-white px-2.5 py-0.5 rounded-lg text-[10px] font-bold transition-all shrink-0 cursor-pointer shadow-xs font-button"
+                title="Remove Searched Location Pin"
+              >
+                <Trash2 className="h-3 w-3" />
+                Remove Pin ✕
+              </button>
+            </div>
+          )}
           {/* Autocomplete Dropdown */}
           {showResultsDropdown && searchResults.length > 0 && (
             <div className="absolute top-12 left-0 right-0 bg-background/95 backdrop-blur-md rounded-xl border border-border shadow-xl overflow-hidden z-50 max-h-64 overflow-y-auto p-2 space-y-1.5">
@@ -846,7 +931,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                     onClick={() => handleSelectSearchResult(res)}
                     className="flex items-start gap-2 text-left flex-1 min-w-0 font-medium text-foreground cursor-pointer"
                   >
-                    <MapPin className="h-4 w-4 text-[#00356B] dark:text-[#86B3E6] shrink-0 mt-0.5" />
+                    <MapPin className="h-4 w-4 text-[#8d5bb3] dark:text-[#86B3E6] shrink-0 mt-0.5" />
                     <span className="line-clamp-2">{res.display_name}</span>
                   </button>
                   <button
@@ -859,7 +944,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                       setShowResultsDropdown(false)
                       mapInstanceRef.current?.flyTo([lat, lng], 14, { duration: 1.2 })
                     }}
-                    className="rounded-lg bg-[#00356B] text-white hover:bg-[#002852] text-[10px] font-medium px-2.5 py-1 shrink-0 cursor-pointer font-button shadow-xs"
+                    className="rounded-lg bg-[#8d5bb3] text-white hover:bg-[#7a4aa0] text-[10px] font-medium px-2.5 py-1 shrink-0 cursor-pointer font-button shadow-xs"
                   >
                     Set as Stay
                   </button>
@@ -879,7 +964,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               onClick={() => setMapMode("discovery")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 text-[11px] font-medium rounded-xl transition-all font-button ${
                 mapMode === "discovery"
-                  ? "bg-[#00356B] text-white shadow-sm"
+                  ? "bg-[#8d5bb3] text-white shadow-sm"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               }`}
             >
@@ -891,7 +976,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               onClick={() => setMapMode("itinerary")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 text-[11px] font-medium rounded-xl transition-all font-button ${
                 mapMode === "itinerary"
-                  ? "bg-[#00356B] text-white shadow-sm"
+                  ? "bg-[#8d5bb3] text-white shadow-sm"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               }`}
             >
@@ -908,7 +993,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                 onClick={() => setActiveDayFilter("all")}
                 className={`px-3 py-1 text-[11px] font-medium rounded-xl transition-all font-button ${
                   activeDayFilter === "all"
-                    ? "bg-[#00356B] text-white shadow-sm"
+                    ? "bg-[#8d5bb3] text-white shadow-sm"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 }`}
               >
@@ -921,7 +1006,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                   onClick={() => setActiveDayFilter(d.day.toString())}
                   className={`px-3 py-1 text-[11px] font-medium rounded-xl transition-all font-button ${
                     activeDayFilter === d.day.toString()
-                      ? "bg-[#00356B] text-white shadow-sm"
+                      ? "bg-[#8d5bb3] text-white shadow-sm"
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   }`}
                 >
@@ -939,7 +1024,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               isAddingStayMode
                 ? "bg-rose-500 text-white border-rose-400 animate-pulse"
                 : activeStay
-                ? "bg-[#00356B] text-white border-[#00356B] shadow-sm"
+                ? "bg-[#8d5bb3] text-white border-[#8d5bb3] shadow-sm"
                 : "bg-background/90 text-foreground border-border hover:bg-accent"
             }`}
           >
@@ -1206,6 +1291,17 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
                 >
                   <Heart className="h-4 w-4 fill-rose-500" />
                 </button>
+                {selectedMarkerSpot.isSearchedLocation && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearchedLocation}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium text-xs cursor-pointer font-button transition-colors"
+                    title="Remove searched pin from map"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Remove Pin
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -1217,41 +1313,16 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
          ═════════════════════════════════════════════════════════════════ */}
       <div className="absolute bottom-3 left-3 right-3 z-[1000] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pointer-events-none">
 
-        {/* Transit Mode & Stats (Itinerary Mode) */}
-        {mapMode === "itinerary" && (
-          <div className="flex items-center gap-2 bg-background/95 backdrop-blur-md p-2 rounded-2xl border border-border shadow-2xl pointer-events-auto overflow-x-auto scrollbar-none">
-            <span className="text-[10px] font-semibold uppercase text-muted-foreground px-1 shrink-0">Transit:</span>
-            {TRANSIT_MODES.map((mode) => {
-              const Icon = mode.icon
-              const isActive = selectedTransit === mode.id
-              return (
-                <button
-                  key={mode.id}
-                  type="button"
-                  onClick={() => setSelectedTransit(mode.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer font-button ${
-                    isActive
-                      ? "bg-[#00356B] text-white shadow-sm"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                  }`}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  <span>{mode.label}</span>
-                </button>
-              )
-            })}
-
-            {totalStats.distanceKm > 0 && (
-              <div className="ml-2 pl-3 border-l border-border flex items-center gap-2 text-xs font-semibold text-[#5B8DEF] shrink-0">
-                {isRoutingLoading ? (
-                  <span className="animate-pulse text-amber-500 font-medium text-[11px]">⚡ Calculating...</span>
-                ) : (
-                  <>
-                    <span>📍 {totalStats.distanceKm} km</span>
-                    <span>•</span>
-                    <span>⏱️ {totalStats.durationText}</span>
-                  </>
-                )}
+        {/* Route Stats (Itinerary Mode) */}
+        {mapMode === "itinerary" && totalStats.distanceKm > 0 && (
+          <div className="flex items-center gap-2 bg-background/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-border shadow-2xl pointer-events-auto shrink-0 font-button">
+            {isRoutingLoading ? (
+              <span className="animate-pulse text-amber-500 font-medium text-[11px]">⚡ Calculating route...</span>
+            ) : (
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#5B8DEF]">
+                <span>📍 {totalStats.distanceKm} km</span>
+                <span>•</span>
+                <span>⏱️ {totalStats.durationText}</span>
               </div>
             )}
           </div>

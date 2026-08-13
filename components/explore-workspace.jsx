@@ -441,7 +441,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
               <div className="flex flex-col gap-2.5">
                 <Button
                   onClick={() => onExplore(destination.name)}
-                  className="w-full rounded-xl py-2.5 text-xs font-medium uppercase tracking-wider text-white shadow-md transition bg-[#00356B] hover:bg-[#002852] cursor-pointer font-button"
+                  className="w-full rounded-xl py-2.5 text-xs font-medium uppercase tracking-wider text-white shadow-md transition bg-[#8d5bb3] hover:bg-[#7a4aa0] cursor-pointer font-button"
                 >
                   <Sparkles className="mr-1.5 h-4 w-4 text-amber-300" />
                   Customize Itinerary directly in Planner
@@ -531,7 +531,7 @@ function DetailPanel({ destination, position, onClose, onExplore, onNavigateView
                 <Button
                   size="sm"
                   onClick={() => onExplore(destination.name)}
-                  className="rounded-xl bg-[#00356B] text-white text-xs font-medium px-4 py-2 hover:bg-[#002852] cursor-pointer shadow-md font-button"
+                  className="rounded-xl bg-[#8d5bb3] text-white text-xs font-medium px-4 py-2 hover:bg-[#7a4aa0] cursor-pointer shadow-md font-button"
                 >
                   <Sparkles className="mr-1.5 h-3.5 w-3.5" />
                   Customize Itinerary
