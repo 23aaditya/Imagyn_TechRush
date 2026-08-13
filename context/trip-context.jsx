@@ -1011,6 +1011,62 @@ export function TripProvider({ children }) {
   // Group Members & Person-Wise Expense Splitting State
   const [groupMembers, setGroupMembers] = useState(["Aaditya", "Rohan", "Priya"])
 
+  // Sync group members count automatically with travelers parameter
+  useEffect(() => {
+    const DEFAULT_NAMES = ["Aaditya", "Rohan", "Priya", "Ananya", "Karan", "Sneha", "Vikram", "Neha", "Rahul", "Pooja"]
+    setGroupMembers((prev) => {
+      const targetCount = travelers || 2
+      if (prev.length === targetCount) return prev
+      if (prev.length < targetCount) {
+        const added = []
+        for (let i = prev.length; i < targetCount; i++) {
+          added.push(DEFAULT_NAMES[i] || `Traveler ${i + 1}`)
+        }
+        return [...prev, ...added]
+      } else {
+        return prev.slice(0, targetCount)
+      }
+    })
+  }, [travelers])
+
+  // Sync itinerary days length automatically with days parameter
+  useEffect(() => {
+    setItinerary((prev) => {
+      if (!prev || prev.length === 0) return prev
+      const targetDays = days || 3
+      if (prev.length === targetDays) return prev
+      if (prev.length > targetDays) {
+        return prev.slice(0, targetDays)
+      } else {
+        const updated = [...prev]
+        for (let d = prev.length + 1; d <= targetDays; d++) {
+          updated.push({
+            day: d,
+            title: `Day ${d}: Local Explorations`,
+            date: `Aug ${14 + d}`,
+            activities: [
+              {
+                id: `spot-auto-d${d}-s1-${Date.now()}`,
+                time: "10:00 AM",
+                openingHours: "09:00 AM - 06:00 PM",
+                type: "Sightseeing",
+                category: "Activities",
+                title: `${destination || "Trip"} Day ${d} Highlight`,
+                desc: `Curated local attraction for Day ${d}.`,
+                cost: "₹650",
+                numericCost: 650,
+                lat: 15.55 + d * 0.01,
+                lng: 73.75 + d * 0.01,
+                images: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"]
+              }
+            ]
+          })
+        }
+        return updated
+      }
+    })
+  }, [days, destination])
+
   const addActualExpense = (expense) => {
     const newEntry = {
       id: Date.now(),

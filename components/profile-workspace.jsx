@@ -314,6 +314,141 @@ const VISITED_PLACES_BADGES = [
   }
 ]
 
+/* ─────────────────────────────────────────────
+   THEME-MATCHED CUSTOMIZABLE DOB CALENDAR PICKER
+   ───────────────────────────────────────────── */
+const DOB_MONTHS_FULL = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+]
+const DOB_MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+const DOB_YEARS = Array.from({ length: 80 }, (_, i) => 2026 - i)
+
+function DobCalendarPicker({ value, onChange }) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const parseDob = (val) => {
+    if (!val) return { day: 12, month: 4, year: 2003 }
+    const parts = val.trim().split(/[\s\/-]+/)
+    if (parts.length === 3) {
+      const d = parseInt(parts[0], 10)
+      const y = parseInt(parts[2], 10) || parseInt(parts[0], 10)
+      const mIdx = DOB_MONTHS_SHORT.findIndex((m) => m.toLowerCase() === parts[1].toLowerCase())
+      if (!isNaN(d) && mIdx !== -1 && !isNaN(y) && y > 1900) {
+        return { day: Math.min(31, Math.max(1, d)), month: mIdx, year: y }
+      }
+      const yIso = parseInt(parts[0], 10)
+      const mIso = parseInt(parts[1], 10) - 1
+      const dIso = parseInt(parts[2], 10)
+      if (!isNaN(yIso) && !isNaN(mIso) && !isNaN(dIso) && yIso > 1900) {
+        return { day: Math.min(31, Math.max(1, dIso)), month: Math.min(11, Math.max(0, mIso)), year: yIso }
+      }
+    }
+    return { day: 12, month: 4, year: 2003 }
+  }
+
+  const parsed = parseDob(value)
+  const [selectedDay, setSelectedDay] = useState(parsed.day)
+  const [viewMonth, setViewMonth] = useState(parsed.month)
+  const [viewYear, setViewYear] = useState(parsed.year)
+
+  useEffect(() => {
+    const p = parseDob(value)
+    setSelectedDay(p.day)
+    setViewMonth(p.month)
+    setViewYear(p.year)
+  }, [value, isOpen])
+
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate()
+  const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay()
+
+  const handleSelectDay = (day) => {
+    setSelectedDay(day)
+    const formatted = `${String(day).padStart(2, "0")} ${DOB_MONTHS_SHORT[viewMonth]} ${viewYear}`
+    onChange(formatted)
+    setIsOpen(false)
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between rounded-lg border border-border bg-background p-2.5 text-xs font-semibold text-foreground outline-none focus:border-emerald-500 hover:border-emerald-500/50 transition-all text-left cursor-pointer font-button"
+      >
+        <div className="flex items-center gap-2 truncate">
+          <Calendar className="h-4 w-4 text-emerald-500 shrink-0" />
+          <span>{value || "Select Date of Birth"}</span>
+        </div>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div className="absolute bottom-full mb-1.5 sm:bottom-auto sm:top-full sm:mt-1.5 left-0 z-50 w-72 rounded-xl border border-border bg-card p-4 shadow-2xl space-y-3 font-button text-foreground">
+            <div className="flex items-center justify-between gap-1.5 border-b border-border/60 pb-2.5">
+              <select
+                value={viewMonth}
+                onChange={(e) => setViewMonth(parseInt(e.target.value, 10))}
+                className="rounded-md border border-border bg-background px-2 py-1 text-xs font-bold text-foreground outline-none focus:border-emerald-500 cursor-pointer"
+              >
+                {DOB_MONTHS_FULL.map((m, idx) => (
+                  <option key={m} value={idx}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={viewYear}
+                onChange={(e) => setViewYear(parseInt(e.target.value, 10))}
+                className="rounded-md border border-border bg-background px-2 py-1 text-xs font-bold text-foreground outline-none focus:border-emerald-500 cursor-pointer"
+              >
+                {DOB_YEARS.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-7 text-center text-[10px] font-extrabold text-muted-foreground uppercase">
+              {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+                <span key={d}>{d}</span>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: firstDayOfWeek }).map((_, i) => (
+                <div key={`empty-${i}`} />
+              ))}
+
+              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((dayNum) => {
+                const isSelected = selectedDay === dayNum
+                return (
+                  <button
+                    key={dayNum}
+                    type="button"
+                    onClick={() => handleSelectDay(dayNum)}
+                    className={`h-7 w-7 rounded-lg text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-emerald-500 text-white shadow-md scale-105"
+                        : "hover:bg-accent text-foreground"
+                    }`}
+                  >
+                    {dayNum}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 export function ProfileWorkspace({ onBack, user, onUserUpdate }) {
   const {
     savedTrips,
@@ -1088,11 +1223,9 @@ export function ProfileWorkspace({ onBack, user, onUserUpdate }) {
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block mb-1 font-bold text-muted-foreground">Date of Birth</label>
-                    <input
-                      type="text"
+                    <DobCalendarPicker
                       value={editForm.dob}
-                      onChange={(e) => setEditForm({ ...editForm, dob: e.target.value })}
-                      className="w-full rounded-lg border border-border bg-background p-2.5 text-xs font-semibold text-foreground outline-none focus:border-emerald-500"
+                      onChange={(newDob) => setEditForm({ ...editForm, dob: newDob })}
                     />
                   </div>
 

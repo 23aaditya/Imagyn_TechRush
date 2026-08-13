@@ -1347,16 +1347,6 @@ export function PackageComparison({ onNavigateView, onSelectDestination, onOpenA
                 </div>
               </div>
 
-              {/* Right CTA Block */}
-              <div className="flex flex-col sm:flex-row md:flex-col items-center gap-3 shrink-0 w-full md:w-auto">
-                <Button
-                  onClick={() => handleAddToTrip(decisionData.recommendedPkg)}
-                  className="w-full sm:w-auto rounded-sm bg-[#8D5BB3] hover:bg-[#7b4d9e] text-white border border-[#8D5BB3] font-bold text-xs uppercase tracking-wider px-5 py-2.5 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Plus className="h-4 w-4" />
-                  Select {decisionData.recommendedPkg.destination} Trip
-                </Button>
-              </div>
             </div>
           </motion.div>
         )}

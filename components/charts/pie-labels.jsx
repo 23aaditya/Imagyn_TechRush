@@ -4,9 +4,15 @@ import { usePieStable, usePieHover } from "./pie-context"
 
 export function PieLabels({
   hoverColor = "#513229",
+  darkHoverColor = "#ffffff",
   labelRadiusOffset = 28,
   onHoverChange
 }) {
+  // Detect dark mode at render time via the class on <html>
+  const isDark =
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark")
+  const resolvedHoverColor = isDark ? darkHoverColor : hoverColor
   const { arcs, outerRadius } = usePieStable()
   const { hoveredIndex } = usePieHover()
 
@@ -49,7 +55,7 @@ export function PieLabels({
             onMouseEnter={() => onHoverChange && onHoverChange(index)}
             onMouseLeave={() => onHoverChange && onHoverChange(null)}
             style={{
-              fill: isHovered ? hoverColor : "currentColor",
+              fill: isHovered ? resolvedHoverColor : "currentColor",
               fontSize: isHovered ? "16.5px" : "15px",
               fontWeight: isHovered ? 900 : 750,
             }}

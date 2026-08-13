@@ -32,7 +32,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useTrip } from "@/context/trip-context"
 import { DoodleBackground } from "@/components/doodle-background"
-import { ExpenseEntranceLoader } from "@/components/expense-entrance-loader"
+
 
 // Category Bags Configuration for Low-Resistance Quick Logging
 const CATEGORY_BAGS = [
@@ -200,8 +200,6 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
     return () => clearInterval(timer)
   }, [])
 
-  // Entrance Loader state (Only triggers once on workspace mount)
-  const [showEntranceLoader, setShowEntranceLoader] = useState(isWorkspace)
 
   // Profile Selector: 'current' | 'person-wise' | 'past'
   const [activeProfile, setActiveProfile] = useState("current")
@@ -241,14 +239,27 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
       }))
 
   // Initial fallback actual logs (linked directly to initial Goa itinerary spots if actualExpenses is empty)
-  const displayActualExpenses = actualExpenses.length > 0 ? actualExpenses : [
-    { id: 101, title: "Artjuna Cafe Breakfast & Smoothies", category: "Food & Dining", amount: 950, isPaid: true, day: "Day 1", date: "Aug 15", paidBy: "Aaditya" },
-    { id: 102, title: "Fort Aguada Entrance & Museum", category: "Tickets & Entry", amount: 400, isPaid: true, day: "Day 1", date: "Aug 15", paidBy: "Rohan" },
-    { id: 103, title: "Thalassa Cliffside Greek Dinner", category: "Food & Dining", amount: 3250, isPaid: true, day: "Day 1", date: "Aug 15", paidBy: "Rohan" },
-    { id: 104, title: "Baga & Calangute Water Sports", category: "Activities", amount: 3600, isPaid: true, day: "Day 2", date: "Aug 16", paidBy: "Priya" },
-    { id: 105, title: "Fisherman's Wharf Seafood", category: "Food & Dining", amount: 1900, isPaid: true, day: "Day 2", date: "Aug 16", paidBy: "Aaditya" },
-    { id: 106, title: "Anjuna Flea Market Souvenirs", category: "Shopping", amount: 3000, isPaid: true, day: "Day 3", date: "Aug 17", paidBy: "Rohan" }
-  ]
+  const displayActualExpenses = useMemo(() => {
+    const raw = actualExpenses.length > 0 ? actualExpenses : [
+      { id: 101, title: "Artjuna Cafe Breakfast & Smoothies", category: "Food & Dining", amount: 950, isPaid: true, day: "Day 1", date: "Aug 15", paidBy: "Aaditya" },
+      { id: 102, title: "Fort Aguada Entrance & Museum", category: "Tickets & Entry", amount: 400, isPaid: true, day: "Day 1", date: "Aug 15", paidBy: "Rohan" },
+      { id: 103, title: "Thalassa Cliffside Greek Dinner", category: "Food & Dining", amount: 3250, isPaid: true, day: "Day 1", date: "Aug 15", paidBy: "Rohan" },
+      { id: 104, title: "Baga & Calangute Water Sports", category: "Activities", amount: 3600, isPaid: true, day: "Day 2", date: "Aug 16", paidBy: "Aaditya" },
+      { id: 105, title: "Fisherman's Wharf Seafood", category: "Food & Dining", amount: 1900, isPaid: true, day: "Day 2", date: "Aug 16", paidBy: "Aaditya" },
+      { id: 106, title: "Anjuna Flea Market Souvenirs", category: "Shopping", amount: 3000, isPaid: true, day: "Day 3", date: "Aug 17", paidBy: "Rohan" }
+    ]
+
+    const maxDays = tripDaysCount || 3
+    return raw
+      .filter((exp) => {
+        const dNum = parseInt(String(exp.day).replace(/[^\d]/g, ""), 10)
+        return !dNum || isNaN(dNum) || dNum <= maxDays
+      })
+      .map((exp) => ({
+        ...exp,
+        paidBy: exp.paidBy && members.includes(exp.paidBy) ? exp.paidBy : (members[0] || "Aaditya")
+      }))
+  }, [actualExpenses, tripDaysCount, members])
 
   // Person-Wise Calculations
   const memberPaidTotals = useMemo(() => {
@@ -374,12 +385,6 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
 
   return (
     <section id="tracker" className={`relative w-full overflow-hidden ${isWorkspace ? "min-h-screen bg-background dark:bg-[#11100E] text-[#2F3E4E] dark:text-[#F1ECE2] pt-24 pb-28" : "py-20 md:py-28 bg-background"}`}>
-      {/* Expense Tracker Entrance Animation Overlay ("Every Expense Has a Place") */}
-      <AnimatePresence>
-        {isWorkspace && showEntranceLoader && (
-          <ExpenseEntranceLoader onComplete={() => setShowEntranceLoader(false)} />
-        )}
-      </AnimatePresence>
 
       {/* Travel Doodles Background */}
       <DoodleBackground />
@@ -1062,7 +1067,7 @@ export function ExpenseTracker({ isWorkspace = false, onBack }) {
                             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-0.5">
                               <span className="font-semibold text-foreground">{exp.category}</span>
                               <span>• {exp.day}</span>
-                              <span className="text-[10px] font-bold bg-secondary px-2 py-0.5 rounded-sm text-muted-foreground">
+                              <span className="text-[10px] font-bold bg-secondary px-2 py-0.5 rounded-sm text-black dark:text-black">
                                 Split {members.length} ways (₹{perPersonSplit.toLocaleString("en-IN")}/person)
                               </span>
                             </div>

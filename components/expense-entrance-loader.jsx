@@ -2,130 +2,163 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Utensils, Ticket, Hotel, Car, CheckCircle2 } from "lucide-react"
+import { Utensils, Ticket, Hotel, Car, ShoppingBag } from "lucide-react"
 
 /* ─────────────────────────────────────────────
-   EXPENSE TRACKER ENTRANCE ANIMATION (PURE MONOCHROME WHITE & BLACK)
-   Concept: Different types of travel bills (Food, Ticket, Hotel, Taxi)
-   floating in, getting logged, and exiting smoothly.
+   EXPENSE TRACKER ENTRANCE ANIMATION
+   Concept: A travel ledger sheet that builds row-by-row,
+   with a purple scanner sweep, then a total tallies up.
+   Total runtime: 2000ms
    ───────────────────────────────────────────── */
-export function ExpenseEntranceLoader({ onComplete }) {
-  const [activeBillIdx, setActiveBillIdx] = useState(0)
-  const [showText, setShowText] = useState(false)
+const ENTRIES = [
+  { icon: Utensils,    label: "Food & Dining",   amount: "₹850",   color: "#f97316" },
+  { icon: Ticket,      label: "Entry Tickets",    amount: "₹400",   color: "#8b5cf6" },
+  { icon: Hotel,       label: "Accommodation",    amount: "₹3,500", color: "#06b6d4" },
+  { icon: Car,         label: "Transport",        amount: "₹1,200", color: "#10b981" },
+  { icon: ShoppingBag, label: "Shopping",         amount: "₹650",   color: "#ec4899" },
+]
 
-  const bills = [
-    { id: 1, type: "Food & Dining", title: "Cafe & Breakfast Bill", amount: "₹850", icon: Utensils, tag: "Food Bill" },
-    { id: 2, type: "Tickets & Entry", title: "Fort Entrance & Tour Pass", amount: "₹400", icon: Ticket, tag: "Ticket Pass" },
-    { id: 3, type: "Accommodation", title: "Resort & Stay Invoice", amount: "₹3,500", icon: Hotel, tag: "Hotel Stay" },
-    { id: 4, type: "Transport & Fuel", title: "Taxi & Cab Fare", amount: "₹1,200", icon: Car, tag: "Taxi Fare" }
-  ]
+const STAGGER_MS = 270
+const SCAN_DELAY = 80
+const DONE_MS    = 2000
+
+export function ExpenseEntranceLoader({ onComplete }) {
+  const [visibleRows, setVisibleRows] = useState(0)
+  const [scanDone, setScanDone]       = useState(false)
 
   useEffect(() => {
-    // Reduced motion preference
-    const prefersReducedMotion =
+    if (
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
-
-    if (prefersReducedMotion) {
-      const tReduced = setTimeout(() => {
-        if (onComplete) onComplete()
-      }, 700)
-      return () => clearTimeout(tReduced)
+    ) {
+      const t = setTimeout(() => onComplete?.(), 600)
+      return () => clearTimeout(t)
     }
 
-    const t1 = setTimeout(() => setActiveBillIdx(1), 400)
-    const t2 = setTimeout(() => setActiveBillIdx(2), 800)
-    const t3 = setTimeout(() => setActiveBillIdx(3), 1200)
-    const tText = setTimeout(() => setShowText(true), 1100)
+    const timers = ENTRIES.map((_, i) =>
+      setTimeout(() => setVisibleRows(i + 1), SCAN_DELAY + i * STAGGER_MS)
+    )
 
-    const tEnd = setTimeout(() => {
-      if (onComplete) onComplete()
-    }, 1950)
+    const tScan = setTimeout(
+      () => setScanDone(true),
+      SCAN_DELAY + ENTRIES.length * STAGGER_MS + 120
+    )
+
+    const tDone = setTimeout(() => onComplete?.(), DONE_MS)
 
     return () => {
-      clearTimeout(t1)
-      clearTimeout(t2)
-      clearTimeout(t3)
-      clearTimeout(tText)
-      clearTimeout(tEnd)
+      timers.forEach(clearTimeout)
+      clearTimeout(tScan)
+      clearTimeout(tDone)
     }
   }, [onComplete])
 
-  const currentBill = bills[activeBillIdx] || bills[0]
-  const IconComp = currentBill.icon
+  const total = ENTRIES.reduce(
+    (sum, e) => sum + parseInt(e.amount.replace(/[^0-9]/g, ""), 10),
+    0
+  )
 
   return (
-    <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-xl overflow-hidden select-none">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.25 } }}
+      className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/88 backdrop-blur-xl select-none"
+    >
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="h-72 w-72 rounded-full bg-[#8E5AB5]/20 blur-3xl" />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.3 } }}
-        className="w-full max-w-md text-center flex flex-col items-center justify-center space-y-7 relative z-10 text-white font-button"
+        initial={{ opacity: 0, y: 18, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+        className="relative w-full max-w-sm mx-4 z-10"
       >
-        {/* Ambient Soft White Glow */}
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 h-56 w-80 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+        {/* Ledger card */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-2xl shadow-2xl overflow-hidden">
 
-        {/* Floating Bills Container (Bills Come & Go Sequentially) */}
-        <div className="relative w-72 h-44 flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentBill.id}
-              initial={{ opacity: 0, y: 25, scale: 0.9, rotate: -2 }}
-              animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, y: -25, scale: 0.9, rotate: 2 }}
-              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-              className="w-64 rounded-2xl border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-2xl text-left relative overflow-hidden"
-            >
-              {/* Top Bill Badge Header */}
-              <div className="flex items-center justify-between border-b border-white/15 pb-2 mb-3">
-                <span className="text-[10px] font-normal uppercase tracking-widest text-white/80">
-                  {currentBill.tag}
-                </span>
-                <span className="flex items-center gap-1 text-[10px] text-white/80 font-normal">
-                  <CheckCircle2 className="h-3 w-3 text-white" /> Logged
-                </span>
-              </div>
+          {/* Header strip */}
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-white/[0.04]">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
+              Trip Ledger
+            </span>
+            <span className="text-[10px] font-mono font-bold text-[#8E5AB5]">
+              {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+            </span>
+          </div>
 
-              {/* Bill Details */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 border border-white/25 text-white">
-                    <IconComp className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-normal text-white">{currentBill.title}</h4>
-                    <span className="text-[10px] font-normal text-white/70">{currentBill.type}</span>
-                  </div>
-                </div>
-                <span className="text-sm font-normal text-white">{currentBill.amount}</span>
-              </div>
+          {/* Rows */}
+          <div className="px-5 py-4 relative">
+            {/* Scanning line — sweeps downward as rows appear */}
+            <AnimatePresence>
+              {visibleRows > 0 && !scanDone && (
+                <motion.div
+                  key="scan"
+                  initial={{ top: "0%" }}
+                  animate={{ top: `${(visibleRows / ENTRIES.length) * 100}%` }}
+                  transition={{ type: "tween", ease: "linear", duration: STAGGER_MS / 1000 }}
+                  className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#8E5AB5] to-transparent pointer-events-none z-10"
+                />
+              )}
+            </AnimatePresence>
 
-              {/* Bottom Subtle Dotted Receipt Line */}
-              <div className="mt-3 pt-2 border-t border-dashed border-white/15 flex items-center justify-between text-[9px] text-white/60">
-                <span>Verified Entry</span>
-                <span>TripNest Sync</span>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+            <div className="space-y-0">
+              {ENTRIES.map((entry, i) => {
+                const Icon = entry.icon
+                const isVisible = i < visibleRows
+                return (
+                  <motion.div
+                    key={entry.label}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex items-center justify-between py-2.5 border-b border-white/[0.06] last:border-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${entry.color}22`, border: `1px solid ${entry.color}44` }}
+                      >
+                        <Icon className="h-3.5 w-3.5" style={{ color: entry.color }} />
+                      </div>
+                      <span className="text-xs font-medium text-white/80">{entry.label}</span>
+                    </div>
+                    <span className="text-xs font-bold font-mono text-white">{entry.amount}</span>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Total row — appears after all entries */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: visibleRows >= ENTRIES.length ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center justify-between px-5 py-3.5 border-t border-white/10 bg-white/[0.04]"
+          >
+            <span className="text-xs font-bold uppercase tracking-wider text-white/40">Total</span>
+            <span className="font-mono font-extrabold text-sm text-[#8E5AB5]">
+              ₹{total.toLocaleString("en-IN")}
+            </span>
+          </motion.div>
         </div>
 
-        {/* Text Reveal ("Know where every rupee goes.") */}
-        <div className="min-h-[28px] flex items-center justify-center">
-          <AnimatePresence>
-            {showText && (
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="font-button text-sm sm:text-base font-medium tracking-wide text-white drop-shadow-sm"
-              >
-                Know where every rupee goes.
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
+        {/* Tagline */}
+        <motion.p
+          initial={{ opacity: 0, y: 6 }}
+          animate={{
+            opacity: visibleRows >= ENTRIES.length ? 1 : 0,
+            y: visibleRows >= ENTRIES.length ? 0 : 6,
+          }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-5 text-center text-sm font-medium text-white/50 tracking-wide"
+        >
+          Know where every rupee goes.
+        </motion.p>
       </motion.div>
-    </div>
+    </motion.div>
   )
 }
