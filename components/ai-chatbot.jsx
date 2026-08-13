@@ -705,7 +705,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
           const targetDest = actionMatch[2] // optional destination
 
           const viewLabels = {
-            itinerary: `🚀 Open Planner ${targetDest ? `for ${targetDest}` : ""}`,
+            itinerary: `Open Itinerary Workspace${targetDest ? ` for ${targetDest}` : ""}`,
             budget: "💰 Open Budget Calculator",
             expenses: "📊 Open Expense Tracker",
             explore: `🌍 Explore ${targetDest || "World Destinations"}`,
@@ -726,9 +726,9 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
                   onNavigate?.(targetView)
                   setIsOpen(false)
                 }}
-                className="w-full rounded-2xl bg-amber-400 text-[#0D2B45] hover:bg-amber-300 font-extrabold text-xs py-2 shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-[1.02]"
+                className="w-full rounded-xl bg-[#8d5bb3] text-white hover:bg-[#7a4aa0] font-semibold text-xs py-1.5 shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-[1.01] font-button"
               >
-                <Compass className="h-4 w-4" />
+                <Compass className="h-3.5 w-3.5" />
                 {btnText}
               </Button>
             </div>
@@ -1094,7 +1094,7 @@ export function AiChatbot({ currentView, onNavigate, user, onOpenAuth }) {
                         )}
 
                         {/* Location Action CTA Button */}
-                        {msg.isLocationAction && (
+                        {msg.isLocationAction && !msg.content?.includes("[ACTION:navigate:") && (
                           <Button
                             size="sm"
                             onClick={() => {
