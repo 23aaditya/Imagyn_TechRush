@@ -537,7 +537,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
             <svg viewBox="0 0 384 512" width="44" height="52" fill="#EF4444">
               <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z"/>
             </svg>
-            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: white; font-size: 18px;">📍</div>
+            <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: white; border-radius: 50%;"></div>
             <div style="
               position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
               width: 52px; height: 52px; border-radius: 50%;
@@ -832,22 +832,7 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
             </button>
           </form>
 
-          {/* Contextual Search Chips */}
-          <div className="flex items-center gap-1.5 mt-2 overflow-x-auto scrollbar-none">
-            {SMART_SEARCH_CHIPS.map((chip, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => {
-                  setMapSearchQuery(chip)
-                  handleMapLocationSearch(chip)
-                }}
-                className="px-2.5 py-1 rounded-lg bg-background/90 backdrop-blur-md border border-border text-[10px] font-medium text-foreground hover:bg-[#00356B]/10 hover:border-[#00356B] transition-colors shrink-0 shadow-xs cursor-pointer font-button"
-              >
-                {chip}
-              </button>
-            ))}
-          </div>
+
           {/* Autocomplete Dropdown */}
           {showResultsDropdown && searchResults.length > 0 && (
             <div className="absolute top-12 left-0 right-0 bg-background/95 backdrop-blur-md rounded-xl border border-border shadow-xl overflow-hidden z-50 max-h-64 overflow-y-auto p-2 space-y-1.5">
@@ -965,79 +950,28 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       </div>
 
       {/* ═════════════════════════════════════════════════════════════════
-          2. DISCOVERY CATEGORY TABS BAR
-         ═════════════════════════════════════════════════════════════════ */}
-      {mapMode === "discovery" && (
-        <div className="absolute top-16 left-3 right-3 z-[1000] pointer-events-none">
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pointer-events-auto">
-            {DISCOVERY_CATEGORIES.map((cat) => {
-              const Icon = cat.icon
-              const isActive = activeDiscoveryCategory === cat.id
-              const count = discoveredPlaces?.[cat.id]?.length || 0
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setActiveDiscoveryCategory(cat.id)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-medium transition-all shrink-0 cursor-pointer backdrop-blur-md border shadow-lg font-button ${
-                    isActive
-                      ? "text-white shadow-md"
-                      : "bg-background/90 text-muted-foreground border-border hover:bg-accent hover:text-foreground"
-                  }`}
-                  style={isActive ? { backgroundColor: cat.color, borderColor: cat.color } : {}}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  <span>{cat.label}</span>
-                  {count > 0 && (
-                    <span className={`ml-0.5 text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${
-                      isActive ? "bg-white/25" : "bg-accent"
-                    }`}>
-                      {count}
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ═════════════════════════════════════════════════════════════════
           3. MAIN MAP BODY — FLEX CONTAINER WITH LEFT DISCOVERY PANEL
          ═════════════════════════════════════════════════════════════════ */}
-      <div className="flex flex-1 h-full w-full relative overflow-hidden pt-28 sm:pt-16">
+      <div className="flex flex-1 h-full w-full relative overflow-hidden pt-16">
         {/* Discovery Side Panel (Left Side Outside Map) */}
-        {activeStay && discoveryPanelOpen && mapMode === "discovery" && (
-          <div className="w-72 sm:w-80 h-full border-r border-border bg-background/95 backdrop-blur-md flex flex-col shrink-0 z-20 overflow-hidden shadow-md">
-            {/* Panel Header */}
-            <div className="p-3 border-b border-border flex items-center justify-between">
-              <div>
-                <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  {isDiscoveryLoading ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-[#E60023]" />
-                  ) : (
-                    <Sparkles className="h-3.5 w-3.5 text-[#E60023]" />
-                  )}
-                  {DISCOVERY_CATEGORIES.find((c) => c.id === activeDiscoveryCategory)?.label || "Nearby"} near Stay
-                </h4>
-                <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
-                  📍 {activeStay.name || "Your Hotel"} • {(discoveryRadius / 1000).toFixed(0)}km radius
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDiscoveryPanelOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Radius Slider */}
-            <div className="px-3 py-2 border-b border-border">
-              <div className="flex items-center justify-between text-[10px] font-medium text-muted-foreground mb-1">
-                <span>Search Radius</span>
-                <span className="text-[#E60023] font-semibold">{(discoveryRadius / 1000).toFixed(0)} km</span>
+        {discoveryPanelOpen && mapMode === "discovery" && (
+          <div className="w-72 sm:w-80 h-full border-r border-border bg-white flex flex-col shrink-0 z-20 overflow-hidden shadow-md">
+            {/* Search Radius & Top-Right Close Button Header */}
+            <div className="p-3 border-b border-border bg-white">
+              <div className="flex items-center justify-between mb-1.5 font-button">
+                <span className="text-xs font-semibold text-foreground">Search Radius</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[#E60023] font-semibold text-xs font-button">{(discoveryRadius / 1000).toFixed(0)} km</span>
+                  <button
+                    type="button"
+                    onClick={() => setDiscoveryPanelOpen(false)}
+                    className="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer transition-colors"
+                    title="Close Map Sidebar"
+                    aria-label="Close Map Sidebar"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
               <input
                 type="range"
@@ -1053,55 +987,60 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
               />
             </div>
 
-            {/* Places List */}
-            <div className="flex-1 overflow-y-auto p-2 space-y-1.5 scrollbar-none">
+            {/* Places List (All icons removed per instructions) */}
+            <div className="flex-1 overflow-y-auto p-2 space-y-1.5 scrollbar-none bg-white">
               {isDiscoveryLoading ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <Loader2 className="h-6 w-6 animate-spin text-[#E60023] mb-2" />
-                  <span className="text-xs font-medium">Discovering nearby places...</span>
+                  <span className="text-xs font-medium font-button">Discovering nearby places...</span>
                 </div>
               ) : activeDiscoveredPlaces.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                  <MapPin className="h-6 w-6 mb-2 opacity-40" />
-                  <span className="text-xs font-medium">No places found</span>
-                  <span className="text-[10px] mt-1">Try increasing the radius</span>
+                  <span className="text-xs font-medium font-button">No places found</span>
+                  <span className="text-[10px] mt-1 font-button text-muted-foreground">Try increasing the radius</span>
                 </div>
               ) : (
-                activeDiscoveredPlaces.map((place) => {
-                  const ring = getDistanceRing(place.distanceKm)
-                  const isSelected = selectedDiscoveryPlace?.id === place.id
-                  return (
-                    <button
-                      key={place.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedDiscoveryPlace(place)
-                        const map = mapInstanceRef.current
-                        if (map) map.flyTo([place.lat, place.lng], 16, { duration: 0.8 })
-                      }}
-                      className={`w-full text-left p-2.5 rounded-xl transition-all ${
-                        isSelected
-                          ? "bg-[#E60023]/10 border-[#E60023] border"
-                          : "hover:bg-accent border border-transparent"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[11px] font-semibold text-foreground line-clamp-1">{place.name}</p>
-                          <div className="flex items-center gap-1.5 mt-1">
-                            <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${ring.color}20`, color: ring.color }}>
-                              {ring.emoji} {place.distanceKm.toFixed(1)} km
-                            </span>
-                            <span className="text-[9px] font-medium text-muted-foreground">
-                              ~₹{place.estimatedCabCost} cab
-                            </span>
+                <>
+                  {activeDiscoveredPlaces.map((place) => {
+                    const isSelected = selectedDiscoveryPlace?.id === place.id
+                    return (
+                      <button
+                        key={place.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedDiscoveryPlace(place)
+                          const map = mapInstanceRef.current
+                          if (map) map.flyTo([place.lat, place.lng], 16, { duration: 0.8 })
+                        }}
+                        className={`w-full text-left p-2.5 rounded-xl transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-[#E60023]/10 border-[#E60023] border"
+                            : "hover:bg-accent border border-transparent"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-semibold text-foreground line-clamp-1 font-button">{place.name}</p>
+                            <div className="flex items-center gap-2 mt-1 font-button">
+                              <span className="text-[10px] font-medium text-muted-foreground">
+                                {place.distanceKm.toFixed(1)} km
+                              </span>
+                              <span className="text-[10px] font-medium text-muted-foreground">
+                                ~₹{place.estimatedCabCost} cab
+                              </span>
+                            </div>
                           </div>
+                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-1" />
                         </div>
-                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-1" />
-                      </div>
-                    </button>
-                  )
-                })
+                      </button>
+                    )
+                  })}
+                  {/* Bottom item with NO location icon */}
+                  <div className="w-full text-left p-2.5 rounded-xl border border-transparent text-[11px] font-semibold text-foreground flex items-center justify-between font-button mt-1">
+                    <span>Neugi Nagar {activeDiscoveredPlaces.length} {DISCOVERY_CATEGORIES.find((c) => c.id === activeDiscoveryCategory)?.label || "Places"} found</span>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  </div>
+                </>
               )}
             </div>
           </div>

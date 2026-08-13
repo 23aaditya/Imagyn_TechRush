@@ -5,20 +5,23 @@ export function Footer({ onNavigateView }) {
     <footer className="relative w-full border-t border-border/60 bg-card px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-6">
         
-        {/* Official TripNest Imagyn Logo */}
+        {/* Official TripNest Imagyn Text Branding */}
         <button
           suppressHydrationWarning
           onClick={() => {
             onNavigateView?.("home")
             window.scrollTo({ top: 0, behavior: "smooth" })
           }}
-          className="flex items-center text-left focus:outline-none group cursor-pointer"
+          className="flex flex-col items-center text-center focus:outline-none group cursor-pointer font-button"
+          aria-label="TripNest Homepage"
         >
-          <img
-            src="/tripnest-logo.png"
-            alt="TripNest Imagyn"
-            className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
-          />
+          <span className="font-heading text-2xl font-extrabold tracking-tight leading-none">
+            <span className="text-[#0075FF]">Trip</span>
+            <span className="text-[#0B2545] dark:text-white">nest</span>
+          </span>
+          <span className="text-[9px] font-semibold text-muted-foreground tracking-[0.25em] lowercase mt-1">
+            imagyn
+          </span>
         </button>
 
         {/* Essential Navigation Links */}

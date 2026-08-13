@@ -93,17 +93,19 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
       )}
     >
       <nav className="container-responsive flex items-center justify-between gap-1.5 sm:gap-4 py-2.5 sm:py-3">
-        {/* Official TripNest Imagyn Logo */}
+        {/* Official TripNest Imagyn Text Branding */}
         <button
           onClick={() => handleNavClick("home")}
-          className="flex items-center text-left focus:outline-none group py-0.5 bg-transparent border-none cursor-pointer shrink-0"
+          className="flex flex-col items-center focus:outline-none group py-0.5 bg-transparent border-none cursor-pointer shrink-0 text-center font-button"
           aria-label="TripNest Homepage"
         >
-          <img
-            src="/tripnest-logo.png"
-            alt="TripNest by Imagyn"
-            className="h-6 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105"
-          />
+          <span className="font-heading text-xl sm:text-2xl font-extrabold tracking-tight leading-none">
+            <span className="text-[#0075FF]">Trip</span>
+            <span className="text-[#0B2545] dark:text-white">nest</span>
+          </span>
+          <span className="text-[9px] font-semibold text-muted-foreground tracking-[0.25em] lowercase mt-1">
+            imagyn
+          </span>
         </button>
 
         {/* Top Navbar Menu Links (Clean underline for active view, no blue background) */}
@@ -275,19 +277,19 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "100%", opacity: 0 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-md h-full bg-[#0B0D11] border-l border-white/15 shadow-2xl flex flex-col overflow-hidden text-white"
+              className="w-full max-w-md h-full bg-white dark:bg-[#0B0D11] border-l border-neutral-200 dark:border-white/15 shadow-2xl flex flex-col overflow-hidden text-neutral-900 dark:text-white transition-colors"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#12151C] shrink-0">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-[#12151C] shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-amber-400 border border-white/10">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10 dark:bg-white/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 dark:border-white/10">
                     <ShieldAlert className="h-4 w-4" />
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-base text-white leading-tight">
+                    <h3 className="font-heading font-semibold text-base text-neutral-900 dark:text-white leading-tight">
                       Travel Alerts
                     </h3>
-                    <p className="text-[11px] text-neutral-400 font-medium">
+                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">
                       Live crowd & safety context
                     </p>
                   </div>
@@ -295,14 +297,14 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
 
                 <div className="flex items-center gap-2">
                   {unreadAlertCount > 0 && (
-                    <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/15 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30">
                       {unreadAlertCount} Active
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => setIsAlertCenterOpen(false)}
-                    className="h-8 w-8 flex items-center justify-center rounded-xl text-neutral-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                    className="h-8 w-8 flex items-center justify-center rounded-xl text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200/60 dark:hover:bg-white/10 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -311,15 +313,15 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
 
               {/* Push Permission Prompt */}
               {notificationPermission !== "granted" && (
-                <div className="p-3.5 mx-4 mt-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs shrink-0">
+                <div className="p-3.5 mx-4 mt-4 rounded-2xl bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 flex items-center justify-between text-xs shrink-0">
                   <div className="space-y-0.5">
-                    <span className="font-semibold text-white">Background Push Advisories</span>
-                    <p className="text-[11px] text-neutral-400">Get notified when site is closed</p>
+                    <span className="font-semibold text-neutral-900 dark:text-white">Background Alerts</span>
+                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Get notified when a site is closed</p>
                   </div>
                   <Button
                     size="sm"
                     onClick={requestNotifications}
-                    className="rounded-xl bg-white text-black hover:bg-neutral-200 text-xs font-semibold px-3 py-1 font-button shadow-xs cursor-pointer"
+                    className="rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 text-xs font-semibold px-3 py-1 font-button shadow-xs cursor-pointer"
                   >
                     Enable
                   </Button>
@@ -328,17 +330,17 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
 
               {/* Swipe Hint for Mobile */}
               {alerts.length > 0 && (
-                <div className="px-4 pt-3 text-[10px] text-neutral-500 font-medium text-center uppercase tracking-wider flex items-center justify-center gap-1.5 shrink-0">
-                  <span>← Swipe left to dismiss alert</span>
+                <div className="px-4 pt-3 text-[10px] text-neutral-400 dark:text-neutral-500 font-medium text-center uppercase tracking-wider flex items-center justify-center gap-1.5 shrink-0">
+                  <span>— Swipe left to dismiss —</span>
                 </div>
               )}
 
               {/* Alerts List */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {alerts.length === 0 ? (
-                  <div className="py-16 text-center text-neutral-400 text-xs space-y-2">
-                    <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto opacity-80" />
-                    <p className="font-medium text-white">All clear around your itinerary</p>
+                  <div className="py-16 text-center text-neutral-500 dark:text-neutral-400 text-xs space-y-2">
+                    <CheckCircle2 className="h-8 w-8 text-emerald-500 dark:text-emerald-400 mx-auto opacity-80" />
+                    <p className="font-medium text-neutral-900 dark:text-white">All clear around your itinerary</p>
                     <p className="text-[11px]">No active crowd or safety alerts</p>
                   </div>
                 ) : (
@@ -371,30 +373,30 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                         </div>
 
                         {/* Foreground Alert Card */}
-                        <div className="relative bg-[#151821] border border-white/10 rounded-2xl p-4 space-y-3 text-left shadow-md">
+                        <div className="relative bg-neutral-50 dark:bg-[#151821] border border-neutral-200 dark:border-white/10 rounded-2xl p-4 space-y-3 text-left shadow-sm dark:shadow-md">
                           <div className="flex items-center justify-between gap-2">
                             <span
                               className={cn(
                                 "text-[10px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-md border",
                                 isSafety
-                                  ? "bg-rose-500/20 border-rose-500/40 text-rose-300"
+                                  ? "bg-rose-500/15 dark:bg-rose-500/20 border-rose-500/30 dark:border-rose-500/40 text-rose-700 dark:text-rose-300"
                                   : alt.severity >= 2
-                                  ? "bg-amber-500/20 border-amber-500/40 text-amber-300"
-                                  : "bg-neutral-800 border-white/10 text-neutral-300"
+                                  ? "bg-amber-500/15 dark:bg-amber-500/20 border-amber-500/30 dark:border-amber-500/40 text-amber-800 dark:text-amber-300"
+                                  : "bg-neutral-200/60 dark:bg-neutral-800 border-neutral-300/60 dark:border-white/10 text-neutral-700 dark:text-neutral-300"
                               )}
                             >
                               {severityMeta.label}
                             </span>
 
                             <div className="flex items-center gap-2">
-                              <span className="text-[11px] text-neutral-400 font-medium">
+                              <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">
                                 {alt.timestamp}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => dismissAlert(alt.id)}
                                 title="Dismiss Alert"
-                                className="text-neutral-500 hover:text-neutral-300 p-0.5 transition-colors cursor-pointer"
+                                className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 p-0.5 transition-colors cursor-pointer"
                               >
                                 <X className="h-3.5 w-3.5" />
                               </button>
@@ -402,31 +404,31 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                           </div>
 
                           <div>
-                            <h4 className="font-heading font-semibold text-sm text-white flex items-center gap-1.5">
+                            <h4 className="font-heading font-bold text-sm text-neutral-900 dark:text-white flex items-center gap-1.5">
                               {alt.placeName}
-                              <span className="text-neutral-500">•</span>
-                              <span className="font-normal text-neutral-300">{alt.title}</span>
+                              <span className="text-neutral-400 dark:text-neutral-500">•</span>
+                              <span className="font-normal text-neutral-600 dark:text-neutral-300">{alt.title}</span>
                             </h4>
-                            <p className="text-xs text-neutral-300 mt-1 leading-relaxed">
+                            <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1 leading-relaxed">
                               {alt.message}
                             </p>
                           </div>
 
-                          <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-xs space-y-1">
-                            <div className="font-medium text-[11px] text-amber-300">
-                              Recommended Action
+                          <div className="p-3 rounded-xl bg-neutral-100/80 dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 text-xs space-y-1">
+                            <div className="font-semibold text-[11px] text-amber-800 dark:text-amber-300">
+                              Recommended action
                             </div>
-                            <p className="text-xs text-neutral-300 leading-normal">
+                            <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-normal">
                               {alt.recommendation}
                             </p>
                             {alt.peakHours && (
-                              <p className="text-[11px] text-neutral-400 pt-0.5 font-mono">
+                              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 pt-0.5 font-mono">
                                 Peak: {alt.peakHours}
                               </p>
                             )}
                           </div>
 
-                          <div className="flex items-center justify-between pt-1 border-t border-white/10 text-[11px] text-neutral-400">
+                          <div className="flex items-center justify-between pt-1 border-t border-neutral-200/80 dark:border-white/10 text-[11px] text-neutral-500 dark:text-neutral-400">
                             <span>{alt.source}</span>
                             <button
                               type="button"
@@ -439,7 +441,7 @@ export function Navbar({ activeView = "home", setActiveView, user, onLogout, onO
                                   })
                                 )
                               }}
-                              className="font-medium text-sky-400 hover:text-sky-300 hover:underline cursor-pointer font-button"
+                              className="font-semibold text-[#0075FF] dark:text-sky-400 hover:underline cursor-pointer font-button"
                             >
                               Focus in Itinerary →
                             </button>

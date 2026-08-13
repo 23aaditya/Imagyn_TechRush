@@ -931,7 +931,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
       {/* Dynamic Edge-to-Edge Master Two-Panel Layout Region (No floating box margin, no side gaps) */}
       <div
         id="notebook-spread-container"
-        className="w-full border-y border-border/80 bg-card overflow-hidden flex flex-col lg:flex-row gap-0 items-stretch my-2 transition-all rounded-none"
+        className="w-full border-y border-border/80 bg-white overflow-hidden flex flex-col lg:flex-row gap-0 items-stretch my-2 transition-all rounded-none"
       >
           {/* LEFT SIDE: Map (Slides in from Left) OR Preferences Panel */}
           <AnimatePresence mode="wait">
@@ -945,10 +945,10 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 style={{
                   width: typeof window !== "undefined" && window.innerWidth >= 1024 ? `${mapSplitPercent}%` : "100%"
                 }}
-                className="relative flex flex-col h-[640px] border-b lg:border-b-0 lg:border-r border-border/80 shrink-0 bg-background overflow-hidden shadow-[inset_-12px_0_20px_-8px_rgba(0,0,0,0.06)]"
+                className="relative flex flex-col h-[640px] border-b lg:border-b-0 lg:border-r border-border/80 shrink-0 bg-white overflow-hidden shadow-[inset_-12px_0_20px_-8px_rgba(0,0,0,0.06)]"
               >
                 {/* Minimal Left Page Atlas Header */}
-                <div className="flex items-center justify-between px-4 py-2 border-b border-border/60 bg-card/90 text-xs font-semibold text-muted-foreground shrink-0 font-button">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-border/60 bg-white text-xs font-semibold text-muted-foreground shrink-0 font-button">
                   <span className="flex items-center gap-1.5 text-[#8E5AB5] dark:text-[#86B3E6] font-heading">
                     <Compass className="h-3.5 w-3.5 text-[#8E5AB5] dark:text-[#86B3E6]" />
                     Atlas Map Page
@@ -978,7 +978,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
                 style={{
                   width: typeof window !== "undefined" && window.innerWidth >= 1024 ? `${mapSplitPercent}%` : "100%"
                 }}
-                className="relative flex flex-col border-b lg:border-b-0 lg:border-r border-border/80 bg-card p-6 space-y-6 shrink-0 shadow-[inset_-12px_0_20px_-8px_rgba(0,0,0,0.06)] overflow-y-auto max-h-[640px]"
+                className="relative flex flex-col border-b lg:border-b-0 lg:border-r border-border/80 bg-white p-6 space-y-6 shrink-0 shadow-[inset_-12px_0_20px_-8px_rgba(0,0,0,0.06)] overflow-y-auto max-h-[640px]"
               >
                 <div className="border-b border-border/80 pb-4 space-y-1">
                   <div className="flex items-center justify-between">
@@ -1242,7 +1242,7 @@ export function ItineraryPlanner({ onBack, onNavigateView }) {
             style={{
               width: typeof window !== "undefined" && window.innerWidth >= 1024 ? `${100 - mapSplitPercent}%` : "100%"
             }}
-            className="flex-1 flex flex-col p-5 sm:p-7 space-y-6 overflow-y-auto bg-card"
+            className="flex-1 flex flex-col p-5 sm:p-7 space-y-6 overflow-y-auto bg-white"
           >
             {/* Full-Screen Centered Backdrop Blur Loader */}
             <AnimatePresence>
