@@ -1035,6 +1035,46 @@ export function TripMap({ spots = [], nearbyPlaces = [], hoveredSpotId, onSpotCl
       </div>
 
       {/* ═════════════════════════════════════════════════════════════════
+          2. DISCOVERY CATEGORY TABS BAR (Positioned to the right of side panel)
+         ═════════════════════════════════════════════════════════════════ */}
+      {mapMode === "discovery" && (
+        <div className={`absolute top-16 z-30 pointer-events-none transition-all duration-200 ${
+          discoveryPanelOpen ? "left-76 sm:left-84 right-3" : "left-3 right-3"
+        }`}>
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pointer-events-auto py-1">
+            {DISCOVERY_CATEGORIES.map((cat) => {
+              const Icon = cat.icon
+              const isActive = activeDiscoveryCategory === cat.id
+              const count = discoveredPlaces?.[cat.id]?.length || 0
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setActiveDiscoveryCategory(cat.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-medium transition-all shrink-0 cursor-pointer backdrop-blur-md border shadow-md font-button ${
+                    isActive
+                      ? "text-white shadow-md scale-105"
+                      : "bg-white/95 text-neutral-700 border-neutral-200 hover:bg-white hover:text-neutral-900"
+                  }`}
+                  style={isActive ? { backgroundColor: cat.color, borderColor: cat.color } : {}}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{cat.label}</span>
+                  {count > 0 && (
+                    <span className={`ml-0.5 text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${
+                      isActive ? "bg-white/25 text-white" : "bg-neutral-100 text-neutral-800"
+                    }`}>
+                      {count}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════
           3. MAIN MAP BODY — FLEX CONTAINER WITH LEFT DISCOVERY PANEL
          ═════════════════════════════════════════════════════════════════ */}
       <div className="flex flex-1 h-full w-full relative overflow-hidden pt-16">
